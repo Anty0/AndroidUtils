@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="CardView">
+        <attr name="cardViewTheme" format="reference"/>
+    </declare-styleable>
+    <declare-styleable name="Theme">
+        <attr name="appBarOverlay" format="reference"/>
+        <attr name="popupOverlay" format="reference"/>
+    </declare-styleable>
+
+</resources>

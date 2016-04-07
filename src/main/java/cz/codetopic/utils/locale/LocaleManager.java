@@ -1,0 +1,95 @@
+package cz.codetopic.utils.locale;
+
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+
+import java.util.Locale;
+
+import cz.codetopic.utils.R;
+import cz.codetopic.utils.module.data.ModuleDataGetter;
+
+/**
+ * Created by anty on 25.3.16.
+ *
+ * @author anty
+ */
+public class LocaleManager {
+
+    private static final String LOG_TAG = "LocaleManager";
+
+    private static Context mContext = null;
+    private static ModuleDataGetter<?, LocaleData> mLocaleDataGetter = null;
+
+    /**
+     * Must be called in Application.onCreate()
+     *
+     * @param app              application
+     * @param localeDataGetter ModuleDataGetter of LocaleData for saving changes
+     */
+    public static void initialize(@NonNull Application app, @NonNull ModuleDataGetter<?, LocaleData> localeDataGetter) {// TODO: 26.3.16 initialize in ApplicationBase
+        if (mContext != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
+        mContext = app.getBaseContext();
+        mLocaleDataGetter = localeDataGetter;
+        restoreLocale();
+    }
+
+    public static void showLanguageChangeDialog(Activity activity, String[] locales, @Nullable final Runnable onChange) {
+        final RadioGroup radioGroup = new RadioGroup(activity);
+        radioGroup.setOrientation(LinearLayout.VERTICAL);
+
+        for (int i = 0, localesLength = locales.length; i < localesLength; i++) {
+            String lang = locales[i];
+            RadioButton radioButton = new RadioButton(activity);
+            radioButton.setText(new Locale(lang).getDisplayLanguage());
+            radioButton.setTag(lang);
+            radioButton.setId(i);
+            radioGroup.addView(radioButton);
+        }
+
+        RadioButton radioButton = (RadioButton) radioGroup.findViewWithTag(mLocaleDataGetter.get().getActualLanguage());
+        if (radioButton != null) radioGroup.check(radioButton.getId());
+
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.dialog_title_select_language)
+                .setView(radioGroup)
+                .setPositiveButton(R.string.but_ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        setLocale((String) radioGroup.findViewById(radioGroup
+                                .getCheckedRadioButtonId()).getTag());
+                        if (onChange != null) onChange.run();
+                    }
+                })
+                .setCancelable(true)
+                .setNeutralButton(R.string.but_cancel, null)
+                .show();
+    }
+
+    public static void setLocale(String language) {
+        applyLocale(language);
+        mLocaleDataGetter.get().setLanguage(language);
+    }
+
+    private static void restoreLocale() {
+        String lang = mLocaleDataGetter.get().getLanguage();
+        if (lang != null) applyLocale(lang);
+    }
+
+    private static void applyLocale(String language) {
+        Resources res = mContext.getResources();
+        Configuration conf = res.getConfiguration();
+        conf.locale = new Locale(language);
+        res.updateConfiguration(conf, res.getDisplayMetrics());
+    }
+
+}
