@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <cz.anty.purkynkamanager.utils.list.recyclerView.base.EmptyRecyclerView
+        <eu.anty.purkynkamanager.utils.list.recyclerView.base.EmptyRecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
