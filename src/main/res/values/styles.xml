@@ -12,22 +12,34 @@
 
     </style>
 
-    <style name="DefaultTheme.Base" parent="Theme.AppCompat">
+    <style name="DefaultTheme.Base" parent="Theme.AppCompat.Light">
         <item name="colorPrimary">@color/defaultColorPrimary</item>
         <item name="colorPrimaryDark">@color/defaultColorPrimaryDark</item>
         <item name="colorAccent">@color/defaultColorAccent</item>
+        <item name="cardViewTheme">@style/CardView.Light</item>
+        <item name="appBarOverlay">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="popupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="titleTextAppearance">@style/TextAppearance.AppCompat.Large.Inverse</item>
     </style>
 
-    <style name="DefaultTheme.NoActionBar.Base" parent="Theme.AppCompat.NoActionBar">
+    <style name="DefaultTheme.NoActionBar.Base" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/defaultColorPrimary</item>
         <item name="colorPrimaryDark">@color/defaultColorPrimaryDark</item>
         <item name="colorAccent">@color/defaultColorAccent</item>
+        <item name="cardViewTheme">@style/CardView.Light</item>
+        <item name="appBarOverlay">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="popupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="titleTextAppearance">@style/TextAppearance.AppCompat.Large.Inverse</item>
     </style>
 
-    <style name="DefaultTheme.Dialog.Base" parent="Theme.AppCompat.Dialog">
+    <style name="DefaultTheme.Dialog.Base" parent="Theme.AppCompat.Light.Dialog">
         <item name="colorPrimary">@color/defaultColorPrimary</item>
         <item name="colorPrimaryDark">@color/defaultColorPrimaryDark</item>
         <item name="colorAccent">@color/defaultColorAccent</item>
+        <item name="cardViewTheme">@style/CardView.Light</item>
+        <item name="appBarOverlay">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
+        <item name="popupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
+        <item name="titleTextAppearance">@style/TextAppearance.AppCompat.Large.Inverse</item>
     </style>-->
 
 </resources>

@@ -110,7 +110,7 @@ public class ModulesDashboardFragment extends NavigationFragment {
     @Nullable
     @Override
     public View onCreateContentView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mRecyclerManager = Recycler.apply().withoutSwipeToRefresh().on(inflater, container, false);
+        mRecyclerManager = Recycler.inflate().withoutSwipeToRefresh().on(inflater, container, false);
 
         synchronized (mAdapterLock) {
             mRecyclerManager.setAdapter(mAdapter);

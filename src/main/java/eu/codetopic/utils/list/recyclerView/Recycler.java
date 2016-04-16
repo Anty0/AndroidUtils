@@ -12,7 +12,7 @@ public final class Recycler {
     private Recycler() {
     }
 
-    public static RecyclerInflater apply() {
+    public static RecyclerInflater inflate() {
         return new RecyclerInflater();
     }
 

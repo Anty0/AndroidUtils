@@ -15,6 +15,9 @@ public class IteratorWrapper<E> implements Iterator<E> {
         mBase = base;
     }
 
+    public Iterator<E> getBase() {
+        return mBase;
+    }
 
     @Override
     public boolean hasNext() {

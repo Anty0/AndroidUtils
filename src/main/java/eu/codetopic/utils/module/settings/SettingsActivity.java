@@ -46,7 +46,7 @@ public class SettingsActivity extends BackButtonActivity {
             }));
         }
 
-        Recycler.apply().withoutSwipeToRefresh().on(this)
+        Recycler.inflate().withoutSwipeToRefresh().on(this)
                 .setAdapter(cardItems.toArray(new MultilineCardItem[cardItems.size()]));
     }
 }

@@ -1,5 +1,6 @@
 package eu.codetopic.utils.list.recyclerView.adapter;
 
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v7.widget.RecyclerView;
 
@@ -7,11 +8,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
+import eu.codetopic.utils.IteratorWrapper;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
-import eu.codetopic.utils.exceptions.NonUiThreadUsedException;
-import eu.codetopic.utils.thread.JobUtils;
 
 /**
  * Created by anty on 21.2.16.
@@ -25,7 +26,6 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
 
     private final Object mLock = new Object();
     private final ArrayList<T> mData = new ArrayList<>();
-    private Editor<T> mEditorInstance = null;
 
     public ArrayEditRecyclerAdapter() {
 
@@ -85,18 +85,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
     @Override
     public Iterator<T> iterator() {
         synchronized (mLock) {
-            final Iterator<T> base = mData.iterator();
-            return new Iterator<T>() {
-                @Override
-                public boolean hasNext() {
-                    return base.hasNext();
-                }
-
-                @Override
-                public T next() {
-                    return base.next();
-                }
-
+            return new IteratorWrapper<T>(mData.iterator()) {
                 @Override
                 public void remove() {
                     throw new UnsupportedOperationException("Not supported");
@@ -106,219 +95,183 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
     }
 
     public Editor<T> edit() {
-        synchronized (mLock) {
-            if (mEditorInstance != null) {
-                throw new IllegalStateException("edit() called on " + LOG_TAG +
-                        " before cancel() or apply() called on previous editor");
-            }
-            mEditorInstance = new Editor<>(this);
-            return mEditorInstance;
-        }
+        return new Editor<>(this);
     }
 
-    protected void onDataEdited(Object editorTag) {
-
+    public void postModifications(Collection<Modification<T>> modifications) {
+        postModifications(null, modifications);
     }
 
     @UiThread
+    public void postModifications(@Nullable Object editTag, Collection<Modification<T>> modifications) {
+        synchronized (mLock) {
+            //noinspection unchecked
+            List<T> mDataBackup = (List<T>) mData.clone();
+            for (Modification<T> modification : modifications)
+                modification.modify(mData);
+
+            for (Iterator<T> iterator = mDataBackup.iterator(); iterator.hasNext(); ) {
+                T obj = iterator.next();
+                if (!mData.contains(obj)) {
+                    notifyItemRemoved(mDataBackup.indexOf(obj));
+                    iterator.remove();
+                }
+            }
+
+            for (int i = 0, mNewDataSize = mData.size(); i < mNewDataSize; i++) {
+                T obj = mData.get(i);
+                if (!mDataBackup.contains(obj)) {
+                    mDataBackup.add(i, obj);
+                    notifyItemInserted(i);
+                    continue;
+                }
+
+                int oldIndex = mDataBackup.indexOf(obj);
+                if (oldIndex != i) {
+                    notifyItemMoved(oldIndex, i);
+                    mDataBackup.remove(obj);
+                    mDataBackup.add(i, obj);
+                }
+            }
+
+            if (!Objects.equals(mDataBackup, mData)) {// TODO: 16.4.16 only if is in debug mode
+                Error e = new InternalError("Detected problem in " + LOG_TAG + " while applying changes");
+                Log.e(LOG_TAG, "apply", e);
+            }
+            onDataEdited(editTag);
+        }
+    }
+
+    protected void onDataEdited(@Nullable Object editTag) {
+
+    }
+
+    public interface Modification<T> {
+        void modify(List<T> toModify);
+    }
+
     public static class Editor<T> {
 
         private static final String LOG_TAG = ArrayEditRecyclerAdapter.LOG_TAG + "$Editor";
 
         private final ArrayEditRecyclerAdapter<T, ?> mAdapter;
-        private final ArrayList<T> mDataBackup;
-        private final ArrayList<T> mNewData;
-        private final Object mLock;
+        private final ArrayList<Modification<T>> mModifications = new ArrayList<>();
         private Object mTag = null;
 
-        @SuppressWarnings("unchecked")
         private Editor(ArrayEditRecyclerAdapter<T, ?> adapter) {
             mAdapter = adapter;
-            mLock = mAdapter.mLock;
-            synchronized (mLock) {
-                mNewData = (ArrayList<T>) mAdapter.mData.clone();
-                mDataBackup = (ArrayList<T>) mAdapter.mData.clone();
-            }
         }
 
-        public Editor<T> setTag(Object tag) {
+        public synchronized Object getTag() {
+            return mTag;
+        }
+
+        public synchronized Editor<T> setTag(@Nullable Object tag) {
             this.mTag = tag;
             return this;
         }
 
-        public Editor<T> add(T object) {
-            synchronized (mLock) {
-                mNewData.add(object);
-            }
+        public synchronized Editor<T> post(Modification<T> modification) {
+            mModifications.add(modification);
             return this;
         }
 
-        public Editor<T> add(int index, T object) {
-            synchronized (mLock) {
-                mNewData.add(index, object);
-            }
-            return this;
+        public Editor<T> add(final T object) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.add(object);
+                }
+            });
         }
 
-        public Editor<T> addAll(Collection<? extends T> collection) {
-            synchronized (mLock) {
-                mNewData.addAll(collection);
-            }
-            return this;
+        public Editor<T> add(final int index, final T object) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.add(index, object);
+                }
+            });
         }
 
-        public Editor<T> addAll(int index, Collection<? extends T> collection) {
-            synchronized (mLock) {
-                mNewData.addAll(index, collection);
-            }
-            return this;
+        public Editor<T> addAll(final Collection<? extends T> collection) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.addAll(collection);
+                }
+            });
         }
 
-        public T get(int index) {
-            synchronized (mLock) {
-                return mNewData.get(index);
-            }
+        public Editor<T> addAll(final int index, final Collection<? extends T> collection) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.addAll(index, collection);
+                }
+            });
         }
 
         public Editor<T> clear() {
-            synchronized (mLock) {
-                mNewData.clear();
-            }
-            return this;
-        }
-
-        public int size() {
-            synchronized (mLock) {
-                return mNewData.size();
-            }
-        }
-
-        public boolean isEmpty() {
-            synchronized (mLock) {
-                return mNewData.isEmpty();
-            }
-        }
-
-        public boolean contains(Object object) {
-            synchronized (mLock) {
-                //noinspection SuspiciousMethodCalls
-                return mNewData.contains(object);
-            }
-        }
-
-        public int indexOf(Object object) {
-            synchronized (mLock) {
-                //noinspection SuspiciousMethodCalls
-                return mNewData.indexOf(object);
-            }
-        }
-
-        public Editor<T> remove(int index) {
-            synchronized (mLock) {
-                mNewData.remove(index);
-            }
-            return this;
-        }
-
-        public Editor<T> remove(Object object) {
-            synchronized (mLock) {
-                //noinspection SuspiciousMethodCalls
-                mNewData.remove(object);
-            }
-            return this;
-        }
-
-        public Editor<T> set(int index, T object) {
-            synchronized (mLock) {
-                mNewData.set(index, object);
-            }
-            return this;
-        }
-
-        public Object[] toArray() {
-            synchronized (mLock) {
-                return mNewData.toArray();
-            }
-        }
-
-        public <E> E[] toArray(E[] contents) {
-            synchronized (mLock) {
-                //noinspection SuspiciousToArrayCall
-                return mNewData.toArray(contents);
-            }
-        }
-
-        public boolean containsAll(Collection<?> collection) {
-            synchronized (mLock) {
-                return mNewData.containsAll(collection);
-            }
-        }
-
-        public boolean removeAll(Collection<?> collection) {
-            synchronized (mLock) {
-                //noinspection SuspiciousMethodCalls
-                return mNewData.removeAll(collection);
-            }
-        }
-
-        public boolean retainAll(Collection<?> collection) {
-            synchronized (mLock) {
-                return mNewData.retainAll(collection);
-            }
-        }
-
-        public boolean apply() {
-            synchronized (mLock) {
-                if (!JobUtils.isOnMainThread())
-                    throw new NonUiThreadUsedException("apply() must be called on ui thread");
-                if (!cancel()) return false;
-
-                mAdapter.mData.clear();
-
-                for (Iterator<T> iterator = mDataBackup.iterator(); iterator.hasNext(); ) {
-                    T obj = iterator.next();
-                    if (!mNewData.contains(obj)) {
-                        mAdapter.notifyItemRemoved(mDataBackup.indexOf(obj));
-                        iterator.remove();
-                    }
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.clear();
                 }
-
-                for (int i = 0, mNewDataSize = mNewData.size(); i < mNewDataSize; i++) {
-                    T obj = mNewData.get(i);
-                    if (!mDataBackup.contains(obj)) {
-                        mDataBackup.add(i, obj);
-                        mAdapter.notifyItemInserted(i);
-                        continue;
-                    }
-
-                    int oldIndex = mDataBackup.indexOf(obj);
-                    if (oldIndex != i) {
-                        mAdapter.notifyItemMoved(oldIndex, i);
-                        mDataBackup.remove(obj);
-                        mDataBackup.add(i, obj);
-                    }
-                }
-
-                if (!Objects.equals(mDataBackup, mNewData)) {
-                    Error e = new InternalError("Detected problem in " + LOG_TAG + " while applying changes");
-                    Log.e(LOG_TAG, "apply", e);
-                }
-                mAdapter.mData.addAll(mNewData);
-                mAdapter.onDataEdited(mTag);
-                return true;
-            }
+            });
         }
 
-        public boolean cancel() {
-            synchronized (mLock) {
-                if (mAdapter.mEditorInstance != this) {
-                    Exception e = new IllegalStateException("cancel() called on canceled editor");
-                    Log.e(LOG_TAG, "cancel", e);
-                    return false;
+        public Editor<T> remove(final int index) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.remove(index);
                 }
-                mAdapter.mEditorInstance = null;
-                return true;
-            }
+            });
+        }
+
+        public Editor<T> remove(final Object object) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    //noinspection SuspiciousMethodCalls
+                    toModify.remove(object);
+                }
+            });
+        }
+
+        public Editor<T> set(final int index, final T object) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.set(index, object);
+                }
+            });
+        }
+
+        public Editor<T> removeAll(final Collection<?> collection) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    //noinspection SuspiciousMethodCalls
+                    toModify.removeAll(collection);
+                }
+            });
+        }
+
+        public Editor<T> retainAll(final Collection<?> collection) {
+            return post(new Modification<T>() {
+                @Override
+                public void modify(List<T> toModify) {
+                    toModify.retainAll(collection);
+                }
+            });
+        }
+
+        @UiThread
+        public synchronized void apply() {
+            mAdapter.postModifications(getTag(), mModifications);
+            mModifications.clear();
         }
     }
 

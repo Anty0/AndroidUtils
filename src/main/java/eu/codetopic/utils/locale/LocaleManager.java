@@ -59,7 +59,7 @@ public class LocaleManager {
         RadioButton radioButton = (RadioButton) radioGroup.findViewWithTag(mLocaleDataGetter.get().getActualLanguage());
         if (radioButton != null) radioGroup.check(radioButton.getId());
 
-        new AlertDialog.Builder(activity)
+        new AlertDialog.Builder(activity)// TODO: 10.4.16 use dialog activity
                 .setTitle(R.string.dialog_title_select_language)
                 .setView(radioGroup)
                 .setPositiveButton(R.string.but_ok, new DialogInterface.OnClickListener() {
