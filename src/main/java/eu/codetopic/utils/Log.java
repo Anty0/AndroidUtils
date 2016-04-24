@@ -262,6 +262,12 @@ public class Log {
         return DEBUG_MODE;
     }
 
+    public static synchronized void initDebugMode(boolean debugMode) {
+        if (INITIALIZED) throw new IllegalStateException("Log is still initialized");
+        INITIALIZED = true;
+        DEBUG_MODE = debugMode;
+    }
+
     public static synchronized void initDebugMode(Application app, @NonNull final DataGetter
             <? extends DebugProviderData> debugDataGetter) {// TODO: 8.3.16 initialize Log in ApplicationBase
         if (INITIALIZED) throw new IllegalStateException("Log is still initialized");

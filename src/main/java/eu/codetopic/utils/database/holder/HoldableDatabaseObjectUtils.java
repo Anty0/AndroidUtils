@@ -39,7 +39,9 @@ public final class HoldableDatabaseObjectUtils {
             result = FieldsSearch.getFields(new SimpleFieldsFilter(clazz)
                     .addCalssesToFind(DatabaseObjectHolder.class, DatabaseObjectHolder[].class)
                     .addAnnotationsToDeepSearch(ScanForHolders.class));
-            Log.d(LOG_TAG, "getHolderFieldsOf for " + clazz.getName() + ":\n" + result.hierarchyToString());
+            if (Log.isInDebugMode())
+                Log.d(LOG_TAG, "getHolderFieldsOf for " + clazz.getName() + ":\n"
+                        + result.hierarchyToString());
 
                     /*FieldsSearch.getFields(new FieldsFilter() {
                 @Override

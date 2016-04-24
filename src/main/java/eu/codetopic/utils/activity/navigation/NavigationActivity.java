@@ -164,14 +164,13 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
                 if (item instanceof MenuItemImpl) {
                     final SupportMenuItem.OnMenuItemClickListener listener =
                             (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//HACK
-                    if (listener != null)
-                        listenerField.set(item, new SupportMenuItem.OnMenuItemClickListener() {
-                            @Override
-                            public boolean onMenuItemClick(MenuItem item) {
-                                drawer.closeDrawer(GravityCompat.START);
-                                return listener.onMenuItemClick(item);
-                            }
-                        });
+                    listenerField.set(item, new SupportMenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            drawer.closeDrawer(GravityCompat.START);
+                            return listener != null && listener.onMenuItemClick(item);
+                        }
+                    });
                 } else throw new ClassCastException("Wrong class: " + item.getClass());
             } catch (Throwable e) {
                 Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +

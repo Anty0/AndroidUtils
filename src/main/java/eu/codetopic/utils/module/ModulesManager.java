@@ -50,12 +50,13 @@ public final class ModulesManager {
     public static void initialize(Configuration config) {// TODO: 6.3.16 use it in ApplicationBase
         if (mInstance != null)
             throw new IllegalStateException(LOG_TAG + " is already initialized");
-        SecurePreferences.setLoggingEnabled(true);
+        SecurePreferences.setLoggingEnabled(config.getDefaultDebugMode());
         mInstance = new ModulesManager(config);
         mInstance.init();
 
         DataGetter<? extends DebugProviderData> debugDataGetter = config.getDebugDataGetter();
-        boolean debugMode = debugDataGetter == null || debugDataGetter.get().isDebugMode();
+        boolean debugMode = debugDataGetter != null ? debugDataGetter
+                .get().isDebugMode() : config.getDefaultDebugMode();
         SecurePreferences.setLoggingEnabled(debugMode);
         if (debugMode) mInstance.validate();
     }
@@ -123,6 +124,7 @@ public final class ModulesManager {
         private final Context context;
         private final List<Class<? extends Module>> modules = new ArrayList<>();
         @StyleRes private int defaultTheme;
+        private boolean defaultDebugMode = true;
         private DataGetter<? extends DebugProviderData> debugDataGetter = null;
 
         public Configuration(@NonNull Context context) {
@@ -149,6 +151,15 @@ public final class ModulesManager {
 
         public Configuration setDebugDataGetter(DataGetter<? extends DebugProviderData> debugDataGetter) {
             this.debugDataGetter = debugDataGetter;
+            return this;
+        }
+
+        public boolean getDefaultDebugMode() {
+            return defaultDebugMode;
+        }
+
+        public Configuration setDefaultDebugMode(boolean enabled) {
+            this.defaultDebugMode = enabled;
             return this;
         }
 
