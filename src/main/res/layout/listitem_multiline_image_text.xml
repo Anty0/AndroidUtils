@@ -6,42 +6,34 @@
     android:orientation="horizontal"
     android:padding="3dp">
 
-    <LinearLayout
-        android:id="@+id/linear_layout_title"
+    <ImageView
+        android:id="@+id/image_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:gravity="center_vertical"
-        android:orientation="horizontal">
+        android:contentDescription="@string/description_icon"/>
+    <!--TODO: test and fix height-->
 
-        <ImageView
-            android:id="@+id/image_view"
-            android:layout_width="wrap_content"
-            android:layout_height="18sp"
-            android:contentDescription="@string/description_icon"/>
-
-        <TextView
-            android:id="@+id/text_view_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="1dp"
-            android:layout_marginTop="1dp"
-            android:gravity="center_vertical"
-            android:padding="1dip"
-            android:singleLine="true"
-            android:textAppearance="?attr/textAppearanceListItem"/>
-
-    </LinearLayout>
+    <TextView
+        android:id="@+id/text_view_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="1dp"
+        android:layout_marginTop="1dp"
+        android:layout_toRightOf="@id/image_view"
+        android:layout_toEndOf="@id/image_view"
+        android:padding="1dip"
+        android:maxLines="1"
+        android:textAppearance="?attr/textAppearanceListItem"/>
 
     <TextView
         android:id="@+id/text_view_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/linear_layout_title"
+        android:layout_below="@id/image_view"
         android:layout_marginBottom="1dp"
         android:layout_marginTop="1dp"
-        android:gravity="center_vertical"
         android:padding="1dip"
         android:textAppearance="?attr/textAppearanceListItemSmall"/>
 

@@ -7,10 +7,9 @@ import android.content.Context;
  *
  * @author anty
  */
-public class TextMultilineItem implements MultilinePaddingItem {
+public class TextMultilineItem implements MultilineItem {
 
     private CharSequence title = "", text = null;
-    private boolean padding = true;
     private Object tag;
 
     public TextMultilineItem() {
@@ -22,12 +21,6 @@ public class TextMultilineItem implements MultilinePaddingItem {
         this.text = text;
     }
 
-    public TextMultilineItem(CharSequence title, CharSequence text, boolean usePadding) {
-        this.title = title;
-        this.text = text;
-        this.padding = usePadding;
-    }
-
     @Override
     public CharSequence getTitle(Context context, int position) {
         return title;
@@ -36,11 +29,6 @@ public class TextMultilineItem implements MultilinePaddingItem {
     @Override
     public CharSequence getText(Context context, int position) {
         return text;
-    }
-
-    @Override
-    public boolean usePadding(Context context, int position) {
-        return padding;
     }
 
     public CharSequence getTitle() {
@@ -57,14 +45,6 @@ public class TextMultilineItem implements MultilinePaddingItem {
 
     public void setText(CharSequence text) {
         this.text = text;
-    }
-
-    public boolean usePadding() {
-        return padding;
-    }
-
-    public void setPadding(boolean padding) {
-        this.padding = padding;
     }
 
     public Object getTag() {

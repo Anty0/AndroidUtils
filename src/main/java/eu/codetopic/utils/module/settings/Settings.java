@@ -8,6 +8,8 @@ import android.widget.ScrollView;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
@@ -17,10 +19,20 @@ import eu.codetopic.utils.R;
  *
  * @author anty
  */
-public class Settings extends ArrayList<SettingsProvider> implements Serializable {
+public class Settings implements Serializable {
 
     public static final String EXTRA_SETTINGS = Settings.class.getName() + ".EXTRA_SETTINGS";
     private static final String LOG_TAG = "Settings";
+
+    private final ArrayList<SettingsProvider> mProviders = new ArrayList<>();
+
+    public Settings(SettingsProvider... providers) {
+        Collections.addAll(mProviders, providers);
+    }
+
+    public Settings(Collection<SettingsProvider> providers) {
+        mProviders.addAll(providers);
+    }
 
     View generateView(Context context) {
         try {
@@ -35,7 +47,7 @@ public class Settings extends ArrayList<SettingsProvider> implements Serializabl
             ((ScrollView.LayoutParams) parent.getLayoutParams()).setMargins(marginHorizontal,
                     marginVertical, marginHorizontal, marginVertical);
 
-            for (SettingsProvider provider : this) {
+            for (SettingsProvider provider : mProviders) {
                 View view = provider.generateView(context, parent);
                 view.setPadding(0, 0, 0, padding);
                 parent.addView(view);

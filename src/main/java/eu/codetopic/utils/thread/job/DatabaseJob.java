@@ -15,8 +15,7 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.database.DependencyDao;
-import eu.codetopic.utils.module.ModulesManager;
-import eu.codetopic.utils.module.data.DatabaseDaoGetter;
+import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
 
 /**
  * Created by anty on 26.2.16.
@@ -27,11 +26,11 @@ public class DatabaseJob<T, ID> extends LoadingViewHolderJob {
 
     private static final String LOG_TAG = "DatabaseJob";
     private static final String JOB_DATABASE_GROUP_NAME_ADD = ".DATABASE_GROUP";
-    private final DatabaseDaoGetter<?, T> daoGetter;
+    private final DatabaseDaoGetter<T> daoGetter;
     private final DatabaseWork<T, ID> job;
 
     public DatabaseJob(@Nullable LoadingViewHolder loadingViewHolder,
-                       DatabaseDaoGetter<?, T> daoGetter, DatabaseWork<T, ID> job) {
+                       DatabaseDaoGetter<T> daoGetter, DatabaseWork<T, ID> job) {
         super(new Params(Constants.JOB_PRIORITY_DATABASE)
                 .groupBy(generateDatabaseJobGroupNameFor(daoGetter
                         .getDaoObjectClass())), loadingViewHolder);
@@ -39,63 +38,61 @@ public class DatabaseJob<T, ID> extends LoadingViewHolderJob {
         this.job = job;
     }
 
-    public DatabaseJob(DatabaseDaoGetter<?, T> daoGetter, DatabaseWork<T, ID> job) {
+    public DatabaseJob(DatabaseDaoGetter<T> daoGetter, DatabaseWork<T, ID> job) {
         this(null, daoGetter, job);
     }
 
     @SafeVarargs
     public DatabaseJob(@Nullable LoadingViewHolder loadingViewHolder,
-                       DatabaseDaoGetter<?, T> daoGetter, Modification modification, T... toModify) {
+                       DatabaseDaoGetter<T> daoGetter, Modification modification, T... toModify) {
         this(loadingViewHolder, daoGetter, modification.<T, ID>generateWork(toModify));
     }
 
     @SafeVarargs
-    public DatabaseJob(DatabaseDaoGetter<?, T> daoGetter, Modification modification, T... toModify) {
+    public DatabaseJob(DatabaseDaoGetter<T> daoGetter, Modification modification, T... toModify) {
         this(null, daoGetter, modification, toModify);
     }
 
     @SafeVarargs
-    public static <T, ID> void saveData(DatabaseDaoGetter<?, T> daoGetter, T... toModify) {
+    public static <T, ID> void saveData(DatabaseDaoGetter<T> daoGetter, T... toModify) {
         DatabaseJob.<T, ID>start(null, daoGetter, Modification.CREATE_OR_UPDATE, toModify);
     }
 
     @SafeVarargs
     public static <T, ID> void saveData(@Nullable LoadingViewHolder loadingViewHolder,
-                                        DatabaseDaoGetter<?, T> daoGetter, T... toModify) {
+                                        DatabaseDaoGetter<T> daoGetter, T... toModify) {
         DatabaseJob.<T, ID>start(loadingViewHolder, daoGetter, Modification.CREATE_OR_UPDATE, toModify);
     }
 
     @SafeVarargs
-    public static <T, ID> void deleteData(DatabaseDaoGetter<?, T> daoGetter, T... toModify) {
+    public static <T, ID> void deleteData(DatabaseDaoGetter<T> daoGetter, T... toModify) {
         DatabaseJob.<T, ID>start(null, daoGetter, Modification.DELETE, toModify);
     }
 
     @SafeVarargs
     public static <T, ID> void deleteData(@Nullable LoadingViewHolder loadingViewHolder,
-                                          DatabaseDaoGetter<?, T> daoGetter, T... toModify) {
+                                          DatabaseDaoGetter<T> daoGetter, T... toModify) {
         DatabaseJob.<T, ID>start(loadingViewHolder, daoGetter, Modification.DELETE, toModify);
     }
 
     @SafeVarargs
-    public static <T, ID> long start(DatabaseDaoGetter<?, T> daoGetter, Modification modification, T... toModify) {
+    public static <T, ID> long start(DatabaseDaoGetter<T> daoGetter, Modification modification, T... toModify) {
         return DatabaseJob.<T, ID>start(null, daoGetter, modification, toModify);
     }
 
     @SafeVarargs
     public static <T, ID> long start(@Nullable LoadingViewHolder loadingViewHolder,
-                                     DatabaseDaoGetter<?, T> daoGetter, Modification modification, T... toModify) {
+                                     DatabaseDaoGetter<T> daoGetter, Modification modification, T... toModify) {
         return start(loadingViewHolder, daoGetter, modification.<T, ID>generateWork(toModify));
     }
 
-    public static <T, ID> long start(DatabaseDaoGetter<?, T> daoGetter, DatabaseWork<T, ID> job) {
+    public static <T, ID> long start(DatabaseDaoGetter<T> daoGetter, DatabaseWork<T, ID> job) {
         return start(null, daoGetter, job);
     }
 
     public static <T, ID> long start(@Nullable LoadingViewHolder loadingViewHolder,
-                                     DatabaseDaoGetter<?, T> daoGetter, DatabaseWork<T, ID> job) {
-        //noinspection ConstantConditions
-        return ModulesManager.findModule(daoGetter.getModuleClass())
-                .getJobManager().addJob(new DatabaseJob<>(loadingViewHolder, daoGetter, job));
+                                     DatabaseDaoGetter<T> daoGetter, DatabaseWork<T, ID> job) {
+        return daoGetter.getJobManager().addJob(new DatabaseJob<>(loadingViewHolder, daoGetter, job));
     }
 
     public static String generateDatabaseJobGroupNameFor(Class databaseObject) {

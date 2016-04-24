@@ -14,7 +14,7 @@ import com.path.android.jobqueue.JobManager;
 import eu.codetopic.utils.activity.loading.LoadingViewHolderActivity;
 import eu.codetopic.utils.database.DatabaseObject;
 import eu.codetopic.utils.database.DependencyTextDatabaseObject;
-import eu.codetopic.utils.module.data.DatabaseDaoGetter;
+import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
@@ -27,14 +27,14 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject> extends Lo
     private static final String EXTRA_SERIALIZED_DATA =
             "DatabaseDataActivity.EXTRA_DATA_KEY";
 
-    private DatabaseDaoGetter<?, DT> mDaoGetter = null;
+    private DatabaseDaoGetter<DT> mDaoGetter = null;
     private JobManager mJobManager;
     private DT mData = null;
     private Long mDataId = null;
 
     public static <DT extends DatabaseObject> Intent generateDataActivityIntent
             (Context context, Class<? extends DatabaseDataActivity<DT>> clazz,
-             @NonNull DatabaseDaoGetter<?, DT> daoGetter, @Nullable DT data) {
+             @NonNull DatabaseDaoGetter<DT> daoGetter, @Nullable DT data) {
         return new Intent(context, clazz)
                 .putExtra(EXTRA_DATA_ID, data == null ? null : data.getId())
                 .putExtra(EXTRA_DAO_GETTER, daoGetter);
@@ -42,13 +42,13 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject> extends Lo
 
     public static <DT extends DatabaseObject> void startDataActivity
             (Context context, Class<? extends DatabaseDataActivity<DT>> clazz,
-             @NonNull DatabaseDaoGetter<?, DT> daoGetter, @Nullable DT data) {
+             @NonNull DatabaseDaoGetter<DT> daoGetter, @Nullable DT data) {
         context.startActivity(generateDataActivityIntent(context, clazz, daoGetter, data));
     }
 
     public static <DT extends DatabaseObject> void startDataActivityForResult
             (Activity activity, int requestCode, Class<? extends DatabaseDataActivity<DT>> clazz,
-             @NonNull DatabaseDaoGetter<?, DT> daoGetter, @Nullable DT data) {
+             @NonNull DatabaseDaoGetter<DT> daoGetter, @Nullable DT data) {
         activity.startActivityForResult(generateDataActivityIntent(activity, clazz, daoGetter, data), requestCode);
     }
 
@@ -57,8 +57,8 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject> extends Lo
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDataId = (Long) getIntent().getSerializableExtra(EXTRA_DATA_ID);
-        mDaoGetter = (DatabaseDaoGetter<?, DT>) getIntent().getSerializableExtra(EXTRA_DAO_GETTER);
-        mJobManager = mDaoGetter.getModule().getJobManager();
+        mDaoGetter = (DatabaseDaoGetter<DT>) getIntent().getSerializableExtra(EXTRA_DAO_GETTER);
+        mJobManager = mDaoGetter.getJobManager();
         if (mJobManager == null) throw new NullPointerException("Module must have JobManager");
 
 
@@ -133,7 +133,7 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject> extends Lo
         return mData;
     }
 
-    public DatabaseDaoGetter<?, DT> getDaoGetter() {
+    public DatabaseDaoGetter<DT> getDaoGetter() {
         return mDaoGetter;
     }
 }

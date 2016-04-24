@@ -62,7 +62,7 @@ public class FieldsSearchTest {
 
     private void testWith(FieldsFilter filter, @Nullable Object fieldsObject) {
         Log.d(LOG_TAG, "testGetAllFields - fields of " + filter.getStartClass().getName() + ":\n" +
-                FieldsSearch.getAllFields(filter).hierarchyToString(fieldsObject));
+                FieldsSearch.getFields(filter).hierarchyToString(fieldsObject));
     }
 
     @After

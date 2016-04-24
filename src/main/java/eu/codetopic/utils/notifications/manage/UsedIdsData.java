@@ -21,7 +21,7 @@ final class UsedIdsData extends ModuleData {
     private static final int SAVE_VERSION = 0;
 
     public UsedIdsData(Context context) {
-        super(context, PrefNames.FILE_NAME_USED_IDS_DATA, false, SAVE_VERSION);
+        super(context, PrefNames.FILE_NAME_USED_IDS_DATA, SAVE_VERSION);
     }
 
     void addId(String groupName, int id) {

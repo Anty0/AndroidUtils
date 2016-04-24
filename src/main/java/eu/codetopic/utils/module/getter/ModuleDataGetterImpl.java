@@ -1,18 +1,19 @@
-package eu.codetopic.utils.module.data;
+package eu.codetopic.utils.module.getter;
 
 import eu.codetopic.utils.module.Module;
-import eu.codetopic.utils.module.ModuleGetter;
+import eu.codetopic.utils.module.data.ModuleData;
 
 /**
- * Created by anty on 24.2.16.
+ * Created by anty on 23.4.16.
  *
  * @author anty
  */
-public class ModuleDataGetter<MT extends Module, DT extends ModuleData> extends ModuleGetter<MT> {
+public class ModuleDataGetterImpl<MT extends Module, DT extends ModuleData>
+        extends ModuleGetterImpl<MT> implements ModuleDataGetter<MT, DT> {
 
     private final Class<DT> mModuleDataClass;
 
-    public ModuleDataGetter(Class<MT> moduleClass, Class<DT> moduleDataClass) {
+    public ModuleDataGetterImpl(Class<MT> moduleClass, Class<DT> moduleDataClass) {
         super(moduleClass);
         mModuleDataClass = moduleDataClass;
     }

@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 import eu.codetopic.utils.database.DependencyDao;
 import eu.codetopic.utils.database.DependencyDatabaseObject;
-import eu.codetopic.utils.module.data.DatabaseDaoGetter;
+import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
 
 /**
  * Created by anty on 30.3.16.
@@ -56,6 +56,6 @@ public abstract class DatabaseObjectHolder<T extends DependencyDatabaseObject> i
                 .queryForIdWithTemp(getObjectId());
     }
 
-    public abstract DatabaseDaoGetter<?, T> getDaoGetter();
+    public abstract DatabaseDaoGetter<T> getDaoGetter();
 
 }

@@ -17,12 +17,6 @@ public class TextMultilineResourceImageItem extends TextMultilineItem implements
         mImageResourceId = imageResourceId;
     }
 
-    public TextMultilineResourceImageItem(CharSequence title, CharSequence text,
-                                          @DrawableRes int imageResourceId, boolean usePadding) {
-        super(title, text, usePadding);
-        mImageResourceId = imageResourceId;
-    }
-
     public int getImageResourceId() {
         return mImageResourceId;
     }

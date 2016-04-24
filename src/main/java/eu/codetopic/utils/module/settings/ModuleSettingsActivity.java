@@ -14,35 +14,23 @@ import eu.codetopic.utils.activity.BackButtonActivity;
  */
 public class ModuleSettingsActivity extends BackButtonActivity {
 
-    private Settings mSettings;
+    private static final String EXTRA_TITLE = "eu.codetopic.utils.module.settings.ModuleSettingsActivity.TITLE";
 
-    static void startModuleSettingsActivity(Context context, Settings settings) {
+    static void startModuleSettingsActivity(Context context, CharSequence title, Settings settings) {
         context.startActivity(new Intent(context, ModuleSettingsActivity.class)
-                .putExtra(Settings.EXTRA_SETTINGS, settings));
+                .putExtra(EXTRA_TITLE, title).putExtra(Settings.EXTRA_SETTINGS, settings));
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            Intent intent = getIntent();
-            if (intent == null) {
-                finish();
-                return;
-            }
-            savedInstanceState = intent.getExtras();
-        }
-        mSettings = (Settings) savedInstanceState.getSerializable(Settings.EXTRA_SETTINGS);
-        if (mSettings != null) {
-            setContentView(mSettings.generateView(this));
+        Intent intent = getIntent();
+        if (intent == null || !intent.hasExtra(Settings.EXTRA_SETTINGS)) {
+            finish();
             return;
         }
-        finish();
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(Settings.EXTRA_SETTINGS, mSettings);
-        super.onSaveInstanceState(outState);
+        setTitle(intent.getCharSequenceExtra(EXTRA_TITLE));
+        setContentView(((Settings) intent.getSerializableExtra(Settings.EXTRA_SETTINGS))
+                .generateView(this));
     }
 }

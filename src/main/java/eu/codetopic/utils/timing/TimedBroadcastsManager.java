@@ -14,7 +14,7 @@ import java.util.HashMap;
 
 import eu.codetopic.utils.Connectivity;
 import eu.codetopic.utils.exceptions.NoModuleFoundException;
-import eu.codetopic.utils.module.data.ModuleDataGetter;
+import eu.codetopic.utils.module.getter.DataGetter;
 import eu.codetopic.utils.notifications.manage.NotificationIdsModule;
 
 /**
@@ -31,11 +31,11 @@ public class TimedBroadcastsManager {
 
     private final Context mContext;
     private final boolean mUseMobileNetworks;
-    private final ModuleDataGetter<?, TimingData> mTimingDataGetter;
+    private final DataGetter<TimingData> mTimingDataGetter;
     private final HashMap<Class, TimedBroadcastInfo> mBroadcastsInfos;
 
-    private TimedBroadcastsManager(Context context, boolean useMobileNetworks, @NonNull ModuleDataGetter
-            <?, TimingData> timingDataGetter, Class... timedBroadcastsClasses) {
+    private TimedBroadcastsManager(Context context, boolean useMobileNetworks, @NonNull DataGetter
+            <TimingData> timingDataGetter, Class... timedBroadcastsClasses) {
         mContext = context;
         mUseMobileNetworks = useMobileNetworks;
         mTimingDataGetter = timingDataGetter;
@@ -57,8 +57,8 @@ public class TimedBroadcastsManager {
      * @param timingDataGetter ModuleDataGetter of TimingData for saving required data using SharedPreferences
      * @param timedBroadcastsClasses all broadcasts that uses TimedBroadcastsManager annotation
      */
-    public static void initialize(Context context, boolean useMobileNetworks, @NonNull ModuleDataGetter
-            <?, TimingData> timingDataGetter, Class... timedBroadcastsClasses) {// TODO: 26.3.16 initialize in ApplicationBase
+    public static void initialize(Context context, boolean useMobileNetworks, @NonNull DataGetter
+            <TimingData> timingDataGetter, Class... timedBroadcastsClasses) {// TODO: 26.3.16 initialize in ApplicationBase
         if (isInitialized()) throw new IllegalStateException(LOG_TAG + " is still initialized");
         INSTANCE = new TimedBroadcastsManager(context, useMobileNetworks,
                 timingDataGetter, timedBroadcastsClasses);

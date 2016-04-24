@@ -20,6 +20,7 @@ public class SimpleFieldsFilter implements FieldsFilter {
 
     private Class<?> startClass = null;
     private Class<?> stopClass = Object.class;
+    private boolean throwExceptions = false;
     private List<Class> classesToFind = new ArrayList<>();
     private List<Class<? extends Annotation>> annotationsToFind = new ArrayList<>();
     private List<Class> classesToDeepSearch = new ArrayList<>();
@@ -74,8 +75,19 @@ public class SimpleFieldsFilter implements FieldsFilter {
         return stopClass;
     }
 
-    public void setStopSuperClass(Class<?> stopClass) {
+    public SimpleFieldsFilter setStopSuperClass(Class<?> stopClass) {
         this.stopClass = stopClass;
+        return this;
+    }
+
+    @Override
+    public boolean isThrowExceptions() {
+        return throwExceptions;
+    }
+
+    public SimpleFieldsFilter setThrowExceptions(boolean throwExceptions) {
+        this.throwExceptions = throwExceptions;
+        return this;
     }
 
     @Override

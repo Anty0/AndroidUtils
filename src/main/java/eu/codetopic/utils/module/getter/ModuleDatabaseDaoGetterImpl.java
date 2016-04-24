@@ -1,24 +1,26 @@
-package eu.codetopic.utils.module.data;
+package eu.codetopic.utils.module.getter;
 
 import android.support.annotation.WorkerThread;
 
 import com.j256.ormlite.dao.Dao;
+import com.path.android.jobqueue.JobManager;
 
 import java.sql.SQLException;
 
 import eu.codetopic.utils.module.Module;
-import eu.codetopic.utils.module.ModuleGetter;
+import eu.codetopic.utils.module.data.ModuleDatabase;
 
 /**
- * Created by anty on 25.2.16.
+ * Created by anty on 23.4.16.
  *
  * @author anty
  */
-public class DatabaseDaoGetter<MT extends Module, DT> extends ModuleGetter<MT> {
+public class ModuleDatabaseDaoGetterImpl<MT extends Module, DT> extends ModuleGetterImpl<MT>
+        implements ModuleDatabaseDaoGetter<MT, DT> {
 
     private final Class<DT> mDaoObjectClass;
 
-    public DatabaseDaoGetter(Class<MT> moduleClass, Class<DT> daoObjectClass) {
+    public ModuleDatabaseDaoGetterImpl(Class<MT> moduleClass, Class<DT> daoObjectClass) {
         super(moduleClass);
         mDaoObjectClass = daoObjectClass;
     }
@@ -37,6 +39,11 @@ public class DatabaseDaoGetter<MT extends Module, DT> extends ModuleGetter<MT> {
 
     public ModuleDatabase getDatabase() {
         return getModule().getDatabase();
+    }
+
+    @Override
+    public JobManager getJobManager() {
+        return getModule().getJobManager();
     }
 
     public Class<DT> getDaoObjectClass() {

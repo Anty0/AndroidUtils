@@ -76,13 +76,13 @@ public class CardRecyclerAdapter<T extends CardItem> extends RecyclerAdapter<T,
 
             parent.removeAllViews();
             view = item.getViewBase(mContext, parent, view, position);
-            view.setOnClickListener(new View.OnClickListener() {
+            parent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     item.onClick(mContext, v, position);
                 }
             });
-            view.setOnLongClickListener(new View.OnLongClickListener() {
+            parent.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
                     return item.onLongClick(mContext, v, position);

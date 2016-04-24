@@ -15,13 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.codetopic.utils.module.data.DebugProviderData;
-import eu.codetopic.utils.module.data.ModuleDataGetter;
+import eu.codetopic.utils.module.getter.DataGetter;
 import eu.codetopic.utils.module.data.ModuleDataManager;
 
 /**
- * Created by anty on 7.9.15.
- *
- * @author anty
+ * Mock Log implementation for testing on non android host.
  */
 public class Log {
 
@@ -264,8 +262,8 @@ public class Log {
         return DEBUG_MODE;
     }
 
-    public static synchronized void initDebugMode(Application app, @NonNull final ModuleDataGetter<?,
-            ? extends DebugProviderData> debugDataGetter) {// TODO: 8.3.16 initialize Log in ApplicationBase
+    public static synchronized void initDebugMode(Application app, @NonNull final DataGetter
+            <? extends DebugProviderData> debugDataGetter) {// TODO: 8.3.16 initialize Log in ApplicationBase
         if (INITIALIZED) throw new IllegalStateException("Log is still initialized");
         INITIALIZED = true;
 

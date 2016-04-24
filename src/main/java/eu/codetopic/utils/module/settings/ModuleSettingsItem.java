@@ -32,7 +32,8 @@ public class ModuleSettingsItem extends MultilineCardItem {
     @Override
     public void onClick(Context context, View v, int itemPosition) {
         if (mModule.hasSettings())
-            ModuleSettingsActivity.startModuleSettingsActivity(context, mModule.getSettings());
+            ModuleSettingsActivity.startModuleSettingsActivity(context,
+                    mModule.getSettingsName(), mModule.getSettings());
     }
 
     @Override

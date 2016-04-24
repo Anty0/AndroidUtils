@@ -32,7 +32,9 @@ import eu.codetopic.utils.module.settings.Settings;
  *
  * @author anty
  */
-public abstract class Module extends ContextThemeWrapper {
+public abstract class Module extends ContextThemeWrapper implements Comparable<Module> {
+
+    public static final int DEFAULT_PRIORITY = 0;
 
     protected void validate() throws Throwable {
         Assert.assertNotNull(getName());
@@ -54,6 +56,15 @@ public abstract class Module extends ContextThemeWrapper {
 
     @NonNull
     public abstract CharSequence getName();
+
+    public int getPriority() {
+        return DEFAULT_PRIORITY;
+    }
+
+    @Override
+    public int compareTo(@NonNull Module another) {
+        return another.getPriority() - getPriority();
+    }
 
     @Nullable
     public abstract ComponentsManager getComponentsManager();// TODO: 13.3.16 implement component manager in all modules
@@ -113,8 +124,13 @@ public abstract class Module extends ContextThemeWrapper {
 
     public void close() throws Throwable {
         ModuleDataManager dataManager = getDataManager();
-        if (dataManager != null) dataManager.close();
+        if (dataManager != null) dataManager.onDestroy();
         ModuleDatabase database = getDatabase();
         if (database != null) database.close();
+    }
+
+    @Override
+    public String toString() {
+        return getName().toString();
     }
 }

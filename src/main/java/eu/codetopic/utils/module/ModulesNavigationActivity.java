@@ -8,6 +8,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
@@ -78,23 +86,36 @@ public abstract class ModulesNavigationActivity extends NavigationActivity {
 
     @Override
     protected boolean onCreateNavigationMenu(Menu menu) {
-        boolean hasMenu = false;
-        for (Module module : ModulesManager.getInstance().getModules()) {
+        super.onCreateNavigationMenu(menu);
+
+        getMenuInflater().inflate(R.menu.menu_modules_navigation, menu);
+        Menu modulesMenu = menu.findItem(R.id.modules_menu_item)
+                .setTitle(getModulesSubMenuTitle()).getSubMenu();
+
+        ArrayList<Module> modules = new ArrayList<>(ModulesManager.getInstance().getModules());
+        Collections.sort(modules);
+        for (Module module : modules) {
             try {
-                hasMenu |= module.onCreateNavigationMenu(this, menu);
+                Log.d(LOG_TAG, "onCreateNavigationMenu - " +
+                        "Creating NavigationMenu for " + module.getName());
+                module.onCreateNavigationMenu(this, modulesMenu);
             } catch (Exception e) {
                 Log.e(LOG_TAG, "onCreateNavigationMenu", e);
             }
         }
-        menu.addSubMenu(R.string.menu_item_text_settings).getItem().setIcon(R.drawable.ic_action_settings)
-                .setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        startActivity(new Intent(ModulesNavigationActivity.this, SettingsActivity.class));
-                        return true;
-                    }
-                });
-        return hasMenu;
+
+        menu.findItem(R.id.settings_menu_item).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                startActivity(new Intent(ModulesNavigationActivity.this, SettingsActivity.class));
+                return true;
+            }
+        });
+        return true;
+    }
+
+    protected CharSequence getModulesSubMenuTitle() {
+        return "Modules";// TODO: 23.4.16 to strings
     }
 
     @Override

@@ -10,13 +10,13 @@ import eu.codetopic.utils.PrefNames;
  *
  * @author anty
  */
-public class LoginData extends ModuleData {
+public class LoginData extends SecureModuleData {
 
     private static final String LOG_TAG = "LoginData";
     private static final int LOGIN_SAVE_DATA_VERSION_ADD = 0;
 
     public LoginData(Context context, String fileName, int saveVersion) {
-        super(context, fileName, true, LOGIN_SAVE_DATA_VERSION_ADD + saveVersion);
+        super(context, fileName, LOGIN_SAVE_DATA_VERSION_ADD + saveVersion);
     }
 
     public synchronized void login(String username, String password) {

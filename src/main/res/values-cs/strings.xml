@@ -18,6 +18,7 @@
     <string name="dialog_title_select_language">Vyber jazyk</string>
 
     <string name="description_icon">Ikona</string>
+    <string name="description_empty_view_image">Prázdný list</string>
 
     <string name="navigation_drawer_open">Otevřít navigaci</string>
     <string name="navigation_drawer_close">Zavřít navigaci</string>

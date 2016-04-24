@@ -46,12 +46,11 @@ public abstract class ListViewFragment<M extends DependencyTextDatabaseObject> e
     @Override
     public View onCreateContentView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.listview_base, container, false);
-        TextView emptyView = (TextView) view.findViewById(R.id.empty_view);
         ListView listView = (ListView) view.findViewById(R.id.listView);
 
-        emptyView.setText(getEmptyViewText());
+        ((TextView) view.findViewById(R.id.empty_text)).setText(getEmptyViewText());
         listView.setAdapter(mAdapter);
-        listView.setEmptyView(emptyView);
+        listView.setEmptyView(view.findViewById(R.id.empty_view));
         listView.setOnItemClickListener(this);
         listView.setOnItemLongClickListener(this);
         view.findViewById(R.id.floatingActionButton)

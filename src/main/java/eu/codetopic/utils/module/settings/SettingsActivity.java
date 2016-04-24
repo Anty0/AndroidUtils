@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import eu.codetopic.utils.R;
@@ -32,8 +33,10 @@ public class SettingsActivity extends BackButtonActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        ArrayList<Module> modules = new ArrayList<>(ModulesManager.getInstance().getModules());
+        Collections.sort(modules);
         List<MultilineCardItem> cardItems = new ArrayList<>();
-        for (Module module : ModulesManager.getInstance().getModules())
+        for (Module module : modules)
             if (module.hasSettings()) cardItems.add(new ModuleSettingsItem(module));
 
         final Class aboutActivity = mAboutActivityClass;
@@ -46,7 +49,6 @@ public class SettingsActivity extends BackButtonActivity {
             }));
         }
 
-        Recycler.inflate().withoutSwipeToRefresh().on(this)
-                .setAdapter(cardItems.toArray(new MultilineCardItem[cardItems.size()]));
+        Recycler.inflate().withoutSwipeToRefresh().on(this).setAdapter(cardItems);
     }
 }

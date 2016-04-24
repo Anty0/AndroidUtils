@@ -13,7 +13,7 @@ import eu.codetopic.utils.module.data.ModuleData;
 public class DashboardData extends ModuleData {
 
     public DashboardData(Context context, String fileName, int saveVersion) {
-        super(context, fileName, false, saveVersion);
+        super(context, fileName, saveVersion);
     }
 
     void saveDashboardItemEnabledState(DashboardItem item) {

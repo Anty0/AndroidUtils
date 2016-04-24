@@ -3,18 +3,25 @@ package eu.codetopic.utils.activity.navigation;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.support.design.internal.NavigationMenuPresenter;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import java.lang.reflect.Field;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
@@ -60,14 +67,24 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
         invalidateNavigationMenu();
     }
 
-    protected abstract Class<? extends Fragment> getMainFragmentClass();
+    protected Class<? extends Fragment> getMainFragmentClass() {
+        return null;
+    }
+
+    protected Fragment getMainFragment() {
+        try {
+            return getMainFragmentClass().newInstance();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     protected Fragment onCreatePane() {
         try {
-            return getMainFragmentClass().newInstance();
+            return getMainFragment();
         } catch (Exception e) {
-            Log.e(LOG_TAG, "onCreatePane", e);
+            Log.e(LOG_TAG, "onCreatePane - provided wrong MainFragment", e);
             return null;
         }
     }
@@ -107,10 +124,62 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
     }
 
     public void invalidateNavigationMenu() {
+        if (navigationView == null) return;
+
+        NavigationMenuPresenter presenter;
+        try {
+            Field presenterField = NavigationView.class.getDeclaredField("mPresenter");
+            presenterField.setAccessible(true);
+            presenter = (NavigationMenuPresenter) presenterField.get(navigationView);//HACK
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "invalidateNavigationMenu - " +
+                    "can't get menu presenter: can't get field from class", e);
+            return;
+        }
+
+        presenter.setUpdateSuspended(true);
+
         Menu menu = navigationView.getMenu();
         menu.clear();
-        navigationView.setEnabled(onCreateNavigationMenu(menu));
+        onCreateNavigationMenu(menu);
+        setupMenuItemsClickListeners(menu);
         resetNavigationView(getCurrentFragment());
+
+        presenter.setUpdateSuspended(false);
+        presenter.updateMenuView(false);
+    }
+
+    private void setupMenuItemsClickListeners(Menu menu) {
+        Field listenerField;
+        try {
+            listenerField = MenuItemImpl.class.getDeclaredField("mClickListener");
+            listenerField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +
+                    "can't setup listeners: can't get field from class", e);
+            return;
+        }
+
+        for (int i = 0, size = menu.size(); i < size; i++) {
+            MenuItem item = menu.getItem(i);
+            try {
+                if (item instanceof MenuItemImpl) {
+                    final SupportMenuItem.OnMenuItemClickListener listener =
+                            (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//HACK
+                    if (listener != null) listenerField.set(item, new SupportMenuItem.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            drawer.closeDrawer(GravityCompat.START);
+                            return listener.onMenuItemClick(item);
+                        }
+                    });
+                } else throw new ClassCastException("Wrong class: " + item.getClass());
+            } catch (Throwable e) {
+                Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +
+                        "can't setup listener for " + item, e);
+            }
+            if (item.hasSubMenu()) setupMenuItemsClickListeners(item.getSubMenu());
+        }
     }
 
     private void resetNavigationView(Fragment currentFragment) {
@@ -132,6 +201,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
             return false;
         }
 
+
         for (int i = 0; i < menu.size(); i++) {
             menu.getItem(i).setChecked(false);
         }
@@ -144,7 +214,6 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        drawer.closeDrawer(GravityCompat.START);
         return false;
     }
 

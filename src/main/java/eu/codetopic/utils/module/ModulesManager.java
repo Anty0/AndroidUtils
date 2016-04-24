@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.StyleRes;
 
+import com.securepreferences.SecurePreferences;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -14,7 +16,7 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.exceptions.InvalidModuleDataFileNameException;
 import eu.codetopic.utils.module.data.DebugProviderData;
 import eu.codetopic.utils.module.data.ModuleData;
-import eu.codetopic.utils.module.data.ModuleDataGetter;
+import eu.codetopic.utils.module.getter.DataGetter;
 import eu.codetopic.utils.module.data.ModuleDataManager;
 
 /**
@@ -38,7 +40,8 @@ public final class ModulesManager {
         mDefaultTheme = config.getDefaultTheme();
         for (Class<? extends Module> moduleClass : config.getModules())
             try {
-                mModules.put(moduleClass, moduleClass.newInstance());
+                if (!moduleClass.isAnnotationPresent(DisableModule.class))
+                    mModules.put(moduleClass, moduleClass.newInstance());
             } catch (Exception e) {
                 Log.e(LOG_TAG, "<init>", e);
             }
@@ -47,11 +50,14 @@ public final class ModulesManager {
     public static void initialize(Configuration config) {// TODO: 6.3.16 use it in ApplicationBase
         if (mInstance != null)
             throw new IllegalStateException(LOG_TAG + " is already initialized");
+        SecurePreferences.setLoggingEnabled(true);
         mInstance = new ModulesManager(config);
         mInstance.init();
-        ModuleDataGetter<?, ? extends DebugProviderData> debugDataGetter = config.getDebugDataGetter();
-        if (debugDataGetter == null || debugDataGetter.get().isDebugMode())
-            mInstance.validate();
+
+        DataGetter<? extends DebugProviderData> debugDataGetter = config.getDebugDataGetter();
+        boolean debugMode = debugDataGetter == null || debugDataGetter.get().isDebugMode();
+        SecurePreferences.setLoggingEnabled(debugMode);
+        if (debugMode) mInstance.validate();
     }
 
     public static ModulesManager getInstance() {
@@ -117,7 +123,7 @@ public final class ModulesManager {
         private final Context context;
         private final List<Class<? extends Module>> modules = new ArrayList<>();
         @StyleRes private int defaultTheme;
-        private ModuleDataGetter<?, ? extends DebugProviderData> debugDataGetter = null;
+        private DataGetter<? extends DebugProviderData> debugDataGetter = null;
 
         public Configuration(@NonNull Context context) {
             this.context = context;
@@ -137,22 +143,26 @@ public final class ModulesManager {
             return this;
         }
 
-        public ModuleDataGetter<?, ? extends DebugProviderData> getDebugDataGetter() {
+        public DataGetter<? extends DebugProviderData> getDebugDataGetter() {
             return debugDataGetter;
         }
 
-        public Configuration setDebugDataGetter(ModuleDataGetter<?, ? extends DebugProviderData> debugDataGetter) {
+        public Configuration setDebugDataGetter(DataGetter<? extends DebugProviderData> debugDataGetter) {
             this.debugDataGetter = debugDataGetter;
             return this;
         }
 
         @SafeVarargs
         public final Configuration addModules(Class<? extends Module>... modules) {
+            //for (Class<? extends Module> module : modules)
+            //    this.modules.add(0, module);
             Collections.addAll(this.modules, modules);
             return this;
         }
 
         public Configuration addModules(Collection<Class<? extends Module>> modules) {
+            //for (Class<? extends Module> module : modules)
+            //    this.modules.add(0, module);
             this.modules.addAll(modules);
             return this;
         }

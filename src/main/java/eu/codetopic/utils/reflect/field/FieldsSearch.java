@@ -24,17 +24,22 @@ public class FieldsSearch {
     private static final String LOG_TAG = "FieldsSearch";
 
     public static FoundField getAllFields(@NonNull Class<?> startClass) {
-        return getAllFields(new SimpleFieldsFilter(startClass).addCalssesToFind(Object.class));
-        /*, boolean.class, byte.class, char.class, double.class, float.class, int.class, long.class, short.class*/
+        return getFields(new SimpleFieldsFilter(startClass).addCalssesToFind(Object.class,
+                boolean.class, byte.class, char.class, double.class,
+                float.class, int.class, long.class, short.class));
     }
 
-    public static FoundField getAllFields(@NonNull FieldsFilter filter) {
+    public static FoundField getAllNonPrimitiveFields(@NonNull Class<?> startClass) {
+        return getFields(new SimpleFieldsFilter(startClass).addCalssesToFind(Object.class));
+    }
+
+    public static FoundField getFields(@NonNull FieldsFilter filter) {
         Class<?> startClass = filter.getStartClass();
-        return getAllFields(filter, startClass, startClass, null);
+        return getFields(filter, startClass, startClass, null);
     }
 
-    private static FoundField getAllFields(@NonNull FieldsFilter filter, @NonNull Class<?> baseClass,
-                                           @NonNull Class<?> actualClass, @Nullable Field field) {
+    private static FoundField getFields(@NonNull FieldsFilter filter, @NonNull Class<?> baseClass,
+                                        @NonNull Class<?> actualClass, @Nullable Field field) {
 
         if (actualClass.equals(filter.getStopSuperClass()))
             return new FoundField(!filter.addField(field, actualClass), field, actualClass, new FoundField[0]);
@@ -43,16 +48,26 @@ public class FieldsSearch {
         List<FoundField> contentFields = new ArrayList<>();
 
         for (Field declaredField : actualClass.getDeclaredFields()) {
-            Class<?> declaredFieldType = getGenericFieldType(declaredField, baseClass);
-            contentFields.add(filter.searchFieldsInFieldClass(declaredField, declaredFieldType)
-                    ? getAllFields(filter, declaredFieldType, declaredFieldType, declaredField)
-                    : new FoundField(!filter.addField(declaredField, declaredFieldType),
-                    declaredField, declaredFieldType, new FoundField[0]));
+            try {
+                Class<?> declaredFieldType = getGenericFieldType(declaredField, baseClass);
+                contentFields.add(filter.searchFieldsInFieldClass(declaredField, declaredFieldType)
+                        ? getFields(filter, declaredFieldType, declaredFieldType, declaredField)
+                        : new FoundField(!filter.addField(declaredField, declaredFieldType),
+                        declaredField, declaredFieldType, new FoundField[0]));
+            } catch (Throwable t) {
+                if (filter.isThrowExceptions()) throw t;
+                Log.e(LOG_TAG, "getFields - problem detected while getting info of " + actualClass);
+            }
         }
 
-        Class<?> parentClass = actualClass.getSuperclass();
-        if (parentClass != null) Collections.addAll(contentFields,
-                getAllFields(filter, baseClass, parentClass, field).getContentFields());
+        try {
+            Class<?> parentClass = actualClass.getSuperclass();
+            if (parentClass != null) Collections.addAll(contentFields,
+                    getFields(filter, baseClass, parentClass, field).getContentFields());
+        } catch (Throwable t) {
+            if (filter.isThrowExceptions()) throw t;
+            Log.e(LOG_TAG, "getFields - problem detected while getting info of " + actualClass);
+        }
 
         return new FoundField(!filter.addField(field, actualClass), field, actualClass,
                 contentFields.toArray(new FoundField[contentFields.size()]));

@@ -18,7 +18,7 @@ public abstract class MultilineCardItem extends CardItemNoClickImpl implements M
 
     @Override
     public View getViewBase(Context context, ViewGroup parent, @Nullable View oldView, int itemPosition) {
-        return MultilineItemUtils.apply(this)
+        return MultilineItemUtils.apply(this).withoutPadding()
                 .withDefaultLayoutResId(getLayoutResId(context, itemPosition))
                 .withPosition(itemPosition).on(context, parent, oldView);
     }

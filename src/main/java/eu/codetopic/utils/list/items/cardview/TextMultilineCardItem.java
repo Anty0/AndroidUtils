@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import eu.codetopic.utils.list.items.multiline.MultilinePaddingItem;
 import eu.codetopic.utils.list.items.multiline.MultilineResourceLayoutItem;
 
 /**
@@ -12,11 +11,10 @@ import eu.codetopic.utils.list.items.multiline.MultilineResourceLayoutItem;
  *
  * @author anty
  */
-public class TextMultilineCardItem extends MultilineCardItem implements MultilinePaddingItem, MultilineResourceLayoutItem {
+public class TextMultilineCardItem extends MultilineCardItem implements MultilineResourceLayoutItem {
 
     private CharSequence title = "", text = null;
     private int layoutId = -1;
-    private boolean padding = true;
     private View.OnClickListener onClick = null;
     private Object tag;
 
@@ -34,13 +32,6 @@ public class TextMultilineCardItem extends MultilineCardItem implements Multilin
         this.onClick = onClick;
     }
 
-    public TextMultilineCardItem(CharSequence title, CharSequence text, boolean usePadding, @Nullable View.OnClickListener onClick) {
-        this.title = title;
-        this.text = text;
-        this.padding = usePadding;
-        this.onClick = onClick;
-    }
-
     @Override
     public int getLayoutResourceId(Context context, int position) {
         return layoutId == -1 ? super.getLayoutResId(context, position) : layoutId;
@@ -54,11 +45,6 @@ public class TextMultilineCardItem extends MultilineCardItem implements Multilin
     @Override
     public CharSequence getText(Context context, int position) {
         return text;
-    }
-
-    @Override
-    public boolean usePadding(Context context, int position) {
-        return padding;
     }
 
     @Override
@@ -81,15 +67,6 @@ public class TextMultilineCardItem extends MultilineCardItem implements Multilin
 
     public TextMultilineCardItem setText(CharSequence text) {
         this.text = text;
-        return this;
-    }
-
-    public boolean usePadding() {
-        return padding;
-    }
-
-    public TextMultilineCardItem setPadding(boolean padding) {
-        this.padding = padding;
         return this;
     }
 

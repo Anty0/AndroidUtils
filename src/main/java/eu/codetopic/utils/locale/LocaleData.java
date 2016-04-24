@@ -16,7 +16,7 @@ public final class LocaleData extends ModuleData {
     private static final int SAVE_VERSION = 0;
 
     public LocaleData(Context context) {
-        super(context, PrefNames.FILE_NAME_LOCALE_DATA, false, SAVE_VERSION);
+        super(context, PrefNames.FILE_NAME_LOCALE_DATA, SAVE_VERSION);
     }
 
     public String getActualLanguage() {

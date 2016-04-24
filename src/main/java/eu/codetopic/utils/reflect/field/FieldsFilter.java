@@ -16,6 +16,8 @@ public interface FieldsFilter {
 
     Class<?> getStopSuperClass();
 
+    boolean isThrowExceptions();
+
     boolean addField(@Nullable Field field, @NonNull Class<?> fieldType);
 
     boolean searchFieldsInFieldClass(@Nullable Field field, @NonNull Class<?> fieldType);

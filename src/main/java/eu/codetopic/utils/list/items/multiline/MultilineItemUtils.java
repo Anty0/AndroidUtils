@@ -69,6 +69,7 @@ public class MultilineItemUtils {
         private int mPosition = MultilineItem.NO_POSITION;
         private ItemSetupCallback mCallback = null;
         private Integer mDefaultLayoutResId = MultilineItem.DEFAULT_ITEM_LAYOUT_ID;
+        private boolean mUsePadding = true;
 
         private MultilineItemViewSetup(@Nullable MultilineItem item) {
             mItem = item == null ? new NullItem() : item;
@@ -109,6 +110,20 @@ public class MultilineItemUtils {
 
         public MultilineItemViewSetup withDefaultLayoutResId(@LayoutRes Integer defaultLayoutResId) {
             mDefaultLayoutResId = defaultLayoutResId;
+            return this;
+        }
+
+        public boolean isUsePadding() {
+            return mUsePadding;
+        }
+
+        public MultilineItemViewSetup withPadding() {
+            mUsePadding = true;
+            return this;
+        }
+
+        public MultilineItemViewSetup withoutPadding() {
+            mUsePadding = false;
             return this;
         }
 
@@ -154,10 +169,7 @@ public class MultilineItemUtils {
                 holder.text1.setText(mItem.getTitle(holder.text1.getContext(), mPosition));
                 CharSequence text = mItem.getText(holder.text1.getContext(), mPosition);
                 if (text == null) {
-                    if (mItem instanceof MultilinePaddingItem && !((MultilinePaddingItem) mItem)
-                            .usePadding(holder.text1.getContext(), mPosition)) {
-                        Utils.setPadding(holder.text1, 1, 1, 1, 1);
-                    } else Utils.setPadding(holder.text1, 1, 8, 1, 8);
+                    setPaddingFor(holder.text1);
                     holder.text2.setVisibility(View.GONE);
                 } else {
                     Utils.setPadding(holder.text1, 1, 1, 1, 1);
@@ -171,15 +183,17 @@ public class MultilineItemUtils {
                             mItem.getTitle(textView.getContext(), mPosition) :
                             mItem.getText(textView.getContext(), mPosition));
 
-                    if (mItem instanceof MultilinePaddingItem && !((MultilinePaddingItem) mItem)
-                            .usePadding(textView.getContext(), mPosition)) {
-                        Utils.setPadding(textView, 1, 1, 1, 1);
-                    } else Utils.setPadding(textView, 1, 8, 1, 8);
+                    setPaddingFor(textView);
                 }
             }
             if (mCallback != null)
                 mCallback.onTextLoaded(mItem, holder, holder.text1 == null ? null : holder.text1.getText(),
                         holder.text2 == null ? null : holder.text2.getText());
+        }
+
+        @MainThread
+        protected void setPaddingFor(TextView textView) {
+            Utils.setPadding(textView, 1, mUsePadding ? 8 : 1);
         }
 
         @MainThread

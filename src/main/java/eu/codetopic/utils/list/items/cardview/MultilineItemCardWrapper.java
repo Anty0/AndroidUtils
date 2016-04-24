@@ -38,10 +38,9 @@ public class MultilineItemCardWrapper extends CardItemNoClickImpl {
 
     @Override
     public View getViewBase(Context context, ViewGroup parent, @Nullable View oldView, int itemPosition) {
-        return MultilineItemUtils.apply(item)
-                .withPosition(itemPosition)
+        return MultilineItemUtils.apply(item).withoutPadding()
                 .withDefaultLayoutResId(getLayoutResId(context, itemPosition))
-                .on(context, parent, oldView);
+                .withPosition(itemPosition).on(context, parent, oldView);
     }
 
     @Override

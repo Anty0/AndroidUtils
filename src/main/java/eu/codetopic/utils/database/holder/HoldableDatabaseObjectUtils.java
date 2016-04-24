@@ -36,12 +36,12 @@ public final class HoldableDatabaseObjectUtils {
     public synchronized static FoundField getHolderFieldsOf(final Class clazz) {
         FoundField result = cache.get(clazz);
         if (result == null) {
-            result = FieldsSearch.getAllFields(new SimpleFieldsFilter(clazz)
+            result = FieldsSearch.getFields(new SimpleFieldsFilter(clazz)
                     .addCalssesToFind(DatabaseObjectHolder.class, DatabaseObjectHolder[].class)
                     .addAnnotationsToDeepSearch(ScanForHolders.class));
             Log.d(LOG_TAG, "getHolderFieldsOf for " + clazz.getName() + ":\n" + result.hierarchyToString());
 
-                    /*FieldsSearch.getAllFields(new FieldsFilter() {
+                    /*FieldsSearch.getFields(new FieldsFilter() {
                 @Override
                 public Class<?> getStartClass() {
                     return clazz;

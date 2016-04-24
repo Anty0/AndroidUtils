@@ -16,7 +16,7 @@ import android.widget.RadioGroup;
 import java.util.Locale;
 
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.module.data.ModuleDataGetter;
+import eu.codetopic.utils.module.getter.DataGetter;
 
 /**
  * Created by anty on 25.3.16.
@@ -28,15 +28,15 @@ public class LocaleManager {
     private static final String LOG_TAG = "LocaleManager";
 
     private static Context mContext = null;
-    private static ModuleDataGetter<?, LocaleData> mLocaleDataGetter = null;
+    private static DataGetter<LocaleData> mLocaleDataGetter = null;
 
     /**
      * Must be called in Application.onCreate()
      *
      * @param app              application
-     * @param localeDataGetter ModuleDataGetter of LocaleData for saving changes
+     * @param localeDataGetter DataGetter of LocaleData for saving changes
      */
-    public static void initialize(@NonNull Application app, @NonNull ModuleDataGetter<?, LocaleData> localeDataGetter) {// TODO: 26.3.16 initialize in ApplicationBase
+    public static void initialize(@NonNull Application app, @NonNull DataGetter<LocaleData> localeDataGetter) {// TODO: 26.3.16 initialize in ApplicationBase
         if (mContext != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
         mContext = app.getBaseContext();
         mLocaleDataGetter = localeDataGetter;

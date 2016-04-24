@@ -15,7 +15,7 @@ public final class TimingData extends ModuleData {
     private static final int SAVE_VERSION = 0;
 
     public TimingData(Context context) {
-        super(context, PrefNames.FILE_NAME_TIMING_DATA, false, SAVE_VERSION);
+        super(context, PrefNames.FILE_NAME_TIMING_DATA, SAVE_VERSION);
     }
 
     public void clear() {

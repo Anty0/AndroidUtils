@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import eu.codetopic.utils.module.data.ModuleDataGetter;
+import eu.codetopic.utils.module.getter.DataGetter;
 
 /**
  * Created by anty on 24.3.16.
@@ -22,7 +22,7 @@ public class TimedBroadcastsExecutor extends BroadcastReceiver {
             "eu.codetopic.utils.timing.TimedBroadcastsExecutor.EXECUTE_EXTRAS";
 
     static Intent generateIntent(Context context, String action,
-                                 ModuleDataGetter<?, TimingData> timingDataGetter,
+                                 DataGetter<TimingData> timingDataGetter,
                                  TimedBroadcastInfo broadcastInfo, Bundle executeExtras) {
         return new Intent(context, TimedBroadcastsExecutor.class).setAction(action)
                 .putExtra(EXTRA_TIMING_DATA_GETTER, timingDataGetter)
@@ -38,7 +38,7 @@ public class TimedBroadcastsExecutor extends BroadcastReceiver {
         Class<? extends BroadcastReceiver> broadcastClass = ((TimedBroadcastInfo)
                 intent.getSerializableExtra(EXTRA_TIMED_BROADCAST_INFO)).getBroadcastClass();
         //noinspection unchecked
-        ((ModuleDataGetter<?, TimingData>)
+        ((DataGetter<TimingData>)
                 intent.getSerializableExtra(EXTRA_TIMING_DATA_GETTER)).get()
                 .setLastExecuteTime(broadcastClass, System.currentTimeMillis());
         context.sendBroadcast(new Intent(context, broadcastClass)

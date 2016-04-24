@@ -17,7 +17,9 @@ public class ModuleData {
 
     private final Context mContext;
     private final String mFileName;
-    private final SharedPreferences mPreferences;
+    private final int mSaveVersion;
+    private final int mPrefOperatingMode;
+    private SharedPreferences mPreferences;
     private final SharedPreferences.OnSharedPreferenceChangeListener mPreferenceChangeListener =
             new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
@@ -28,17 +30,25 @@ public class ModuleData {
             };
 
 
-    public ModuleData(Context context, String fileName, boolean secured, int saveVersion) {
-        this(context, fileName, Context.MODE_PRIVATE, secured, saveVersion);
+    public ModuleData(Context context, String fileName, int saveVersion) {
+        this(context, fileName, Context.MODE_PRIVATE, saveVersion);
     }
 
-    public ModuleData(Context context, String fileName, int prefOperatingMode, boolean secured, int saveVersion) {
+    public ModuleData(Context context, String fileName, int prefOperatingMode, int saveVersion) {
         mContext = context.getApplicationContext();
         mFileName = fileName;
-        mPreferences = secured ? new SecurePreferences(mContext, "", mFileName) :
-                context.getSharedPreferences(fileName, prefOperatingMode);
+        mPrefOperatingMode = prefOperatingMode;
+        mSaveVersion = saveVersion;
+    }
+
+    public void onCreate() {
+        mPreferences = createSharedPreferences();
         mPreferences.registerOnSharedPreferenceChangeListener(mPreferenceChangeListener);
-        checkUpgrade(saveVersion);
+        checkUpgrade(mSaveVersion);
+    }
+
+    protected SharedPreferences createSharedPreferences() {
+        return mContext.getSharedPreferences(mFileName, mPrefOperatingMode);
     }
 
     private void checkUpgrade(int saveVersion) {
@@ -58,6 +68,10 @@ public class ModuleData {
         return mFileName;
     }
 
+    public int getPrefOperatingMode() {
+        return mPrefOperatingMode;
+    }
+
     protected SharedPreferences getPreferences() {
         return mPreferences;
     }
@@ -70,8 +84,9 @@ public class ModuleData {
         editor.clear();
     }
 
-    public void close() throws Throwable {
+    public void onDestroy() throws Throwable {
         mPreferences.unregisterOnSharedPreferenceChangeListener(mPreferenceChangeListener);
+        mPreferences = null;
     }
 
     @Override

@@ -17,7 +17,7 @@ import eu.codetopic.utils.callback.CallbackUtils;
 import eu.codetopic.utils.database.holder.BitmapDatabaseObject;
 import eu.codetopic.utils.database.holder.BitmapHolder;
 import eu.codetopic.utils.list.items.multiline.MultilineLoadableImageItem;
-import eu.codetopic.utils.module.data.DatabaseDaoGetter;
+import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
 /**
@@ -30,13 +30,13 @@ public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapData
 
     private static final String LOG_TAG = "DependencyPictureTextDatabaseObject";
 
-    private final DatabaseDaoGetter<?, BDO> bdoGetter;
+    private final DatabaseDaoGetter<BDO> bdoGetter;
     private final Class<BH> bhClass;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private BH picture;
 
-    public DependencyPictureTextDatabaseObject(DatabaseDaoGetter<?, BDO> bitmapDatabaseObjectDaoGetter,
+    public DependencyPictureTextDatabaseObject(DatabaseDaoGetter<BDO> bitmapDatabaseObjectDaoGetter,
                                                Class<BH> bitmapHolderClass) {
         bdoGetter = bitmapDatabaseObjectDaoGetter;
         bhClass = bitmapHolderClass;

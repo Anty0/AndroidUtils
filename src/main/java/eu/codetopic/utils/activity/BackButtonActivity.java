@@ -11,7 +11,7 @@ import android.view.MenuItem;
  *
  * @author anty
  */
-public class BackButtonActivity extends AppCompatActivity {
+public abstract class BackButtonActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "BackButtonActivity";
 

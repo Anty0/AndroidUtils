@@ -48,6 +48,10 @@ public class Utils {
     public static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
     private static final String LOG_TAG = "Utils";
 
+    public static void setPadding(View view, int horizontal, int vertical) {
+        setPadding(view, horizontal, vertical, horizontal, vertical);
+    }
+
     public static void setPadding(View view, int left, int top, int right, int bottom) {
         Context context = view.getContext();
         view.setPadding((int) toDP(context, left), (int) toDP(context, top),

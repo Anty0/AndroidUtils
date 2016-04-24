@@ -20,7 +20,7 @@ import eu.codetopic.utils.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.list.items.cardview.CardItem;
 import eu.codetopic.utils.list.items.cardview.MultilineItemCardWrapper;
 import eu.codetopic.utils.list.items.multiline.MultilineItem;
-import eu.codetopic.utils.module.data.DatabaseDaoGetter;
+import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
@@ -42,7 +42,7 @@ public class DatabaseCardRecyclerAdapter<T, ID> extends CardRecyclerAdapter<Card
     };
     private boolean mRegistered = false;
 
-    public DatabaseCardRecyclerAdapter(Context context, DatabaseDaoGetter<?, T> daoGetter,
+    public DatabaseCardRecyclerAdapter(Context context, DatabaseDaoGetter<T> daoGetter,
                                        @Nullable LoadingViewHolder viewHolder) {
         this(context, new DefaultItemsGetter<T, ID>(daoGetter, viewHolder));
     }
@@ -91,10 +91,10 @@ public class DatabaseCardRecyclerAdapter<T, ID> extends CardRecyclerAdapter<Card
 
     public static class DefaultItemsGetter<T, ID> extends ItemsGetter<T, ID> {
 
-        private final DatabaseDaoGetter<?, T> mDaoGetter;
+        private final DatabaseDaoGetter<T> mDaoGetter;
         private final LoadingViewHolder mViewHolder;
 
-        public DefaultItemsGetter(DatabaseDaoGetter<?, T> daoGetter,
+        public DefaultItemsGetter(DatabaseDaoGetter<T> daoGetter,
                                   @Nullable LoadingViewHolder viewHolder) {
             mDaoGetter = daoGetter;
             mViewHolder = viewHolder;

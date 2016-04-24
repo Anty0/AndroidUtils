@@ -27,7 +27,7 @@ import eu.codetopic.utils.list.recyclerView.RecyclerManager;
 import eu.codetopic.utils.list.recyclerView.adapter.CardRecyclerAdapter;
 import eu.codetopic.utils.module.Module;
 import eu.codetopic.utils.module.ModulesManager;
-import eu.codetopic.utils.module.data.ModuleDataGetter;
+import eu.codetopic.utils.module.getter.DataGetter;
 
 /**
  * Created by anty on 23.2.16.
@@ -50,7 +50,7 @@ public class ModulesDashboardFragment extends NavigationFragment {
     private final Object mAdapterLock = new Object();
     private final Object mModulesLock = new Object();
     private DashboardData mData;
-    private ModuleDataGetter<?, ? extends DashboardData> mDataGetter;
+    private DataGetter<? extends DashboardData> mDataGetter;
     private CardRecyclerAdapter<DashboardItem> mAdapter;
     private RecyclerManager mRecyclerManager = null;
     private DashboardItemsAdapter[] mModules;
@@ -67,7 +67,7 @@ public class ModulesDashboardFragment extends NavigationFragment {
         setHasOptionsMenu(true);
     }
 
-    public static ModulesDashboardFragment getInstance(ModuleDataGetter<?, ? extends DashboardData> dataGetter) {
+    public static ModulesDashboardFragment getInstance(DataGetter<? extends DashboardData> dataGetter) {
         ModulesDashboardFragment dashboardFragment = new ModulesDashboardFragment();
         dashboardFragment.mDataGetter = dataGetter;
         return dashboardFragment;
@@ -83,7 +83,7 @@ public class ModulesDashboardFragment extends NavigationFragment {
         if (savedInstanceState != null) {
             mItemsFilter = (DashboardItemsFilter) savedInstanceState.getSerializable(EXTRA_ITEMS_FILTER);
             //noinspection unchecked
-            mDataGetter = (ModuleDataGetter<?, ? extends DashboardData>) savedInstanceState.getSerializable(EXTRA_DATA_GETTER);
+            mDataGetter = (DataGetter<? extends DashboardData>) savedInstanceState.getSerializable(EXTRA_DATA_GETTER);
         }
         if (mDataGetter == null)
             throw new NullPointerException(LOG_TAG + " must be created using getInstance()");
