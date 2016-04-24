@@ -17,4 +17,5 @@ import proguard.annotation.KeepName;
 @Target(ElementType.TYPE)
 @Keep
 @KeepName
-public @interface DisableModule {}
+public @interface DisableModule {
+}

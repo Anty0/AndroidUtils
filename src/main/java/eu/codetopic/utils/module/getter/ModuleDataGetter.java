@@ -9,4 +9,5 @@ import eu.codetopic.utils.module.data.ModuleData;
  * @author anty
  */
 public interface ModuleDataGetter<MT extends Module, DT extends ModuleData>
-        extends ModuleGetter<MT>, DataGetter<DT> { }
+        extends ModuleGetter<MT>, DataGetter<DT> {
+}

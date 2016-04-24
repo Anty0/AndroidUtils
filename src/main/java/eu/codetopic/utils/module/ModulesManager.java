@@ -16,8 +16,8 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.exceptions.InvalidModuleDataFileNameException;
 import eu.codetopic.utils.module.data.DebugProviderData;
 import eu.codetopic.utils.module.data.ModuleData;
-import eu.codetopic.utils.module.getter.DataGetter;
 import eu.codetopic.utils.module.data.ModuleDataManager;
+import eu.codetopic.utils.module.getter.DataGetter;
 
 /**
  * Created by anty on 15.2.16.

@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
-import com.securepreferences.SecurePreferences;
-
 import eu.codetopic.utils.PrefNames;
 
 /**
@@ -19,7 +17,6 @@ public class ModuleData {
     private final String mFileName;
     private final int mSaveVersion;
     private final int mPrefOperatingMode;
-    private SharedPreferences mPreferences;
     private final SharedPreferences.OnSharedPreferenceChangeListener mPreferenceChangeListener =
             new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
@@ -28,6 +25,7 @@ public class ModuleData {
                             .getBroadcastActionChanged(ModuleData.this)));
                 }
             };
+    private SharedPreferences mPreferences;
 
 
     public ModuleData(Context context, String fileName, int saveVersion) {

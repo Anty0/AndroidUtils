@@ -53,8 +53,8 @@ public class TimedBroadcastsManager {
      * This method must be called in onCreate() in Application, otherwise it won't work!
      *
      * @param context                application context
-     * @param useMobileNetworks use mobile network if timed broadcast requires internet access
-     * @param timingDataGetter ModuleDataGetter of TimingData for saving required data using SharedPreferences
+     * @param useMobileNetworks      use mobile network if timed broadcast requires internet access
+     * @param timingDataGetter       ModuleDataGetter of TimingData for saving required data using SharedPreferences
      * @param timedBroadcastsClasses all broadcasts that uses TimedBroadcastsManager annotation
      */
     public static void initialize(Context context, boolean useMobileNetworks, @NonNull DataGetter

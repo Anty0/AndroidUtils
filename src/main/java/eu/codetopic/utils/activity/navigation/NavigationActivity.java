@@ -16,8 +16,6 @@ import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -166,13 +164,14 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
                 if (item instanceof MenuItemImpl) {
                     final SupportMenuItem.OnMenuItemClickListener listener =
                             (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//HACK
-                    if (listener != null) listenerField.set(item, new SupportMenuItem.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            drawer.closeDrawer(GravityCompat.START);
-                            return listener.onMenuItemClick(item);
-                        }
-                    });
+                    if (listener != null)
+                        listenerField.set(item, new SupportMenuItem.OnMenuItemClickListener() {
+                            @Override
+                            public boolean onMenuItemClick(MenuItem item) {
+                                drawer.closeDrawer(GravityCompat.START);
+                                return listener.onMenuItemClick(item);
+                            }
+                        });
                 } else throw new ClassCastException("Wrong class: " + item.getClass());
             } catch (Throwable e) {
                 Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +

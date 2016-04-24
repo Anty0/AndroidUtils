@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.codetopic.utils.module.data.DebugProviderData;
-import eu.codetopic.utils.module.getter.DataGetter;
 import eu.codetopic.utils.module.data.ModuleDataManager;
+import eu.codetopic.utils.module.getter.DataGetter;
 
 /**
  * Mock Log implementation for testing on non android host.
