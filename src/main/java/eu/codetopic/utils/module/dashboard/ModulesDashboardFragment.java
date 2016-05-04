@@ -34,6 +34,8 @@ import eu.codetopic.utils.module.getter.DataGetter;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class ModulesDashboardFragment extends NavigationFragment {
 
     public static final String ACTION_NOTIFY_UPDATE_ITEMS = "eu.codetopic.utils.module.dashboard.ModulesDashboardFragment";

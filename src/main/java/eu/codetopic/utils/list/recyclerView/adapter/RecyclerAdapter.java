@@ -42,7 +42,6 @@ public abstract class RecyclerAdapter<T, VH extends RecyclerAdapter
 
     @Override
     public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        Log.d(LOG_TAG, "onCreateViewHolder");
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(mLayoutResourceId, parent, false);
 
@@ -53,7 +52,6 @@ public abstract class RecyclerAdapter<T, VH extends RecyclerAdapter
 
     @Override
     public void onBindViewHolder(VH holder, int position) {
-        Log.d(LOG_TAG, "onBindViewHolder");
         holder.onBindViewHolder(getItem(position), position);
     }
 
@@ -63,7 +61,6 @@ public abstract class RecyclerAdapter<T, VH extends RecyclerAdapter
 
         public ItemViewHolder(View itemView) {
             super(itemView);
-            Log.d(LOG_TAG, "<init>");
         }
 
         protected abstract void onBindViewHolder(I item, int position);

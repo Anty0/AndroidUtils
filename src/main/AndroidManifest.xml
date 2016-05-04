@@ -19,16 +19,26 @@
         <service
             android:name=".thread.service.BackgroundWorksService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false"
+            android:label="BackgroundWorks"/>
         <service
-            android:name=".list.widget.WidgetService"
+            android:name=".widget.WidgetService"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false"
+            android:label="WidgetService"
+            android:permission="android.permission.BIND_REMOTEVIEWS"/>
+
+        <receiver
+            android:name=".module.ModulesNavigationActivity$FragmentReplaceReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="FragmentReplaceReceiver"/>
 
         <receiver
             android:name=".timing.BootConnectivityReceiver"
-            android:enabled="true"
-            android:exported="false">
+            android:enabled="false"
+            android:exported="false"
+            android:label="TimingBootConnectivityReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
@@ -37,21 +47,25 @@
         <receiver
             android:name=".timing.TimedBroadcastsExecutor"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false"
+            android:label="TimedBroadcastsExecutor"/>
 
         <receiver
             android:name=".notifications.manage.NotificationDeleteReceiver"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false"
+            android:label="NotificationDeleteReceiver"/>
 
         <receiver
             android:name=".notifications.PostNotificationCanceler"
             android:enabled="true"
-            android:exported="false"/>
+            android:exported="false"
+            android:label="PostNotificationCanceler"/>
         <receiver
             android:name=".notifications.manage.ClearOnBootReceiver"
-            android:enabled="true"
-            android:exported="false">
+            android:enabled="false"
+            android:exported="false"
+            android:label="NotificationsClearOnBootReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>

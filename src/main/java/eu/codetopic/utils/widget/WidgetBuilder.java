@@ -19,9 +19,9 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.list.items.multiline.MultilineItem;
@@ -51,6 +51,17 @@ public class WidgetBuilder {
     @Nullable private WidgetItemsProvider itemsProvider;
     @Nullable private CharSequence emptyViewText;
     @DrawableRes private int emptyViewImageSrc;
+
+    private WidgetBuilder(Context context, int[] appWidgetIds) {
+        this(context);
+        this.appWidgetIds = appWidgetIds;
+    }
+
+    @TargetApi(14)
+    private WidgetBuilder(Context context) {
+        mContext = context;
+        setupDefaults();
+    }
 
     public static Intent getUpdateIntent(Context context, Class<? extends AppWidgetProvider> widgetClass) {
         return new Intent(context.getApplicationContext(), widgetClass)
@@ -90,17 +101,6 @@ public class WidgetBuilder {
 
     public static WidgetBuilder build(Context context) {
         return new WidgetBuilder(context);
-    }
-
-    private WidgetBuilder(Context context, int[] appWidgetIds) {
-        this(context);
-        this.appWidgetIds = appWidgetIds;
-    }
-
-    @TargetApi(14)
-    private WidgetBuilder(Context context) {
-        mContext = context;
-        setupDefaults();
     }
 
     @SuppressLint("PrivateResource")
@@ -186,12 +186,12 @@ public class WidgetBuilder {
         return this;
     }
 
-    public void apply() {
-        apply(ContentType.FULL);
+    public WidgetApplicator apply() {
+        return apply(ContentType.FULL);
     }
 
-    public void apply(@NonNull ContentType type) {
-
+    public WidgetApplicator apply(@NonNull ContentType type) {
+        return new WidgetApplicator(mContext, get(type));
     }
 
     public RemoteViews get() {
@@ -253,9 +253,13 @@ public class WidgetBuilder {
                 }
             }
         } else {
-            List<MultilineItem> itemList = itemsProvider == null ?
-                    new ArrayList<MultilineItem>() : itemsProvider.getItems();
-            if (itemList.size() == 0) {
+            List<? extends MultilineItem> itemList = null;
+            try {
+                itemList = itemsProvider == null ? null : itemsProvider.getItems();
+            } catch (Throwable t) {
+                Log.e(LOG_TAG, "getDataView", t);
+            }
+            if (itemList == null || itemList.size() == 0) {
                 dataView = new RemoteViews(mContext.getPackageName(), R.layout.empty_view_base);
             } else {
                 dataView = new RemoteViews(mContext.getPackageName(), R.layout.widget_content_old);
@@ -273,7 +277,8 @@ public class WidgetBuilder {
             }
         }
 
-        if (emptyViewImageSrc != 0) dataView.setImageViewResource(R.id.empty_image, emptyViewImageSrc);
+        if (emptyViewImageSrc != 0)
+            dataView.setImageViewResource(R.id.empty_image, emptyViewImageSrc);
         if (emptyViewText != null) dataView.setTextViewText(R.id.empty_text, emptyViewText);
         return dataView;
     }
@@ -299,6 +304,33 @@ public class WidgetBuilder {
                             intent, PendingIntent.FLAG_CANCEL_CURRENT);
             }
             return null;
+        }
+    }
+
+    public static class WidgetApplicator {
+
+        private final Context mContext;
+        private final RemoteViews mRemoteViews;
+
+        private WidgetApplicator(Context context, RemoteViews toApply) {
+            mContext = context;
+            mRemoteViews = toApply;
+        }
+
+        public void on(int[] appWidgetIds) {
+            on(AppWidgetManager.getInstance(mContext), appWidgetIds);
+        }
+
+        public void on(AppWidgetManager manager, int[] appWidgetIds) {
+            manager.updateAppWidget(appWidgetIds, mRemoteViews);
+        }
+
+        public void on(Class<? extends AppWidgetProvider> widgetClass) {
+            on(AppWidgetManager.getInstance(mContext), widgetClass);
+        }
+
+        public void on(AppWidgetManager manager, Class<? extends AppWidgetProvider> widgetClass) {
+            manager.updateAppWidget(new ComponentName(mContext, widgetClass), mRemoteViews);
         }
     }
 

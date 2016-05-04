@@ -14,6 +14,4 @@ public class Constants {
     public static final int JOB_PRIORITY_DATABASE = 10;
     //
     public static final int WIDGET_HOST_ID = 148297;
-    //
-    public static final int DASHBOARD_ITEM_DEFAULT_PRIORITY_LOADING = 50;
 }

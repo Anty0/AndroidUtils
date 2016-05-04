@@ -5,10 +5,10 @@
               android:orientation="horizontal"
               android:padding="3dp">
 
-    <ProgressBar
+    <include
+        layout="@layout/base_progress_bar"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:indeterminate="true"/>
+        android:layout_height="match_parent"/>
 
     <include layout="@layout/listitem_multiline_text"/>
 

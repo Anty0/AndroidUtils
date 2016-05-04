@@ -10,13 +10,14 @@
         android:id="@+id/relative_layout_widget_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
+        android:background="@color/primary_material_dark"
         android:clickable="true"
         android:paddingLeft="3dp"
         android:paddingRight="3dp">
 
         <TextView
             android:id="@+id/text_view_title"
+            style="@android:style/TextAppearance.Large"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -26,8 +27,7 @@
             android:layout_toStartOf="@+id/image_button_refresh"
             android:paddingLeft="15dp"
             android:paddingRight="15dp"
-            android:singleLine="true"
-            android:textAppearance="?attr/titleTextAppearance"/>
+            android:singleLine="true"/>
 
         <ImageButton
             android:id="@+id/image_button_refresh"
@@ -48,7 +48,7 @@
         android:layout_height="match_parent"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
-        android:background="?attr/colorPrimaryDark"
+        android:background="@color/primary_dark_material_dark"
         android:paddingLeft="2dp"
         android:paddingRight="2dp"/>
 

@@ -22,8 +22,13 @@ public final class TimingData extends ModuleData {
         edit().clear().apply();
     }
 
+    public void clear(Class clazz) {
+        edit().remove(clazz.getName() + PrefNames.ADD_TIME_LAST_START)
+                .remove(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE).apply();
+    }
+
     public long getLastExecuteTime(Class clazz) {
-        return getPreferences().getLong(clazz.getName() + PrefNames.ADD_TIME_LAST_START, -1);
+        return getPreferences().getLong(clazz.getName() + PrefNames.ADD_TIME_LAST_START, -1L);
     }
 
     void setLastExecuteTime(Class clazz, long lastExecuteTime) {

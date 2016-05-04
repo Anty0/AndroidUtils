@@ -15,5 +15,5 @@ import eu.codetopic.utils.list.items.multiline.MultilineItem;
 public interface WidgetItemsProvider extends Serializable {
 
     @NonNull
-    List<MultilineItem> getItems();
+    List<? extends MultilineItem> getItems() throws Throwable;
 }

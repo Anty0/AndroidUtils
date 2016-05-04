@@ -3,6 +3,7 @@ package eu.codetopic.utils.notifications.manage;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
@@ -31,6 +32,13 @@ public final class NotificationIdsModule extends ModuleImpl {// TODO: 6.3.16 add
     @Override
     public CharSequence getName() {
         return getText(R.string.module_name_notifications_ids);
+    }
+
+    @Override
+    protected void onCreate() {
+        super.onCreate();
+        getPackageManager().setComponentEnabledSetting(new ComponentName(this, ClearOnBootReceiver.class),
+                PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
     }
 
     @Nullable
@@ -123,7 +131,7 @@ public final class NotificationIdsModule extends ModuleImpl {// TODO: 6.3.16 add
         }
     }
 
-    public void cancelNotification(Group singleIdGroup) {
+    public void cancelNotification(Group singleIdGroup) {// FIXME: 27.4.16 why don't use cancelAllNotifications()?
         int[] ids = singleIdGroup.getIdsFromCache();
         if (!singleIdGroup.usesSingleId() || ids.length > 1)
             throw new WrongIdException("Group uses more then single id and is unusable for this method");

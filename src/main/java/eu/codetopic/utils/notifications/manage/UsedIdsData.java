@@ -2,8 +2,6 @@ package eu.codetopic.utils.notifications.manage;
 
 import android.content.Context;
 
-import com.google.gson.Gson;
-
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.exceptions.WrongIdException;
@@ -15,8 +13,6 @@ import eu.codetopic.utils.module.data.ModuleData;
  * @author anty
  */
 final class UsedIdsData extends ModuleData {
-
-    private static final Gson GSON = new Gson();
 
     private static final int SAVE_VERSION = 0;
 

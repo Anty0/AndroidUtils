@@ -17,6 +17,8 @@ import eu.codetopic.utils.list.items.cardview.CardItem;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class DashboardItem implements CardItem {
 
     private final DashboardItemsAdapter mModule;

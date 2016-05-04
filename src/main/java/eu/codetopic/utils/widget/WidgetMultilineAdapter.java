@@ -3,6 +3,7 @@ package eu.codetopic.utils.widget;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
@@ -22,16 +23,12 @@ import eu.codetopic.utils.list.items.multiline.MultilineItem;
 @TargetApi(11)
 public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFactory {
 
-    static final String EXTRA_ITEMS_PROVIDER = "eu.codetopic.utils.widget.WidgetService.EXTRA_ITEMS_PROVIDER";
+    static final String EXTRA_ITEMS_PROVIDER =
+            "eu.codetopic.utils.widget.WidgetService.EXTRA_ITEMS_PROVIDER";
     private static final String LOG_TAG = "WidgetMultilineAdapter";
     private final Context mContext;
     private final WidgetItemsProvider mItemsProvider;
     private final ArrayList<MultilineItem> mItems = new ArrayList<>();
-
-    public static Intent getServiceIntent(Context context, WidgetItemsProvider itemsProvider) {
-        return new Intent(context, WidgetService.class)
-                .putExtra(EXTRA_ITEMS_PROVIDER, itemsProvider);
-    }
 
     public WidgetMultilineAdapter(Context context, Intent intent) {
         Log.d(LOG_TAG, "<init>");
@@ -47,51 +44,56 @@ public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFac
         };
     }
 
+    public static Intent getServiceIntent(Context context, WidgetItemsProvider itemsProvider) {
+        Intent intent = new Intent(context, WidgetService.class)
+                .putExtra(EXTRA_ITEMS_PROVIDER, itemsProvider);
+        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));// TODO: 5.5.16 use or not use?
+        // FIXME: 5.5.16 don't working (i don't know why)
+        return intent;
+    }
+
     private void updateItems() {
         Log.d(LOG_TAG, "updateItems");
         mItems.clear();
-        mItems.addAll(mItemsProvider.getItems());
+        try {
+            mItems.addAll(mItemsProvider.getItems());
+        } catch (Throwable t) {
+            Log.e(LOG_TAG, "updateItems", t);
+        }
     }
 
     @Override
     public void onCreate() {
-        Log.d(LOG_TAG, "onCreate");
         updateItems();
     }
 
     @Override
     public void onDataSetChanged() {
-        Log.d(LOG_TAG, "onDataSetChanged");
         updateItems();
     }
 
     @Override
     public void onDestroy() {
-        Log.d(LOG_TAG, "onDestroy");
         mItems.clear();
     }
 
     @Override
     public int getCount() {
-        Log.d(LOG_TAG, "getCount: " + mItems.size());
         return mItems.size();
     }
 
     @Override
     public long getItemId(int position) {
-        Log.d(LOG_TAG, "getItemId: " + position);
         return position;
     }
 
     @Override
     public boolean hasStableIds() {
-        Log.d(LOG_TAG, "hasStableIds: " + false);
         return false;
     }
 
     @Override
     public RemoteViews getViewAt(int position) {
-        Log.d(LOG_TAG, "getViewAt: " + position);
         final RemoteViews remoteView = new RemoteViews(
                 mContext.getPackageName(), R.layout.widget_list_item_multi_line_text);
         MultilineItem multilineItem = mItems.get(position);
@@ -102,13 +104,11 @@ public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public RemoteViews getLoadingView() {
-        Log.d(LOG_TAG, "getLoadingView: " + null);
         return null;
     }
 
     @Override
     public int getViewTypeCount() {
-        Log.d(LOG_TAG, "getViewTypeCount: " + 1);
         return 1;
     }
 }

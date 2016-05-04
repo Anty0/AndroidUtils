@@ -17,6 +17,8 @@ import eu.codetopic.utils.list.items.multiline.MultilineItemUtils;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class MultilineDashboardItem extends DashboardItem implements MultilineItem {
 
     private static final String TAG_CONTENT_VIEW = "CONTENT_VIEW";

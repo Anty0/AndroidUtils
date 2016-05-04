@@ -22,7 +22,6 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import eu.codetopic.utils.Log;
@@ -67,6 +66,29 @@ public abstract class WidgetProvider extends AppWidgetProvider {
         Log.d(LOG_TAG, "getAllWidgetIds");
         return AppWidgetManager.getInstance(context)
                 .getAppWidgetIds(new ComponentName(context, widgetClass));
+    }
+
+    public static void notifyItemsChanged(Context context, Bundle intentData,
+                                          Class<? extends WidgetProvider> widgetClass) {
+        if (Build.VERSION.SDK_INT >= 11) {
+            notifyItemsChanged(context, widgetClass);
+            return;
+        }
+        context.sendBroadcast(new Intent(context.getApplicationContext(), widgetClass)
+                .setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
+                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
+                        getAllWidgetIds(context, widgetClass))
+                .putExtras(intentData));
+    }
+
+    @TargetApi(11)
+    public static void notifyItemsChanged(Context context, Class<? extends WidgetProvider> widgetClass) {
+        notifyItemsChanged(context, getAllWidgetIds(context, widgetClass));
+    }
+
+    @TargetApi(11)
+    public static void notifyItemsChanged(Context context, int[] appWidgetIds) {
+        AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetIds, R.id.content_list_view);
     }
 
     public Intent getLastIntent() {
@@ -127,29 +149,6 @@ public abstract class WidgetProvider extends AppWidgetProvider {
 
     protected PendingIntent getTitlePendingIntent(Context context, int[] appWidgetIds) {
         return null;
-    }
-
-    public static void notifyItemsChanged(Context context, Bundle intentData,
-                                   Class<? extends WidgetProvider> widgetClass) {
-        if (Build.VERSION.SDK_INT >= 11) {
-            notifyItemsChanged(context, widgetClass);
-            return;
-        }
-        context.sendBroadcast(new Intent(context.getApplicationContext(), widgetClass)
-                .setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
-                .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
-                        getAllWidgetIds(context, widgetClass))
-                .putExtras(intentData));
-    }
-
-    @TargetApi(11)
-    public static void notifyItemsChanged(Context context, Class<? extends WidgetProvider> widgetClass) {
-        notifyItemsChanged(context, getAllWidgetIds(context, widgetClass));
-    }
-
-    @TargetApi(11)
-    public static void notifyItemsChanged(Context context, int[] appWidgetIds) {
-        AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetIds, R.id.content_list_view);
     }
 
     @Nullable
@@ -270,9 +269,13 @@ public abstract class WidgetProvider extends AppWidgetProvider {
             contentRemoteViews.setEmptyView(R.id.content_list_view, R.id.empty_view);
         } else {
             WidgetItemsProvider provider = getItemsProvider(context, appWidgetIds);
-            List<MultilineItem> itemList = provider == null ?
-                    new ArrayList<MultilineItem>() : provider.getItems();
-            if (itemList.size() == 0)
+            List<? extends MultilineItem> itemList = null;
+            try {
+                itemList = provider == null ? null : provider.getItems();
+            } catch (Throwable t) {
+                Log.e(LOG_TAG, "getDataContent", t);
+            }
+            if (itemList == null || itemList.size() == 0)
                 contentRemoteViews = new RemoteViews(context
                         .getPackageName(), R.layout.empty_view_base);
             else {

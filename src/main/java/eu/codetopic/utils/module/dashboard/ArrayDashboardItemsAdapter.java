@@ -14,6 +14,8 @@ import java.util.ListIterator;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class ArrayDashboardItemsAdapter<T extends DashboardItem> extends DashboardItemsAdapter implements List<T> {
 
     private final ArrayList<T> mItems = new ArrayList<>();

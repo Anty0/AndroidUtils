@@ -1,8 +1,5 @@
 package eu.codetopic.utils.module;
 
-import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -16,12 +13,12 @@ import junit.framework.Assert;
 
 import java.sql.SQLException;
 
-import eu.codetopic.utils.OnceReceiver;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.activity.navigation.NavigationActivity;
 import eu.codetopic.utils.module.component.ComponentsManager;
 import eu.codetopic.utils.module.dashboard.DashboardItemsAdapter;
+import eu.codetopic.utils.module.dashboard2.DashboardItem;
 import eu.codetopic.utils.module.data.ModuleData;
 import eu.codetopic.utils.module.data.ModuleDataManager;
 import eu.codetopic.utils.module.data.ModuleDatabase;
@@ -47,8 +44,7 @@ public abstract class Module extends ContextThemeWrapper implements Comparable<M
 
     final void attach(ModulesManager manager) {
         attachBaseContext(manager.getContext());
-        ModuleTheme theme = getClass().getAnnotation(ModuleTheme.class);
-        setTheme(theme == null ? manager.getDefaultTheme() : theme.value());
+        setTheme(ModulesManager.getThemeIdFor(this));
         onCreate();
     }
 
@@ -67,7 +63,7 @@ public abstract class Module extends ContextThemeWrapper implements Comparable<M
     }
 
     @Nullable
-    public abstract ComponentsManager getComponentsManager();// TODO: 13.3.16 implement component manager in all modules
+    public abstract ComponentsManager getComponentsManager();// TODO: 30.4.16 rework and implement in all modules
 
     @Nullable
     public abstract ModuleDataManager getDataManager();
@@ -89,28 +85,27 @@ public abstract class Module extends ContextThemeWrapper implements Comparable<M
     @Nullable
     public abstract JobManager getJobManager();
 
-    public abstract boolean onCreateNavigationMenu(NavigationActivity activity, Menu menu);
+    public abstract boolean onCreateNavigationMenu(NavigationActivity activity, Menu menu);// TODO: 4.5.16 add on NavigationItem click function
 
-    public void replaceFragment(@Nullable Class fragmentClass) {
+    /*public void replaceFragment(@Nullable Class fragmentClass) {
         replaceFragment(fragmentClass, null);
     }
 
     public void replaceFragment(@Nullable final Class fragmentClass, @Nullable final Bundle fragmentExtras) {
-        startActivity(new Intent(this, ModulesNavigationActivity.class));
-        new OnceReceiver(this, ModulesNavigationActivity.BROADCAST_ACTION_ACTIVITY_INITIALIZED) {
-            @Override
-            public void onReceived(Context context, Intent intent) {
-                ModulesNavigationActivity.replaceFragment(context, fragmentClass, fragmentExtras);
-            }
-        };
-    }
+        ModulesNavigationActivity.FragmentReplaceReceiver
+                .replaceFragment(this, fragmentClass, fragmentExtras);
+    }*/
 
     public void invalidateNavigationMenu() {
         ModulesNavigationActivity.invalidateNavigationMenu(this);
     }
 
     @Nullable
+    @Deprecated
     public abstract DashboardItemsAdapter[] getDashboardItemsAdapters();
+
+    @Nullable
+    public abstract DashboardItem[] getDashboardItems();
 
     public abstract boolean hasSettings();
 

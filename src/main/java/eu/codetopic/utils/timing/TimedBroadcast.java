@@ -4,6 +4,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.Calendar;
 
 import proguard.annotation.Keep;
 import proguard.annotation.KeepClassMemberNames;
@@ -24,6 +25,13 @@ import proguard.annotation.KeepName;
 public @interface TimedBroadcast {
 
     long time();
+
+    int[] usableDays() default {Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY,
+            Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY};
+
+    int startHour() default 0;
+
+    int stopHour() default 0;
 
     boolean resetTimingOnBoot() default false;
 

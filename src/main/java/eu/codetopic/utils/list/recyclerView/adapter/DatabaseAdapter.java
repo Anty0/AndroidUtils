@@ -17,6 +17,7 @@ import com.j256.ormlite.stmt.PreparedQuery;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import eu.codetopic.utils.Log;
@@ -59,7 +60,7 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
         mItemsGetter = itemsGetter;
     }
 
-    public void notifyDatabaseDataChanged() {
+    public synchronized void notifyDatabaseDataChanged() {
         mItemsGetter.onUpdateItems(getContext());
     }
 
@@ -95,7 +96,8 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
     @Override
     public void postModifications(@Nullable Object editTag, Collection<Modification<CardItem>>
             modifications, Collection<CardItem> contentModifiedItems) {
-        if (!EDIT_TAG.equals(editTag)) throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
+        if (!EDIT_TAG.equals(editTag))
+            throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
                     " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
         super.postModifications(editTag, modifications, contentModifiedItems);
     }
@@ -106,14 +108,15 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
                 " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
     }
 
-    private void setItems(@NonNull Collection<? extends CardItem> items) {
-        super.edit().clear().addAll(items).setTag(EDIT_TAG).apply();
+    private synchronized void setItems(@NonNull Collection<? extends CardItem> items) {
+        super.edit().clear().addAll(items).notifyAllItemsChanged().setTag(EDIT_TAG).apply();
     }
 
     public static class FilteredItemsGetter<T, ID> extends DefaultItemsGetter<T, ID> {
 
         private Filter<T> mFilter = null;
         private PreparedQuery<T> mPreparedQuery = null;
+        private Comparator<T> mComparator = null;
 
         public FilteredItemsGetter(DatabaseDaoGetter<T> daoGetter,
                                    @Nullable LoadingViewHolder viewHolder) {
@@ -130,8 +133,21 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
             return this;
         }
 
+        public FilteredItemsGetter<T, ID> setSorter(Comparator<T> comparator) {
+            this.mComparator = comparator;
+            return this;
+        }
+
         @Override
+        @WorkerThread
         protected Collection<? extends T> getItems(Dao<T, ID> dao) throws Throwable {
+            List<? extends T> items = getDatabaseItems(dao);
+            if (mComparator != null) Collections.sort(items, mComparator);
+            return items;
+        }
+
+        @WorkerThread
+        protected List<? extends T> getDatabaseItems(Dao<T, ID> dao) throws Throwable {
             if (mFilter == null)
                 return mPreparedQuery != null ? dao.query(mPreparedQuery) : dao.queryForAll();
 
@@ -220,6 +236,15 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
                 @Override
                 public void run() {
                     mAdapter.setItems(items);
+                }
+            });
+        }
+
+        protected void requestUpdateItems() {
+            JobUtils.runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    mAdapter.notifyDatabaseDataChanged();
                 }
             });
         }

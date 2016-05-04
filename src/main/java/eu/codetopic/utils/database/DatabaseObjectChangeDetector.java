@@ -17,6 +17,7 @@ public class DatabaseObjectChangeDetector<T> {
 
     private final Context mContext;
     private final String mBroadcastActionChangedName;
+    private boolean mEnabled = true;
 
     public DatabaseObjectChangeDetector(Context context, Class<T> clazz) {
         mContext = context;
@@ -61,11 +62,19 @@ public class DatabaseObjectChangeDetector<T> {
     }
 
     public void onChange() {
-        sendChangeBroadcast();
+        if (isEnabled()) sendChangeBroadcast();
     }
 
     protected void sendChangeBroadcast() {
         sendChangeBroadcast(mContext, mBroadcastActionChangedName);
     }
 
+    public boolean isEnabled() {
+        return mEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.mEnabled = enabled;
+        onChange();
+    }
 }

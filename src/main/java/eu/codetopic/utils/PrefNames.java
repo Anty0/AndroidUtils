@@ -14,6 +14,7 @@ public class PrefNames {
     public static final String PASSWORD = "PASSWORD";
     public static final String LOGGED_IN = "LOGGED_IN";
     //DashboardData
+    public static final String FILE_NAME_DASHBOARD_DATA = "DashboardData";
     public static final String SHOW_DESCRIPTION = "SHOW_DESCRIPTION";
     public static final String ADD_DASHBOARD_ITEM_ENABLED = "_DASHBOARD_ITEM_ENABLED";
     //UsedIdsData

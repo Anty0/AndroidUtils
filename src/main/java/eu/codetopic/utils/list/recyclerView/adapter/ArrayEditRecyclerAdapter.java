@@ -84,60 +84,69 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
 
     @Override
     public Iterator<T> iterator() {
-        synchronized (mLock) {
-            return new IteratorWrapper<T>(mData.iterator()) {
-                @Override
-                public void remove() {
-                    throw new UnsupportedOperationException("Not supported");
-                }
-            };
-        }
+        return new IteratorWrapper<T>(getItems().iterator()) {
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("Not supported");
+            }
+        };
     }
 
     public Editor<T> edit() {
         return new Editor<>(this);
     }
 
-    public void postModifications(Collection<Modification<T>> modifications) {
-        postModifications(null, modifications);
+    @UiThread
+    public void postModifications(Collection<Modification<T>> modifications,
+                                  @Nullable Collection<T> contentModifiedItems) {
+
+        postModifications(null, modifications, contentModifiedItems);
     }
 
     @UiThread
-    public void postModifications(@Nullable Object editTag, Collection<Modification<T>> modifications) {
+    public void postModifications(@Nullable Object editTag, Collection<Modification<T>> modifications,
+                                  @Nullable Collection<T> contentModifiedItems) {
+
         synchronized (mLock) {
             //noinspection unchecked
-            List<T> mDataBackup = (List<T>) mData.clone();
+            List<T> dataBackup = (List<T>) mData.clone();
             for (Modification<T> modification : modifications)
                 modification.modify(mData);
 
-            for (Iterator<T> iterator = mDataBackup.iterator(); iterator.hasNext(); ) {
+            for (Iterator<T> iterator = dataBackup.iterator(); iterator.hasNext(); ) {
                 T obj = iterator.next();
                 if (!mData.contains(obj)) {
-                    notifyItemRemoved(mDataBackup.indexOf(obj));
+                    notifyItemRemoved(dataBackup.indexOf(obj));
                     iterator.remove();
                 }
             }
 
-            for (int i = 0, mNewDataSize = mData.size(); i < mNewDataSize; i++) {
+            for (int i = 0, size = mData.size(); i < size; i++) {
                 T obj = mData.get(i);
-                if (!mDataBackup.contains(obj)) {
-                    mDataBackup.add(i, obj);
+                if (!dataBackup.contains(obj)) {
+                    dataBackup.add(i, obj);
                     notifyItemInserted(i);
                     continue;
                 }
 
-                int oldIndex = mDataBackup.indexOf(obj);
+                int oldIndex = dataBackup.indexOf(obj);
                 if (oldIndex != i) {
                     notifyItemMoved(oldIndex, i);
-                    mDataBackup.remove(obj);
-                    mDataBackup.add(i, obj);
+                    dataBackup.remove(obj);
+                    dataBackup.add(i, obj);
                 }
             }
 
-            if (!Objects.equals(mDataBackup, mData)) {// TODO: 16.4.16 only if is in debug mode
-                Error e = new InternalError("Detected problem in " + LOG_TAG + " while applying changes");
-                Log.e(LOG_TAG, "apply", e);
-            }
+            if (contentModifiedItems != null) {
+                for (T item : contentModifiedItems) {
+                    int index = mData.indexOf(item);
+                    if (index != -1) notifyItemChanged(index);
+                }
+            } else notifyItemRangeChanged(0, mData.size());
+
+            if (!Objects.equals(dataBackup, mData)) Log.e(LOG_TAG, "apply",
+                    new InternalError("Detected problem in " + LOG_TAG + " while applying changes" +
+                            " - !dataBackup.equals(newData)"));
             onDataEdited(editTag);
         }
     }
@@ -150,12 +159,14 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
         void modify(List<T> toModify);
     }
 
-    public static class Editor<T> {
+    public static final class Editor<T> {
 
         private static final String LOG_TAG = ArrayEditRecyclerAdapter.LOG_TAG + "$Editor";
 
         private final ArrayEditRecyclerAdapter<T, ?> mAdapter;
         private final ArrayList<Modification<T>> mModifications = new ArrayList<>();
+        private final ArrayList<T> mChangedItems = new ArrayList<>();
+        private boolean mAllItemsChanged = false;
         private Object mTag = null;
 
         private Editor(ArrayEditRecyclerAdapter<T, ?> adapter) {
@@ -268,10 +279,29 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
+        @SafeVarargs
+        public synchronized final Editor<T> notifyItemsChanged(T... items) {
+            Collections.addAll(mChangedItems, items);
+            return this;
+        }
+
+        public synchronized Editor<T> notifyItemsChanged(Collection<T> items) {
+            mChangedItems.addAll(items);
+            return this;
+        }
+
+        public synchronized Editor<T> notifyAllItemsChanged() {
+            mAllItemsChanged = true;
+            return this;
+        }
+
         @UiThread
         public synchronized void apply() {
-            mAdapter.postModifications(getTag(), mModifications);
+            mAdapter.postModifications(getTag(), mModifications,
+                    mAllItemsChanged ? null : mChangedItems);
             mModifications.clear();
+            mChangedItems.clear();
+            mAllItemsChanged = false;
         }
     }
 

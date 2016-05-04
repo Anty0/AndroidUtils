@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 
 import java.util.Collection;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.list.items.cardview.CardItem;
 
@@ -55,7 +54,6 @@ public class CardRecyclerAdapter<T extends CardItem> extends RecyclerAdapter<T,
 
         public CardViewViewHolder(Context context, View itemView) {
             super(itemView);
-            Log.d(LOG_TAG, "<init>");
             mContext = context;
         }
 
@@ -65,7 +63,6 @@ public class CardRecyclerAdapter<T extends CardItem> extends RecyclerAdapter<T,
 
         @Override
         protected void onBindViewHolder(final T item, final int position) {
-            Log.d(LOG_TAG, "onBindViewHolder");
             ViewGroup parent = (ViewGroup) itemView.findViewById(R.id.card_view);
 
             Object tag = parent.getTag();

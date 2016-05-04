@@ -15,6 +15,11 @@ public abstract class DatabaseObject implements Serializable {
         return id;
     }
 
+    public void setId(Long id) {
+        if (this.id != null) throw new IllegalStateException("Can't set 'id': id is already set");
+        this.id = id;
+    }
+
     @Override
     public boolean equals(Object o) {
         return super.equals(o) || o instanceof DatabaseObject && Objects.equals(getClass(),

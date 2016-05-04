@@ -3,7 +3,6 @@ package eu.codetopic.utils.module.dashboard;
 import android.content.Context;
 import android.support.annotation.StringRes;
 
-import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.JobUtils;
@@ -13,6 +12,8 @@ import eu.codetopic.utils.thread.JobUtils;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class DashboardItemsAdapter {
 
     private static final String LOG_TAG = "DashboardItemsAdapter";
@@ -104,7 +105,7 @@ public abstract class DashboardItemsAdapter {
 
             @Override
             public int getPriority() {
-                return Constants.DASHBOARD_ITEM_DEFAULT_PRIORITY_LOADING;
+                return 50;// FIXME: 2.5.16 constant
             }
         };
     }

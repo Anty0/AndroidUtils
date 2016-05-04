@@ -1,6 +1,9 @@
 package eu.codetopic.utils.activity.navigation;
 
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.design.internal.NavigationMenuPresenter;
@@ -50,9 +53,8 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
         //noinspection ConstantConditions
         ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
                 .setImageDrawable(Utils.getActivityIcon(this, getComponentName()));
-        //noinspection ConstantConditions
-        navigationView.getHeaderView(0).findViewById(R.id.navigationHeader)
-                .setBackgroundResource(getHeaderBackground());
+        setHeaderBackgroundColor(Utils.makeColorDarker(Utils.getColorFromAttr(this,
+                R.attr.colorPrimaryDark, Color.rgb(0, 0, 0)), 0.8f));
         textViewAppTitle.setText(getTitle());
         setSupportActionBar(toolbar);
 
@@ -87,8 +89,21 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
         }
     }
 
-    @DrawableRes
-    protected abstract int getHeaderBackground();
+    public void setHeaderBackground(Drawable drawable) {
+        //noinspection deprecation
+        navigationView.getHeaderView(0).findViewById(R.id.navigationHeader)
+                .setBackgroundDrawable(drawable);
+    }
+
+    public void setHeaderBackgroundColor(@ColorInt int color) {
+        navigationView.getHeaderView(0).findViewById(R.id.navigationHeader)
+                .setBackgroundColor(color);
+    }
+
+    public void setHeaderBackgroundResource(@DrawableRes int resId) {
+        navigationView.getHeaderView(0).findViewById(R.id.navigationHeader)
+                .setBackgroundResource(resId);
+    }
 
     @Override
     public void setTitle(CharSequence title) {

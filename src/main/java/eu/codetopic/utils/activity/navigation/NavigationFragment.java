@@ -12,4 +12,8 @@ public abstract class NavigationFragment extends LoadingViewHolderFragment {
         getNavigationActivity().replaceFragment(clazz);
     }
 
+    protected void removeSelfFragment() {
+        getNavigationActivity().removeCurrentFragment();
+    }
+
 }

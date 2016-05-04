@@ -33,11 +33,13 @@ public final class ModulesManager {
     private final Context mContext;
     @StyleRes private final int mDefaultTheme;
     private final HashMap<Class<? extends Module>, Module> mModules = new HashMap<>();
+    //private final Class<? extends ModulesNavigationActivity> mMainActivity;
     private Throwable validateResult = null;
 
     private ModulesManager(Configuration config) {
         mContext = config.getContext();
         mDefaultTheme = config.getDefaultTheme();
+        //mMainActivity = config.getMainActivity();
         for (Class<? extends Module> moduleClass : config.getModules())
             try {
                 if (!moduleClass.isAnnotationPresent(DisableModule.class))
@@ -67,6 +69,22 @@ public final class ModulesManager {
 
     public static <M extends Module> M findModule(Class<M> moduleClass) {
         return mInstance == null ? null : mInstance.getModule(moduleClass);
+    }
+
+    /*@Nullable
+    public static Class<? extends ModulesNavigationActivity> getMainActivityClass() {
+        return getInstance().mMainActivity;
+    }*/
+
+    @StyleRes
+    public static int getThemeIdFor(Module module) {
+        return getThemeIdFor(module.getClass());
+    }
+
+    @StyleRes
+    public static int getThemeIdFor(Class<? extends Module> moduleClass) {
+        ModuleTheme theme = moduleClass.getAnnotation(ModuleTheme.class);
+        return theme == null ? getInstance().getDefaultTheme() : theme.value();
     }
 
     public void validate() {
@@ -123,6 +141,7 @@ public final class ModulesManager {
 
         private final Context context;
         private final List<Class<? extends Module>> modules = new ArrayList<>();
+        //private Class<? extends ModulesNavigationActivity> mainActivity = null;
         @StyleRes private int defaultTheme;
         private boolean defaultDebugMode = true;
         private DataGetter<? extends DebugProviderData> debugDataGetter = null;
@@ -144,6 +163,15 @@ public final class ModulesManager {
             this.defaultTheme = defaultTheme;
             return this;
         }
+
+        /*public Class<? extends ModulesNavigationActivity> getMainActivity() {
+            return mainActivity;
+        }*/
+
+        /*public Configuration setMainActivity(Class<? extends ModulesNavigationActivity> activity) {
+            this.mainActivity = activity;
+            return this;
+        }*/
 
         public DataGetter<? extends DebugProviderData> getDebugDataGetter() {
             return debugDataGetter;

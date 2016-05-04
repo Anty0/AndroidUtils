@@ -9,6 +9,7 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.navigation.NavigationActivity;
 import eu.codetopic.utils.module.component.ComponentsManager;
 import eu.codetopic.utils.module.dashboard.DashboardItemsAdapter;
+import eu.codetopic.utils.module.dashboard2.DashboardItem;
 import eu.codetopic.utils.module.data.ModuleDataManager;
 import eu.codetopic.utils.module.data.ModuleDatabase;
 import eu.codetopic.utils.module.settings.Settings;
@@ -107,6 +108,12 @@ public abstract class ModuleImpl extends Module {
     @Override
     public DashboardItemsAdapter[] getDashboardItemsAdapters() {
         return new DashboardItemsAdapter[0];
+    }
+
+    @Nullable
+    @Override
+    public DashboardItem[] getDashboardItems() {
+        return new DashboardItem[0];
     }
 
     @Override

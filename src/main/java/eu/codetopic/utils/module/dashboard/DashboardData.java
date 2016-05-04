@@ -10,6 +10,8 @@ import eu.codetopic.utils.module.data.ModuleData;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class DashboardData extends ModuleData {
 
     public DashboardData(Context context, String fileName, int saveVersion) {

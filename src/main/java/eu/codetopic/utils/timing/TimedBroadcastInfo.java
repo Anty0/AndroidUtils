@@ -7,7 +7,7 @@ import android.content.Context;
 import java.io.Serializable;
 
 import eu.codetopic.utils.exceptions.InvalidClass;
-import eu.codetopic.utils.exceptions.NoAnnotationException;
+import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 
 /**
  * Created by anty on 24.3.16.
@@ -26,7 +26,7 @@ public class TimedBroadcastInfo implements Serializable {
         mBroadcast = broadcastClass;
         mBroadcastInfo = (TimedBroadcast) broadcastClass.getAnnotation(TimedBroadcast.class);
         if (mBroadcastInfo == null)
-            throw new NoAnnotationException("TimedBroadcast annotation is not present in "
+            throw new NoAnnotationPresentException("TimedBroadcast annotation is not present in "
                     + broadcastClass.getName());
     }
 

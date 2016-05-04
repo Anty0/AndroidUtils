@@ -6,10 +6,17 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.support.annotation.AnyRes;
+import android.support.annotation.AttrRes;
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.WorkerThread;
 import android.text.Html;
@@ -61,6 +68,24 @@ public class Utils {
     public static float toDP(Context context, int size) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 size, context.getResources().getDisplayMetrics());
+    }
+
+    /**
+     * Returns text between start and end in base
+     *
+     * @param base  string to cut from
+     * @param start text before text to return
+     * @param end   text after text to return
+     * @return text between start and end
+     */
+    public static String substring(@NonNull String base, @Nullable String start,
+                                   @Nullable String end) {
+
+        int startIndex = start != null ? base.indexOf(start) : -1;
+        if (startIndex != -1) startIndex += start.length();
+        int endIndex = end != null ? base.indexOf(end) : -1;
+        return base.substring(startIndex != -1 ? startIndex : 0,
+                endIndex != -1 ? endIndex : base.length());
     }
 
     public static CharSequence getFormattedText(Context context, @StringRes int stringId,
@@ -134,6 +159,46 @@ public class Utils {
                 return i;
         }
         return -1;
+    }
+
+    @ColorInt
+    public static int makeColorDarker(@ColorInt int color, float factor) {
+        float[] hsv = new float[3];
+        Color.colorToHSV(color, hsv);
+        hsv[2] *= factor;
+        return Color.HSVToColor(hsv);
+    }
+
+    @ColorInt
+    public static int makeColorTransparent(@ColorInt int color, int factor) {
+        return Color.argb(
+                Color.alpha(color) - factor,
+                Color.red(color),
+                Color.green(color),
+                Color.blue(color)
+        );
+    }
+
+    @ColorInt
+    public static int getColorFromAttr(Context themedContext, @AttrRes int attr, @ColorInt int defValue) {
+        TypedArray a = null;
+        try {
+            a = themedContext.obtainStyledAttributes(new int[]{attr});
+            return a.getColor(0, defValue);
+        } finally {
+            if (a != null) a.recycle();
+        }
+    }
+
+    @AnyRes
+    public static int getResIdFromAttr(Context themedContext, @AttrRes int attr, @AnyRes int defValue) {
+        TypedArray a = null;
+        try {
+            a = themedContext.obtainStyledAttributes(new int[]{attr});
+            return a.getResourceId(0, defValue);
+        } finally {
+            if (a != null) a.recycle();
+        }
     }
 
     public static CharSequence getApplicationName(Context context) {

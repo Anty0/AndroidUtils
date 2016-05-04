@@ -26,6 +26,10 @@ public class DatabaseObjectDao<T> extends DaoWrapper<T, Long> {
         mChangeDetector = dataChangedDetector;
     }
 
+    public DatabaseObjectChangeDetector<T> getChangeDetector() {
+        return mChangeDetector;
+    }
+
     @Override
     public int create(T data) throws SQLException {
         int toReturn = super.create(data);

@@ -1,8 +1,9 @@
 package eu.codetopic.utils.module.data;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
+
+import com.google.gson.Gson;
 
 import eu.codetopic.utils.PrefNames;
 
@@ -13,6 +14,10 @@ import eu.codetopic.utils.PrefNames;
  */
 public class ModuleData {
 
+    public static final Gson GSON = new Gson();
+
+    private static final int SAVE_VERSION_ADD = 0;
+
     private final Context mContext;
     private final String mFileName;
     private final int mSaveVersion;
@@ -21,8 +26,7 @@ public class ModuleData {
             new SharedPreferences.OnSharedPreferenceChangeListener() {
                 @Override
                 public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-                    mContext.sendBroadcast(new Intent(ModuleDataManager
-                            .getBroadcastActionChanged(ModuleData.this)));
+                    onChanged(key);
                 }
             };
     private SharedPreferences mPreferences;
@@ -36,7 +40,7 @@ public class ModuleData {
         mContext = context.getApplicationContext();
         mFileName = fileName;
         mPrefOperatingMode = prefOperatingMode;
-        mSaveVersion = saveVersion;
+        mSaveVersion = SAVE_VERSION_ADD + saveVersion;
     }
 
     public void onCreate() {
@@ -80,6 +84,10 @@ public class ModuleData {
 
     protected void onUpgrade(SharedPreferences.Editor editor, int from, int to) {
         editor.clear();
+    }
+
+    protected void onChanged(String key) {
+        mContext.sendBroadcast(ModuleDataManager.generateIntentActionChanged(this, key));
     }
 
     public void onDestroy() throws Throwable {
