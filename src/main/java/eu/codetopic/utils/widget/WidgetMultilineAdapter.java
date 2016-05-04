@@ -1,4 +1,4 @@
-package eu.codetopic.utils.list.widget;
+package eu.codetopic.utils.widget;
 
 import android.annotation.TargetApi;
 import android.content.Context;
@@ -22,12 +22,16 @@ import eu.codetopic.utils.list.items.multiline.MultilineItem;
 @TargetApi(11)
 public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFactory {
 
-    static final String EXTRA_ITEMS_PROVIDER = "eu.codetopic.utils.list.widget.WidgetService.EXTRA_ITEMS_PROVIDER";
+    static final String EXTRA_ITEMS_PROVIDER = "eu.codetopic.utils.widget.WidgetService.EXTRA_ITEMS_PROVIDER";
     private static final String LOG_TAG = "WidgetMultilineAdapter";
     private final Context mContext;
     private final WidgetItemsProvider mItemsProvider;
     private final ArrayList<MultilineItem> mItems = new ArrayList<>();
 
+    public static Intent getServiceIntent(Context context, WidgetItemsProvider itemsProvider) {
+        return new Intent(context, WidgetService.class)
+                .putExtra(EXTRA_ITEMS_PROVIDER, itemsProvider);
+    }
 
     public WidgetMultilineAdapter(Context context, Intent intent) {
         Log.d(LOG_TAG, "<init>");

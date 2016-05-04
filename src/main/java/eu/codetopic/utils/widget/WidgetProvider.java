@@ -1,4 +1,4 @@
-package eu.codetopic.utils.list.widget;
+package eu.codetopic.utils.widget;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
@@ -36,12 +36,15 @@ import eu.codetopic.utils.thread.JobUtils;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class WidgetProvider extends AppWidgetProvider {
 
     private static final String LOG_TAG = "WidgetProvider";
     private Intent mLastIntent = null;
 
     @MainThread
+    @Nullable
     public static RemoteViews getContent(Context context, int[] appWidgetIds, Intent dataIntent,
                                          Class<? extends WidgetProvider> widgetClass, ContentType type)
             throws IllegalAccessException, InstantiationException {
@@ -88,7 +91,6 @@ public abstract class WidgetProvider extends AppWidgetProvider {
     }
 
     @ColorInt
-    @SuppressLint("PrivateResource")
     protected int getTopColor(Context context, int[] appWidgetIds) {
         TypedArray a = context.obtainStyledAttributes(new int[]{R.attr.colorPrimary});
         try {
@@ -102,7 +104,6 @@ public abstract class WidgetProvider extends AppWidgetProvider {
     }
 
     @ColorInt
-    @SuppressLint("PrivateResource")
     protected int getBackgroundColor(Context context, int[] appWidgetIds) {
         if (Build.VERSION.SDK_INT < 21)
             throw new Resources.NotFoundException("navigationBarColor not supported," +
@@ -128,7 +129,7 @@ public abstract class WidgetProvider extends AppWidgetProvider {
         return null;
     }
 
-    public void notifyItemsChanged(Context context, Bundle intentData,
+    public static void notifyItemsChanged(Context context, Bundle intentData,
                                    Class<? extends WidgetProvider> widgetClass) {
         if (Build.VERSION.SDK_INT >= 11) {
             notifyItemsChanged(context, widgetClass);
@@ -137,16 +138,17 @@ public abstract class WidgetProvider extends AppWidgetProvider {
         context.sendBroadcast(new Intent(context.getApplicationContext(), widgetClass)
                 .setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE)
                 .putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS,
-                        getAllWidgetIds(context, widgetClass)).putExtras(intentData));
+                        getAllWidgetIds(context, widgetClass))
+                .putExtras(intentData));
     }
 
     @TargetApi(11)
-    public void notifyItemsChanged(Context context, Class<? extends WidgetProvider> widgetClass) {
+    public static void notifyItemsChanged(Context context, Class<? extends WidgetProvider> widgetClass) {
         notifyItemsChanged(context, getAllWidgetIds(context, widgetClass));
     }
 
     @TargetApi(11)
-    public void notifyItemsChanged(Context context, int[] appWidgetIds) {
+    public static void notifyItemsChanged(Context context, int[] appWidgetIds) {
         AppWidgetManager.getInstance(context).notifyAppWidgetViewDataChanged(appWidgetIds, R.id.content_list_view);
     }
 

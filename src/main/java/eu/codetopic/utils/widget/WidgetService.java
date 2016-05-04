@@ -1,4 +1,4 @@
-package eu.codetopic.utils.list.widget;
+package eu.codetopic.utils.widget;
 
 import android.annotation.TargetApi;
 import android.content.Intent;
