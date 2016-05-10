@@ -18,8 +18,8 @@ import java.util.HashMap;
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.NetworkManager;
-import eu.codetopic.utils.exceptions.NoModuleFoundException;
 import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.exceptions.NoModuleFoundException;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
 /**

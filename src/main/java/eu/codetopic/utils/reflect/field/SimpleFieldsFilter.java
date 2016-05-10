@@ -17,14 +17,13 @@ import java.util.List;
 public class SimpleFieldsFilter implements FieldsFilter {
 
     private static final String LOG_TAG = "SimpleFieldsFilter";
-
-    private Class<?> startClass = null;
-    private Class<?> stopClass = Object.class;
-    private boolean throwExceptions = false;
     private final List<Class> classesToFind = new ArrayList<>();
     private final List<Class<? extends Annotation>> annotationsToFind = new ArrayList<>();
     private final List<Class> classesToDeepSearch = new ArrayList<>();
     private final List<Class<? extends Annotation>> annotationsToDeepSearch = new ArrayList<>();
+    private Class<?> startClass = null;
+    private Class<?> stopClass = Object.class;
+    private boolean throwExceptions = false;
 
     public SimpleFieldsFilter() {
     }

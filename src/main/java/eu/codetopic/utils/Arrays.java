@@ -13,7 +13,7 @@ public class Arrays {
      * Add int to array of ints.
      *
      * @param ints array to modify
-     * @param i int to add
+     * @param i    int to add
      * @return new array with specified int
      */
     public static int[] add(int[] ints, int i) {
@@ -27,7 +27,7 @@ public class Arrays {
      * Add long to array of longs.
      *
      * @param longs array to modify
-     * @param l long to add
+     * @param l     long to add
      * @return new array with specified long
      */
     public static long[] add(long[] longs, long l) {
@@ -41,7 +41,7 @@ public class Arrays {
      * Add String to array of Strings.
      *
      * @param strings array to modify
-     * @param s String to add
+     * @param s       String to add
      * @return new array with specified String
      */
     public static String[] add(String[] strings, String s) {
@@ -55,7 +55,7 @@ public class Arrays {
      * Remove int from array of ints.
      *
      * @param ints array to modify
-     * @param i int to remove
+     * @param i    int to remove
      * @return new array without specified int (if found)
      */
     public static int[] remove(int[] ints, int i) {
@@ -74,7 +74,7 @@ public class Arrays {
      * Remove long from array of longs.
      *
      * @param longs array to modify
-     * @param l long to remove
+     * @param l     long to remove
      * @return new array without specified long (if found)
      */
     public static long[] remove(long[] longs, long l) {
@@ -93,7 +93,7 @@ public class Arrays {
      * Remove String from array of Strings.
      *
      * @param strings array to modify
-     * @param s String to remove
+     * @param s       String to remove
      * @return new array without specified String (if found)
      */
     public static String[] remove(String[] strings, String s) {
@@ -112,8 +112,8 @@ public class Arrays {
      * Remove object T from T[].
      *
      * @param objects array to modify
-     * @param o T to remove
-     * @param <T> type of array to modify
+     * @param o       T to remove
+     * @param <T>     type of array to modify
      * @return new array without specified T (if found)
      */
     public static <T> T[] remove(T[] objects, T o) {
@@ -125,8 +125,8 @@ public class Arrays {
      * Remove object on index from T[].
      *
      * @param objects array to modify
-     * @param index index of object to remove
-     * @param <T> type of array to modify
+     * @param index   index of object to remove
+     * @param <T>     type of array to modify
      * @return new array without object on specified index
      */
     public static <T> T[] remove(T[] objects, int index) {
@@ -144,7 +144,7 @@ public class Arrays {
      * Returns true if specified array contains specified int.
      *
      * @param ints array to search
-     * @param i to find
+     * @param i    to find
      * @return true if specified array contains specified int
      */
     public static boolean contains(int[] ints, int i) {
@@ -157,7 +157,7 @@ public class Arrays {
      * Returns true if specified array contains specified long.
      *
      * @param longs array to search
-     * @param l to find
+     * @param l     to find
      * @return true if specified array contains specified long
      */
     public static boolean contains(long[] longs, long l) {
@@ -170,7 +170,7 @@ public class Arrays {
      * Returns true if specified array contains specified object.
      *
      * @param objects array to search
-     * @param o to find
+     * @param o       to find
      * @return true if specified array contains specified object
      */
     public static boolean contains(Object[] objects, Object o) {
@@ -184,7 +184,7 @@ public class Arrays {
      * Returns -1 if specified int is not in specified array.
      *
      * @param ints array to search
-     * @param i to find
+     * @param i    to find
      * @return index of specified int in specified array or -1
      */
     public static int indexOf(int[] ints, int i) {
@@ -199,7 +199,7 @@ public class Arrays {
      * Returns -1 if specified long is not in specified array.
      *
      * @param longs array to search
-     * @param l to find
+     * @param l     to find
      * @return index of specified long in specified array or -1
      */
     public static int indexOf(long[] longs, long l) {
@@ -214,7 +214,7 @@ public class Arrays {
      * Returns -1 if specified object is not in specified array.
      *
      * @param objects array to search
-     * @param o to find
+     * @param o       to find
      * @return index of specified object in specified array or -1
      */
     public static int indexOf(Object[] objects, Object o) {
@@ -242,7 +242,7 @@ public class Arrays {
      *
      * @param objects1 first array to concat
      * @param objects2 second array to concat
-     * @param <T> type of arrays to concatenate
+     * @param <T>      type of arrays to concatenate
      * @return concatenated first specified array and second specified array
      */
     public static <T> T[] concat(T[] objects1, T[] objects2) {

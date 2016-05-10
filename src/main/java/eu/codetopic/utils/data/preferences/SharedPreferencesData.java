@@ -15,11 +15,9 @@ import eu.codetopic.utils.PrefNames;
  */
 public abstract class SharedPreferencesData {
 
-    private static final String LOG_TAG = "SharedPreferencesData";
     public static final String EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY";
-
     protected static final Gson GSON = new Gson();
-
+    private static final String LOG_TAG = "SharedPreferencesData";
     private final Context mContext;
     private final String mFileName;
     private final int mSaveVersion;

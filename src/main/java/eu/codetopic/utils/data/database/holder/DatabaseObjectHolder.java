@@ -9,8 +9,8 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import eu.codetopic.utils.data.database.DependencyDatabaseObject;
 import eu.codetopic.utils.data.database.DependencyDao;
+import eu.codetopic.utils.data.database.DependencyDatabaseObject;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
 /**
