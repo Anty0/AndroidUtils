@@ -14,8 +14,8 @@ import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
-import eu.codetopic.utils.database.DependencyDao;
-import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
+import eu.codetopic.utils.data.database.DependencyDao;
+import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
 /**
  * Created by anty on 26.2.16.

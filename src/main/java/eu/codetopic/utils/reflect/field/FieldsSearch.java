@@ -24,13 +24,13 @@ public class FieldsSearch {
     private static final String LOG_TAG = "FieldsSearch";
 
     public static FoundField getAllFields(@NonNull Class<?> startClass) {
-        return getFields(new SimpleFieldsFilter(startClass).addCalssesToFind(Object.class,
+        return getFields(new SimpleFieldsFilter(startClass).addClassesToFind(Object.class,
                 boolean.class, byte.class, char.class, double.class,
                 float.class, int.class, long.class, short.class));
     }
 
     public static FoundField getAllNonPrimitiveFields(@NonNull Class<?> startClass) {
-        return getFields(new SimpleFieldsFilter(startClass).addCalssesToFind(Object.class));
+        return getFields(new SimpleFieldsFilter(startClass).addClassesToFind(Object.class));
     }
 
     public static FoundField getFields(@NonNull FieldsFilter filter) {

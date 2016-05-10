@@ -16,10 +16,10 @@ import eu.codetopic.utils.R;
  */
 public final class RecyclerInflater {
 
-    public static final int DEFAULT_RECYCLER_LAYOUT_ID = R.layout.recycler_activity;
+    @LayoutRes public static final int DEFAULT_RECYCLER_LAYOUT_ID = R.layout.recycler_activity;
     private static final String LOG_TAG = "RecyclerInflater";
-    @LayoutRes
-    private int mLayoutResId = DEFAULT_RECYCLER_LAYOUT_ID;
+    @LayoutRes private int mLayoutResId = DEFAULT_RECYCLER_LAYOUT_ID;
+    private int[] mSwipeSchemeColors = null;
     private boolean mUseSwipeToRefresh = false;
 
     RecyclerInflater() {
@@ -52,9 +52,19 @@ public final class RecyclerInflater {
         this.mUseSwipeToRefresh = useSwipeToRefresh;
     }
 
+    public RecyclerInflater withSchemeColors(int[] swipeToRefreshSchemeColors) {// TODO: 9.5.16 don't forget to use it every time
+        this.mSwipeSchemeColors = swipeToRefreshSchemeColors;
+        return this;
+    }
+
+    public int[] getSchemeColors() {
+        return mSwipeSchemeColors;
+    }
+
     public RecyclerManager on(Activity activity) {
         activity.setContentView(mLayoutResId);
-        return new RecyclerManager(activity.getWindow().getDecorView(), mUseSwipeToRefresh);
+        return new RecyclerManager(activity.getWindow().getDecorView(),
+                mSwipeSchemeColors, mUseSwipeToRefresh);
     }
 
     public RecyclerManager on(Context context, @Nullable ViewGroup parent, boolean attachToRoot) {
@@ -62,6 +72,7 @@ public final class RecyclerInflater {
     }
 
     public RecyclerManager on(LayoutInflater inflater, @Nullable ViewGroup parent, boolean attachToRoot) {
-        return new RecyclerManager(inflater.inflate(mLayoutResId, parent, attachToRoot), mUseSwipeToRefresh);
+        return new RecyclerManager(inflater.inflate(mLayoutResId, parent, attachToRoot),
+                mSwipeSchemeColors, mUseSwipeToRefresh);
     }
 }

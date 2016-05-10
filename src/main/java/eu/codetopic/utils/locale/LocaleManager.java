@@ -16,7 +16,7 @@ import android.widget.RadioGroup;
 import java.util.Locale;
 
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.module.getter.DataGetter;
+import eu.codetopic.utils.data.getter.DataGetter;
 
 /**
  * Created by anty on 25.3.16.

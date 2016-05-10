@@ -18,8 +18,8 @@ import java.util.Collection;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.activity.navigation.NavigationFragment;
-import eu.codetopic.utils.database.DatabaseObjectChangeDetector;
-import eu.codetopic.utils.database.DependencyTextDatabaseObject;
+import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
+import eu.codetopic.utils.data.database.DependencyTextDatabaseObject;
 import eu.codetopic.utils.list.listView.MultilineAdapter;
 import eu.codetopic.utils.thread.JobUtils;
 

@@ -21,10 +21,10 @@ public class SimpleFieldsFilter implements FieldsFilter {
     private Class<?> startClass = null;
     private Class<?> stopClass = Object.class;
     private boolean throwExceptions = false;
-    private List<Class> classesToFind = new ArrayList<>();
-    private List<Class<? extends Annotation>> annotationsToFind = new ArrayList<>();
-    private List<Class> classesToDeepSearch = new ArrayList<>();
-    private List<Class<? extends Annotation>> annotationsToDeepSearch = new ArrayList<>();
+    private final List<Class> classesToFind = new ArrayList<>();
+    private final List<Class<? extends Annotation>> annotationsToFind = new ArrayList<>();
+    private final List<Class> classesToDeepSearch = new ArrayList<>();
+    private final List<Class<? extends Annotation>> annotationsToDeepSearch = new ArrayList<>();
 
     public SimpleFieldsFilter() {
     }
@@ -38,7 +38,7 @@ public class SimpleFieldsFilter implements FieldsFilter {
         this.stopClass = stopClass;
     }
 
-    public final SimpleFieldsFilter addCalssesToDeepSearch(Class... classes) {
+    public final SimpleFieldsFilter addClassesToDeepSearch(Class... classes) {
         Collections.addAll(classesToDeepSearch, classes);
         return this;
     }
@@ -49,7 +49,7 @@ public class SimpleFieldsFilter implements FieldsFilter {
         return this;
     }
 
-    public final SimpleFieldsFilter addCalssesToFind(Class... classes) {
+    public final SimpleFieldsFilter addClassesToFind(Class... classes) {
         Collections.addAll(classesToFind, classes);
         return this;
     }

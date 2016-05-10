@@ -19,8 +19,8 @@ import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.exceptions.NoModuleFoundException;
-import eu.codetopic.utils.module.getter.DataGetter;
-import eu.codetopic.utils.notifications.manage.NotificationIdsModule;
+import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
 /**
  * Created by anty on 24.3.16.
@@ -50,8 +50,8 @@ public class TimedBroadcastsManager {
         mRequiredNetwork = requiredNetwork;
         mTimingDataGetter = timingDataGetter;
 
-        if (NotificationIdsModule.getInstance() == null)
-            throw new NoModuleFoundException("NotificationIdsModule no found please add it to ModulesManager initialization");
+        if (NotificationIdsManager.getInstance() == null)
+            throw new NoModuleFoundException("NotificationIdsManager no found please add it to ModulesManager initialization");
 
         mBroadcastsInfoMap = new HashMap<>(broadcasts.length);
         Log.d(LOG_TAG, "<init> initialising for: " + java.util.Arrays.toString(broadcasts));
@@ -205,7 +205,7 @@ public class TimedBroadcastsManager {
             return;
         }
 
-        int newRequestCode = NotificationIdsModule.getInstance().obtainRequestCode();
+        int newRequestCode = NotificationIdsManager.getInstance().obtainRequestCode();
         data.setLastRequestCode(broadcastInfo.getBroadcastClass(), newRequestCode);
         TimedBroadcast.RepeatingMode repeatingMode = broadcast.repeatingMode();
         Calendar calendar = Calendar.getInstance();

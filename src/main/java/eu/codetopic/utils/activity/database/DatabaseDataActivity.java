@@ -12,9 +12,9 @@ import com.j256.ormlite.dao.Dao;
 import com.path.android.jobqueue.JobManager;
 
 import eu.codetopic.utils.activity.loading.LoadingViewHolderActivity;
-import eu.codetopic.utils.database.DatabaseObject;
-import eu.codetopic.utils.database.DependencyTextDatabaseObject;
-import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
+import eu.codetopic.utils.data.database.DatabaseObject;
+import eu.codetopic.utils.data.database.DependencyTextDatabaseObject;
+import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 

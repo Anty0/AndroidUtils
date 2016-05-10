@@ -25,7 +25,7 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.list.items.multiline.MultilineItem;
-import eu.codetopic.utils.notifications.manage.NotificationIdsModule;
+import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
 /**
  * Created by anty on 3.5.16.
@@ -291,7 +291,7 @@ public class WidgetBuilder {
         BROADCAST, SERVICE, ACTIVITY;
 
         public PendingIntent toPendingIntent(Context context, Intent intent) {
-            int requestCode = NotificationIdsModule.getInstance().obtainRequestCode();
+            int requestCode = NotificationIdsManager.getInstance().obtainRequestCode();
             switch (this) {
                 case BROADCAST:
                     return PendingIntent.getBroadcast(context, requestCode,

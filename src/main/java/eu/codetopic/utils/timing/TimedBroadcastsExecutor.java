@@ -5,7 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import eu.codetopic.utils.module.getter.DataGetter;
+import eu.codetopic.utils.data.getter.DataGetter;
 
 /**
  * Created by anty on 24.3.16.

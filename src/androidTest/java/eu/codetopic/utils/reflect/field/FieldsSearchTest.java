@@ -34,16 +34,16 @@ public class FieldsSearchTest {
 
         testWith(TestClass1.class, fieldsClass1);
         testWith(new SimpleFieldsFilter(TestClass1.class)
-                        .addCalssesToFind(Object.class)
-                        .addCalssesToDeepSearch(TestClass1.class, TestClass2.class, TestClass3.class),
+                        .addClassesToFind(Object.class)
+                        .addClassesToDeepSearch(TestClass1.class, TestClass2.class, TestClass3.class),
                 fieldsClass1);
 
         /*TestClass2 fieldsClass2 = new TestClass2();
 
         testWith(TestClass1.class, fieldsClass2);
         testWith(new SimpleFieldsFilter(TestClass1.class)
-                        .addCalssesToFind(Object.class)
-                        .addCalssesToDeepSearch(TestClass1.class, TestClass2.class, TestClass3.class),
+                        .addClassesToFind(Object.class)
+                        .addClassesToDeepSearch(TestClass1.class, TestClass2.class, TestClass3.class),
                 fieldsClass2);*/
 
     }
@@ -53,7 +53,7 @@ public class FieldsSearchTest {
     }
 
     private void testWith(Class<?> clazz, @Nullable Object fieldsObject) {
-        testWith(new SimpleFieldsFilter(clazz).addCalssesToFind(Object.class), fieldsObject);
+        testWith(new SimpleFieldsFilter(clazz).addClassesToFind(Object.class), fieldsObject);
     }
 
     private void testWith(FieldsFilter filter) {
@@ -71,7 +71,7 @@ public class FieldsSearchTest {
     }
 
     public static class TestClass1 extends TestClass3<Long> {
-        public TestClass2 somePublicObject2 = new TestClass2();
+        public final TestClass2 somePublicObject2 = new TestClass2();
         private String somePrivateStr = "somePrivateStr";
         private int somePrivateInt = -1;
         private char somePrivateChar = 'r';

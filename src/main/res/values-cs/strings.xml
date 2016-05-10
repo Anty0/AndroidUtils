@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="module_name_notifications_ids">NotificationIds</string>
-
     <string name="menu_item_text_settings">Nastavení</string>
 
     <string name="text_default_no_list_items">Nic k zobrazení</string>

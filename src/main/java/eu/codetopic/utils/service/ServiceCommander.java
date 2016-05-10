@@ -20,7 +20,8 @@ import eu.codetopic.utils.thread.JobUtils;
  *
  * @author anty
  */
-public final class ServiceCommander<B extends CommandService.CommandBinder> {// TODO: 4.4.16 find way to stop unneded services (try use timeout and CommandBinder to make it)
+// TODO: 4.4.16 find way to stop unneeded services (try use timeout and CommandBinder to make it)
+public final class ServiceCommander<B extends CommandService.CommandBinder> {
 
     private static final String LOG_TAG = "ServiceCommander";
 
@@ -213,7 +214,7 @@ public final class ServiceCommander<B extends CommandService.CommandBinder> {// 
         return this;
     }
 
-    public ServiceCommander<B> disconnectAndStopIfUnneed() {
+    public ServiceCommander<B> disconnectAndStopIfUnneeded() {
         if (isConnected() && getBinder().isUnneeded()) {
             forceDisconnect();
             stopService();

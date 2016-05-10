@@ -14,9 +14,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.codetopic.utils.module.data.DebugProviderData;
-import eu.codetopic.utils.module.data.ModuleDataManager;
-import eu.codetopic.utils.module.getter.DataGetter;
+import eu.codetopic.utils.data.DebugProviderData;
+import eu.codetopic.utils.data.getter.DataGetter;
 
 /**
  * Mock Log implementation for testing on non android host.
@@ -273,12 +272,14 @@ public class Log {
         if (INITIALIZED) throw new IllegalStateException("Log is still initialized");
         INITIALIZED = true;
 
-        app.registerReceiver(new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                DEBUG_MODE = debugDataGetter.get().isDebugMode();
-            }
-        }, new IntentFilter(ModuleDataManager.getBroadcastActionChanged(debugDataGetter.get())));
+        if (debugDataGetter.hasDataChangedBroadcastAction()) {
+            app.registerReceiver(new BroadcastReceiver() {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    DEBUG_MODE = debugDataGetter.get().isDebugMode();
+                }
+            }, new IntentFilter(debugDataGetter.getDataChangedBroadcastAction()));
+        }
         DEBUG_MODE = debugDataGetter.get().isDebugMode();
     }
 

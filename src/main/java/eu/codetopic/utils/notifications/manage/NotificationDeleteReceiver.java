@@ -22,7 +22,7 @@ public class NotificationDeleteReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            NotificationIdsModule.getInstance()
+            NotificationIdsManager.getInstance()
                     .notifyIdRemoved((Group) intent.getSerializableExtra(EXTRA_GROUP),
                             intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1));
         } catch (Exception e) {

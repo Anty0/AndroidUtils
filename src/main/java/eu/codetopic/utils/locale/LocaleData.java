@@ -4,14 +4,14 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.PrefNames;
-import eu.codetopic.utils.module.data.ModuleData;
+import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 
 /**
  * Created by anty on 25.3.16.
  *
  * @author anty
  */
-public final class LocaleData extends ModuleData {
+public final class LocaleData extends SharedPreferencesData {
 
     private static final int SAVE_VERSION = 0;
 

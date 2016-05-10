@@ -14,11 +14,6 @@ public abstract class SingleIdGroup extends Group {
         super(name);
     }
 
-    @Override
-    public boolean usesSingleId() {
-        return true;
-    }
-
     /**
      * Called before notification will be showed.
      * Generates only single id and uses it every next call.

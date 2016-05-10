@@ -19,11 +19,11 @@ public class ClearOnBootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (!Objects.equals(intent.getAction(), Intent.ACTION_BOOT_COMPLETED)) return;
-        NotificationIdsModule idsModule = NotificationIdsModule.getInstance();
+        NotificationIdsManager idsModule = NotificationIdsManager.getInstance();
         if (idsModule == null) {
-            Log.d(LOG_TAG, "NotificationIdsModule is not initialized, skipping ids clear");
+            Log.d(LOG_TAG, "NotificationIdsManager is not initialized, skipping ids clear");
             return;
         }
-        idsModule.findModuleData(UsedIdsData.class).clearIds();
+        idsModule.getData().clearIds();
     }
 }

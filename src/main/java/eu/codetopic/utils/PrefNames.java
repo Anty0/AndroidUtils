@@ -7,16 +7,12 @@ package eu.codetopic.utils;
  */
 public class PrefNames {
 
-    //ModuleData
+    //SharedPreferencesData
     public static final String DATA_SAVE_VERSION = "DATA_SAVE_VERSION";
     //LoginData
     public static final String LOGIN = "LOGIN";
     public static final String PASSWORD = "PASSWORD";
     public static final String LOGGED_IN = "LOGGED_IN";
-    //DashboardData
-    public static final String FILE_NAME_DASHBOARD_DATA = "DashboardData";
-    public static final String SHOW_DESCRIPTION = "SHOW_DESCRIPTION";
-    public static final String ADD_DASHBOARD_ITEM_ENABLED = "_DASHBOARD_ITEM_ENABLED";
     //UsedIdsData
     public static final String FILE_NAME_USED_IDS_DATA = "UsedIdsData";
     public static final String ADD_IDS_FOR_GROUP = "_USED_IDS";

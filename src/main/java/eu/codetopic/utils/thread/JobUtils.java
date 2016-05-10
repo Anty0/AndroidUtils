@@ -11,16 +11,16 @@ public class JobUtils {
     private static final String LOG_TAG = "JobUtils";
 
     private static Handler HANDLER;
-    private static Thread UI_THREAD;
+    private static Thread MAIN_THREAD;
 
     public synchronized static void initialize(Context context) {
-        Looper looper = context.getMainLooper();
+        Looper looper = context.getApplicationContext().getMainLooper();
         HANDLER = new Handler(looper);
-        UI_THREAD = looper.getThread();
+        MAIN_THREAD = looper.getThread();
     }
 
     public static boolean isOnMainThread() {
-        return Thread.currentThread() == UI_THREAD;
+        return Thread.currentThread() == MAIN_THREAD;
     }
 
     public static void runOnMainThread(Runnable action) {

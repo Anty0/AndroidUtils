@@ -9,7 +9,7 @@ import android.content.Intent;
 import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.notifications.manage.Group;
-import eu.codetopic.utils.notifications.manage.NotificationIdsModule;
+import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
 /**
  * Created by anty on 14.11.2015.
@@ -42,7 +42,7 @@ public class PostNotificationCanceler extends BroadcastReceiver {
         Group group = (Group) intent.getSerializableExtra(EXTRA_GROUP);
         int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1);
         if (group != null) {
-            NotificationIdsModule.getInstance().cancelNotification(group, id);
+            NotificationIdsManager.getInstance().cancelNotification(group, id);
             return;
         }
         ((NotificationManager) context.getSystemService(Context

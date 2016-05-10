@@ -2,12 +2,12 @@ package eu.codetopic.utils.list.recyclerView;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.Icon;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,19 +15,14 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
-import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.list.items.cardview.CardItem;
 import eu.codetopic.utils.list.recyclerView.adapter.CardRecyclerAdapter;
 import eu.codetopic.utils.list.recyclerView.utils.EmptyRecyclerView;
 import eu.codetopic.utils.list.recyclerView.utils.RecyclerItemClickListener;
-import eu.codetopic.utils.module.Module;
-import eu.codetopic.utils.module.ModulesManager;
 import eu.codetopic.utils.thread.JobUtils;
 
 /**
@@ -44,7 +39,7 @@ public final class RecyclerManager {
     private final EmptyRecyclerView mRecyclerView;
     private final SwipeRefreshLayout mSwipeRefreshLayout;
 
-    RecyclerManager(@NonNull View mainView, boolean useSwipeRefresh) {
+    RecyclerManager(@NonNull View mainView, @Nullable int[] swipeSchemeColors, boolean useSwipeRefresh) {
         mContext = mainView.getContext();
         mMainView = mainView;
         mRecyclerView = (EmptyRecyclerView) mainView.findViewById(R.id.recyclerView);
@@ -56,16 +51,17 @@ public final class RecyclerManager {
         mRecyclerView.setEmptyView(mainView.findViewById(R.id.empty_view));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mainView.getContext()));
 
-        ArrayList<Module> modules = new ArrayList<>(ModulesManager.getInstance().getModules());
-        Collections.sort(modules);
+        /*ArrayList<Module> modules = new ArrayList<>(ModulesManager.getInstance().getModules());
+        Collections.sort(modules);// TODO: 9.5.16 use it to init modules colors (and use to obtaining styles attributes method in Utils)
         int[] colors = new int[0];
         for (Module module : modules) {
             TypedArray a = module.getTheme().obtainStyledAttributes(new int[]{R.attr.colorPrimary});
             int color = a.getColor(0, -1);
             if (color != -1 && !Arrays.contains(colors, color)) colors = Arrays.add(colors, color);
             a.recycle();
-        }
-        mSwipeRefreshLayout.setColorSchemeColors(colors);
+        }*/
+        if (swipeSchemeColors != null)
+            mSwipeRefreshLayout.setColorSchemeColors(swipeSchemeColors);
         mSwipeRefreshLayout.setEnabled(useSwipeRefresh);
     }
 

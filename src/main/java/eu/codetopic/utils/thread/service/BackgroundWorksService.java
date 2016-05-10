@@ -9,9 +9,7 @@ import com.path.android.jobqueue.JobStatus;
 import java.util.ArrayList;
 
 import eu.codetopic.utils.exceptions.NoModuleFoundException;
-import eu.codetopic.utils.module.Module;
-import eu.codetopic.utils.module.ModulesManager;
-import eu.codetopic.utils.notifications.manage.NotificationIdsModule;
+import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.service.CommandService;
 
 /**
@@ -29,9 +27,9 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
     @Override
     public void onCreate() {
         super.onCreate();
-        if (NotificationIdsModule.getInstance() == null) {
+        if (NotificationIdsManager.getInstance() == null) {
             safeStopSelf();
-            throw new NoModuleFoundException("NotificationIdsModule no found please add it to ModulesManager initialization");
+            throw new NoModuleFoundException("NotificationIdsManager no found please add it to ModulesManager initialization");
         }
     }
 
@@ -42,13 +40,13 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
         synchronized (works) {
             if (isStopped()) throw new IllegalStateException(LOG_TAG + " is stopped (what?)");
 
-            WorkInfo info = new WorkInfo(this, jobManager, NotificationIdsModule.getInstance()
+            WorkInfo info = new WorkInfo(this, jobManager, NotificationIdsManager.getInstance()
                     .obtainNewId(new WorksIdsGroup()), work) {
                 @Override
                 public void onBeforeNotificationRemoved() {
                     synchronized (works) {
                         if (works.remove(this)) {
-                            NotificationIdsModule.getInstance().notifyIdRemoved(
+                            NotificationIdsManager.getInstance().notifyIdRemoved(
                                     new WorksIdsGroup(), getNotificationId());
                             if (getNotificationId() == actualForegroundId) {
                                 stopForeground(false);
@@ -118,28 +116,6 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
     public final class WorkBinder extends CommandService.CommandBinder {
 
         private WorkBinder() {
-        }
-
-        /**
-         * Start work on moduleClass JobManager and show progress notification
-         *
-         * @param moduleClass class of module with JobManager
-         * @param work        work to run
-         * @return info for created work
-         */
-        public WorkInfo startWork(Class moduleClass, ServiceWork work) {
-            return startWork(ModulesManager.findModule(moduleClass), work);
-        }
-
-        /**
-         * Start work on module JobManager and show progress notification
-         *
-         * @param module module with JobManager
-         * @param work   work to run
-         * @return info for created work
-         */
-        public WorkInfo startWork(Module module, ServiceWork work) {
-            return startWork(module.getJobManager(), work);
         }
 
         /**

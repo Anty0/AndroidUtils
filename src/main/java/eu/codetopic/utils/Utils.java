@@ -41,7 +41,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import eu.codetopic.utils.database.DatabaseObject;
+import eu.codetopic.utils.data.database.DatabaseObject;
 import eu.codetopic.utils.thread.JobUtils;
 
 /**

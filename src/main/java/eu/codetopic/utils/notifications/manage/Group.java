@@ -35,13 +35,8 @@ public abstract class Group implements Serializable {
         return mName;
     }
 
-    public boolean usesSingleId() {
-        return false;
-    }
-
     private UsedIdsData getData() {
-        if (mData == null) mData = NotificationIdsModule
-                .getInstance().findModuleData(UsedIdsData.class);
+        if (mData == null) mData = NotificationIdsManager.getInstance().getData();
         return mData;
     }
 

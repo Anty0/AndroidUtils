@@ -22,11 +22,11 @@ import java.util.List;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
-import eu.codetopic.utils.database.DatabaseObjectChangeDetector;
+import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.list.items.cardview.CardItem;
 import eu.codetopic.utils.list.items.cardview.MultilineItemCardWrapper;
 import eu.codetopic.utils.list.items.multiline.MultilineItem;
-import eu.codetopic.utils.module.getter.DatabaseDaoGetter;
+import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
