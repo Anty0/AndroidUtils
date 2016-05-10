@@ -12,7 +12,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import eu.codetopic.utils.list.items.multiline.MultilineItem;
+import eu.codetopic.utils.container.items.multiline.MultilineItem;
 
 public abstract class DependencyTextDatabaseObject extends DependencyDatabaseObject implements MultilineItem {
 

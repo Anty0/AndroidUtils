@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import java.io.Serializable;
 import java.util.List;
 
-import eu.codetopic.utils.list.items.multiline.MultilineItem;
+import eu.codetopic.utils.container.items.multiline.MultilineItem;
 
 /**
  * Created by anty on 22.3.16.

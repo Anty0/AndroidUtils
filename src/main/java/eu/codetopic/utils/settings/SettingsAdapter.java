@@ -12,6 +12,8 @@ import java.util.List;
 
 import eu.codetopic.utils.R;
 
+@Deprecated
+@SuppressWarnings("ALL")
 public class SettingsAdapter extends BaseAdapter {
 
     private final LayoutInflater mLayoutInflater;

@@ -18,11 +18,12 @@ import java.util.Collection;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.activity.navigation.NavigationFragment;
+import eu.codetopic.utils.container.listView.adapter.MultilineAdapter;
 import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.data.database.DependencyTextDatabaseObject;
-import eu.codetopic.utils.list.listView.MultilineAdapter;
 import eu.codetopic.utils.thread.JobUtils;
 
+@Deprecated
 public abstract class ListViewFragment<M extends DependencyTextDatabaseObject> extends NavigationFragment
         implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
@@ -45,7 +46,7 @@ public abstract class ListViewFragment<M extends DependencyTextDatabaseObject> e
     @Nullable
     @Override
     public View onCreateContentView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.listview_base, container, false);
+        View view = inflater.inflate(R.layout.listview_base_old, container, false);
         ListView listView = (ListView) view.findViewById(R.id.listView);
 
         ((TextView) view.findViewById(R.id.empty_text)).setText(getEmptyViewText());
@@ -127,46 +128,4 @@ public abstract class ListViewFragment<M extends DependencyTextDatabaseObject> e
     }
 
     protected abstract void onFabClick(View v);
-
-    /*@Override
-    protected Class<? extends LoadingViewHolder> getViewHolderClass() {
-        return ListViewViewHolder.class;
-    }
-
-    public static class ListViewViewHolder extends LoadingViewHolder {
-
-        @Bind(R.id.loadingProgressBar) @Nullable public View loadingProgressBar;
-        @Bind(R.id.floatingActionButton) @Nullable public View floatingActionButton;
-        @Bind(R.id.listView) @Nullable public ListView listView;
-
-        @Override
-        protected synchronized void doShowLoading() {
-            if (floatingActionButton != null)
-                floatingActionButton.setVisibility(View.GONE);
-
-            if (loadingProgressBar != null) {
-                loadingProgressBar.setVisibility(View.VISIBLE);
-                if (listView != null) {
-                    listView.setVisibility(View.GONE);
-                    View emptyView = listView.getEmptyView();
-                    if (emptyView != null)
-                        emptyView.setVisibility(View.GONE);
-                }
-            }
-        }
-
-        @Override
-        protected synchronized void doHideLoading() {
-            if (floatingActionButton != null)
-                floatingActionButton.setVisibility(View.VISIBLE);
-
-            if (loadingProgressBar != null) {
-                loadingProgressBar.setVisibility(View.GONE);
-                if (listView != null) {
-                    listView.setVisibility(View.VISIBLE);
-                    listView.setEmptyView(listView.getEmptyView());
-                }
-            }
-        }
-    }*/
 }

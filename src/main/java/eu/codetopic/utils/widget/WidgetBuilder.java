@@ -24,7 +24,7 @@ import java.util.List;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
-import eu.codetopic.utils.list.items.multiline.MultilineItem;
+import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
 /**

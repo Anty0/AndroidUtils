@@ -1,5 +1,7 @@
 package eu.codetopic.utils.settings;
 
+@Deprecated
+@SuppressWarnings("ALL")
 public class SettingsItem {
 
     private String title;
