@@ -30,8 +30,8 @@ import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.activity.fragment.BaseFragmentActivity;
 
-public abstract class NavigationActivity extends BaseFragmentActivity implements NavigationView
-        .OnNavigationItemSelectedListener {
+public abstract class NavigationActivity extends BaseFragmentActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final String LOG_TAG = "NavigationActivity";
 
@@ -143,7 +143,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
         try {
             Field presenterField = NavigationView.class.getDeclaredField("mPresenter");
             presenterField.setAccessible(true);
-            presenter = (NavigationMenuPresenter) presenterField.get(navigationView);//HACK
+            presenter = (NavigationMenuPresenter) presenterField.get(navigationView);//this is HACK
         } catch (Exception e) {
             Log.e(LOG_TAG, "invalidateNavigationMenu - " +
                     "can't get menu presenter: can't get field from class", e);
@@ -178,7 +178,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
             try {
                 if (item instanceof MenuItemImpl) {
                     final SupportMenuItem.OnMenuItemClickListener listener =
-                            (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//HACK
+                            (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//this is HACK
                     listenerField.set(item, new SupportMenuItem.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
@@ -209,8 +209,8 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
      */
     protected boolean onUpdateSelectedNavigationMenuItem(@Nullable Fragment currentFragment, Menu menu) {
         if (currentFragment != null) {
-            Log.e(LOG_TAG, "onUpdateSelectedNavigationMenuItem can't detect selected item," +
-                    " override method onUpdateSelectedNavigationMenuItem() and implement your own selected item detecting.");
+            Log.e(LOG_TAG, "onUpdateSelectedNavigationMenuItem can't detect selected item for " + currentFragment.getClass() +
+                    ", override method onUpdateSelectedNavigationMenuItem() and implement your own selected item detecting.");
             return false;
         }
 
@@ -233,7 +233,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity implements
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-        resetNavigationView(fragment);
+        if (ROOT_FRAGMENT_TAG.equals(fragment.getTag())) resetNavigationView(fragment);
     }
 
     @Override

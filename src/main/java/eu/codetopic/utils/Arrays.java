@@ -52,6 +52,35 @@ public class Arrays {
     }
 
     /**
+     * Add object to specified array.
+     *
+     * @param objects array to modify
+     * @param object  object to add
+     * @return new array with specified object
+     */
+    public static <T> T[] add(T[] objects, T object) {
+        T[] newObjects = java.util.Arrays.copyOf(objects, objects.length + 1);
+        newObjects[objects.length] = object;
+        return newObjects;
+    }
+
+    /**
+     * Add object to start (indexOfStart == 0) of specified array.
+     *
+     * @param objects array to modify
+     * @param object  object to add
+     * @return new array with specified object
+     */
+    public static <T> T[] addToStart(T[] objects, T object) {
+        //noinspection unchecked
+        T[] newObjects = (T[]) Array.newInstance(objects.getClass()
+                .getComponentType(), objects.length + 1);
+        System.arraycopy(objects, 0, newObjects, 1, objects.length);
+        newObjects[0] = object;
+        return newObjects;
+    }
+
+    /**
      * Remove int from array of ints.
      *
      * @param ints array to modify

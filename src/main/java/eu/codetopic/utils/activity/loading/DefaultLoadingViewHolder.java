@@ -3,8 +3,6 @@ package eu.codetopic.utils.activity.loading;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import eu.codetopic.utils.R;
-
 /**
  * Created by anty on 31.3.16.
  *
@@ -23,8 +21,8 @@ public class DefaultLoadingViewHolder extends LoadingViewHolder {
     @Override
     protected void onUpdateMainView(@Nullable View newMainView) {
         if (newMainView != null) {
-            loading = newMainView.findViewById(R.id.base_loading);
-            content = newMainView.findViewById(R.id.base_content);
+            loading = newMainView.findViewById(LoadingViewHolder.DEFAULT_LOADING_VIEW_ID);
+            content = newMainView.findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID);
             if (loading == null || content == null)
                 throw new NullPointerException("Used view is not usable for " + LOG_TAG);
         }

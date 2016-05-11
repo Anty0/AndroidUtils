@@ -4,12 +4,16 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import eu.codetopic.utils.Log;
-import eu.codetopic.utils.R;
 import eu.codetopic.utils.activity.BackButtonActivity;
 
-public abstract class LoadingViewHolderActivity extends BackButtonActivity {
+/**
+ * Use {@link LoadingModule}
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
+public abstract class LoadingActivity extends BackButtonActivity {
 
-    private static final String LOG_TAG = "LoadingViewHolderActivity";
+    private static final String LOG_TAG = "LoadingActivity";
 
     private LoadingViewHolder loadingViewHolder = null;
 
@@ -20,8 +24,8 @@ public abstract class LoadingViewHolderActivity extends BackButtonActivity {
             return;
         }
 
-        super.setContentView(R.layout.view_holder_loading_base);
-        getLayoutInflater().inflate(layoutResID, (ViewGroup) findViewById(R.id.base_content));
+        super.setContentView(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID);
+        getLayoutInflater().inflate(layoutResID, (ViewGroup) findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID));
         updateViewHolder();
     }
 
@@ -32,9 +36,9 @@ public abstract class LoadingViewHolderActivity extends BackButtonActivity {
             return;
         }
 
-        super.setContentView(R.layout.view_holder_loading_base);
+        super.setContentView(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID);
         //noinspection ConstantConditions
-        ((ViewGroup) findViewById(R.id.base_content)).addView(view);
+        ((ViewGroup) findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID)).addView(view);
         updateViewHolder();
     }
 
@@ -45,15 +49,16 @@ public abstract class LoadingViewHolderActivity extends BackButtonActivity {
             return;
         }
 
-        super.setContentView(R.layout.view_holder_loading_base);
+        super.setContentView(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID);
         //noinspection ConstantConditions
-        ((ViewGroup) findViewById(R.id.base_content)).addView(view, params);
+        ((ViewGroup) findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID)).addView(view, params);
         updateViewHolder();
     }
 
     @Override
     protected void onDestroy() {
-        loadingViewHolder.clearViews();
+        if (loadingViewHolder != null)
+            loadingViewHolder.clearViews();
         super.onDestroy();
     }
 

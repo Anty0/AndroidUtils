@@ -16,8 +16,7 @@ import eu.codetopic.utils.Utils;
 
 public abstract class BaseFragmentActivity extends AppCompatActivity {
 
-    @IdRes
-    public static final int CONTAINER_LAYOUT_ID = R.id.fragment_container;
+    @IdRes public static final int CONTAINER_LAYOUT_ID = R.id.base_content;
     public static final String ROOT_FRAGMENT_TAG =
             "eu.codetopic.utils.activity.fragment.BaseFragmentActivity.ROOT_FRAGMENT";
     private static final String LOG_TAG = "BaseFragmentActivity";

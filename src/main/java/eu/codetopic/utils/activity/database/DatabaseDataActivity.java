@@ -11,14 +11,15 @@ import android.support.annotation.WorkerThread;
 import com.j256.ormlite.dao.Dao;
 import com.path.android.jobqueue.JobManager;
 
-import eu.codetopic.utils.activity.loading.LoadingViewHolderActivity;
+import eu.codetopic.utils.activity.loading.LoadingModularActivity;
+import eu.codetopic.utils.activity.modular.ActivityCallBackModule;
 import eu.codetopic.utils.data.database.DatabaseObject;
 import eu.codetopic.utils.data.database.DependencyTextDatabaseObject;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
-public abstract class DatabaseDataActivity<DT extends DatabaseObject> extends LoadingViewHolderActivity {
+public abstract class DatabaseDataActivity<DT extends DatabaseObject> extends LoadingModularActivity {
 
     private static final String EXTRA_DATA_ID =
             "DatabaseDataActivity.EXTRA_DATA_ID";
@@ -31,6 +32,10 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject> extends Lo
     private JobManager mJobManager;
     private DT mData = null;
     private Long mDataId = null;
+
+    public DatabaseDataActivity(ActivityCallBackModule... modules) {
+        super(modules);
+    }
 
     public static <DT extends DatabaseObject> Intent generateDataActivityIntent
             (Context context, Class<? extends DatabaseDataActivity<DT>> clazz,

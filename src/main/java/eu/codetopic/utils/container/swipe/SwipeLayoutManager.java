@@ -74,7 +74,6 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setOnRefreshListener(final SwipeRefreshLayout.OnRefreshListener listener) {
-
         JobUtils.runOnMainThread(new Runnable() {
             @Override
             public void run() {
@@ -82,6 +81,15 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
             }
         });
         return self();
+    }
+
+    public synchronized T setOnRefreshListener(final OnSwipeRefreshListener listener) {
+        return setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                listener.onRefresh(getSwipeRefreshLayout());
+            }
+        });
     }
 
     public synchronized T setRefreshing(final boolean refreshing) {
@@ -162,5 +170,13 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
             }
         });
         return self();
+    }
+
+    /**
+     * Classes that wish to be notified when the swipe gesture correctly
+     * triggers a refresh should implement this interface.
+     */
+    public interface OnSwipeRefreshListener {
+        void onRefresh(SwipeRefreshLayout view);
     }
 }

@@ -1,8 +1,8 @@
 package eu.codetopic.utils.activity.navigation;
 
-import eu.codetopic.utils.activity.loading.LoadingViewHolderFragment;
+import eu.codetopic.utils.activity.loading.LoadingFragment;
 
-public abstract class NavigationFragment extends LoadingViewHolderFragment {
+public abstract class NavigationFragment extends LoadingFragment {
 
     protected NavigationActivity getNavigationActivity() {
         return (NavigationActivity) getActivity();

@@ -14,6 +14,8 @@ import android.view.ViewGroup;
  *
  * @author anty
  */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class BackButtonActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "BackButtonActivity";

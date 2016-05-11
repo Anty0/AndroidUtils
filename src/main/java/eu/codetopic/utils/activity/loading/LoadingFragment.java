@@ -8,11 +8,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import eu.codetopic.utils.Log;
-import eu.codetopic.utils.R;
 
-public abstract class LoadingViewHolderFragment extends Fragment {
+public abstract class LoadingFragment extends Fragment {
 
-    private static final String LOG_TAG = "LoadingViewHolderFragment";
+    private static final String LOG_TAG = "LoadingFragment";
 
     private LoadingViewHolder loadingViewHolder = null;
 
@@ -23,8 +22,8 @@ public abstract class LoadingViewHolderFragment extends Fragment {
         if (!hasDefaultViewHolder())
             return onCreateContentView(inflater, container, savedInstanceState);
 
-        View base = inflater.inflate(R.layout.view_holder_loading_base, container, false);
-        ViewGroup contentView = (ViewGroup) base.findViewById(R.id.base_content);
+        View base = inflater.inflate(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID, container, false);
+        ViewGroup contentView = (ViewGroup) base.findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID);
         View view = onCreateContentView(inflater, contentView, savedInstanceState);
         if (view == null) return null;
         contentView.addView(view);

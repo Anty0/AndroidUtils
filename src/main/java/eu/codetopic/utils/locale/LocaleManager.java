@@ -17,6 +17,7 @@ import java.util.Locale;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.data.getter.DataGetterNoBroadcastImpl;
 
 /**
  * Created by anty on 25.3.16.
@@ -31,7 +32,28 @@ public class LocaleManager {
     private static DataGetter<LocaleData> mLocaleDataGetter = null;
 
     /**
-     * Must be called in Application.onCreate()
+     * Must be called in Application.onCreate() if you want to use this class
+     *
+     * @param app        application
+     * @param localeData DataGetter of LocaleData for saving changes
+     */
+    @Deprecated
+    public static void initialize(@NonNull Application app, @NonNull final LocaleData localeData) {
+        initialize(app, new DataGetterNoBroadcastImpl<LocaleData>() {
+            @Override
+            public LocaleData get() {
+                return localeData;
+            }
+
+            @Override
+            public Class<LocaleData> getDataClass() {
+                return LocaleData.class;
+            }
+        });
+    }
+
+    /**
+     * Must be called in Application.onCreate() if you want to use this class
      *
      * @param app              application
      * @param localeDataGetter DataGetter of LocaleData for saving changes

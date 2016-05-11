@@ -1,8 +1,11 @@
 package eu.codetopic.utils.activity.loading;
 
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.JobUtils;
 
 /**
@@ -11,6 +14,10 @@ import eu.codetopic.utils.thread.JobUtils;
  * @author anty
  */
 public abstract class LoadingViewHolder {
+
+    @LayoutRes public static final int DEFAULT_LOADING_LAYOUT_ID = R.layout.loading_base;
+    @IdRes public static final int DEFAULT_LOADING_VIEW_ID = R.id.base_loading;
+    @IdRes public static final int DEFAULT_CONTENT_VIEW_ID = R.id.base_loadable_content;
 
     private final Object lock = new Object();
     private View mainView;

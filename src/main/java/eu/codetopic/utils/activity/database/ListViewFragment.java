@@ -24,6 +24,7 @@ import eu.codetopic.utils.data.database.DependencyTextDatabaseObject;
 import eu.codetopic.utils.thread.JobUtils;
 
 @Deprecated
+@SuppressWarnings("deprecation")
 public abstract class ListViewFragment<M extends DependencyTextDatabaseObject> extends NavigationFragment
         implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 

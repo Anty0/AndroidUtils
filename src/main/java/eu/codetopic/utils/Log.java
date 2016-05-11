@@ -1,6 +1,5 @@
 package eu.codetopic.utils;
 
-import android.app.Application;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -267,13 +266,17 @@ public class Log {
         DEBUG_MODE = debugMode;
     }
 
-    public static synchronized void initDebugMode(Application app, @NonNull final DataGetter
+    public static synchronized void initDebugMode(@NonNull DebugProviderData debugData) {
+        initDebugMode(debugData.isDebugMode());
+    }
+
+    public static synchronized void initDebugMode(Context context, @NonNull final DataGetter
             <? extends DebugProviderData> debugDataGetter) {// TODO: 8.3.16 initialize Log in ApplicationBase
         if (INITIALIZED) throw new IllegalStateException("Log is still initialized");
         INITIALIZED = true;
 
         if (debugDataGetter.hasDataChangedBroadcastAction()) {
-            app.registerReceiver(new BroadcastReceiver() {
+            context.getApplicationContext().registerReceiver(new BroadcastReceiver() {
                 @Override
                 public void onReceive(Context context, Intent intent) {
                     DEBUG_MODE = debugDataGetter.get().isDebugMode();
