@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Bundle;
 import android.support.annotation.AnyRes;
 import android.support.annotation.AttrRes;
 import android.support.annotation.ColorInt;
@@ -289,5 +290,26 @@ public class Utils {
 
     public static String addBeforeEveryLine(String toEdit, String toAdd) {
         return toAdd + toEdit.replace("\n", "\n" + toAdd);
+    }
+
+    public static boolean equalBundles(Bundle first, Bundle second) {
+        if (first.size() != second.size()) return false;
+
+        for (String key : first.keySet()) {
+            Object firstValue = first.get(key);
+            Object secondValue = second.get(key);
+
+            if (firstValue instanceof Bundle && secondValue instanceof Bundle &&
+                    !equalBundles((Bundle) firstValue, (Bundle) secondValue)) {
+                return false;
+            }
+
+            if (!Objects.equals(firstValue, secondValue)
+                    || (secondValue == null && !second.containsKey(key))) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

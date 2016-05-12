@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.design.internal.NavigationMenuPresenter;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.GravityCompat;
@@ -80,11 +79,11 @@ public abstract class NavigationActivity extends BaseFragmentActivity
     }
 
     @Override
-    protected Fragment onCreatePane() {
+    protected Fragment onCreateMainFragment() {
         try {
             return getMainFragment();
         } catch (Exception e) {
-            Log.e(LOG_TAG, "onCreatePane - provided wrong MainFragment", e);
+            Log.e(LOG_TAG, "onCreateMainFragment - provided wrong MainFragment", e);
             return null;
         }
     }
@@ -233,12 +232,12 @@ public abstract class NavigationActivity extends BaseFragmentActivity
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-        if (ROOT_FRAGMENT_TAG.equals(fragment.getTag())) resetNavigationView(fragment);
+        if (CURRENT_FRAGMENT_TAG.equals(fragment.getTag())) resetNavigationView(fragment);
     }
 
     @Override
     @SuppressWarnings("PrivateResource")
-    protected void onBeforeCommitReplaceFragment(FragmentManager fm, FragmentTransaction ft, Fragment fragment) {
+    protected void onBeforeReplaceFragment(FragmentTransaction ft, Fragment fragment) {
         ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out);
     }
 }

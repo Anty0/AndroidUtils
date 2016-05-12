@@ -79,7 +79,7 @@ public abstract class SwipeLayoutInflater<T extends SwipeLayoutInflater<T, E>, E
         this.mUseFloatingActionButton = useFloatingActionButton;
     }
 
-    public T withSchemeColors(int[] swipeToRefreshSchemeColors) {// TODO: 9.5.16 don't forget to use it every time
+    public T withSchemeColors(int[] swipeToRefreshSchemeColors) {
         setSchemeColors(swipeToRefreshSchemeColors);
         return self();
     }

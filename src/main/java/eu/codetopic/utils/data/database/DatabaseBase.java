@@ -90,7 +90,7 @@ public abstract class DatabaseBase extends OrmLiteSqliteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, ConnectionSource connectionSource, int oldVersion, int newVersion) {
         try {
             for (Class clazz : mClasses)
-                TableUtils.dropTable(connectionSource, clazz, true);// FIXME: 27.4.16 why we are ignoring errors?
+                TableUtils.dropTable(connectionSource, clazz, true);// FIXME: 27.4.16 why we are ignoring errors? (don't ignore errors and filter no table found exception)
             onCreate(db, connectionSource);
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -1,11 +1,10 @@
 package eu.codetopic.utils.activity.fragment;
 
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
@@ -14,202 +13,96 @@ import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 
-public abstract class BaseFragmentActivity extends AppCompatActivity {
+public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 12.5.16 rework fragment replacing
 
     @IdRes public static final int CONTAINER_LAYOUT_ID = R.id.base_content;
-    public static final String ROOT_FRAGMENT_TAG =
-            "eu.codetopic.utils.activity.fragment.BaseFragmentActivity.ROOT_FRAGMENT";
+    public static final String CURRENT_FRAGMENT_TAG =
+            "eu.codetopic.utils.activity.fragment.BaseFragmentActivity.CURRENT_FRAGMENT";
     private static final String LOG_TAG = "BaseFragmentActivity";
-
-    /**
-     * Converts an intent into a {@link Bundle} suitable for use as fragment arguments.
-     */
-    public static Bundle intentToFragmentArguments(Intent intent) {
-        Bundle arguments = new Bundle();
-        if (intent == null) {
-            return arguments;
-        }
-
-        final Uri data = intent.getData();
-        if (data != null) {
-            arguments.putParcelable("_uri", data);
-        }
-        final String action = intent.getAction();
-        if (action != null) {
-            arguments.putString("_action", action);
-        }
-
-        final Bundle extras = intent.getExtras();
-        if (extras != null) {
-            arguments.putAll(intent.getExtras());
-        }
-
-        return arguments;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState == null) {
-            tryAttachFragment();
-        }
+        if (savedInstanceState == null) replaceFragment(onCreateMainFragment());
     }
 
-    private void tryAttachFragment() {
-        final Fragment fragment = onCreatePane();
-        if (fragment == null)
-            return;
-
-        attachBundleToFragment(fragment);
-        getSupportFragmentManager().beginTransaction()
-                .add(CONTAINER_LAYOUT_ID, fragment, ROOT_FRAGMENT_TAG).commit();
-    }
-
-    private void attachBundleToFragment(Fragment fragment) {
-        Bundle bundle = fragment.getArguments();
-        if (bundle == null) {
-            bundle = new Bundle();
+    @Nullable
+    private <T extends Fragment> T initFragment(@NonNull Class<T> fragmentClass, @Nullable Bundle bundle) {
+        try {
+            T fragment = fragmentClass.newInstance();
+            if (bundle != null) fragment.setArguments(bundle);
+            return fragment;
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "initFragment", e);
         }
-        bundle.putAll(intentToFragmentArguments(getIntent()));
-        fragment.setArguments(bundle);
+        return null;
     }
 
     public Fragment getCurrentFragment() {
-        return getSupportFragmentManager().findFragmentByTag(ROOT_FRAGMENT_TAG);
+        return getSupportFragmentManager().findFragmentByTag(CURRENT_FRAGMENT_TAG);
     }
 
     public void removeCurrentFragment() {
-        Fragment currentFrag = getSupportFragmentManager()
-                .findFragmentByTag(ROOT_FRAGMENT_TAG);
-        if (currentFrag != null)
-            getSupportFragmentManager().beginTransaction()
-                    .remove(currentFrag).commit();
-        setTitle(Utils.getApplicationName(this));
+        replaceFragment((Fragment) null);
     }
 
-    /**
-     * Will replace existing fragment by new one.
-     *
-     * @param fragmentClass target fragment class
-     */
-    public <T extends Fragment> T replaceFragment(Class<T> fragmentClass) {
+    public <T extends Fragment> T replaceFragment(@NonNull Class<T> fragmentClass) {
         return replaceFragment(fragmentClass, null);
     }
 
-    /**
-     * Will replace existing fragment by new one.
-     *
-     * @param fragmentClass target fragment class
-     * @param bundle        bundle which will be available in new fragment
-     */
-    public <T extends Fragment> T replaceFragment(Class<T> fragmentClass, Bundle bundle) {
-        Fragment currentFragment = getCurrentFragment();
-        if (bundle == null && currentFragment != null && Objects.equals(currentFragment
-                .getClass(), fragmentClass)) return null;
-        try {
-            T fragment = fragmentClass.newInstance();
-            if (bundle != null) {
-                fragment.setArguments(bundle);
-            }
-            return replaceFragment(fragment);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "replaceFragment failed", e);
-        }
-        return null;
+    public <T extends Fragment> T replaceFragment(@NonNull Class<T> fragmentClass, @Nullable Bundle bundle) {
+        return replaceFragment(initFragment(fragmentClass, bundle));
     }
 
-    /**
-     * Will replace existing fragment by new one.
-     *
-     * @param fragment target fragment
-     */
-    public <T extends Fragment> T replaceFragment(T fragment) {
-        final FragmentManager fm = getSupportFragmentManager();
-        try {
-            FragmentTransaction ft = fm.beginTransaction();
-            onBeforeCommitReplaceFragment(fm, ft, fragment);
-            if (fragment != null) {
-                Fragment currentFragment = getCurrentFragment();
-                if (currentFragment == null || !Objects.equals(fragment
-                        .getClass(), currentFragment.getClass()))
-                    ft.replace(CONTAINER_LAYOUT_ID, fragment, ROOT_FRAGMENT_TAG);
-            } else removeCurrentFragment();
-            ft.commit();
-            return fragment;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "replaceFragment failed", e);
-        }
-        return null;
+    public <T extends Fragment> T replaceFragment(@NonNull FragmentTransaction ft,
+                                                  @NonNull Class<T> fragmentClass, @Nullable Bundle bundle) {
+        return replaceFragment(ft, initFragment(fragmentClass, bundle));
     }
 
-    /**
-     * Will replace existing fragment by new one in desired transaction
-     *
-     * @param ft            active translation which weill be used for fragment replace
-     * @param fragmentClass class of new fragment
-     * @param bundle        bundle which will be available in new fragment
-     */
-    public <T extends Fragment> T replaceFragment(FragmentTransaction ft,
-                                                  Class<T> fragmentClass, Bundle bundle) {
-        Fragment currentFragment = getCurrentFragment();
-        if (bundle == null && currentFragment != null && Objects.equals(currentFragment
-                .getClass(), fragmentClass)) return null;
+    public <T extends Fragment> T replaceFragment(@Nullable T fragment) {
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         try {
-            T fragment = fragmentClass.newInstance();
-            if (bundle != null) {
-                fragment.setArguments(bundle);
-            }
             return replaceFragment(ft, fragment);
         } catch (Exception e) {
-            Log.e(LOG_TAG, "replaceFragment failed", e);
+            Log.e(LOG_TAG, "replaceFragment", e);
+        } finally {
+            ft.commit();
         }
         return null;
     }
 
-    /**
-     * Will replace existing fragment by new one in desired transaction
-     *
-     * @param ft       active translation which weill be used for fragment replace
-     * @param fragment target fragment instance
-     */
-    public <T extends Fragment> T replaceFragment(FragmentTransaction ft, T fragment) {
-        final FragmentManager fm = getSupportFragmentManager();
+    public <T extends Fragment> T replaceFragment(@NonNull FragmentTransaction ft, @Nullable T fragment) {
         try {
-            onBeforeCommitReplaceFragment(fm, ft, fragment);
+            onBeforeReplaceFragment(ft, fragment);
+            Fragment currentFragment = getCurrentFragment();
+
             if (fragment != null) {
-                Fragment currentFragment = getCurrentFragment();
-                if (currentFragment == null || !Objects.equals(fragment
-                        .getClass(), currentFragment.getClass()))
-                    ft.replace(CONTAINER_LAYOUT_ID, fragment, ROOT_FRAGMENT_TAG);
-            } else removeCurrentFragment();
-            return fragment;
+                if (currentFragment == null
+                        || !Objects.equals(fragment.getClass(), currentFragment.getClass())
+                        || !Utils.equalBundles(fragment.getArguments(), currentFragment.getArguments()))
+                    ft.replace(CONTAINER_LAYOUT_ID, fragment, CURRENT_FRAGMENT_TAG);
+                return fragment;
+            }
+
+            if (currentFragment != null) ft.remove(currentFragment);
+            setTitle(Utils.getApplicationName(this));
+
         } catch (Exception e) {
-            Log.e(LOG_TAG, "replaceFragment failed", e);
+            Log.e(LOG_TAG, "replaceFragment", e);
         }
         return null;
     }
 
-    /**
-     * Called just before a fragment replacement transaction is committed in response to an intent
-     * being fired and substituted for a fragment.
-     * <p/>
-     * Here you can put custom animation or any other customization for fragment replacement.
-     */
-    protected void onBeforeCommitReplaceFragment(FragmentManager fm, FragmentTransaction ft, Fragment fragment) {
-
+    protected void onBeforeReplaceFragment(FragmentTransaction ft, Fragment fragment) {
     }
 
-    /**
-     * Called in <code>onCreate</code> when the fragment constituting this
-     * activity is needed. The returned fragment's arguments will be set to the
-     * intent used to invoke this activity.
-     */
-    protected abstract Fragment onCreatePane();
+    protected abstract Fragment onCreateMainFragment();
 
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-        if (fragment instanceof TitleProvider)
+        if (fragment instanceof TitleProvider &&
+                CURRENT_FRAGMENT_TAG.equals(fragment.getTag()))
             setTitle(((TitleProvider) fragment).getTitle());
 
         System.runFinalization();

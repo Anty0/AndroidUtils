@@ -16,7 +16,7 @@ import eu.codetopic.utils.exceptions.WrongIdException;
  *
  * @author anty
  */
-public final class NotificationIdsManager {// TODO: 6.3.16 add to modules in ApplicationBase
+public final class NotificationIdsManager {
 
     private static final String LOG_TAG = "NotificationIdsManager";
 
@@ -34,7 +34,7 @@ public final class NotificationIdsManager {// TODO: 6.3.16 add to modules in App
         mData.init();
     }
 
-    public static void initialize(Context context) {
+    public static void initialize(Context context) {// TODO: 6.3.16 initialize in ApplicationBase
         if (mInstance != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
         mInstance = new NotificationIdsManager(context.getApplicationContext());
     }
