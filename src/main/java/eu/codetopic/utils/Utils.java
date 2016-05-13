@@ -292,7 +292,8 @@ public class Utils {
         return toAdd + toEdit.replace("\n", "\n" + toAdd);
     }
 
-    public static boolean equalBundles(Bundle first, Bundle second) {
+    public static boolean equalBundles(@Nullable Bundle first, @Nullable Bundle second) {
+        if (first == null || second == null) return first == second;
         if (first.size() != second.size()) return false;
 
         for (String key : first.keySet()) {
