@@ -63,33 +63,25 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
         try {
             return replaceFragment(ft, fragment);
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "replaceFragment", e);
         } finally {
             ft.commit();
         }
-        return null;
     }
 
     public <T extends Fragment> T replaceFragment(@NonNull FragmentTransaction ft, @Nullable T fragment) {
-        try {
-            onBeforeReplaceFragment(ft, fragment);
-            Fragment currentFragment = getCurrentFragment();
+        onBeforeReplaceFragment(ft, fragment);
+        Fragment currentFragment = getCurrentFragment();
 
-            if (fragment != null) {
-                if (currentFragment == null
-                        || !Objects.equals(fragment.getClass(), currentFragment.getClass())
-                        || !Utils.equalBundles(fragment.getArguments(), currentFragment.getArguments()))
-                    ft.replace(CONTAINER_LAYOUT_ID, fragment, CURRENT_FRAGMENT_TAG);
-                return fragment;
-            }
-
-            if (currentFragment != null) ft.remove(currentFragment);
-            setTitle(Utils.getApplicationName(this));
-
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "replaceFragment", e);
+        if (fragment != null) {
+            if (currentFragment == null
+                    || !Objects.equals(fragment.getClass(), currentFragment.getClass())
+                    || !Utils.equalBundles(fragment.getArguments(), currentFragment.getArguments()))
+                ft.replace(CONTAINER_LAYOUT_ID, fragment, CURRENT_FRAGMENT_TAG);
+            return fragment;
         }
+
+        if (currentFragment != null) ft.remove(currentFragment);
+        setTitle(Utils.getApplicationName(this));
         return null;
     }
 
