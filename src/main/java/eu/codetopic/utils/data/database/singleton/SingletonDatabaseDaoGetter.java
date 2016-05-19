@@ -1,19 +1,19 @@
 package eu.codetopic.utils.data.database.singleton;
 
 import com.j256.ormlite.dao.Dao;
-import com.path.android.jobqueue.JobManager;
 
 import java.sql.SQLException;
 
 import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
+import eu.codetopic.utils.thread.job.SingletonJobManagerGetter;
 
 /**
  * Created by anty on 24.4.16.
  *
  * @author anty
  */
-public class SingletonDatabaseDaoGetter<DT> implements DatabaseDaoGetter<DT> {
+public class SingletonDatabaseDaoGetter<DT> extends SingletonJobManagerGetter implements DatabaseDaoGetter<DT> {
 
     private static final String LOG_TAG = "SingletonDatabaseDaoGetter";
 
@@ -36,10 +36,5 @@ public class SingletonDatabaseDaoGetter<DT> implements DatabaseDaoGetter<DT> {
     @Override
     public DatabaseBase getDatabase() {
         return SingletonDatabase.getInstance();
-    }
-
-    @Override
-    public JobManager getJobManager() {
-        return SingletonDatabase.getJobManager();
     }
 }

@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.items.cardview;
+package eu.codetopic.utils.container.items.custom;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -14,22 +14,24 @@ import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineItemUtils;
 
 /**
- * Created by anty on 30.3.16.
+ * Created by anty on 16.5.16.
  *
  * @author anty
  */
-public class MultilineItemCardWrapper extends CardItemNoClickImpl {
+public class MultilineItemCustomItemWrapper implements CustomItem {
+
+    private static final String LOG_TAG = "MultilineItemCustomItemWrapper";
 
     private final MultilineItem item;
 
-    public MultilineItemCardWrapper(MultilineItem item) {
+    public MultilineItemCustomItemWrapper(MultilineItem item) {
         this.item = item;
     }
 
-    public static List<MultilineItemCardWrapper> wrapAll(Collection<? extends MultilineItem> items) {
-        List<MultilineItemCardWrapper> wrappedItems = new ArrayList<>();
+    public static List<MultilineItemCustomItemWrapper> wrapAll(Collection<? extends MultilineItem> items) {
+        List<MultilineItemCustomItemWrapper> wrappedItems = new ArrayList<>();
         for (MultilineItem item : items)
-            wrappedItems.add(new MultilineItemCardWrapper(item));
+            wrappedItems.add(new MultilineItemCustomItemWrapper(item));
         return wrappedItems;
     }
 
@@ -38,7 +40,7 @@ public class MultilineItemCardWrapper extends CardItemNoClickImpl {
     }
 
     @Override
-    public View getViewBase(Context context, ViewGroup parent, @Nullable View oldView, int itemPosition) {
+    public View getView(Context context, ViewGroup parent, @Nullable View oldView, int itemPosition) {
         return MultilineItemUtils.apply(item).withoutPadding()
                 .withDefaultLayoutResId(getLayoutResId(context, itemPosition))
                 .withPosition(itemPosition).on(context, parent, oldView);
@@ -46,8 +48,9 @@ public class MultilineItemCardWrapper extends CardItemNoClickImpl {
 
     @Override
     @LayoutRes
-    public int getBaseLayoutResId(Context context, int itemPosition) {
+    public int getLayoutResId(Context context, int itemPosition) {
         return MultilineItemUtils.getLayoutResIdFor(context, item, itemPosition, null);
     }
+
 
 }

@@ -22,7 +22,7 @@ import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
  *
  * @author anty
  */
-public class DatabaseJob<T, ID> extends LoadingViewHolderJob {
+public class DatabaseJob<T, ID> extends LoadingJob {
 
     private static final String LOG_TAG = "DatabaseJob";
     private static final String JOB_DATABASE_GROUP_NAME_ADD = ".DATABASE_GROUP";
@@ -112,7 +112,7 @@ public class DatabaseJob<T, ID> extends LoadingViewHolderJob {
 
     @Override
     protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
-        Log.e(LOG_TAG, "LoadingJob shouldReRunOnThrowable", throwable);
+        Log.e(LOG_TAG, "shouldReRunOnThrowable", throwable);
         return super.shouldReRunOnThrowable(throwable, runCount, maxRunCount);
     }
 

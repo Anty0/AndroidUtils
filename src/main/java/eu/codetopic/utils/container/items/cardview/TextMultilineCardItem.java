@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 import android.view.View;
 
+import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineResourceLayoutItem;
 
 /**
@@ -76,12 +77,12 @@ public class TextMultilineCardItem extends MultilineCardItem implements Multilin
     }
 
     public TextMultilineCardItem callOnClick() {
-        onClick(null, null, NO_POSITION);
+        onClick(null, null, MultilineItem.NO_POSITION);
         return this;
     }
 
     public int getLayoutResourceId() {
-        return getLayoutResourceId(null, NO_POSITION);
+        return getLayoutResourceId(null, MultilineItem.NO_POSITION);
     }
 
     public TextMultilineCardItem setLayoutResId(int layoutId) {

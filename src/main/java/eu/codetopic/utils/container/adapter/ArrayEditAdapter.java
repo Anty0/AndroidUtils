@@ -1,9 +1,10 @@
-package eu.codetopic.utils.container.recyclerView.adapter;
+package eu.codetopic.utils.container.adapter;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.v7.widget.RecyclerView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -15,38 +16,31 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 
 /**
- * Created by anty on 21.2.16.
+ * Created by anty on 18.5.16.
  *
  * @author anty
  */
-public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHolder>
-        extends RecyclerView.Adapter<VH> implements Iterable<T> {
+public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
+        extends UniversalAdapter<VH> implements Iterable<T> {
 
-    private static final String LOG_TAG = "ArrayEditRecyclerAdapter";
+    private static final String LOG_TAG = "ArrayEditAdapter";
 
     private final Object mLock = new Object();
     private final ArrayList<T> mData = new ArrayList<>();
 
-    public ArrayEditRecyclerAdapter() {
-
+    public ArrayEditAdapter() {
     }
 
-    public ArrayEditRecyclerAdapter(Collection<? extends T> data) {
+    public ArrayEditAdapter(Collection<? extends T> data) {
         synchronized (mLock) {
             mData.addAll(data);
         }
     }
 
     @SafeVarargs
-    public ArrayEditRecyclerAdapter(T... data) {
+    public ArrayEditAdapter(T... data) {
         synchronized (mLock) {
             Collections.addAll(mData, data);
-        }
-    }
-
-    public boolean isEmpty() {
-        synchronized (mLock) {
-            return mData.isEmpty();
         }
     }
 
@@ -57,6 +51,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
         }
     }
 
+    @Override
     public T getItem(int position) {
         synchronized (mLock) {
             return mData.get(position);
@@ -83,6 +78,13 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
     }
 
     @Override
+    public boolean isEmpty() {
+        synchronized (mLock) {
+            return mData.isEmpty();
+        }
+    }
+
+    @Override
     public Iterator<T> iterator() {
         return new IteratorWrapper<T>(getItems().iterator()) {
             @Override
@@ -92,7 +94,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
         };
     }
 
-    public Editor<T> edit() {
+    public Editor<T, ? extends ArrayEditAdapter<T, VH>> edit() {
         return new Editor<>(this);
     }
 
@@ -107,46 +109,55 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
     public void postModifications(@Nullable Object editTag, Collection<Modification<T>> modifications,
                                   @Nullable Collection<T> contentModifiedItems) {
 
+        Base base = getBase();
         synchronized (mLock) {
-            //noinspection unchecked
-            List<T> dataBackup = (List<T>) mData.clone();
-            for (Modification<T> modification : modifications)
-                modification.modify(mData);
+            if (base.hasOnlySimpleDataChangedReporting()) {
+                for (Modification<T> modification : modifications)
+                    modification.modify(mData);
 
-            for (Iterator<T> iterator = dataBackup.iterator(); iterator.hasNext(); ) {
-                T obj = iterator.next();
-                if (!mData.contains(obj)) {
-                    notifyItemRemoved(dataBackup.indexOf(obj));
-                    iterator.remove();
+                base.notifyDataSetChanged();
+            } else {
+                //noinspection unchecked
+                List<T> dataBackup = (List<T>) mData.clone();
+                for (Modification<T> modification : modifications)
+                    modification.modify(mData);
+
+                for (Iterator<T> iterator = dataBackup.iterator(); iterator.hasNext(); ) {
+                    T obj = iterator.next();
+                    if (!mData.contains(obj)) {
+                        base.notifyItemRemoved(dataBackup.indexOf(obj));
+                        iterator.remove();
+                    }
                 }
+
+                for (int i = 0, size = mData.size(); i < size; i++) {
+                    T obj = mData.get(i);
+                    if (!dataBackup.contains(obj)) {
+                        dataBackup.add(i, obj);
+                        base.notifyItemInserted(i);
+                        continue;
+                    }
+
+                    int oldIndex = dataBackup.indexOf(obj);
+                    if (oldIndex != i) {
+                        base.notifyItemMoved(oldIndex, i);
+                        dataBackup.remove(obj);
+                        dataBackup.add(i, obj);
+                    }
+                }
+
+                if (contentModifiedItems != null) {
+                    for (T item : contentModifiedItems) {
+                        int index = mData.indexOf(item);
+                        if (index != -1) base.notifyItemChanged(index);
+                    }
+                } else base.notifyItemRangeChanged(0, mData.size());
+
+                if (!Objects.equals(dataBackup, mData)) Log.e(LOG_TAG, "apply",
+                        new InternalError("Detected problem in " + LOG_TAG + " while applying changes" +
+                                " - !dataBackup.equals(newData)"));
             }
 
-            for (int i = 0, size = mData.size(); i < size; i++) {
-                T obj = mData.get(i);
-                if (!dataBackup.contains(obj)) {
-                    dataBackup.add(i, obj);
-                    notifyItemInserted(i);
-                    continue;
-                }
-
-                int oldIndex = dataBackup.indexOf(obj);
-                if (oldIndex != i) {
-                    notifyItemMoved(oldIndex, i);
-                    dataBackup.remove(obj);
-                    dataBackup.add(i, obj);
-                }
-            }
-
-            if (contentModifiedItems != null) {
-                for (T item : contentModifiedItems) {
-                    int index = mData.indexOf(item);
-                    if (index != -1) notifyItemChanged(index);
-                }
-            } else notifyItemRangeChanged(0, mData.size());
-
-            if (!Objects.equals(dataBackup, mData)) Log.e(LOG_TAG, "apply",
-                    new InternalError("Detected problem in " + LOG_TAG + " while applying changes" +
-                            " - !dataBackup.equals(newData)"));
             onDataEdited(editTag);
         }
     }
@@ -159,35 +170,41 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
         void modify(List<T> toModify);
     }
 
-    public static final class Editor<T> {
+    public static class Editor<T, A extends ArrayEditAdapter<T, ?>> {
 
-        private static final String LOG_TAG = ArrayEditRecyclerAdapter.LOG_TAG + "$Editor";
+        private static final String LOG_TAG = ArrayEditAdapter.LOG_TAG + "$Editor";
 
-        private final ArrayEditRecyclerAdapter<T, ?> mAdapter;
+        private final WeakReference<A> mAdapterReference;
         private final ArrayList<Modification<T>> mModifications = new ArrayList<>();
         private final ArrayList<T> mChangedItems = new ArrayList<>();
         private boolean mAllItemsChanged = false;
         private Object mTag = null;
 
-        private Editor(ArrayEditRecyclerAdapter<T, ?> adapter) {
-            mAdapter = adapter;
+        protected Editor(A adapter) {
+            mAdapterReference = new WeakReference<>(adapter);
+        }
+
+        @UiThread
+        @Nullable
+        public A getAdapter() {
+            return mAdapterReference.get();
         }
 
         public synchronized Object getTag() {
             return mTag;
         }
 
-        public synchronized Editor<T> setTag(@Nullable Object tag) {
+        public synchronized Editor<T, A> setTag(@Nullable Object tag) {
             this.mTag = tag;
             return this;
         }
 
-        public synchronized Editor<T> post(Modification<T> modification) {
+        public synchronized Editor<T, A> post(Modification<T> modification) {
             mModifications.add(modification);
             return this;
         }
 
-        public Editor<T> add(final T object) {
+        public Editor<T, A> add(final T object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -196,7 +213,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> add(final int index, final T object) {
+        public Editor<T, A> add(final int index, final T object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -205,7 +222,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> addAll(final Collection<? extends T> collection) {
+        public Editor<T, A> addAll(final Collection<? extends T> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -214,7 +231,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> addAll(final int index, final Collection<? extends T> collection) {
+        public Editor<T, A> addAll(final int index, final Collection<? extends T> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -223,7 +240,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> clear() {
+        public Editor<T, A> clear() {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -232,7 +249,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> remove(final int index) {
+        public Editor<T, A> remove(final int index) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -241,7 +258,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> remove(final Object object) {
+        public Editor<T, A> remove(final Object object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -251,7 +268,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> set(final int index, final T object) {
+        public Editor<T, A> set(final int index, final T object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -260,7 +277,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> removeAll(final Collection<?> collection) {
+        public Editor<T, A> removeAll(final Collection<?> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -270,7 +287,7 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
             });
         }
 
-        public Editor<T> retainAll(final Collection<?> collection) {
+        public Editor<T, A> retainAll(final Collection<?> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -280,29 +297,33 @@ public abstract class ArrayEditRecyclerAdapter<T, VH extends RecyclerView.ViewHo
         }
 
         @SafeVarargs
-        public synchronized final Editor<T> notifyItemsChanged(T... items) {
+        public synchronized final Editor<T, A> notifyItemsChanged(T... items) {
             Collections.addAll(mChangedItems, items);
             return this;
         }
 
-        public synchronized Editor<T> notifyItemsChanged(Collection<T> items) {
+        public synchronized Editor<T, A> notifyItemsChanged(Collection<T> items) {
             mChangedItems.addAll(items);
             return this;
         }
 
-        public synchronized Editor<T> notifyAllItemsChanged() {
+        public synchronized Editor<T, A> notifyAllItemsChanged() {
             mAllItemsChanged = true;
             return this;
         }
 
         @UiThread
-        public synchronized void apply() {
-            mAdapter.postModifications(getTag(), mModifications,
-                    mAllItemsChanged ? null : mChangedItems);
-            mModifications.clear();
-            mChangedItems.clear();
-            mAllItemsChanged = false;
+        public synchronized boolean apply() {
+            A adapter = getAdapter();
+            if (adapter != null) {
+                adapter.postModifications(getTag(), mModifications,
+                        mAllItemsChanged ? null : mChangedItems);
+                mModifications.clear();
+                mChangedItems.clear();
+                mAllItemsChanged = false;
+                return true;
+            }
+            return false;
         }
     }
-
 }

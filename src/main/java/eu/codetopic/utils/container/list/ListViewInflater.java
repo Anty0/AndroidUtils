@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.listView;
+package eu.codetopic.utils.container.list;
 
 import android.app.Activity;
 import android.support.annotation.IdRes;

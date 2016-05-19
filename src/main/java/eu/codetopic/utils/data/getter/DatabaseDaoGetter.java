@@ -3,7 +3,6 @@ package eu.codetopic.utils.data.getter;
 import android.support.annotation.WorkerThread;
 
 import com.j256.ormlite.dao.Dao;
-import com.path.android.jobqueue.JobManager;
 
 import java.sql.SQLException;
 
@@ -14,7 +13,7 @@ import eu.codetopic.utils.data.database.DatabaseBase;
  *
  * @author anty
  */
-public interface DatabaseDaoGetter<DT> extends BaseGetter {
+public interface DatabaseDaoGetter<DT> extends BaseGetter, JobManagerGetter {
 
     @WorkerThread
     Dao<DT, ?> get() throws SQLException;
@@ -22,6 +21,4 @@ public interface DatabaseDaoGetter<DT> extends BaseGetter {
     Class<DT> getDaoObjectClass();
 
     DatabaseBase getDatabase();
-
-    JobManager getJobManager();
 }

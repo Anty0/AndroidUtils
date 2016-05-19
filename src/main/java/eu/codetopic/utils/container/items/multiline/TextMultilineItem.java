@@ -1,6 +1,7 @@
 package eu.codetopic.utils.container.items.multiline;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 /**
  * Created by anty on 18.6.15.
@@ -16,7 +17,7 @@ public class TextMultilineItem implements MultilineItem {
 
     }
 
-    public TextMultilineItem(CharSequence title, CharSequence text) {
+    public TextMultilineItem(CharSequence title, @Nullable CharSequence text) {
         this.title = title;
         this.text = text;
     }

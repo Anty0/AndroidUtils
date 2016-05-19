@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.recyclerView;
+package eu.codetopic.utils.container.recycler;
 
 import android.app.Activity;
 import android.support.annotation.IdRes;

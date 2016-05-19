@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.listView;
+package eu.codetopic.utils.container.list;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

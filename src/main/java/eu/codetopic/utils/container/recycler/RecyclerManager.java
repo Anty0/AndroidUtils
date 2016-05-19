@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.recyclerView;
+package eu.codetopic.utils.container.recycler;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,10 +9,11 @@ import android.view.View;
 import java.util.Collection;
 
 import eu.codetopic.utils.R;
+import eu.codetopic.utils.container.adapter.CustomItemAdapter;
 import eu.codetopic.utils.container.items.cardview.CardItem;
-import eu.codetopic.utils.container.recyclerView.adapter.CardRecyclerAdapter;
-import eu.codetopic.utils.container.recyclerView.utils.EmptyRecyclerView;
-import eu.codetopic.utils.container.recyclerView.utils.RecyclerItemClickListener;
+import eu.codetopic.utils.container.items.custom.CustomItem;
+import eu.codetopic.utils.container.recycler.utils.EmptyRecyclerView;
+import eu.codetopic.utils.container.recycler.utils.RecyclerItemClickListener;
 import eu.codetopic.utils.container.swipe.SwipeLayoutManager;
 
 /**
@@ -37,16 +38,16 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
         return mRecyclerView;
     }
 
-    public synchronized <DT extends CardItem> T setAdapter(Collection<DT> adapterData) {
-        return setAdapter(new CardRecyclerAdapter<>(getContext(), adapterData));
+    public synchronized <DT extends CustomItem> T setAdapter(Collection<DT> adapterData) {
+        return setAdapter(new CustomItemAdapter<>(getContext(), adapterData).forRecyclerView());
     }
 
     @SafeVarargs
     public final synchronized <DT extends CardItem> T setAdapter(DT... adapterData) {
-        return setAdapter(new CardRecyclerAdapter<>(getContext(), adapterData));
+        return setAdapter(new CustomItemAdapter<>(getContext(), adapterData).forRecyclerView());
     }
 
-    public synchronized T setAdapter(RecyclerView.Adapter adapter) {
+    public synchronized T setAdapter(RecyclerView.Adapter<?> adapter) {
         getRecyclerView().setAdapter(adapter);
         return self();
     }

@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.recyclerView.utils;
+package eu.codetopic.utils.container.recycler.utils;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

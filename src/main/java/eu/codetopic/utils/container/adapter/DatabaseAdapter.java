@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.recyclerView.adapter;
+package eu.codetopic.utils.container.adapter;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +7,6 @@ import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
-import android.support.v7.widget.RecyclerView;
 
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.CloseableWrappedIterable;
@@ -22,8 +21,8 @@ import java.util.List;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
-import eu.codetopic.utils.container.items.cardview.CardItem;
 import eu.codetopic.utils.container.items.cardview.MultilineItemCardWrapper;
+import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
@@ -31,11 +30,11 @@ import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
 /**
- * Created by anty on 30.3.16.
+ * Created by anty on 19.5.16.
  *
  * @author anty
  */
-public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
+public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
     private static final String LOG_TAG = "DatabaseAdapter";
     private static final String EDIT_TAG = LOG_TAG + ".EDIT_TAG";
@@ -47,7 +46,6 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
             notifyDatabaseDataChanged();
         }
     };
-    private boolean mRegistered = false;
 
     public DatabaseAdapter(Context context, DatabaseDaoGetter<T> daoGetter,
                            @Nullable LoadingViewHolder viewHolder) {
@@ -65,37 +63,31 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
     }
 
     @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-        if (!mRegistered) {
+    public void onRegisterDataObserver(Object observer) {
+        if (!getBase().hasObservers()) {
             getContext().registerReceiver(mDataChangedReceiver, mItemsGetter
                     .getDatabaseItemsChangedIntentFilter(getContext()));
-            mRegistered = true;
             notifyDatabaseDataChanged();
         }
+        super.onRegisterDataObserver(observer);
     }
 
     @Override
-    public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView);
-        if (!mRegistered) {
-            Log.e(LOG_TAG, "onDetachedFromRecyclerView problem detected:" +
-                    " mDataChangedReceiver is not registered while onDetachedFromRecyclerView() is called");
-        } else if (!hasObservers()) {
+    public void onUnregisterDataObserver(Object observer) {
+        super.onUnregisterDataObserver(observer);
+        if (!getBase().hasObservers())
             getContext().unregisterReceiver(mDataChangedReceiver);
-            mRegistered = false;
-        }
     }
 
     @Override
-    public Editor<CardItem> edit() {
+    public Editor<CustomItem, DatabaseAdapter<T, ID>> edit() {
         throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
                 " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
     }
 
     @Override
-    public void postModifications(@Nullable Object editTag, Collection<Modification<CardItem>>
-            modifications, Collection<CardItem> contentModifiedItems) {
+    public void postModifications(@Nullable Object editTag, Collection<Modification<CustomItem>>
+            modifications, Collection<CustomItem> contentModifiedItems) {
         if (!EDIT_TAG.equals(editTag))
             throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
                     " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
@@ -103,12 +95,12 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
     }
 
     @Override
-    public void postModifications(Collection<Modification<CardItem>> modifications, Collection<CardItem> contentModifiedItems) {
+    public void postModifications(Collection<Modification<CustomItem>> modifications, Collection<CustomItem> contentModifiedItems) {
         throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
                 " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
     }
 
-    private synchronized void setItems(@NonNull Collection<? extends CardItem> items) {
+    private synchronized void setItems(@NonNull Collection<? extends CustomItem> items) {
         super.edit().clear().addAll(items).notifyAllItemsChanged().setTag(EDIT_TAG).apply();
     }
 
@@ -199,15 +191,15 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
                 @Override
                 public void run(Dao<T, ID> dao) throws Throwable {
                     Class<T> dataClass = dao.getDataClass();
-                    if (CardItem.class.isAssignableFrom(dataClass)) {
-                        setItems((List<? extends CardItem>) getItems(dao));
+                    if (CustomItem.class.isAssignableFrom(dataClass)) {
+                        setItems((List<? extends CustomItem>) getItems(dao));
                     } else if (MultilineItem.class.isAssignableFrom(dataClass)) {
                         setItems(MultilineItemCardWrapper
                                 .wrapAll((Collection<? extends MultilineItem>) getItems(dao)));
                     } else {
-                        setItems(Collections.<CardItem>emptyList());
+                        setItems(Collections.<CustomItem>emptyList());
                         Log.e(LOG_TAG, "notifyDatabaseDataChanged problem detected:" +
-                                " database data class don't implements CardItem or MultilineItem," +
+                                " database data class don't implements CustomItem or MultilineItem," +
                                 " so " + LOG_TAG + " will be empty");
                     }
                 }
@@ -231,7 +223,7 @@ public class DatabaseAdapter<T, ID> extends CardRecyclerAdapter<CardItem> {
 
         protected abstract void onUpdateItems(Context context);
 
-        protected final void setItems(@NonNull final Collection<? extends CardItem> items) {
+        protected final void setItems(@NonNull final Collection<? extends CustomItem> items) {
             JobUtils.runOnMainThread(new Runnable() {
                 @Override
                 public void run() {

@@ -1,4 +1,4 @@
-package eu.codetopic.utils.container.items.cardview;
+package eu.codetopic.utils.container.items.custom;
 
 import android.content.Context;
 import android.support.annotation.LayoutRes;
@@ -10,14 +10,16 @@ import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineItemUtils;
 
 /**
- * Created by anty on 22.2.16.
+ * Created by anty on 16.5.16.
  *
  * @author anty
  */
-public abstract class MultilineCardItem extends CardItemNoClickImpl implements MultilineItem {
+public abstract class MultilineCustomItem implements CustomItem, MultilineItem {
+
+    private static final String LOG_TAG = "MultilineCustomItem";
 
     @Override
-    public View getViewBase(Context context, ViewGroup parent, @Nullable View oldView, int itemPosition) {
+    public View getView(Context context, ViewGroup parent, @Nullable View oldView, int itemPosition) {
         return MultilineItemUtils.apply(this).withoutPadding()
                 .withDefaultLayoutResId(getLayoutResId(context, itemPosition))
                 .withPosition(itemPosition).on(context, parent, oldView);
@@ -25,7 +27,8 @@ public abstract class MultilineCardItem extends CardItemNoClickImpl implements M
 
     @Override
     @LayoutRes
-    public final int getBaseLayoutResId(Context context, int itemPosition) {
+    public final int getLayoutResId(Context context, int itemPosition) {
         return MultilineItemUtils.getLayoutResIdFor(context, this, itemPosition, null);
     }
+
 }

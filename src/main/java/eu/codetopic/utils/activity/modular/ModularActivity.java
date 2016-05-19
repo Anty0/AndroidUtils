@@ -34,6 +34,10 @@ public abstract class ModularActivity extends AppCompatActivity {
     private final LinkedHashMap<Class<? extends ActivityCallBackModule>,
             ActivityCallBackModule> mModules = new LinkedHashMap<>();
 
+    public ModularActivity() {
+        this(new ActivityCallBackModule[0]);
+    }
+
     public ModularActivity(ActivityCallBackModule... modules) {
         Log.d(LOG_TAG, "<init> using modules: " + Arrays.toString(modules));
         for (ActivityCallBackModule module : modules) {
@@ -48,6 +52,10 @@ public abstract class ModularActivity extends AppCompatActivity {
 
     public Collection<ActivityCallBackModule> getModules() {
         return mModules.values();
+    }
+
+    public boolean hasModule(Class<? extends ActivityCallBackModule> moduleClass) {
+        return mModules.containsKey(moduleClass);
     }
 
     public <T extends ActivityCallBackModule> T findModule(Class<T> moduleClass) {

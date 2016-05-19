@@ -19,10 +19,6 @@ public class JobUtils {
         MAIN_THREAD = looper.getThread();
     }
 
-    public static boolean isOnMainThread() {
-        return Thread.currentThread() == MAIN_THREAD;
-    }
-
     public static void runOnMainThread(Runnable action) {
         if (!isOnMainThread()) {
             postOnMainThread(action);
@@ -31,8 +27,28 @@ public class JobUtils {
         action.run();
     }
 
+    public static boolean isOnMainThread() {
+        return Thread.currentThread() == MAIN_THREAD;
+    }
+
     public static void postOnMainThread(Runnable action) {
         HANDLER.post(action);
+    }
+
+    public static void runOnContextThread(Context context, Runnable action) {
+        if (!isOnContextThread(context)) {
+            postOnContextThread(context, action);
+            return;
+        }
+        action.run();
+    }
+
+    public static boolean isOnContextThread(Context context) {
+        return Thread.currentThread() == context.getMainLooper().getThread();
+    }
+
+    public static void postOnContextThread(Context context, Runnable action) {
+        new Handler(context.getMainLooper()).post(action);
     }
 
     public static boolean threadSleep(long time) {

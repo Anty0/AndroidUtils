@@ -94,6 +94,7 @@ public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFac
 
     @Override
     public RemoteViews getViewAt(int position) {
+        // TODO: 18.5.16 rework to support CustomItem (using canvas capture) and create WidgetClickableCustomItem to add pending click listeners to captured layout
         final RemoteViews remoteView = new RemoteViews(
                 mContext.getPackageName(), R.layout.widget_list_item_multi_line_text);
         MultilineItem multilineItem = mItems.get(position);

@@ -1,7 +1,6 @@
 package eu.codetopic.utils.container.items.multiline;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.MainThread;
@@ -22,7 +21,10 @@ import eu.codetopic.utils.callback.ActionCallback;
  *
  * @author anty
  */
-public class MultilineItemUtils {
+public final class MultilineItemUtils {
+
+    private MultilineItemUtils() {
+    }
 
     public static ItemViewHolder getItemViewHolderFor
             (MultilineItem item, View view, @LayoutRes int layoutResourceId) {
@@ -32,8 +34,8 @@ public class MultilineItemUtils {
         if (tag instanceof ItemViewHolder) {
             holder = (ItemViewHolder) tag;
             if (!Objects.equals(holder.layoutResourceId, layoutResourceId))
-                throw new Resources.NotFoundException("Wrong layout id used for " + item.getClass().getName()
-                        + ": holderLayoutId: " + holder.layoutResourceId + ", usedLayoutId: " + layoutResourceId);
+                throw new IllegalArgumentException("Wrong layout used for " + item.getClass().getName()
+                        + ": holderLayoutId: " + holder.layoutResourceId + ", requiredLayoutId: " + layoutResourceId);
         } else {
             holder = new ItemViewHolder(view, layoutResourceId);
             view.setTag(holder);
@@ -133,9 +135,12 @@ public class MultilineItemUtils {
 
         public View on(LayoutInflater inflater, ViewGroup parent, @Nullable View oldView) {
             if (oldView != null) {
-                int layoutRes = getLayoutResId(inflater.getContext());
-                if (!Objects.equals(getItemViewHolderFor(mItem, oldView, layoutRes)
-                        .layoutResourceId, layoutRes)) oldView = null;
+                try {
+                    getItemViewHolderFor(mItem, oldView,
+                            getLayoutResId(inflater.getContext()));
+                } catch (Exception e) {
+                    oldView = null;
+                }
             }
 
             if (oldView == null) return on(inflater, parent, false);
