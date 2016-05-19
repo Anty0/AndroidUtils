@@ -22,11 +22,6 @@ import java.util.List;
 
 import eu.codetopic.utils.Log;
 
-/**
- * Created by anty on 10.5.16.
- *
- * @author anty
- */
 public abstract class ModularActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "ModularActivity";

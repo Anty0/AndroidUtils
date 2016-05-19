@@ -11,11 +11,6 @@ import android.support.annotation.Nullable;
 import eu.codetopic.utils.notifications.manage.Group;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
-/**
- * Created by anty on 14.11.2015.
- *
- * @author anty
- */
 public class PostNotificationCanceler extends BroadcastReceiver {
 
     private static final String DEFAULT_GROUP_NAME = "DEFAULT_GROUP";

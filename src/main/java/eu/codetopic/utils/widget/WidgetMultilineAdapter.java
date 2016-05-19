@@ -15,11 +15,6 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 
-/**
- * Created by anty on 22.7.15.
- *
- * @author anty
- */
 @TargetApi(11)
 public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFactory {
 

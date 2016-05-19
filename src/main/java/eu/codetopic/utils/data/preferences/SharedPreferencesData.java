@@ -8,11 +8,6 @@ import com.google.gson.Gson;
 
 import eu.codetopic.utils.PrefNames;
 
-/**
- * Created by anty on 9.5.16.
- *
- * @author anty
- */
 public abstract class SharedPreferencesData {
 
     public static final String EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY";

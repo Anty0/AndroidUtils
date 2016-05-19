@@ -5,11 +5,6 @@ import android.content.Context;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.PrefNames;
 
-/**
- * Created by anty on 9.5.16.
- *
- * @author anty
- */
 public class LoginData extends SecuredPreferencesData {
 
     private static final String LOG_TAG = "LoginData";

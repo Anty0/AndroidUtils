@@ -13,11 +13,6 @@ import java.util.List;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineItemUtils;
 
-/**
- * Created by anty on 30.3.16.
- *
- * @author anty
- */
 public class MultilineItemCardWrapper extends CardItemNoClickImpl {
 
     private final MultilineItem item;

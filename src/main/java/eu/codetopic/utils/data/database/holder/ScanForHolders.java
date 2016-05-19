@@ -8,11 +8,6 @@ import java.lang.annotation.Target;
 import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 
-/**
- * Created by anty on 5.4.16.
- *
- * @author anty
- */
 @Keep
 @KeepName
 @Retention(RetentionPolicy.RUNTIME)

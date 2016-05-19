@@ -2,11 +2,6 @@ package eu.codetopic.utils;
 
 import java.util.Iterator;
 
-/**
- * Created by anty on 5.4.16.
- *
- * @author anty
- */
 public class IteratorWrapper<E> implements Iterator<E> {
 
     private final Iterator<E> mBase;

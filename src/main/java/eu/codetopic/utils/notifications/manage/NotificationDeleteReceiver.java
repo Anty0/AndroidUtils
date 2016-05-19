@@ -7,11 +7,6 @@ import android.content.Intent;
 
 import eu.codetopic.utils.Log;
 
-/**
- * Created by anty on 7.3.16.
- *
- * @author anty
- */
 public class NotificationDeleteReceiver extends BroadcastReceiver {
 
     static final String EXTRA_GROUP = "eu.codetopic.utils.notifications.manage.NotificationDeleteReceiver.GROUP";

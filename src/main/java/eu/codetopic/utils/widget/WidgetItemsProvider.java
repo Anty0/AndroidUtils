@@ -7,11 +7,6 @@ import java.util.List;
 
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 
-/**
- * Created by anty on 22.3.16.
- *
- * @author anty
- */
 public interface WidgetItemsProvider extends Serializable {
 
     @NonNull

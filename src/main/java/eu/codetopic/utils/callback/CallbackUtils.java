@@ -4,11 +4,6 @@ import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.thread.JobUtils;
 
-/**
- * Created by anty on 9.4.16.
- *
- * @author anty
- */
 public class CallbackUtils {
 
     private static final String LOG_TAG = "CallbackUtils";

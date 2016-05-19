@@ -4,11 +4,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 
-/**
- * Created by anty on 13.3.16.
- *
- * @author anty
- */
 public class NotificationProgressReporter implements ProgressReporter {
 
     private final int mId;

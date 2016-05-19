@@ -5,11 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 
-/**
- * Created by anty on 14.3.16.
- *
- * @author anty
- */
 public abstract class OnceReceiver extends BroadcastReceiver {
 
     public OnceReceiver(Context context, String action) {

@@ -4,11 +4,6 @@ import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.activity.modular.ActivityCallBackModule;
 import eu.codetopic.utils.activity.modular.ModularActivity;
 
-/**
- * Created by anty on 11.5.16.
- *
- * @author anty
- */
 public class LoadingModularActivity extends ModularActivity {
 
     private static final String LOG_TAG = "LoadingModularActivity";

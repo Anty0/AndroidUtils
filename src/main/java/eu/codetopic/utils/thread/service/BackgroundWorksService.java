@@ -12,11 +12,6 @@ import eu.codetopic.utils.exceptions.NoModuleFoundException;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.service.CommandService;
 
-/**
- * Created by anty on 6.3.16.
- *
- * @author anty
- */
 public final class BackgroundWorksService extends CommandService<BackgroundWorksService.WorkBinder> {
 
     private static final String LOG_TAG = "BackgroundWorksService";

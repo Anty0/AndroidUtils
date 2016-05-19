@@ -16,11 +16,6 @@ import eu.codetopic.utils.container.recycler.utils.EmptyRecyclerView;
 import eu.codetopic.utils.container.recycler.utils.RecyclerItemClickListener;
 import eu.codetopic.utils.container.swipe.SwipeLayoutManager;
 
-/**
- * Created by anty on 10.4.16.
- *
- * @author anty
- */
 public abstract class RecyclerManager<T extends RecyclerManager<T>> extends SwipeLayoutManager<T> {
 
     private static final String LOG_TAG = "RecyclerManager";

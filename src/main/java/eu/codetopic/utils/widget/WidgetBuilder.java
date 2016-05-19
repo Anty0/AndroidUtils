@@ -27,11 +27,6 @@ import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
-/**
- * Created by anty on 3.5.16.
- *
- * @author anty
- */
 public class WidgetBuilder {
 
     private static final String LOG_TAG = "WidgetBuilder";

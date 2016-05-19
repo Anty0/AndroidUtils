@@ -5,11 +5,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.support.annotation.Nullable;
 
-/**
- * Created by anty on 22.9.15.
- *
- * @author anty
- */
 public abstract class CommandService<B extends CommandService.CommandBinder> extends Service {
 
     @Override

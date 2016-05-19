@@ -22,11 +22,6 @@ import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.exceptions.NoModuleFoundException;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
-/**
- * Created by anty on 24.3.16.
- *
- * @author anty
- */
 public class TimedBroadcastsManager {
 
     public static final String ACTION_TIMED_EXECUTE = "eu.codetopic.utils.timing.TimedBroadcastsManager.ACTION_TIMED_EXECUTE";

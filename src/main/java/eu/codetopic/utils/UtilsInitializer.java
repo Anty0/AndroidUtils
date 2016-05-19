@@ -6,11 +6,6 @@ import eu.codetopic.utils.broadcast.BroadcastsConnector;
 import eu.codetopic.utils.service.ServiceCommander;
 import eu.codetopic.utils.thread.JobUtils;
 
-/**
- * Created by anty on 22.3.16.
- *
- * @author anty
- */
 public class UtilsInitializer extends Application {
 
     @Override

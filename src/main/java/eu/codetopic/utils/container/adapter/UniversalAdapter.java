@@ -11,11 +11,6 @@ import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
-/**
- * Created by anty on 18.5.16.
- *
- * @author anty
- */
 public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
 
     public static final int NO_LAYOUT_ID = 0;

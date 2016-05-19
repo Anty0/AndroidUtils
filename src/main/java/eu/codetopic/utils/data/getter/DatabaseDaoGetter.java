@@ -8,11 +8,6 @@ import java.sql.SQLException;
 
 import eu.codetopic.utils.data.database.DatabaseBase;
 
-/**
- * Created by anty on 23.4.16.
- *
- * @author anty
- */
 public interface DatabaseDaoGetter<DT> extends BaseGetter, JobManagerGetter {
 
     @WorkerThread

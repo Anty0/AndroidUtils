@@ -5,11 +5,6 @@ import android.view.View;
 
 import eu.codetopic.utils.container.items.custom.ClickableCustomItem;
 
-/**
- * Created by anty on 15.3.16.
- *
- * @author anty
- */
 public abstract class CardItemNoClickImpl extends CardItem implements ClickableCustomItem {
 
     @Override

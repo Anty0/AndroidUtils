@@ -1,10 +1,5 @@
 package eu.codetopic.utils;
 
-/**
- * Created by anty on 16.2.16.
- *
- * @author anty
- */
 public class PrefNames {
 
     //SharedPreferencesData

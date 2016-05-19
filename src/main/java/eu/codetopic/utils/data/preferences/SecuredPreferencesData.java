@@ -5,11 +5,6 @@ import android.content.SharedPreferences;
 
 import com.securepreferences.SecurePreferences;
 
-/**
- * Created by anty on 9.5.16.
- *
- * @author anty
- */
 public abstract class SecuredPreferencesData extends SharedPreferencesData {
 
     private static final String LOG_TAG = "SecureModuleData";

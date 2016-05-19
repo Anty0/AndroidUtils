@@ -1,10 +1,5 @@
 package eu.codetopic.utils;
 
-/**
- * Created by anty on 26.7.15.
- *
- * @author anty
- */
 public class Constants {
 
     public static final int JOB_REPEAT_COUNT_DEFAULT = 10;

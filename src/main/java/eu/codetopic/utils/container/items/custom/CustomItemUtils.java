@@ -6,11 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-/**
- * Created by anty on 16.5.16.
- *
- * @author anty
- */
 public final class CustomItemUtils {
 
     private static final String LOG_TAG = "CustomItemUtils";

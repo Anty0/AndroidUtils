@@ -8,11 +8,6 @@ import com.path.android.jobqueue.Params;
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 
-/**
- * Created by anty on 26.2.16.
- *
- * @author anty
- */
 public abstract class LoadingViewHolderJob extends Job {
 
     private final LoadingViewHolder mLoadingViewHolder;

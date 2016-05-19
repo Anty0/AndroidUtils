@@ -10,11 +10,6 @@ import org.junit.runner.RunWith;
 
 import eu.codetopic.utils.Log;
 
-/**
- * Created by anty on 6.4.16.
- *
- * @author anty
- */
 @RunWith(AndroidJUnit4.class)
 public class FieldsSearchTest {
 

@@ -1,10 +1,5 @@
 package eu.codetopic.utils.thread.service;
 
-/**
- * Created by anty on 1.4.16.
- *
- * @author anty
- */
 class TestModule /*extends ModuleImpl*/ {
 
     private static final String LOG_TAG = "TestModule";

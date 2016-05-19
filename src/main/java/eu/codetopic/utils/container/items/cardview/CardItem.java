@@ -10,11 +10,6 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 
-/**
- * Created by anty on 21.2.16.
- *
- * @author anty
- */
 public abstract class CardItem implements CustomItem {
 
     @Nullable

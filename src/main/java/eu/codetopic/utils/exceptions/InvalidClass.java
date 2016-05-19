@@ -1,10 +1,5 @@
 package eu.codetopic.utils.exceptions;
 
-/**
- * Created by anty on 24.3.16.
- *
- * @author anty
- */
 public class InvalidClass extends RuntimeException {
 
     public InvalidClass() {

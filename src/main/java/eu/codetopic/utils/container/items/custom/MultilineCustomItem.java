@@ -9,11 +9,6 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineItemUtils;
 
-/**
- * Created by anty on 16.5.16.
- *
- * @author anty
- */
 public abstract class MultilineCustomItem implements CustomItem, MultilineItem {
 
     private static final String LOG_TAG = "MultilineCustomItem";

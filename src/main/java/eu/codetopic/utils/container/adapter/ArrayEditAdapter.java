@@ -15,11 +15,6 @@ import eu.codetopic.utils.IteratorWrapper;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 
-/**
- * Created by anty on 18.5.16.
- *
- * @author anty
- */
 public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
         extends UniversalAdapter<VH> implements Iterable<T> {
 

@@ -9,11 +9,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by anty on 5.4.16.
- *
- * @author anty
- */
 public class SimpleFieldsFilter implements FieldsFilter {
 
     private static final String LOG_TAG = "SimpleFieldsFilter";

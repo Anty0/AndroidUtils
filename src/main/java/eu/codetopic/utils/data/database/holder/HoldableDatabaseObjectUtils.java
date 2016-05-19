@@ -13,11 +13,6 @@ import eu.codetopic.utils.reflect.field.FieldsSearch;
 import eu.codetopic.utils.reflect.field.FoundField;
 import eu.codetopic.utils.reflect.field.SimpleFieldsFilter;
 
-/**
- * Created by anty on 4.4.16.
- *
- * @author anty
- */
 public final class HoldableDatabaseObjectUtils {
 
     private static final String LOG_TAG = "HoldableDatabaseObjectUtils";

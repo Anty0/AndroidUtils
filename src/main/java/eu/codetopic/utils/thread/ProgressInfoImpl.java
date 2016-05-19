@@ -1,10 +1,5 @@
 package eu.codetopic.utils.thread;
 
-/**
- * Created by anty on 1.4.16.
- *
- * @author anty
- */
 public class ProgressInfoImpl implements ProgressInfo {
 
     private final int maxProgress, progress;

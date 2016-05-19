@@ -15,11 +15,6 @@ import eu.codetopic.utils.thread.ProgressReporter;
 import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 
-/**
- * Created by anty on 13.3.16.
- *
- * @author anty
- */
 public interface ServiceWork {
 
     Params getJobParams(Context context);

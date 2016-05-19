@@ -9,11 +9,6 @@ import java.util.Collection;
 
 import eu.codetopic.utils.Log;
 
-/**
- * Created by anty on 16.2.16.
- *
- * @author anty
- */
 public class DatabaseObjectDao<T> extends DaoWrapper<T, Long> {
 
     private static final String LOG_TAG = "DatabaseObjectDao";

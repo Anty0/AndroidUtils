@@ -11,11 +11,6 @@ import java.util.Collection;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.CustomItemUtils;
 
-/**
- * Created by anty on 19.5.16.
- *
- * @author anty
- */
 public class CustomItemAdapter<T extends CustomItem> extends
         ArrayEditAdapter<T, CustomItemAdapter.CustomItemViewHolder> {
 

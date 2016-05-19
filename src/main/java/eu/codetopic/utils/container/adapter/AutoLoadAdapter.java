@@ -17,11 +17,6 @@ import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.TextMultilineResourceLayoutItem;
 
-/**
- * Created by anty on 19.5.16.
- *
- * @author anty
- */
 public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
 
     private static final String LOG_TAG = "AutoLoadAdapter";

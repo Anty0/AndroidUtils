@@ -7,11 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * Created by anty on 19.5.16.
- *
- * @author anty
- */
 public class LayoutItem implements CustomItem {
 
     private static final String LOG_TAG = "LayoutItem";

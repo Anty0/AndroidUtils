@@ -7,11 +7,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-/**
- * Created by anty on 15.5.16.
- *
- * @author anty
- */
 public class ActivityHolder<D> {
 
     private final Context mApplicationContext;

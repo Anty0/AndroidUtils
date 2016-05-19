@@ -12,11 +12,6 @@ import java.util.NoSuchElementException;
 import eu.codetopic.utils.IteratorWrapper;
 import eu.codetopic.utils.Utils;
 
-/**
- * Created by anty on 5.4.16.
- *
- * @author anty
- */
 public class FoundField implements Iterable<FoundField> {
 
     private final boolean hideFromIterator;

@@ -13,11 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-/**
- * Created by anty on 10.5.16.
- *
- * @author anty
- */
 public class SimpleActivityCallBackModule extends ActivityCallBackModule {
 
     private static final String LOG_TAG = "SimpleActivityCallBackModule";

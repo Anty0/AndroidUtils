@@ -12,11 +12,6 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.container.swipe.SwipeLayoutInflater;
 
-/**
- * Created by anty on 16.10.15.
- *
- * @author anty
- */
 public abstract class RecyclerInflater<T extends RecyclerInflater<T, E>, E extends RecyclerManager<E>> extends SwipeLayoutInflater<T, E> {
 
     @LayoutRes public static final int DEFAULT_RECYCLER_LAYOUT_ID = R.layout.recycler_base;

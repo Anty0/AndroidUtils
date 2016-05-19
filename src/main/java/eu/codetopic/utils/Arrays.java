@@ -2,11 +2,6 @@ package eu.codetopic.utils;
 
 import java.lang.reflect.Array;
 
-/**
- * Created by anty on 15.6.15.
- *
- * @author anty
- */
 public class Arrays {
 
     /**

@@ -12,11 +12,6 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.container.swipe.SwipeLayoutInflater;
 
-/**
- * Created by anty on 10.5.16.
- *
- * @author anty
- */
 public abstract class ListViewInflater<T extends ListViewInflater<T, E>, E extends ListViewManager<E>> extends SwipeLayoutInflater<T, E> {
 
     @LayoutRes public static final int DEFAULT_LIST_VIEW_LAYOUT_ID = R.layout.listview_base;

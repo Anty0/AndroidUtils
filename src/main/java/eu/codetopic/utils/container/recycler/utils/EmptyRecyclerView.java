@@ -5,11 +5,6 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
-/**
- * Created by anty on 02.11.2015.
- *
- * @author anty
- */
 public class EmptyRecyclerView extends RecyclerView {
 
     private View mEmptyView;

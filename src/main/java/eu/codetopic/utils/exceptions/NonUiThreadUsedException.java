@@ -1,10 +1,5 @@
 package eu.codetopic.utils.exceptions;
 
-/**
- * Created by anty on 15.3.16.
- *
- * @author anty
- */
 public class NonUiThreadUsedException extends RuntimeException {
 
     public NonUiThreadUsedException() {

@@ -8,11 +8,6 @@ import com.path.android.jobqueue.Job;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.ProgressReporter;
 
-/**
- * Created by anty on 25.3.16.
- *
- * @author anty
- */
 class Work extends Job {
 
     private final Context mContext;

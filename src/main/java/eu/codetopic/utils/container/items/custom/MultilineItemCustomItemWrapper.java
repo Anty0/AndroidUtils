@@ -13,11 +13,6 @@ import java.util.List;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineItemUtils;
 
-/**
- * Created by anty on 16.5.16.
- *
- * @author anty
- */
 public class MultilineItemCustomItemWrapper implements CustomItem {
 
     private static final String LOG_TAG = "MultilineItemCustomItemWrapper";

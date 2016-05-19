@@ -7,11 +7,6 @@ import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.activity.modular.ModularActivity;
 
-/**
- * Created by anty on 15.5.16.
- *
- * @author anty
- */
 public final class ActivityLeakProtector {
 
     private static final String LOG_TAG = "ActivityLeakProtector";

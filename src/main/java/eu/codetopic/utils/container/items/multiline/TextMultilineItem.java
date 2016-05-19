@@ -3,11 +3,6 @@ package eu.codetopic.utils.container.items.multiline;
 import android.content.Context;
 import android.support.annotation.Nullable;
 
-/**
- * Created by anty on 18.6.15.
- *
- * @author anty
- */
 public class TextMultilineItem implements MultilineItem {
 
     private CharSequence title = "", text = null;

@@ -3,11 +3,6 @@ package eu.codetopic.utils.activity.loading;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-/**
- * Created by anty on 31.3.16.
- *
- * @author anty
- */
 public class DefaultLoadingViewHolder extends LoadingViewHolder {
 
     private static final String LOG_TAG = "DefaultLoadingViewHolder";

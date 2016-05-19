@@ -6,11 +6,6 @@ import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.R;
 
-/**
- * Created by anty on 18.6.15.
- *
- * @author anty
- */
 public interface MultilineItem {
 
     @LayoutRes int DEFAULT_ITEM_LAYOUT_ID = R.layout.listitem_multiline_image_text;

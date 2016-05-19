@@ -45,11 +45,6 @@ import java.util.concurrent.TimeUnit;
 import eu.codetopic.utils.data.database.DatabaseObject;
 import eu.codetopic.utils.thread.JobUtils;
 
-/**
- * Created by anty on 17.10.15.
- *
- * @author anty
- */
 public class Utils {
 
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd. MM. yyyy", Locale.ENGLISH);

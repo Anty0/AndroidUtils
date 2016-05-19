@@ -20,11 +20,6 @@ import eu.codetopic.utils.data.database.holder.BitmapHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
-/**
- * Created by anty on 4.4.16.
- *
- * @author anty
- */
 public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapDatabaseObject,
         BH extends BitmapHolder<BDO>> extends DependencyTextDatabaseObject implements MultilineLoadableImageItem {
 

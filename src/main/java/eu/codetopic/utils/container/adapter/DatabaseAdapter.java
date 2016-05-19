@@ -29,11 +29,6 @@ import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
-/**
- * Created by anty on 19.5.16.
- *
- * @author anty
- */
 public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
     private static final String LOG_TAG = "DatabaseAdapter";

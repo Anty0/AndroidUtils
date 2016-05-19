@@ -4,11 +4,6 @@ import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 
-/**
- * Created by anty on 16.5.16.
- *
- * @author anty
- */
 public class TextMultilineResourceLayoutItem extends TextMultilineItem implements MultilineResourceLayoutItem {
 
     @LayoutRes private int layoutRes = DEFAULT_ITEM_LAYOUT_ID;

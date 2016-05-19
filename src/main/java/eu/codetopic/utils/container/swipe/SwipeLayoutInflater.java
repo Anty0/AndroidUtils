@@ -11,11 +11,6 @@ import android.view.ViewGroup;
 
 import eu.codetopic.utils.R;
 
-/**
- * Created by anty on 10.5.16.
- *
- * @author anty
- */
 public abstract class SwipeLayoutInflater<T extends SwipeLayoutInflater<T, E>, E extends SwipeLayoutManager> {
 
     @LayoutRes public static final int DEFAULT_SWIPE_LAYOUT_ID = R.layout.swipe_refresh_base;

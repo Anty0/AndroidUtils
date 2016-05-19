@@ -3,11 +3,6 @@ package eu.codetopic.utils.context;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by anty on 17.5.16.
- *
- * @author anty
- */
 public class DestroyReporterHelper implements ActivityDestroyReporter {
 
     private static final String LOG_TAG = "DestroyReporterHelper";

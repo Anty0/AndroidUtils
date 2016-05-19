@@ -13,11 +13,6 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.data.getter.JobManagerGetter;
 
-/**
- * Created by anty on 26.2.16.
- *
- * @author anty
- */
 public class NetworkJob extends LoadingJob {
 
     private static final String LOG_TAG = "NetworkJob";

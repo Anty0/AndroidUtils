@@ -11,11 +11,6 @@ import java.sql.SQLException;
 
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
-/**
- * Created by anty on 4.4.16.
- *
- * @author anty
- */
 public abstract class BitmapHolder<T extends BitmapDatabaseObject> extends DatabaseObjectHolder<T> {
 
     private Bitmap bitmap = null;

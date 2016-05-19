@@ -5,11 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * Created by anty on 24.3.16.
- *
- * @author anty
- */
 public class BootConnectivityReceiver extends BroadcastReceiver {
 
     @Override

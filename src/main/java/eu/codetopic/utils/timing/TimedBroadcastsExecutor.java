@@ -7,11 +7,6 @@ import android.os.Bundle;
 
 import eu.codetopic.utils.data.getter.DataGetter;
 
-/**
- * Created by anty on 24.3.16.
- *
- * @author anty
- */
 public class TimedBroadcastsExecutor extends BroadcastReceiver {
 
     private static final String EXTRA_TIMING_DATA_GETTER =

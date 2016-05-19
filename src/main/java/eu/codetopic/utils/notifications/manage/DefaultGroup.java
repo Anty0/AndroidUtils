@@ -1,10 +1,5 @@
 package eu.codetopic.utils.notifications.manage;
 
-/**
- * Created by anty on 28.3.16.
- *
- * @author anty
- */
 public class DefaultGroup extends Group {
 
     private static final String LOG_TAG = "DefaultGroup";

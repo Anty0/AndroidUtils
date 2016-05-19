@@ -12,11 +12,6 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.ProgressReporter;
 
-/**
- * Created by anty on 1.4.16.
- *
- * @author anty
- */
 @RunWith(AndroidJUnit4.class)
 public class BackgroundWorksServiceTest {
 

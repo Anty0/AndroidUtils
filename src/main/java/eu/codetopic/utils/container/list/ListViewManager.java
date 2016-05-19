@@ -14,11 +14,6 @@ import eu.codetopic.utils.container.adapter.CustomItemAdapter;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.swipe.SwipeLayoutManager;
 
-/**
- * Created by anty on 10.5.16.
- *
- * @author anty
- */
 public abstract class ListViewManager<T extends ListViewManager<T>> extends SwipeLayoutManager<T> {
 
     private static final String LOG_TAG = "ListViewManager";

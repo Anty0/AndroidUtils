@@ -9,11 +9,6 @@ import java.io.Serializable;
 import eu.codetopic.utils.exceptions.InvalidClass;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 
-/**
- * Created by anty on 24.3.16.
- *
- * @author anty
- */
 public class TimedBroadcastInfo implements Serializable {
 
     private final Class<? extends BroadcastReceiver> mBroadcast;

@@ -7,11 +7,6 @@ import android.view.View;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineResourceLayoutItem;
 
-/**
- * Created by anty on 22.2.16.
- *
- * @author anty
- */
 public class TextMultilineCardItem extends MultilineCardItem implements MultilineResourceLayoutItem {
 
     private CharSequence title = "", text = null;

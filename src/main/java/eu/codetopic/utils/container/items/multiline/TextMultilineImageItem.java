@@ -3,11 +3,6 @@ package eu.codetopic.utils.container.items.multiline;
 import android.content.Context;
 import android.support.annotation.DrawableRes;
 
-/**
- * Created by anty on 03.11.2015.
- *
- * @author anty
- */
 public class TextMultilineImageItem extends TextMultilineItem implements MultilineResourceImageItem {
 
     private int mImageResourceId;

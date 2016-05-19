@@ -8,11 +8,6 @@ import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.job.SingletonJobManagerGetter;
 
-/**
- * Created by anty on 24.4.16.
- *
- * @author anty
- */
 public class SingletonDatabaseDaoGetter<DT> extends SingletonJobManagerGetter implements DatabaseDaoGetter<DT> {
 
     private static final String LOG_TAG = "SingletonDatabaseDaoGetter";

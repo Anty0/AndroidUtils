@@ -1,10 +1,5 @@
 package eu.codetopic.utils.notifications.manage;
 
-/**
- * Created by anty on 28.3.16.
- *
- * @author anty
- */
 public abstract class SingleIdGroup extends Group {
 
     public static final int NO_ID = -1;

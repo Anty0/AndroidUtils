@@ -8,11 +8,6 @@ import android.view.View;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.JobUtils;
 
-/**
- * Created by anty on 31.3.16.
- *
- * @author anty
- */
 public abstract class LoadingViewHolder {
 
     @LayoutRes public static final int DEFAULT_LOADING_LAYOUT_ID = R.layout.loading_base;

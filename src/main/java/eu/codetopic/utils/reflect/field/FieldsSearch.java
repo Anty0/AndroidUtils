@@ -14,11 +14,6 @@ import java.util.List;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 
-/**
- * Created by anty on 5.4.16.
- *
- * @author anty
- */
 public class FieldsSearch {
 
     private static final String LOG_TAG = "FieldsSearch";

@@ -7,11 +7,6 @@ import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 import eu.codetopic.utils.exceptions.WrongIdException;
 
-/**
- * Created by anty on 8.3.16.
- *
- * @author anty
- */
 final class UsedIdsData extends SharedPreferencesData {
 
     private static final int SAVE_VERSION = 0;

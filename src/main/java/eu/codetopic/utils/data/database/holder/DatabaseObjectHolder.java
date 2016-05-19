@@ -13,11 +13,6 @@ import eu.codetopic.utils.data.database.DependencyDao;
 import eu.codetopic.utils.data.database.DependencyDatabaseObject;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
-/**
- * Created by anty on 30.3.16.
- *
- * @author anty
- */
 public abstract class DatabaseObjectHolder<T extends DependencyDatabaseObject> implements Serializable {
 
     private Long objectId = null;

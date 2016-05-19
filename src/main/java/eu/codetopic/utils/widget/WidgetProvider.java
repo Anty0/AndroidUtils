@@ -30,11 +30,6 @@ import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.thread.JobUtils;
 
-/**
- * Created by anty on 23.10.15.
- *
- * @author anty
- */
 @Deprecated
 @SuppressWarnings("deprecation")
 public abstract class WidgetProvider extends AppWidgetProvider {

@@ -6,11 +6,6 @@ import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.job.SingletonJobManager;
 
-/**
- * Created by anty on 24.4.16.
- *
- * @author anty
- */
 public final class SingletonDatabase {
 
     private static final String LOG_TAG = "SingletonDatabase";

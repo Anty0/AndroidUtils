@@ -9,11 +9,6 @@ import eu.codetopic.utils.thread.NotificationProgressReporter;
 import eu.codetopic.utils.thread.ProgressInfo;
 import eu.codetopic.utils.thread.ProgressReporter;
 
-/**
- * Created by anty on 25.3.16.
- *
- * @author anty
- */
 public abstract class WorkInfo {
 
     private final int notificationId;

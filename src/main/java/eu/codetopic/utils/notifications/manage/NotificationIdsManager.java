@@ -11,11 +11,6 @@ import android.support.v4.app.NotificationCompat;
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.exceptions.WrongIdException;
 
-/**
- * Created by anty on 6.3.16.
- *
- * @author anty
- */
 public final class NotificationIdsManager {
 
     private static final String LOG_TAG = "NotificationIdsManager";

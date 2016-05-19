@@ -19,11 +19,6 @@ import eu.codetopic.utils.R;
 import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.getter.DataGetterNoBroadcastImpl;
 
-/**
- * Created by anty on 25.3.16.
- *
- * @author anty
- */
 public class LocaleManager {
 
     private static final String LOG_TAG = "LocaleManager";

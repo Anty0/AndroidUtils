@@ -1,10 +1,5 @@
 package eu.codetopic.utils.thread;
 
-/**
- * Created by anty on 31.3.16.
- *
- * @author anty
- */
 public class ProgressReporterWrapper implements ProgressReporter {
 
     private final ProgressReporter mBase;

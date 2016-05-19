@@ -5,11 +5,6 @@ import android.content.Context;
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 
-/**
- * Created by anty on 24.3.16.
- *
- * @author anty
- */
 public final class TimingData extends SharedPreferencesData {
 
     private static final int SAVE_VERSION = 0;

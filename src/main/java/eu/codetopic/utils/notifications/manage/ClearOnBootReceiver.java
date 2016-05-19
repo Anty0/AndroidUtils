@@ -7,11 +7,6 @@ import android.content.Intent;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 
-/**
- * Created by anty on 24.3.16.
- *
- * @author anty
- */
 public class ClearOnBootReceiver extends BroadcastReceiver {
 
     private static final String LOG_TAG = "ClearOnBootReceiver";

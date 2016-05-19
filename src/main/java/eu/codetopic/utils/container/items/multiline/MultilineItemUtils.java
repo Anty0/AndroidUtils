@@ -16,11 +16,6 @@ import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.callback.ActionCallback;
 
-/**
- * Created by anty on 15.2.16.
- *
- * @author anty
- */
 public final class MultilineItemUtils {
 
     private MultilineItemUtils() {

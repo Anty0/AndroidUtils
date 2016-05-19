@@ -30,11 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-/**
- * Created by anty on 22.3.16.
- *
- * @author anty
- */
 @WorkerThread
 public class DaoWrapper<T, ID> implements Dao<T, ID> {
 

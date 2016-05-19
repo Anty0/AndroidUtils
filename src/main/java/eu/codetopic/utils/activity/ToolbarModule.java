@@ -9,11 +9,6 @@ import eu.codetopic.utils.R;
 import eu.codetopic.utils.activity.modular.ModularActivity;
 import eu.codetopic.utils.activity.modular.SimpleActivityCallBackModule;
 
-/**
- * Created by anty on 11.5.16.
- *
- * @author anty
- */
 public class ToolbarModule extends SimpleActivityCallBackModule {
 
     private static final String LOG_TAG = "ToolbarModule";

@@ -1,10 +1,5 @@
 package eu.codetopic.utils.thread;
 
-/**
- * Created by anty on 29.6.15.
- *
- * @author anty
- */
 public interface ProgressReporter {
 
     void startShowingProgress();

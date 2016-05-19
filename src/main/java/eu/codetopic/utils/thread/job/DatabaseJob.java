@@ -17,11 +17,6 @@ import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.data.database.DependencyDao;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
-/**
- * Created by anty on 26.2.16.
- *
- * @author anty
- */
 public class DatabaseJob<T, ID> extends LoadingJob {
 
     private static final String LOG_TAG = "DatabaseJob";

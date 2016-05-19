@@ -6,11 +6,6 @@ import com.j256.ormlite.field.DatabaseField;
 
 import java.sql.SQLException;
 
-/**
- * Created by anty on 22.3.16.
- *
- * @author anty
- */
 public abstract class DependencyDatabaseObject extends DatabaseObject {
 
     @DatabaseField

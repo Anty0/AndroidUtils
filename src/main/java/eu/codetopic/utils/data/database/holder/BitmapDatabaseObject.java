@@ -11,11 +11,6 @@ import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.database.DependencyDatabaseObject;
 
-/**
- * Created by anty on 4.4.16.
- *
- * @author anty
- */
 public abstract class BitmapDatabaseObject extends DependencyDatabaseObject {
 
     private static final String LOG_TAG = "BitmapDatabaseObject";

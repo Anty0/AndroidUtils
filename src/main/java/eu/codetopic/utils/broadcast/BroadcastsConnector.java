@@ -12,11 +12,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by anty on 3.5.16.
- *
- * @author anty
- */
 public final class BroadcastsConnector extends BroadcastReceiver {
 
     private static final String LOG_TAG = "BroadcastsConnector";
