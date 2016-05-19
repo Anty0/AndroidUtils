@@ -14,7 +14,7 @@ public final class ContextThread<C extends Context> {
 
     private final Context appContext;
     private final WeakReference<C> reference;
-    private final LoadingViewHolder loadingHolder;
+    private final LoadingViewHolder loadingHolder; // FIXME: 19.5.16 leak? it is holding a view which holds context!
 
     private ContextThread(@NonNull C context, @Nullable LoadingViewHolder loadingHolder) {
         this.appContext = context.getApplicationContext();
