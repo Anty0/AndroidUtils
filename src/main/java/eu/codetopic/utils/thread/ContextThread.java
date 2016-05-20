@@ -8,13 +8,16 @@ import android.support.annotation.WorkerThread;
 
 import java.lang.ref.WeakReference;
 
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 
 public final class ContextThread<C extends Context> {
 
+    private static final String LOG_TAG = "ContextThread";
+
     private final Context appContext;
     private final WeakReference<C> reference;
-    private final LoadingViewHolder loadingHolder; // FIXME: 19.5.16 leak? it is holding a view which holds context!
+    private final LoadingViewHolder loadingHolder;
 
     private ContextThread(@NonNull C context, @Nullable LoadingViewHolder loadingHolder) {
         this.appContext = context.getApplicationContext();
@@ -37,26 +40,31 @@ public final class ContextThread<C extends Context> {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                D result = null;
+                Throwable throwable = null;
                 try {
-                    final D data = runnable.work(appContext);
-                    JobUtils.runOnContextThread(reference.get(), new Runnable() {
-                        @Override
-                        public void run() {
-                            C c = reference.get();
-                            if (c != null) runnable.update(c, data);
-                        }
-                    });
-                } catch (final Throwable throwable) {
-                    throwable.printStackTrace();
-                    JobUtils.runOnContextThread(reference.get(), new Runnable() {
-                        @Override
-                        public void run() {
-                            C c = reference.get();
-                            if (c != null) runnable.error(c, throwable);
-                        }
-                    });
+                    result = runnable.work(appContext);
+                } catch (final Throwable t) {
+                    Log.d(LOG_TAG, "start", t);
+                    throwable = t;
                 } finally {
-                    if (loadingHolder != null) loadingHolder.hideLoading();
+                    final D finalResult = result;
+                    final Throwable finalThrowable = throwable;
+                    JobUtils.runOnContextThread(reference.get(), new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                C c = reference.get();
+                                if (c != null) {
+                                    if (finalThrowable != null)
+                                        runnable.error(c, finalThrowable);
+                                    else runnable.update(c, finalResult);
+                                }
+                            } finally {
+                                if (loadingHolder != null) loadingHolder.hideLoading();
+                            }
+                        }
+                    });
                 }
             }
         }).start();

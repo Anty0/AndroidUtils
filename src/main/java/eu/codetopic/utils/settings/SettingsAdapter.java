@@ -54,7 +54,7 @@ public class SettingsAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        convertView = mLayoutInflater.inflate(R.layout.listitem_settings, parent, false);// TODO: 25.3.16 use view holder
+        convertView = mLayoutInflater.inflate(R.layout.item_settings, parent, false);// TODO: 25.3.16 use view holder
 
         SettingsItem item = mItems.get(position);
 

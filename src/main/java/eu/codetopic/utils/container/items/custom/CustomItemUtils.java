@@ -2,9 +2,12 @@ package eu.codetopic.utils.container.items.custom;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+
+import eu.codetopic.utils.R;
+import eu.codetopic.utils.Utils;
 
 public final class CustomItemUtils {
 
@@ -53,11 +56,6 @@ public final class CustomItemUtils {
             return this;
         }
 
-        public CustomItemViewSetup withClickSupport() {
-            mSupportsClicks = true;
-            return this;
-        }
-
         public CustomItemViewSetup withoutClickSupport() {
             mSupportsClicks = false;
             return this;
@@ -70,12 +68,8 @@ public final class CustomItemUtils {
 
         @Nullable
         public View on(final Context context, @Nullable ViewGroup parent, @Nullable View oldView) {
-            if (oldView == null) {
-                oldView = new FrameLayout(context);
-                oldView.setLayoutParams(new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
+            if (oldView == null) oldView = LayoutInflater.from(context)
+                    .inflate(R.layout.frame_wrapper_base, parent, false);
 
             ViewGroup itemParent = (ViewGroup) oldView;
 
@@ -88,7 +82,7 @@ public final class CustomItemUtils {
             view = mItem.getView(context, itemParent, view, mPosition);
 
             if (mSupportsClicks) {
-                /*if (mItem instanceof ClickableCustomItem) {// FIXME: 19.5.16 WTF i must solve this clicking problem
+                if (mItem instanceof ClickableCustomItem) {
                     itemParent.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -104,14 +98,14 @@ public final class CustomItemUtils {
                 } else {
                     itemParent.setOnClickListener(null);
                     itemParent.setOnLongClickListener(null);
-                    itemParent.setClickable(false);
-                }*/
+                }
             }
 
             // TODO: 25.3.16 find way to check if item gives true layout id
             if (view != null) {
                 itemParent.setTag(layoutId);
                 itemParent.addView(view);
+                Utils.copyLayoutParamsSizesToView(itemParent, view.getLayoutParams());
             } else itemParent.setTag(null);
             return oldView;
         }

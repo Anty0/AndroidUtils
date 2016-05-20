@@ -9,13 +9,6 @@
 
     <application android:name=".UtilsInitializer">
 
-        <activity
-            android:name="eu.codetopic.anty.purkynka.utils.module.settings.ModuleSettingsActivity"
-            android:label="@string/menu_item_text_settings"/>
-        <activity
-            android:name="eu.codetopic.anty.purkynka.utils.module.settings.SettingsActivity"
-            android:label="@string/menu_item_text_settings"/>
-
         <service
             android:name=".thread.service.BackgroundWorksService"
             android:enabled="true"
@@ -27,12 +20,6 @@
             android:exported="false"
             android:label="WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
-
-        <receiver
-            android:name="eu.codetopic.anty.purkynka.utils.module.ModulesNavigationActivity$FragmentReplaceReceiver"
-            android:enabled="true"
-            android:exported="false"
-            android:label="FragmentReplaceReceiver"/>
 
         <receiver
             android:name=".timing.BootConnectivityReceiver"

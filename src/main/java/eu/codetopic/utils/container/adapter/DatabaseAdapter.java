@@ -75,7 +75,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
     }
 
     @Override
-    public Editor<CustomItem, DatabaseAdapter<T, ID>> edit() {
+    public Editor<CustomItem> edit() throws UnsupportedOperationException {
         throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
                 " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
     }

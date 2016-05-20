@@ -250,24 +250,50 @@ public class Utils {
         return views;
     }
 
-    public static String drawViewHierarchyToString(View view, boolean showId) {
-        StringBuilder builder = new StringBuilder();
-        drawViewHierarchyToString(builder, view, showId, 1);
-        return builder.toString();
+    public static String drawViewHierarchy(View view, boolean showId, boolean showSizes) {
+        StringBuilder sb = new StringBuilder("-");
+        if (showId) sb.append(fillToMaxLen(view.getId())).append(" -> ");
+        if (showSizes) {
+            ViewGroup.LayoutParams params = view.getLayoutParams();
+            if (params != null) {
+                sb.append("H: ").append(layoutParamsSizeToString(view.getLayoutParams().height))
+                        .append("|").append("W: ")
+                        .append(layoutParamsSizeToString(view.getLayoutParams().width))
+                        .append(" -> ");
+            }
+        }
+        sb.append(view.getClass().getSimpleName()).append(" -> ")
+                .append(view.getClass().getName());
+        if (view instanceof ViewGroup) {
+            sb.append(" {");
+            StringBuilder csb = new StringBuilder();
+            for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++)
+                csb.append("\n").append(drawViewHierarchy(((ViewGroup) view)
+                        .getChildAt(i), showId, showSizes));
+            sb.append(Utils.addBeforeEveryLine(csb.toString(), "    "));
+            sb.append("\n}");
+        }
+        return sb.toString();
     }
 
-    private static void drawViewHierarchyToString(StringBuilder builder, View view, boolean showId, int depth) {
-        for (int i = 0; i < depth; i++) builder.append("-");
-        if (showId) builder.append(fillToMaxLen(view.getId())).append("|");
-        builder.append(view.getClass().getSimpleName()).append("|")
-                .append(view.getClass().getName()).append("\n");
-        if (view instanceof ViewGroup) {
-            for (int i = 0; i < depth; i++) builder.append("-");
-            builder.append("\\\n");
+    public static String layoutParamsSizeToString(int size) {
+        if (size == ViewGroup.LayoutParams.WRAP_CONTENT) return "wrap_content";
+        if (size == ViewGroup.LayoutParams.MATCH_PARENT) return "match_parent";
+        return String.valueOf(size);
+    }
 
-            for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++)
-                drawViewHierarchyToString(builder, ((ViewGroup) view).getChildAt(i), showId, depth + 1);
+    public static ViewGroup.LayoutParams copyLayoutParamsSizesToView(
+            @NonNull View view, @NonNull ViewGroup.LayoutParams params) {
+
+        ViewGroup.LayoutParams oldParams = view.getLayoutParams();
+        if (oldParams == null) {
+            oldParams = new ViewGroup.LayoutParams(params.width, params.height);
+            view.setLayoutParams(oldParams);
+        } else {
+            oldParams.height = params.height;
+            oldParams.width = params.width;
         }
+        return oldParams;
     }
 
     public static String fillToMaxLen(int toFill) {

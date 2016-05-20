@@ -12,6 +12,6 @@
         android:layout_height="match_parent"
         android:indeterminate="true"/>
 
-    <include layout="@layout/listitem_multiline_text"/>
+    <include layout="@layout/item_multiline_text"/>
 
 </LinearLayout>

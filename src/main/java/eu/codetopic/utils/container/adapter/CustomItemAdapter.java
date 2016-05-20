@@ -40,27 +40,22 @@ public class CustomItemAdapter<T extends CustomItem> extends
 
     @Override
     public CustomItemViewHolder onCreateViewHolder(ViewGroup parent, @LayoutRes int viewLayoutId) {
-        return new CustomItemAdapter.CustomItemViewHolder(CustomItemUtils
-                .apply(null).on(parent.getContext(), parent));
+        return new CustomItemAdapter.CustomItemViewHolder(CustomItemUtils.apply(null)
+                .withClickSupport(getBase() instanceof RecyclerView.Adapter)
+                .on(parent.getContext(), parent));
     }
 
     @Override
     public void onBindViewHolder(CustomItemViewHolder holder, int position) {
         CustomItemUtils.apply(getItem(position))
                 .withPosition(position)
-                .withoutClickSupport()// FIXME: 19.5.16 fix this after solve clicking problem
-                //.withClickSupport(getBase() instanceof RecyclerView.Adapter)
+                .withClickSupport(getBase() instanceof RecyclerView.Adapter)
                 .on(holder.itemView.getContext(), null, holder.itemView);
     }
 
     @Override
     public int getItemViewLayoutId(int position) {
         return getItem(position).getLayoutResId(mContext, position);
-    }
-
-    @Override
-    public Editor<T, ? extends CustomItemAdapter<T>> edit() {
-        return new Editor<>(this);
     }
 
     protected static class CustomItemViewHolder extends RecyclerView.ViewHolder {

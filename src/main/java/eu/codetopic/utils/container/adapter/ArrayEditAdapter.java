@@ -89,7 +89,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
         };
     }
 
-    public Editor<T, ? extends ArrayEditAdapter<T, VH>> edit() {
+    public Editor<T> edit() {
         return new Editor<>(this);
     }
 
@@ -165,41 +165,42 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
         void modify(List<T> toModify);
     }
 
-    public static class Editor<T, A extends ArrayEditAdapter<T, ?>> {
+    public static class Editor<T> {
 
         private static final String LOG_TAG = ArrayEditAdapter.LOG_TAG + "$Editor";
 
-        private final WeakReference<A> mAdapterReference;
+        private final WeakReference<? extends ArrayEditAdapter<T, ?>> mAdapterReference;
         private final ArrayList<Modification<T>> mModifications = new ArrayList<>();
         private final ArrayList<T> mChangedItems = new ArrayList<>();
         private boolean mAllItemsChanged = false;
         private Object mTag = null;
 
-        protected Editor(A adapter) {
+        protected Editor(ArrayEditAdapter<T, ?> adapter) {
             mAdapterReference = new WeakReference<>(adapter);
         }
 
         @UiThread
         @Nullable
-        public A getAdapter() {
-            return mAdapterReference.get();
+        public <A extends ArrayEditAdapter<T, ?>> A getAdapter() {
+            //noinspection unchecked
+            return (A) mAdapterReference.get();
         }
 
         public synchronized Object getTag() {
             return mTag;
         }
 
-        public synchronized Editor<T, A> setTag(@Nullable Object tag) {
+        public synchronized Editor<T> setTag(@Nullable Object tag) {
             this.mTag = tag;
             return this;
         }
 
-        public synchronized Editor<T, A> post(Modification<T> modification) {
+        public synchronized Editor<T> post(Modification<T> modification) {
             mModifications.add(modification);
             return this;
         }
 
-        public Editor<T, A> add(final T object) {
+        public Editor<T> add(final T object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -208,7 +209,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> add(final int index, final T object) {
+        public Editor<T> add(final int index, final T object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -217,7 +218,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> addAll(final Collection<? extends T> collection) {
+        public Editor<T> addAll(final Collection<? extends T> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -226,7 +227,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> addAll(final int index, final Collection<? extends T> collection) {
+        public Editor<T> addAll(final int index, final Collection<? extends T> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -235,7 +236,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> clear() {
+        public Editor<T> clear() {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -244,7 +245,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> remove(final int index) {
+        public Editor<T> remove(final int index) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -253,7 +254,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> remove(final Object object) {
+        public Editor<T> remove(final Object object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -263,7 +264,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> set(final int index, final T object) {
+        public Editor<T> set(final int index, final T object) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -272,7 +273,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> removeAll(final Collection<?> collection) {
+        public Editor<T> removeAll(final Collection<?> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -282,7 +283,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
             });
         }
 
-        public Editor<T, A> retainAll(final Collection<?> collection) {
+        public Editor<T> retainAll(final Collection<?> collection) {
             return post(new Modification<T>() {
                 @Override
                 public void modify(List<T> toModify) {
@@ -292,24 +293,24 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
         }
 
         @SafeVarargs
-        public synchronized final Editor<T, A> notifyItemsChanged(T... items) {
+        public synchronized final Editor<T> notifyItemsChanged(T... items) {
             Collections.addAll(mChangedItems, items);
             return this;
         }
 
-        public synchronized Editor<T, A> notifyItemsChanged(Collection<T> items) {
+        public synchronized Editor<T> notifyItemsChanged(Collection<T> items) {
             mChangedItems.addAll(items);
             return this;
         }
 
-        public synchronized Editor<T, A> notifyAllItemsChanged() {
+        public synchronized Editor<T> notifyAllItemsChanged() {
             mAllItemsChanged = true;
             return this;
         }
 
         @UiThread
         public synchronized boolean apply() {
-            A adapter = getAdapter();
+            ArrayEditAdapter<T, ?> adapter = getAdapter();
             if (adapter != null) {
                 adapter.postModifications(getTag(), mModifications,
                         mAllItemsChanged ? null : mChangedItems);

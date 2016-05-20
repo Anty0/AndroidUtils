@@ -4,7 +4,7 @@ import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.activity.modular.ActivityCallBackModule;
 import eu.codetopic.utils.activity.modular.ModularActivity;
 
-public class LoadingModularActivity extends ModularActivity {
+public abstract class LoadingModularActivity extends ModularActivity {
 
     private static final String LOG_TAG = "LoadingModularActivity";
 

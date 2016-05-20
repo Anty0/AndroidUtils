@@ -27,7 +27,8 @@ public class LoadingModule extends SimpleActivityCallBackModule {
             public void run() {
                 ModularActivity activity = getActivity();
                 activity.getLayoutInflater().inflate(layoutResID,
-                        (ViewGroup) activity.findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID));
+                        (ViewGroup) activity.findViewById(LoadingViewHolder
+                                .DEFAULT_CONTENT_VIEW_ID));
                 updateViewHolder();
             }
         });
@@ -45,7 +46,8 @@ public class LoadingModule extends SimpleActivityCallBackModule {
             @Override
             public void run() {
                 //noinspection ConstantConditions
-                ((ViewGroup) getActivity().findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID)).addView(view);
+                ((ViewGroup) getActivity().findViewById(LoadingViewHolder
+                        .DEFAULT_CONTENT_VIEW_ID)).addView(view);
                 updateViewHolder();
             }
         });
@@ -65,7 +67,8 @@ public class LoadingModule extends SimpleActivityCallBackModule {
             @Override
             public void run() {
                 //noinspection ConstantConditions
-                ((ViewGroup) getActivity().findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID)).addView(view, params);
+                ((ViewGroup) getActivity().findViewById(LoadingViewHolder
+                        .DEFAULT_CONTENT_VIEW_ID)).addView(view, params);
                 updateViewHolder();
             }
         });
@@ -89,7 +92,8 @@ public class LoadingModule extends SimpleActivityCallBackModule {
     protected void updateViewHolder() {
         if (loadingViewHolder == null) return;
         ViewGroup root = (ViewGroup) getActivity().findViewById(android.R.id.content);
-        loadingViewHolder.updateViews(root != null && root.getChildCount() > 0 ? root.getChildAt(0) : null);
+        loadingViewHolder.updateViews(root != null && root
+                .getChildCount() > 0 ? root.getChildAt(0) : null);
     }
 
     public LoadingViewHolder getLoadingViewHolder() {

@@ -5,11 +5,14 @@ import android.database.DataSetObserver;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
+
+import eu.codetopic.utils.R;
+import eu.codetopic.utils.Utils;
 
 public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
 
@@ -185,11 +188,8 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) {
-                convertView = new FrameLayout(parent.getContext());
-                convertView.setLayoutParams(new ViewGroup.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
+            if (convertView == null) convertView = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.frame_wrapper_base, parent, false);
 
             ViewGroup itemParent = (ViewGroup) convertView;
             View view = itemParent.getChildCount() == 1 ? itemParent.getChildAt(0) : null;
@@ -207,6 +207,8 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
                     return getView(position, null, parent);
             }
             mAdapter.onBindViewHolder(viewHolder, position);
+            Utils.copyLayoutParamsSizesToView(itemParent, view.getLayoutParams());
+            //Log.d(LOG_TAG, "ListBase getView:\n" + Utils.drawViewHierarchy(convertView, false, true));
             return convertView;
         }
 
