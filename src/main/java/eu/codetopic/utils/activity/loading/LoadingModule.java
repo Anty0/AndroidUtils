@@ -4,7 +4,6 @@ import android.support.annotation.LayoutRes;
 import android.view.View;
 import android.view.ViewGroup;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.modular.ModularActivity;
 import eu.codetopic.utils.activity.modular.SimpleActivityCallBackModule;
 
@@ -13,22 +12,23 @@ public class LoadingModule extends SimpleActivityCallBackModule {
     private static final String LOG_TAG = "LoadingModule";
 
     private LoadingViewHolder loadingViewHolder = null;
+    private LoadingViewHolder.HolderInfo<?> loadingHolderInfo = null;
 
     @Override
     protected void onSetContentView(@LayoutRes final int layoutResID, SetContentViewCallBack callBack) {
-        if (!hasDefaultViewHolder()) {
+        final LoadingViewHolder.HolderInfo<?> holderInfo = getLoadingHolderInfo();
+        if (!holderInfo.isRequestsWrap()) {
             callBack.pass();
             return;
         }
 
-        callBack.set(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID);
+        callBack.set(holderInfo.getWrappingLayoutRes());
         callBack.addViewAttachedCallBack(new Runnable() {
             @Override
             public void run() {
                 ModularActivity activity = getActivity();
-                activity.getLayoutInflater().inflate(layoutResID,
-                        (ViewGroup) activity.findViewById(LoadingViewHolder
-                                .DEFAULT_CONTENT_VIEW_ID));
+                activity.getLayoutInflater().inflate(layoutResID, (ViewGroup) activity
+                        .findViewById(holderInfo.getContentLayoutId()));
                 updateViewHolder();
             }
         });
@@ -36,18 +36,19 @@ public class LoadingModule extends SimpleActivityCallBackModule {
 
     @Override
     protected void onSetContentView(final View view, SetContentViewCallBack callBack) {
-        if (!hasDefaultViewHolder()) {
+        final LoadingViewHolder.HolderInfo<?> holderInfo = getLoadingHolderInfo();
+        if (!holderInfo.isRequestsWrap()) {
             callBack.pass();
             return;
         }
 
-        callBack.set(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID);
+        callBack.set(holderInfo.getWrappingLayoutRes());
         callBack.addViewAttachedCallBack(new Runnable() {
             @Override
             public void run() {
                 //noinspection ConstantConditions
-                ((ViewGroup) getActivity().findViewById(LoadingViewHolder
-                        .DEFAULT_CONTENT_VIEW_ID)).addView(view);
+                ((ViewGroup) getActivity().findViewById(holderInfo
+                        .getContentLayoutId())).addView(view);
                 updateViewHolder();
             }
         });
@@ -57,18 +58,19 @@ public class LoadingModule extends SimpleActivityCallBackModule {
     protected void onSetContentView(final View view, final ViewGroup.LayoutParams params,
                                     SetContentViewCallBack callBack) {
 
-        if (!hasDefaultViewHolder()) {
+        final LoadingViewHolder.HolderInfo<?> holderInfo = getLoadingHolderInfo();
+        if (!holderInfo.isRequestsWrap()) {
             callBack.pass();
             return;
         }
 
-        callBack.set(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID);
+        callBack.set(holderInfo.getWrappingLayoutRes());
         callBack.addViewAttachedCallBack(new Runnable() {
             @Override
             public void run() {
                 //noinspection ConstantConditions
-                ((ViewGroup) getActivity().findViewById(LoadingViewHolder
-                        .DEFAULT_CONTENT_VIEW_ID)).addView(view, params);
+                ((ViewGroup) getActivity().findViewById(holderInfo
+                        .getContentLayoutId())).addView(view, params);
                 updateViewHolder();
             }
         });
@@ -81,14 +83,6 @@ public class LoadingModule extends SimpleActivityCallBackModule {
         super.onDestroy();
     }
 
-    public boolean hasDefaultViewHolder() {
-        return DefaultLoadingViewHolder.class.isAssignableFrom(getViewHolderClass());
-    }
-
-    protected Class<? extends LoadingViewHolder> getViewHolderClass() {
-        return DefaultLoadingViewHolder.class;
-    }
-
     protected void updateViewHolder() {
         if (loadingViewHolder == null) return;
         ViewGroup root = (ViewGroup) getActivity().findViewById(android.R.id.content);
@@ -98,14 +92,23 @@ public class LoadingModule extends SimpleActivityCallBackModule {
 
     public LoadingViewHolder getLoadingViewHolder() {
         if (loadingViewHolder == null) {
-            try {
-                loadingViewHolder = getViewHolderClass().newInstance();
-                updateViewHolder();
-            } catch (Exception e) {
-                Log.d(LOG_TAG, "getLoadingViewHolder: provided wrong LoadingViewHolder class", e);
-            }
+            loadingViewHolder = LoadingViewHolder
+                    .getInstance(getLoadingHolderInfo());
+            updateViewHolder();
         }
         return loadingViewHolder;
+    }
+
+    public LoadingViewHolder.HolderInfo<?> getLoadingHolderInfo() {
+        if (loadingHolderInfo == null) {
+            loadingHolderInfo = LoadingViewHolder
+                    .getLoadingHolderInfo(getViewHolderClass());
+        }
+        return loadingHolderInfo;
+    }
+
+    protected Class<? extends LoadingViewHolder> getViewHolderClass() {
+        return DefaultLoadingViewHolder.class;
     }
 
 }

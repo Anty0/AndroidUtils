@@ -61,7 +61,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
         }
     }
 
-    private void loadNextPage(boolean force) {
+    protected final void loadNextPage(boolean force) {
         if (mSuspendLock.tryLock()) {
             final Editor<CustomItem> editor = getEditor();
             if (mPage == getStartingPage()) editor.clear();

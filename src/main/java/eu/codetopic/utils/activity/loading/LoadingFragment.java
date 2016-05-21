@@ -14,16 +14,18 @@ public abstract class LoadingFragment extends Fragment {
     private static final String LOG_TAG = "LoadingFragment";
 
     private LoadingViewHolder loadingViewHolder = null;
+    private LoadingViewHolder.HolderInfo<?> loadingHolderInfo = null;
 
     @Nullable
     @Override
     public final View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                                    @Nullable Bundle savedInstanceState) {
-        if (!hasDefaultViewHolder())
+        LoadingViewHolder.HolderInfo<?> holderInfo = getLoadingHolderInfo();
+        if (!holderInfo.isRequestsWrap())
             return onCreateContentView(inflater, container, savedInstanceState);
 
-        View base = inflater.inflate(LoadingViewHolder.DEFAULT_LOADING_LAYOUT_ID, container, false);
-        ViewGroup contentView = (ViewGroup) base.findViewById(LoadingViewHolder.DEFAULT_CONTENT_VIEW_ID);
+        View base = inflater.inflate(holderInfo.getWrappingLayoutRes(), container, false);
+        ViewGroup contentView = (ViewGroup) base.findViewById(holderInfo.getContentLayoutId());
         View view = onCreateContentView(inflater, contentView, savedInstanceState);
         if (view == null) return null;
         contentView.addView(view);
@@ -56,24 +58,25 @@ public abstract class LoadingFragment extends Fragment {
         super.onDestroyView();
     }
 
-    public boolean hasDefaultViewHolder() {
-        return DefaultLoadingViewHolder.class.isAssignableFrom(getViewHolderClass());
+    public LoadingViewHolder getLoadingViewHolder() {
+        if (loadingViewHolder == null) {
+            loadingViewHolder = LoadingViewHolder
+                    .getInstance(getLoadingHolderInfo());
+            updateViewHolder(getView());
+        }
+        return loadingViewHolder;
+    }
+
+    public LoadingViewHolder.HolderInfo<?> getLoadingHolderInfo() {
+        if (loadingHolderInfo == null) {
+            loadingHolderInfo = LoadingViewHolder
+                    .getLoadingHolderInfo(getViewHolderClass());
+        }
+        return loadingHolderInfo;
     }
 
     protected Class<? extends LoadingViewHolder> getViewHolderClass() {
         return DefaultLoadingViewHolder.class;
-    }
-
-    public LoadingViewHolder getLoadingViewHolder() {
-        if (loadingViewHolder == null) {
-            try {
-                loadingViewHolder = getViewHolderClass().newInstance();
-                updateViewHolder(getView());
-            } catch (Exception e) {
-                Log.e(LOG_TAG, "getLoadingViewHolder: provided wrong LoadingViewHolder class", e);
-            }
-        }
-        return loadingViewHolder;
     }
 
 }

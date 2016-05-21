@@ -1,11 +1,11 @@
 package eu.codetopic.utils.timing;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 
 import java.io.Serializable;
 
+import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.exceptions.InvalidClass;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 
@@ -29,8 +29,8 @@ public class TimedBroadcastInfo implements Serializable {
         return mBroadcast;
     }
 
-    public int getComponentEnabledState(Context context) {
-        return context.getPackageManager().getComponentEnabledSetting(new ComponentName(context, mBroadcast));
+    public boolean isEnabled(Context context) {
+        return Utils.isComponentEnabled(context, mBroadcast);
     }
 
     public TimedBroadcast getBroadcastInfo() {

@@ -5,20 +5,47 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import eu.codetopic.utils.R;
+import java.lang.reflect.Method;
+
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
 public abstract class LoadingViewHolder {
 
-    @LayoutRes public static final int DEFAULT_LOADING_LAYOUT_ID = R.layout.loading_base;
-    @IdRes public static final int DEFAULT_LOADING_VIEW_ID = R.id.base_loading;
-    @IdRes public static final int DEFAULT_CONTENT_VIEW_ID = R.id.base_loadable_content;
+    private static final String LOG_TAG = "LoadingViewHolder";
 
     private final Object lock = new Object();
     private View mainView;
     private int loadingDepth = 0;
 
     protected LoadingViewHolder() {
+    }
+
+    @Nullable
+    public static <T extends LoadingViewHolder> T getInstance(HolderInfo<T> loadingHolderInfo) {
+        try {
+            return loadingHolderInfo.getHolderClass().newInstance();
+        } catch (Exception e) {
+            Log.d(LOG_TAG, "getLoadingViewHolder: provided wrong LoadingViewHolder class", e);
+        }
+        return null;
+    }
+
+    public static <T extends LoadingViewHolder> HolderInfo<T> getLoadingHolderInfo(Class<T> loadingHolderClass) {
+        try {
+            Method method = loadingHolderClass.getDeclaredMethod("getHolderInfo");
+            method.setAccessible(true);
+            //noinspection unchecked
+            return (HolderInfo<T>) method.invoke(null);
+        } catch (Exception e) {
+            if (!(e instanceof NoSuchMethodException)) Log.d(LOG_TAG, "getLoadingHolderInfo:" +
+                    " exception occurred - method \"getHolderInfo\" is not usable", e);
+
+            RequestWrapWith annotation = loadingHolderClass.getAnnotation(RequestWrapWith.class);
+            if (annotation == null) return new HolderInfo<>(loadingHolderClass);
+            return new HolderInfo<>(loadingHolderClass, true,
+                    annotation.wrappingLayoutRes(), annotation.contentLayoutId());
+        }
     }
 
     final void updateViews(@Nullable View mainView) {
@@ -57,7 +84,7 @@ public abstract class LoadingViewHolder {
 
     public final void showLoading() {
         synchronized (lock) {
-            if (loadingDepth == 0)
+            if (loadingDepth == 0 && hasAttachedView())
                 JobUtils.postOnMainThread(new Runnable() {
                     @Override
                     public void run() {
@@ -75,7 +102,7 @@ public abstract class LoadingViewHolder {
     public final void hideLoading() {
         synchronized (lock) {
             loadingDepth--;
-            if (loadingDepth == 0)
+            if (loadingDepth == 0 && hasAttachedView())
                 JobUtils.postOnMainThread(new Runnable() {
                     @Override
                     public void run() {
@@ -88,4 +115,45 @@ public abstract class LoadingViewHolder {
     }
 
     protected abstract void doHideLoading();
+
+    public static final class HolderInfo<T extends LoadingViewHolder> {
+
+        public static final int NO_RES_OR_ID = -1;
+
+        private final Class<T> holderClass;
+        private final boolean requestsWrap;
+        @LayoutRes private final int wrappingLayoutRes;
+        @IdRes private final int contentLayoutId;
+
+        public HolderInfo(Class<T> holderClass) {
+            this(holderClass, false, NO_RES_OR_ID, NO_RES_OR_ID);
+        }
+
+        public HolderInfo(Class<T> holderClass, boolean requestsWrap, @LayoutRes int wrappingLayoutRes,
+                          @IdRes int contentLayoutId) {
+
+            this.holderClass = holderClass;
+            this.requestsWrap = requestsWrap;
+            this.wrappingLayoutRes = wrappingLayoutRes;
+            this.contentLayoutId = contentLayoutId;
+        }
+
+        public Class<T> getHolderClass() {
+            return holderClass;
+        }
+
+        public boolean isRequestsWrap() {
+            return requestsWrap;
+        }
+
+        @LayoutRes
+        public int getWrappingLayoutRes() {
+            return wrappingLayoutRes;
+        }
+
+        @IdRes
+        public int getContentLayoutId() {
+            return contentLayoutId;
+        }
+    }
 }

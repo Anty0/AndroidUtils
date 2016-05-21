@@ -73,6 +73,7 @@ public class TimedBroadcastsManager {
                                   @NonNull DataGetter<TimingData> timingDataGetter,
                                   Class<? extends BroadcastReceiver>... timedBroadcasts) {// TODO: 26.3.16 initialize in ApplicationBase
         if (isInitialized()) throw new IllegalStateException(LOG_TAG + " is still initialized");
+        context = context.getApplicationContext();
         context.getPackageManager().setComponentEnabledSetting(
                 new ComponentName(context, BootConnectivityReceiver.class),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
@@ -190,11 +191,7 @@ public class TimedBroadcastsManager {
             alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, reloadIntent, 0));
         }
 
-        int enabledState = broadcastInfo.getComponentEnabledState(mContext);
-        if (enabledState == PackageManager.COMPONENT_ENABLED_STATE_DISABLED ||
-                (!broadcast.defaultEnabledState()
-                        && enabledState == PackageManager.COMPONENT_ENABLED_STATE_DEFAULT)
-                || (broadcast.requiresInternetAccess()
+        if (!broadcastInfo.isEnabled(mContext) || (broadcast.requiresInternetAccess()
                 && !NetworkManager.isConnected(mRequiredNetwork))) {
             data.setLastRequestCode(broadcastInfo.getBroadcastClass(), -1);
             return;

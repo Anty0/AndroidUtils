@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ComponentInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -209,6 +212,44 @@ public class Utils {
     public static Drawable getActivityIcon(Context context, ComponentName component) {
         PackageManager pm = context.getPackageManager();
         return pm.resolveActivity(new Intent().setComponent(component), 0).loadIcon(pm);
+    }
+
+    public static boolean isComponentEnabled(Context context, Class<?> componentClass) {
+        return isComponentEnabled(context.getPackageManager(), new ComponentName(context, componentClass));
+    }
+
+    public static boolean isComponentEnabled(PackageManager pm, ComponentName componentName) {
+        switch (pm.getComponentEnabledSetting(componentName)) {
+            case PackageManager.COMPONENT_ENABLED_STATE_ENABLED:
+                return true;
+            case PackageManager.COMPONENT_ENABLED_STATE_DISABLED:
+                return false;
+            case PackageManager.COMPONENT_ENABLED_STATE_DEFAULT:
+            default:
+                try {
+                    PackageInfo packageInfo = pm.getPackageInfo(componentName.getPackageName(),
+                            PackageManager.GET_ACTIVITIES | PackageManager.GET_SERVICES |
+                                    PackageManager.GET_RECEIVERS | PackageManager.GET_PROVIDERS);
+
+                    List<ComponentInfo> components = new ArrayList<>();
+                    if (packageInfo.activities != null)
+                        Collections.addAll(components, packageInfo.activities);
+                    if (packageInfo.services != null)
+                        Collections.addAll(components, packageInfo.services);
+                    if (packageInfo.receivers != null)
+                        Collections.addAll(components, packageInfo.receivers);
+                    if (packageInfo.providers != null)
+                        Collections.addAll(components, packageInfo.providers);
+
+                    String clsName = componentName.getClassName();
+                    for (ComponentInfo componentInfo : components)
+                        if (clsName.equals(componentInfo.name))
+                            return componentInfo.enabled && componentInfo.applicationInfo.enabled;
+                } catch (Exception e) {
+                    Log.d(LOG_TAG, "isComponentEnabled", e);
+                }
+                return false;
+        }
     }
 
     @WorkerThread

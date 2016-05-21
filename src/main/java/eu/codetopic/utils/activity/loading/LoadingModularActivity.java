@@ -15,4 +15,8 @@ public abstract class LoadingModularActivity extends ModularActivity {
     public LoadingViewHolder getLoadingViewHolder() {
         return findModule(LoadingModule.class).getLoadingViewHolder();
     }
+
+    public LoadingViewHolder.HolderInfo<?> getLoadingHolderInfo() {
+        return findModule(LoadingModule.class).getLoadingHolderInfo();
+    }
 }

@@ -39,8 +39,6 @@ public @interface TimedBroadcast {
 
     RepeatingMode repeatingMode() default RepeatingMode.INEXACT_REPEATING_WAKE_UP;
 
-    boolean defaultEnabledState() default true;
-
     @Keep
     @KeepName
     @KeepClassMembers
