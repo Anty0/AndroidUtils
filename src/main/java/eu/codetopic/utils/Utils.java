@@ -11,6 +11,7 @@ import android.content.pm.PackageManager;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
@@ -369,12 +370,12 @@ public class Utils {
     }
 
     public static Bitmap getViewBitmap(View view, int width, int height) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         view.measure(width, height);
         view.layout(0, 0, width, height);
-        view.setDrawingCacheEnabled(true);
         view.buildDrawingCache();
-        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
-        view.setDrawingCacheEnabled(false);
+        view.draw(new Canvas(bitmap));
+        view.destroyDrawingCache();
         return bitmap;
     }
 }
