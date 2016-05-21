@@ -64,14 +64,18 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     protected final void loadNextPage(boolean force) {
         if (mSuspendLock.tryLock()) {
             final Editor<CustomItem> editor = getEditor();
-            if (mPage == getStartingPage()) editor.clear();
-            ActionCallback<Boolean> callback = new ActionCallback<Boolean>() {
+            final boolean firstPage = mPage == getStartingPage();
+            if (firstPage) editor.clear();
+            final ActionCallback<Boolean> callback = new ActionCallback<Boolean>() {
                 @Override
                 public void onActionCompleted(@Nullable Boolean result, @Nullable Throwable caughtThrowable) {
                     editor.setTag(EDIT_TAG).apply();
                     AutoLoadAdapter adapter = editor.getAdapter();
                     if (adapter != null) {
                         adapter.setShowLoadingItem(result != null && result);
+                        Base base;
+                        if (firstPage && (base = adapter.getBase()) instanceof RecyclerView.Adapter)
+                            base.notifyDataSetChanged();// first page auto scroll down fix
                         adapter.mSuspendLock.unlock();
                     }
                 }

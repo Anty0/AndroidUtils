@@ -71,10 +71,16 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
         return getItemCount() == 0;
     }
 
-    public void onRegisterDataObserver(Object observer) {
+    public void onBeforeRegisterDataObserver(Object observer) {
     }
 
-    public void onUnregisterDataObserver(Object observer) {
+    public void onAfterRegisterDataObserver(Object observer) {
+    }
+
+    public void onBeforeUnregisterDataObserver(Object observer) {
+    }
+
+    public void onAfterUnregisterDataObserver(Object observer) {
     }
 
     public interface Base {
@@ -166,14 +172,16 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
 
         @Override
         public void registerDataSetObserver(DataSetObserver observer) {
-            mAdapter.onRegisterDataObserver(observer);
+            mAdapter.onBeforeRegisterDataObserver(observer);
             mObservable.registerObserver(observer);
+            mAdapter.onAfterRegisterDataObserver(observer);
         }
 
         @Override
         public void unregisterDataSetObserver(DataSetObserver observer) {
+            mAdapter.onBeforeUnregisterDataObserver(observer);
             mObservable.unregisterObserver(observer);
-            mAdapter.onUnregisterDataObserver(observer);
+            mAdapter.onAfterUnregisterDataObserver(observer);
         }
 
         @Override
@@ -298,14 +306,16 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
 
         @Override
         public void registerAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
-            mAdapter.onRegisterDataObserver(observer);
+            mAdapter.onBeforeRegisterDataObserver(observer);
             super.registerAdapterDataObserver(observer);
+            mAdapter.onAfterRegisterDataObserver(observer);
         }
 
         @Override
         public void unregisterAdapterDataObserver(RecyclerView.AdapterDataObserver observer) {
+            mAdapter.onBeforeUnregisterDataObserver(observer);
             super.unregisterAdapterDataObserver(observer);
-            mAdapter.onUnregisterDataObserver(observer);
+            mAdapter.onAfterUnregisterDataObserver(observer);
         }
 
         @Override

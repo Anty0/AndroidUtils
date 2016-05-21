@@ -78,12 +78,10 @@ public final class CustomItemUtils {
             return this;
         }
 
-        @Nullable
         public View on(final Context context, @Nullable ViewGroup parent) {
             return on(context, parent, null);
         }
 
-        @Nullable
         public View on(final Context context, @Nullable ViewGroup parent, @Nullable View oldView) {
             boolean useCardView = mForceUseCardView != null ? mForceUseCardView :
                     mItem.getClass().isAnnotationPresent(WrapWithCardView.class);

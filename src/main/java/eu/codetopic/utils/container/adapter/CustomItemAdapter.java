@@ -3,11 +3,14 @@ package eu.codetopic.utils.container.adapter;
 import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import java.util.Collection;
 
+import eu.codetopic.utils.R;
+import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.CustomItemUtils;
 
@@ -40,17 +43,21 @@ public class CustomItemAdapter<T extends CustomItem> extends
 
     @Override
     public CustomItemViewHolder onCreateViewHolder(ViewGroup parent, @LayoutRes int viewLayoutId) {
-        return new CustomItemAdapter.CustomItemViewHolder(CustomItemUtils.apply(null)
-                .withClickSupport(getBase() instanceof RecyclerView.Adapter)
-                .on(parent.getContext(), parent));
+        return new CustomItemViewHolder(LayoutInflater.from(getContext())
+                .inflate(R.layout.frame_wrapper_base, parent, false));
     }
 
     @Override
     public void onBindViewHolder(CustomItemViewHolder holder, int position) {
-        CustomItemUtils.apply(getItem(position))
+        ViewGroup parent = (ViewGroup) holder.itemView;
+        View view = CustomItemUtils.apply(getItem(position))
                 .withPosition(position)
                 .withClickSupport(getBase() instanceof RecyclerView.Adapter)
-                .on(holder.itemView.getContext(), null, holder.itemView);
+                .on(parent.getContext(), parent, parent.getChildCount() == 1
+                        ? parent.getChildAt(0) : null);
+        parent.removeAllViews();
+        parent.addView(view);
+        Utils.copyLayoutParamsSizesToView(parent, view.getLayoutParams());
     }
 
     @Override

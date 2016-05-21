@@ -150,7 +150,7 @@ public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
 
                 if (!Objects.equals(dataBackup, mData)) Log.e(LOG_TAG, "apply",
                         new InternalError("Detected problem in " + LOG_TAG + " while applying changes" +
-                                " - !dataBackup.equals(newData)"));
+                                " -> !dataBackup.equals(newData)"));
             }
 
             onDataEdited(editTag);

@@ -59,18 +59,18 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
     }
 
     @Override
-    public void onRegisterDataObserver(Object observer) {
+    public void onBeforeRegisterDataObserver(Object observer) {
         if (!getBase().hasObservers()) {
             getContext().registerReceiver(mDataChangedReceiver, mItemsGetter
                     .getDatabaseItemsChangedIntentFilter(getContext()));
             notifyDatabaseDataChanged();
         }
-        super.onRegisterDataObserver(observer);
+        super.onBeforeRegisterDataObserver(observer);
     }
 
     @Override
-    public void onUnregisterDataObserver(Object observer) {
-        super.onUnregisterDataObserver(observer);
+    public void onAfterUnregisterDataObserver(Object observer) {
+        super.onAfterUnregisterDataObserver(observer);
         if (!getBase().hasObservers())
             getContext().unregisterReceiver(mDataChangedReceiver);
     }
