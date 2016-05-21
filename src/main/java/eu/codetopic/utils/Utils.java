@@ -69,14 +69,6 @@ public class Utils {
                 size, context.getResources().getDisplayMetrics());
     }
 
-    /**
-     * Returns text between start and end in base
-     *
-     * @param base  string to cut from
-     * @param start text before text to return
-     * @param end   text after text to return
-     * @return text between start and end
-     */
     public static String substring(@NonNull String base, @Nullable String start,
                                    @Nullable String end) {
 
@@ -374,5 +366,15 @@ public class Utils {
         }
 
         return true;
+    }
+
+    public static Bitmap getViewBitmap(View view, int width, int height) {
+        view.measure(width, height);
+        view.layout(0, 0, width, height);
+        view.setDrawingCacheEnabled(true);
+        view.buildDrawingCache();
+        Bitmap bitmap = Bitmap.createBitmap(view.getDrawingCache());
+        view.setDrawingCacheEnabled(false);
+        return bitmap;
     }
 }
