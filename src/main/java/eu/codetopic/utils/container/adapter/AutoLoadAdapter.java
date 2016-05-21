@@ -12,10 +12,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.callback.ActionCallback;
-import eu.codetopic.utils.container.items.cardview.MultilineItemCardWrapper;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
-import eu.codetopic.utils.container.items.multiline.MultilineItem;
+import eu.codetopic.utils.container.items.custom.UseCardViewCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.TextMultilineResourceLayoutItem;
 import eu.codetopic.utils.thread.JobUtils;
 
@@ -41,10 +40,11 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     }
 
     protected CustomItem generateLoadingItem() {
-        MultilineItem loadingItem = new TextMultilineResourceLayoutItem(getContext()
-                .getText(R.string.wait_text_loading), null, R.layout.item_multiline_loading);
-        return getBase() instanceof RecyclerView.Adapter ? new MultilineItemCardWrapper(loadingItem)
-                : new MultilineItemCustomItemWrapper(loadingItem);
+        CustomItem loadingItem = new MultilineItemCustomItemWrapper(new
+                TextMultilineResourceLayoutItem(getContext().getText(R.string.wait_text_loading),
+                null, R.layout.item_multiline_loading));
+        return getBase() instanceof RecyclerView.Adapter ?
+                new UseCardViewCustomItemWrapper(loadingItem) : loadingItem;
     }
 
     protected int getStartingPage() {

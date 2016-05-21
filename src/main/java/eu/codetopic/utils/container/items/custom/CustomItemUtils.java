@@ -2,6 +2,7 @@ package eu.codetopic.utils.container.items.custom;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,6 +26,7 @@ public final class CustomItemUtils {
         private final CustomItem mItem;
         private int mPosition = CustomItem.NO_POSITION;
         private boolean mSupportsClicks = true;
+        private Boolean mForceUseCardView;
 
         private CustomItemViewSetup(@Nullable CustomItem item) {
             mItem = item == null ? new NullItem() : item;
@@ -61,6 +63,21 @@ public final class CustomItemUtils {
             return this;
         }
 
+        public CustomItemViewSetup withoutForceUseCardView() {
+            mForceUseCardView = null;
+            return this;
+        }
+
+        public CustomItemViewSetup withForceUseCardView() {
+            mForceUseCardView = true;
+            return this;
+        }
+
+        public CustomItemViewSetup withForceNotUseCardView() {
+            mForceUseCardView = false;
+            return this;
+        }
+
         @Nullable
         public View on(final Context context, @Nullable ViewGroup parent) {
             return on(context, parent, null);
@@ -68,10 +85,14 @@ public final class CustomItemUtils {
 
         @Nullable
         public View on(final Context context, @Nullable ViewGroup parent, @Nullable View oldView) {
-            if (oldView == null) oldView = LayoutInflater.from(context)
-                    .inflate(R.layout.frame_wrapper_base, parent, false);
+            boolean useCardView = mForceUseCardView != null ? mForceUseCardView :
+                    mItem.getClass().isAnnotationPresent(WrapWithCardView.class);
 
+            if (oldView == null) oldView = LayoutInflater.from(context).inflate(useCardView
+                    ? R.layout.card_view_base : R.layout.frame_wrapper_base, parent, false);
             ViewGroup itemParent = (ViewGroup) oldView;
+            if (useCardView != itemParent instanceof CardView)
+                return on(context, parent, null);
 
             Object tag = itemParent.getTag();
             int layoutId = mItem.getLayoutResId(context, mPosition);

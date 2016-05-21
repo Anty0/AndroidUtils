@@ -51,6 +51,7 @@ public class DefaultLoadingViewHolder extends LoadingViewHolder {
 
         if (Build.VERSION.SDK_INT > 10) {
             Animator animator = AnimatorInflater.loadAnimator(loading.getContext(), android.R.animator.fade_in);
+            animator.setDuration(loading.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
             animator.addListener(new SimpleAnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
@@ -65,6 +66,7 @@ public class DefaultLoadingViewHolder extends LoadingViewHolder {
     protected void doHideLoading() {
         if (Build.VERSION.SDK_INT > 10) {
             Animator animator = AnimatorInflater.loadAnimator(loading.getContext(), android.R.animator.fade_out);
+            animator.setDuration(loading.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
             animator.addListener(new SimpleAnimatorListener() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
