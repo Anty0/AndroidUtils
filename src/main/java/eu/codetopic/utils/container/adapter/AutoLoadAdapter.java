@@ -24,6 +24,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     private static final Object EDIT_TAG = new Object();//LOG_TAG + ".EDIT_TAG";
 
     private final Lock mSuspendLock = new ReentrantLock();
+    private final Object mPageLock = new Object();
     private int mPage = getStartingPage();
     private boolean mEnabled = true;
     private boolean mShowLoadingItem = true;
@@ -63,9 +64,13 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
 
     protected final void loadNextPage(boolean force) {
         if (mSuspendLock.tryLock()) {
+            int page;
+            synchronized (mPageLock) {
+                page = mPage++;
+            }
             final Editor<CustomItem> editor = getEditor();
-            final boolean firstPage = mPage == getStartingPage();
-            if (firstPage) editor.clear();
+            final boolean firstPage = page == getStartingPage();
+            if (firstPage) editor.clear().notifyAllItemsChanged();
             final ActionCallback<Boolean> callback = new ActionCallback<Boolean>() {
                 @Override
                 public void onActionCompleted(@Nullable Boolean result, @Nullable Throwable caughtThrowable) {
@@ -81,7 +86,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
                 }
             };
 
-            onLoadNextPage(mPage++, editor, callback);
+            onLoadNextPage(page, editor, callback);
         } else if (force) {
             Log.d(LOG_TAG, "loadNextPage: still loading, trying to wait one loop before next try");
             JobUtils.postOnContextThread(getContext(), new Runnable() {
@@ -109,7 +114,9 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     }
 
     public void reset() {
-        mPage = getStartingPage();
+        synchronized (mPageLock) {
+            mPage = getStartingPage();
+        }
         loadNextPage(true);
     }
 

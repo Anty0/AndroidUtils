@@ -147,7 +147,8 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
                     }
                 } else base.notifyItemRangeChanged(0, mData.size());
 
-                if (!Objects.equals(dataBackup, mData)) Log.e(LOG_TAG, "apply",
+                if (Log.isInDebugMode() && !Objects.equals(dataBackup, mData))
+                    Log.e(LOG_TAG, "apply",
                         new InternalError("Detected problem in " + LOG_TAG + " while applying changes" +
                                 " -> !dataBackup.equals(newData)"));
             }

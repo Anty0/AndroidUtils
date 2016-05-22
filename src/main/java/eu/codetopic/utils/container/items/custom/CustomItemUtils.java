@@ -116,13 +116,12 @@ public final class CustomItemUtils {
                     Utils.getViewTagFromChildren(oldContent, VIEW_TAG_KEY_USING_CARD_VIEW))
                 oldContent = null;
 
-
             if (oldContent == null) {
                 LayoutInflater inflater = LayoutInflater.from(context);
                 ViewGroup content;
                 if (useCardView) {
                     oldContent = inflater.inflate(R.layout.card_view_base, parent, false);
-                    content = (ViewGroup) oldContent.findViewById(R.id.ripple_layout);
+                    content = (ViewGroup) oldContent.findViewById(R.id.card_view);
                 } else {
                     oldContent = inflater.inflate(R.layout.frame_wrapper_base, parent, false);
                     content = (ViewGroup) oldContent.findViewById(R.id.frame_wrapper_content);

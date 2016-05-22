@@ -2,7 +2,6 @@
 <resources>
     <declare-styleable name="CardView">
         <attr name="cardViewTheme" format="reference"/>
-        <attr name="cardViewRippleColor" format="color"/>
     </declare-styleable>
     <declare-styleable name="Theme">
         <attr name="appBarOverlay" format="reference"/>

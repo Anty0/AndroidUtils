@@ -15,7 +15,7 @@ import eu.codetopic.utils.container.swipe.SwipeLayoutInflater;
 public abstract class ListViewInflater<T extends ListViewInflater<T, E>, E extends ListViewManager<E>> extends SwipeLayoutInflater<T, E> {
 
     @LayoutRes public static final int DEFAULT_LIST_VIEW_LAYOUT_ID = R.layout.listview_base;
-    @IdRes public static final int DEFAULT_CONTENT_VIEW_ID = R.id.swipe_refresh_layout;
+    @IdRes public static final int DEFAULT_CONTENT_VIEW_ID = R.id.container_content;
     private static final String LOG_TAG = "ListViewInflater";
     @LayoutRes private int mListViewLayoutResId = DEFAULT_LIST_VIEW_LAYOUT_ID;
     @IdRes private int mContentId = DEFAULT_CONTENT_VIEW_ID;
