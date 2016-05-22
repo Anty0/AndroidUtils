@@ -18,6 +18,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.AnyRes;
 import android.support.annotation.AttrRes;
+import android.support.annotation.CheckResult;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -27,6 +28,7 @@ import android.text.Html;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 
@@ -42,8 +44,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import eu.codetopic.utils.data.database.DatabaseObject;
@@ -54,6 +58,7 @@ public class Utils {
     public static final DateFormat DATE_FORMAT = new SimpleDateFormat("dd. MM. yyyy", Locale.ENGLISH);
     public static final DateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss", Locale.ENGLISH);
     private static final String LOG_TAG = "Utils";
+    private static final int VIEW_TAG_KEY_TAGS_HASH_MAP = R.id.view_tag_key_tags_hash_map;
 
     public static void setPadding(View view, int horizontal, int vertical) {
         setPadding(view, horizontal, vertical, horizontal, vertical);
@@ -65,11 +70,13 @@ public class Utils {
                 (int) toDP(context, right), (int) toDP(context, bottom));
     }
 
+    @CheckResult
     public static float toDP(Context context, int size) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
                 size, context.getResources().getDisplayMetrics());
     }
 
+    @CheckResult
     public static String substring(@NonNull String base, @Nullable String start,
                                    @Nullable String end) {
 
@@ -80,25 +87,30 @@ public class Utils {
                 endIndex != -1 ? endIndex : base.length());
     }
 
+    @CheckResult
     public static CharSequence getFormattedText(Context context, @StringRes int stringId,
                                                 Object... args) {
         return getFormattedText(context.getString(stringId), args);
     }
 
+    @CheckResult
     public static CharSequence getFormattedText(String text, Object... args) {
         return Html.fromHtml(String.format(text, args));
     }
 
+    @CheckResult
     public static byte[] getBitmapBytes(Bitmap bitmap) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
         return outputStream.toByteArray();
     }
 
+    @CheckResult
     public static Bitmap getBitmapFromBytes(byte[] bytes) {
         return BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
     }
 
+    @CheckResult
     public static Bitmap cropBitmap(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
@@ -125,18 +137,21 @@ public class Utils {
         });
     }
 
+    @CheckResult
     public static CharSequence getTimeFromLong(Context context, long time) {
         if (time < 0) return context.getText(R.string.text_no_time);
         return getFormattedText(context, R.string.text_time_format, TimeUnit.MILLISECONDS.toMinutes(time), // TODO: 26.3.16 use plural string
                 TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MILLISECONDS.toMinutes(time) * 60);
     }
 
+    @CheckResult
     public static String locationToString(Context context, double latitude, double longitude) {
         return Double.isNaN(latitude) || Double.isNaN(longitude) ? context.getString(R.string.location_unknown) :
                 Location.convert(latitude, Location.FORMAT_DEGREES) + ", " +
                         Location.convert(longitude, Location.FORMAT_DEGREES);
     }
 
+    @CheckResult
     public static <T extends DatabaseObject> int findIndexById(Long id, List<T> databaseObjects) {
         for (int i = 0, size = databaseObjects.size(); i < size; i++) {
             if (Objects.equals(id, databaseObjects.get(i).getId()))
@@ -145,6 +160,7 @@ public class Utils {
         return -1;
     }
 
+    @CheckResult
     public static <T extends DatabaseObject> int findIndexById(Long id, T[] databaseObjects) {
         for (int i = 0, size = databaseObjects.length; i < size; i++) {
             if (Objects.equals(id, databaseObjects[i].getId()))
@@ -154,6 +170,7 @@ public class Utils {
     }
 
     @ColorInt
+    @CheckResult
     public static int makeColorDarker(@ColorInt int color, float factor) {
         float[] hsv = new float[3];
         Color.colorToHSV(color, hsv);
@@ -162,6 +179,7 @@ public class Utils {
     }
 
     @ColorInt
+    @CheckResult
     public static int makeColorTransparent(@ColorInt int color, int factor) {
         return Color.argb(
                 Color.alpha(color) - factor,
@@ -172,6 +190,7 @@ public class Utils {
     }
 
     @ColorInt
+    @CheckResult
     public static int getColorFromAttr(Context themedContext, @AttrRes int attr, @ColorInt int defValue) {
         TypedArray a = null;
         try {
@@ -183,6 +202,7 @@ public class Utils {
     }
 
     @AnyRes
+    @CheckResult
     public static int getResIdFromAttr(Context themedContext, @AttrRes int attr, @AnyRes int defValue) {
         TypedArray a = null;
         try {
@@ -193,24 +213,29 @@ public class Utils {
         }
     }
 
+    @CheckResult
     public static CharSequence getApplicationName(Context context) {
         return context.getApplicationInfo().loadLabel(context.getPackageManager());
     }
 
+    @CheckResult
     public static CharSequence getApplicationName(Context context, String packageName) throws PackageManager.NameNotFoundException {
         PackageManager pm = context.getPackageManager();
         return pm.getApplicationInfo(packageName, 0).loadLabel(pm);
     }
 
+    @CheckResult
     public static Drawable getActivityIcon(Context context, ComponentName component) {
         PackageManager pm = context.getPackageManager();
         return pm.resolveActivity(new Intent().setComponent(component), 0).loadIcon(pm);
     }
 
+    @CheckResult
     public static boolean isComponentEnabled(Context context, Class<?> componentClass) {
         return isComponentEnabled(context.getPackageManager(), new ComponentName(context, componentClass));
     }
 
+    @CheckResult
     public static boolean isComponentEnabled(PackageManager pm, ComponentName componentName) {
         switch (pm.getComponentEnabledSetting(componentName)) {
             case PackageManager.COMPONENT_ENABLED_STATE_ENABLED:
@@ -246,6 +271,7 @@ public class Utils {
     }
 
     @WorkerThread
+    @CheckResult
     public static String getLocationName(Context context, double lat, double lon) {
         try {
             String res = Jsoup.connect("http://maps.googleapis.com/maps/api/geocode/json")
@@ -269,11 +295,24 @@ public class Utils {
         return context.getString(R.string.location_none);
     }
 
+    @CheckResult
+    public static Bitmap drawViewToBitmap(View view, int width, int height) {
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        view.measure(width, height);
+        view.layout(0, 0, width, height);
+        view.buildDrawingCache();
+        view.draw(new Canvas(bitmap));
+        view.destroyDrawingCache();
+        return bitmap;
+    }
+
+    @CheckResult
     public static <T extends View> List<T> findViewsByClass(Class<T> clazz, Activity activity) {
         return findViewsByClass(clazz, activity.getWindow().getDecorView());
     }
 
     @SuppressWarnings("unchecked")
+    @CheckResult
     public static <T extends View> List<T> findViewsByClass(Class<T> clazz, View view) {
         List<T> views = new ArrayList<>();
         if (Objects.equals(view.getClass(), clazz)) views.add((T) view);
@@ -284,6 +323,7 @@ public class Utils {
         return views;
     }
 
+    @CheckResult
     public static String drawViewHierarchy(View view, boolean showId, boolean showSizes) {
         StringBuilder sb = new StringBuilder("-");
         if (showId) sb.append(fillToMaxLen(view.getId())).append(" -> ");
@@ -310,10 +350,26 @@ public class Utils {
         return sb.toString();
     }
 
+    @CheckResult
     public static String layoutParamsSizeToString(int size) {
         if (size == ViewGroup.LayoutParams.WRAP_CONTENT) return "wrap_content";
         if (size == ViewGroup.LayoutParams.MATCH_PARENT) return "match_parent";
         return String.valueOf(size);
+    }
+
+    public static void copyLayoutParamsToViewParents(@NonNull View view, @Nullable View maxParent) {
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        while (true) {
+            ViewParent parent = view.getParent();
+            if (!(parent instanceof View)) break;
+            view = (View) parent;
+            copyLayoutParamsSizesToView(view, params);
+            if (parent.equals(maxParent)) break;
+        }
+    }
+
+    public static ViewGroup.LayoutParams copyLayoutParamsSizesToView(@NonNull View target, @NonNull View source) {
+        return copyLayoutParamsSizesToView(target, source.getLayoutParams());
     }
 
     public static ViewGroup.LayoutParams copyLayoutParamsSizesToView(
@@ -330,11 +386,76 @@ public class Utils {
         return oldParams;
     }
 
+    private static Map<String, Object> getTags(View view) {
+        //noinspection unchecked
+        Map<String, Object> tags = (Map<String, Object>)
+                view.getTag(VIEW_TAG_KEY_TAGS_HASH_MAP);
+        if (tags == null) {
+            tags = new HashMap<>();
+            view.setTag(VIEW_TAG_KEY_TAGS_HASH_MAP, tags);
+        }
+        return tags;
+    }
+
+    public static void setViewTag(View view, String key, Object tag) {
+        getTags(view).put(key, tag);
+    }
+
+    @CheckResult
+    public static Object getViewTag(View view, String key) {
+        return getTags(view).get(key);
+    }
+
+    @CheckResult
+    public static Object getViewTagFromChildren(@NonNull View view, String key) {
+        View result = findViewWithTag(view, key);
+        return result == null ? null : getViewTag(result, key);
+    }
+
+    /**
+     * Look for a child view with the given tag key. If this view has the given
+     * key, return this view.
+     *
+     * @param view   starting view
+     * @param tagKey tag key to search
+     * @return found view or null
+     */
+    @CheckResult
+    public static View findViewWithTag(@NonNull View view, String tagKey) {
+        return findViewWithTag(view, tagKey, null);
+    }
+
+    /**
+     * Look for a child view with the given key with value tag. If this view has the given
+     * key with value tag, return this view.
+     *
+     * @param view   starting view
+     * @param tagKey tag key to search
+     * @param tag    tag to search or null for any tag
+     * @return found view or null
+     */
+    @CheckResult
+    public static View findViewWithTag(@NonNull View view, String tagKey, @Nullable Object tag) {
+        if (tag == null ? getTags(view).containsKey(tagKey)
+                : Objects.equals(getViewTag(view, tagKey), tag))
+            return view;
+
+        if (view instanceof ViewGroup) {
+            for (int i = 0, len = ((ViewGroup) view).getChildCount(); i < len; i++) {
+                View result = findViewWithTag(((ViewGroup) view).getChildAt(i), tagKey, tag);
+                if (result != null) return result;
+            }
+        }
+        return null;
+    }
+
+    @CheckResult
     public static String fillToMaxLen(int toFill) {
         return fillToLen(Integer.toString(toFill),
                 Integer.toString(Integer.MAX_VALUE).length());
     }
 
+    @CheckResult
     public static String fillToLen(CharSequence toFill, int len) {
         StringBuilder builder = new StringBuilder();
         for (int i = toFill.length(); i < len; i++)
@@ -343,10 +464,12 @@ public class Utils {
         return builder.toString();
     }
 
+    @CheckResult
     public static String addBeforeEveryLine(String toEdit, String toAdd) {
         return toAdd + toEdit.replace("\n", "\n" + toAdd);
     }
 
+    @CheckResult
     public static boolean equalBundles(@Nullable Bundle first, @Nullable Bundle second) {
         if (first == null || second == null) return first == second;
         if (first.size() != second.size()) return false;
@@ -367,15 +490,5 @@ public class Utils {
         }
 
         return true;
-    }
-
-    public static Bitmap getViewBitmap(View view, int width, int height) {
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        view.measure(width, height);
-        view.layout(0, 0, width, height);
-        view.buildDrawingCache();
-        view.draw(new Canvas(bitmap));
-        view.destroyDrawingCache();
-        return bitmap;
     }
 }

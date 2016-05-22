@@ -18,13 +18,16 @@ import eu.codetopic.utils.callback.ActionCallback;
 
 public final class MultilineItemUtils {
 
+    private static final String LOG_TAG = "MultilineItemUtils";
+    private static final String VIEW_TAG_KEY_VIEW_HOLDER = LOG_TAG + ".VIEW_HOLDER";
+
     private MultilineItemUtils() {
     }
 
-    public static ItemViewHolder getItemViewHolderFor
-            (MultilineItem item, View view, @LayoutRes int layoutResourceId) {
+    public static ItemViewHolder getItemViewHolderFor(MultilineItem item, View view,
+                                                      @LayoutRes int layoutResourceId) {
 
-        Object tag = view.getTag();
+        Object tag = Utils.getViewTag(view, VIEW_TAG_KEY_VIEW_HOLDER);
         ItemViewHolder holder;
         if (tag instanceof ItemViewHolder) {
             holder = (ItemViewHolder) tag;
@@ -33,7 +36,7 @@ public final class MultilineItemUtils {
                         + ": holderLayoutId: " + holder.layoutResourceId + ", requiredLayoutId: " + layoutResourceId);
         } else {
             holder = new ItemViewHolder(view, layoutResourceId);
-            view.setTag(holder);
+            Utils.setViewTag(view, VIEW_TAG_KEY_VIEW_HOLDER, holder);
         }
         return holder;
     }

@@ -52,7 +52,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     }
 
     @Override
-    public void onBindViewHolder(CustomItemViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         try {
             super.onBindViewHolder(holder, position);
         } finally {
@@ -74,7 +74,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
                     if (adapter != null) {
                         adapter.setShowLoadingItem(result != null && result);
                         Base base;
-                        if (firstPage && (base = adapter.getBase()) instanceof RecyclerView.Adapter)
+                        if (firstPage && !(base = adapter.getBase()).hasOnlySimpleDataChangedReporting())
                             base.notifyDataSetChanged();// first page auto scroll down fix
                         adapter.mSuspendLock.unlock();
                     }

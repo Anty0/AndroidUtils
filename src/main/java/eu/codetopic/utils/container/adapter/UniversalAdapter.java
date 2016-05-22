@@ -5,18 +5,17 @@ import android.database.DataSetObserver;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
-import eu.codetopic.utils.R;
+import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.Utils;
 
-public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
+public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
 
-    public static final int NO_LAYOUT_ID = 0;
+    public static final int NO_VIEW_TYPE = 0;
     private static final String LOG_TAG = "UniversalAdapter";
     private Base base = null;
 
@@ -35,18 +34,22 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
         return base;
     }
 
-    public final RecyclerBase<VH> forRecyclerView() {
+    public final RecyclerView.Adapter<?> forRecyclerView() {
         return new RecyclerBase<>(this);
     }
 
-    public final ListBase<VH> forListView() {
+    public final ListAdapter forListView() {
+        return new ListBase<>(this);
+    }
+
+    public final SpinnerAdapter forSpinner() {
         return new ListBase<>(this);
     }
 
     protected void onBaseAttached(Base base) {
     }
 
-    public abstract VH onCreateViewHolder(ViewGroup parent, @LayoutRes int viewLayoutId);
+    public abstract VH onCreateViewHolder(ViewGroup parent, int viewType);
 
     public abstract void onBindViewHolder(VH holder, int position);
 
@@ -63,8 +66,8 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
     }
 
     @LayoutRes
-    public int getItemViewLayoutId(int position) {
-        return NO_LAYOUT_ID;
+    public int getItemViewType(int position) {
+        return NO_VIEW_TYPE;
     }
 
     public boolean isEmpty() {
@@ -104,6 +107,17 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
         void notifyItemRemoved(int position);
 
         void notifyItemRangeRemoved(int positionStart, int itemCount);
+    }
+
+    public static class ViewHolder {
+
+        public final View itemView;
+        public final int viewType;
+
+        public ViewHolder(View itemView, int viewType) {
+            this.itemView = itemView;
+            this.viewType = viewType;
+        }
     }
 
     public static abstract class SimpleReportingBase implements Base {
@@ -149,8 +163,11 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
         }
     }
 
-    public static class ListBase<VH extends RecyclerView.ViewHolder>
+    public static class ListBase<VH extends ViewHolder>
             extends SimpleReportingBase implements ListAdapter, SpinnerAdapter {
+
+        private static final String LOG_TAG = UniversalAdapter.LOG_TAG + "$ListBase";
+        private static final String VIEW_TAG_KEY_VIEW_HOLDER = LOG_TAG + ".VIEW_HOLDER";
 
         private final UniversalAdapter<VH> mAdapter;
         private final DataObservable mObservable = new DataObservable();
@@ -196,27 +213,19 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            if (convertView == null) convertView = LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.frame_wrapper_base, parent, false);
-
-            ViewGroup itemParent = (ViewGroup) convertView;
-            View view = itemParent.getChildCount() == 1 ? itemParent.getChildAt(0) : null;
-            int viewType = mAdapter.getItemViewLayoutId(position);
-            VH viewHolder;
-            if (view == null) {
-                viewHolder = mAdapter.onCreateViewHolder(itemParent, viewType);
-                view = viewHolder.itemView;
-                itemParent.addView(view);
-                itemParent.setTag(viewHolder);
-            } else {
-                //noinspection unchecked
-                viewHolder = (VH) itemParent.getTag();
-                if (viewHolder.getItemViewType() != viewType)
-                    return getView(position, null, parent);
+            //noinspection unchecked
+            VH viewHolder = convertView != null ? (VH) Utils.getViewTag(convertView,
+                    VIEW_TAG_KEY_VIEW_HOLDER) : null;
+            int requestedViewType = mAdapter.getItemViewType(position);
+            if (viewHolder == null || !Objects.equals(requestedViewType, viewHolder.viewType)) {
+                viewHolder = mAdapter.onCreateViewHolder(parent, requestedViewType);
+                if (viewHolder.viewType != requestedViewType)
+                    throw new IllegalArgumentException("ViewHolder returned by " +
+                            "UniversalAdapter.onCreateViewHolder() has invalid viewType.");
+                convertView = viewHolder.itemView;
+                Utils.setViewTag(convertView, VIEW_TAG_KEY_VIEW_HOLDER, viewHolder);
             }
             mAdapter.onBindViewHolder(viewHolder, position);
-            Utils.copyLayoutParamsSizesToView(itemParent, view.getLayoutParams());
-            //Log.d(LOG_TAG, "ListBase getView:\n" + Utils.drawViewHierarchy(convertView, false, true));
             return convertView;
         }
 
@@ -268,8 +277,8 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
         }
     }
 
-    public static class RecyclerBase<VH extends RecyclerView.ViewHolder>
-            extends RecyclerView.Adapter<VH> implements Base {
+    public static class RecyclerBase<VH extends ViewHolder>
+            extends RecyclerView.Adapter<RecyclerBase.UniversalViewHolder<VH>> implements Base {
 
         private final UniversalAdapter<VH> mAdapter;
 
@@ -280,13 +289,17 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
         }
 
         @Override
-        public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-            return mAdapter.onCreateViewHolder(parent, viewType);
+        public UniversalViewHolder<VH> onCreateViewHolder(ViewGroup parent, int viewType) {
+            VH result = mAdapter.onCreateViewHolder(parent, viewType);
+            if (result.viewType != viewType)
+                throw new IllegalArgumentException("ViewHolder returned by " +
+                        "UniversalAdapter.onCreateViewHolder() has invalid viewType.");
+            return new UniversalViewHolder<>(result);
         }
 
         @Override
-        public void onBindViewHolder(VH holder, int position) {
-            mAdapter.onBindViewHolder(holder, position);
+        public void onBindViewHolder(UniversalViewHolder<VH> holder, int position) {
+            mAdapter.onBindViewHolder(holder.universalHolder, position);
         }
 
         @Override
@@ -301,7 +314,7 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
 
         @Override
         public int getItemViewType(int position) {
-            return mAdapter.getItemViewLayoutId(position);
+            return mAdapter.getItemViewType(position);
         }
 
         @Override
@@ -321,6 +334,16 @@ public abstract class UniversalAdapter<VH extends RecyclerView.ViewHolder> {
         @Override
         public boolean hasOnlySimpleDataChangedReporting() {
             return false;
+        }
+
+        protected static class UniversalViewHolder<VH extends ViewHolder> extends RecyclerView.ViewHolder {
+
+            public final VH universalHolder;
+
+            public UniversalViewHolder(VH universalHolder) {
+                super(universalHolder.itemView);
+                this.universalHolder = universalHolder;
+            }
         }
     }
 }

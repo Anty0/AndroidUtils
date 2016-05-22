@@ -1,12 +1,13 @@
 package eu.codetopic.utils.container.items.custom;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.CardView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 
@@ -17,19 +18,28 @@ public final class CustomItemUtils {
     private CustomItemUtils() {
     }
 
-    public static CustomItemViewSetup apply(@Nullable CustomItem item) {
+    public static boolean usesCardView(CustomItem item) {
+        return item.getClass().isAnnotationPresent(WrapWithCardView.class);
+    }
+
+    public static CustomItemViewSetup apply(@NonNull CustomItem item) {
         return new CustomItemViewSetup(item);
     }
 
     public static class CustomItemViewSetup {
+
+        private static final String LOG_TAG = CustomItemUtils.LOG_TAG + "$CustomItemViewSetup";
+        private static final String VIEW_TAG_KEY_THIS_IS_CONTENT = LOG_TAG + ".THIS_IS_CONTENT";
+        private static final String VIEW_TAG_KEY_USING_CARD_VIEW = LOG_TAG + ".USING_CARD_VIEW";
+        private static final String VIEW_TAG_KEY_LAYOUT_ID = LOG_TAG + ".LAYOUT_ID";
 
         private final CustomItem mItem;
         private int mPosition = CustomItem.NO_POSITION;
         private boolean mSupportsClicks = true;
         private Boolean mForceUseCardView;
 
-        private CustomItemViewSetup(@Nullable CustomItem item) {
-            mItem = item == null ? new NullItem() : item;
+        private CustomItemViewSetup(@NonNull CustomItem item) {
+            mItem = item;
         }
 
         public CustomItem getItem() {
@@ -78,70 +88,87 @@ public final class CustomItemUtils {
             return this;
         }
 
-        public View on(final Context context, @Nullable ViewGroup parent) {
+        public View on(Context context, @Nullable ViewGroup parent) {
             return on(context, parent, null);
         }
 
         public View on(final Context context, @Nullable ViewGroup parent, @Nullable View oldView) {
-            boolean useCardView = mForceUseCardView != null ? mForceUseCardView :
-                    mItem.getClass().isAnnotationPresent(WrapWithCardView.class);
+            boolean useCardView = mForceUseCardView != null ? mForceUseCardView : usesCardView(mItem);
+            oldView = createContent(context, parent, oldView, useCardView);
+            ViewGroup content = (ViewGroup) Utils.findViewWithTag(oldView, VIEW_TAG_KEY_THIS_IS_CONTENT);
 
-            if (oldView == null) oldView = LayoutInflater.from(context).inflate(useCardView
-                    ? R.layout.card_view_base : R.layout.frame_wrapper_base, parent, false);
-            ViewGroup itemParent = (ViewGroup) oldView;
-            if (useCardView != itemParent instanceof CardView)
-                return on(context, parent, null);
+            View view = createItemView(context, content,
+                    content.getChildCount() == 1 ? content.getChildAt(0) : null);
 
-            Object tag = itemParent.getTag();
-            int layoutId = mItem.getLayoutResId(context, mPosition);
-            View view = tag != null && layoutId != CustomItem.NO_LAYOUT_RES_ID
-                    && (int) tag == layoutId ? itemParent.getChildAt(0) : null;
+            content.removeAllViews();
+            if (view != null) {
+                content.addView(view);
+                Utils.copyLayoutParamsToViewParents(view, oldView);
+            }
+            return oldView;
+        }
 
-            itemParent.removeAllViews();
-            view = mItem.getView(context, itemParent, view, mPosition);
+        @NonNull
+        private View createContent(Context context, @Nullable ViewGroup parent,
+                                   @Nullable View oldContent, boolean useCardView) {
+            // TODO: 22.5.16 find way to better working with CardView (with only one dependencies on layout id)
+            if (oldContent != null && useCardView != (boolean)
+                    Utils.getViewTagFromChildren(oldContent, VIEW_TAG_KEY_USING_CARD_VIEW))
+                oldContent = null;
 
-            if (mSupportsClicks) {
-                if (mItem instanceof ClickableCustomItem) {
-                    itemParent.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            ((ClickableCustomItem) mItem).onClick(context, v, mPosition);
-                        }
-                    });
-                    itemParent.setOnLongClickListener(new View.OnLongClickListener() {
-                        @Override
-                        public boolean onLongClick(View v) {
-                            return ((ClickableCustomItem) mItem).onLongClick(context, v, mPosition);
-                        }
-                    });
+
+            if (oldContent == null) {
+                LayoutInflater inflater = LayoutInflater.from(context);
+                ViewGroup content;
+                if (useCardView) {
+                    oldContent = inflater.inflate(R.layout.card_view_base, parent, false);
+                    content = (ViewGroup) oldContent.findViewById(R.id.ripple_layout);
                 } else {
-                    itemParent.setOnClickListener(null);
-                    itemParent.setOnLongClickListener(null);
+                    oldContent = inflater.inflate(R.layout.frame_wrapper_base, parent, false);
+                    content = (ViewGroup) oldContent.findViewById(R.id.frame_wrapper_content);
+                }
+                Utils.setViewTag(content, VIEW_TAG_KEY_THIS_IS_CONTENT, null);
+                Utils.setViewTag(content, VIEW_TAG_KEY_USING_CARD_VIEW, useCardView);
+            }
+            return oldContent;
+        }
+
+        @Nullable
+        private View createItemView(final Context context, @NonNull ViewGroup parent, @Nullable View oldView) {
+            Object usedLayoutId = Utils.getViewTag(parent, VIEW_TAG_KEY_LAYOUT_ID);
+            int requestedLayoutId = mItem.getLayoutResId(context, mPosition);
+            if (oldView != null && (usedLayoutId == null || requestedLayoutId == CustomItem
+                    .NO_LAYOUT_RES_ID || !Objects.equals(usedLayoutId, requestedLayoutId)))
+                oldView = null;
+
+            oldView = mItem.getView(context, parent, oldView, mPosition);
+
+            if (oldView != null) {
+                if (mSupportsClicks) {
+                    if (mItem instanceof ClickableCustomItem) {
+                        oldView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ((ClickableCustomItem) mItem).onClick(context, v, mPosition);
+                            }
+                        });
+                        oldView.setOnLongClickListener(new View.OnLongClickListener() {
+                            @Override
+                            public boolean onLongClick(View v) {
+                                return ((ClickableCustomItem) mItem).onLongClick(context, v, mPosition);
+                            }
+                        });
+                    } else {
+                        oldView.setOnClickListener(null);
+                        oldView.setOnLongClickListener(null);
+                    }
                 }
             }
 
             // TODO: 25.3.16 find way to check if item gives true layout id
-            if (view != null) {
-                itemParent.setTag(layoutId);
-                itemParent.addView(view);
-                Utils.copyLayoutParamsSizesToView(itemParent, view.getLayoutParams());
-            } else itemParent.setTag(null);
+            Utils.setViewTag(parent, VIEW_TAG_KEY_LAYOUT_ID,
+                    oldView != null ? requestedLayoutId : null);
             return oldView;
-        }
-
-        private static class NullItem implements CustomItem {
-
-            @Override
-            @Nullable
-            public View getView(Context context, ViewGroup parent,
-                                @Nullable View oldView, int itemPosition) {
-                return null;
-            }
-
-            @Override
-            public int getLayoutResId(Context context, int itemPosition) {
-                return NO_LAYOUT_RES_ID;
-            }
         }
     }
 

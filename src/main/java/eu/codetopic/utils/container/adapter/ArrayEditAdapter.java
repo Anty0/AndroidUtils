@@ -2,7 +2,6 @@ package eu.codetopic.utils.container.adapter;
 
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v7.widget.RecyclerView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -15,7 +14,7 @@ import eu.codetopic.utils.IteratorWrapper;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 
-public abstract class ArrayEditAdapter<T, VH extends RecyclerView.ViewHolder>
+public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder>
         extends UniversalAdapter<VH> implements Iterable<T> {
 
     private static final String LOG_TAG = "ArrayEditAdapter";

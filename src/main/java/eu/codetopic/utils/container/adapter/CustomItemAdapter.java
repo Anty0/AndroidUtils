@@ -1,7 +1,6 @@
 package eu.codetopic.utils.container.adapter;
 
 import android.content.Context;
-import android.support.annotation.LayoutRes;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +14,7 @@ import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.CustomItemUtils;
 
 public class CustomItemAdapter<T extends CustomItem> extends
-        ArrayEditAdapter<T, CustomItemAdapter.CustomItemViewHolder> {
+        ArrayEditAdapter<T, UniversalAdapter.ViewHolder> {
 
     private static final String LOG_TAG = "CustomItemAdapter";
 
@@ -42,13 +41,13 @@ public class CustomItemAdapter<T extends CustomItem> extends
     }
 
     @Override
-    public CustomItemViewHolder onCreateViewHolder(ViewGroup parent, @LayoutRes int viewLayoutId) {
-        return new CustomItemViewHolder(LayoutInflater.from(getContext())
-                .inflate(R.layout.frame_wrapper_base, parent, false));
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(getContext())
+                .inflate(R.layout.frame_wrapper_base, parent, false), viewType);
     }
 
     @Override
-    public void onBindViewHolder(CustomItemViewHolder holder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         ViewGroup parent = (ViewGroup) holder.itemView;
         View view = CustomItemUtils.apply(getItem(position))
                 .withPosition(position)
@@ -57,18 +56,13 @@ public class CustomItemAdapter<T extends CustomItem> extends
                         ? parent.getChildAt(0) : null);
         parent.removeAllViews();
         parent.addView(view);
-        Utils.copyLayoutParamsSizesToView(parent, view.getLayoutParams());
+        Utils.copyLayoutParamsSizesToView(parent, view);
     }
 
     @Override
-    public int getItemViewLayoutId(int position) {
-        return getItem(position).getLayoutResId(mContext, position);
-    }
-
-    protected static class CustomItemViewHolder extends RecyclerView.ViewHolder {
-
-        public CustomItemViewHolder(View itemView) {
-            super(itemView);
-        }
+    public int getItemViewType(int position) {
+        CustomItem item = getItem(position);
+        return (item.getLayoutResId(mContext, position) * 2)
+                + (CustomItemUtils.usesCardView(item) ? 1 : 0);
     }
 }
