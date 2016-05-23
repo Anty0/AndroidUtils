@@ -56,11 +56,13 @@ public class DefaultLoadingViewHolder extends LoadingViewHolder {
                 @Override
                 public void onAnimationStart(Animator animation) {
                     loading.setVisibility(View.VISIBLE);
+                    getMainView().requestLayout();
                 }
             });
             animator.setTarget(loading);
             animator.start();
         } else loading.setVisibility(View.VISIBLE);
+        getMainView().requestLayout();
     }
 
     protected void doHideLoading() {
@@ -89,10 +91,12 @@ public class DefaultLoadingViewHolder extends LoadingViewHolder {
                 @Override
                 public void onAnimationStart(Animator animation) {
                     content.setVisibility(View.VISIBLE);
+                    getMainView().requestLayout();
                 }
             });
             animator.setTarget(content);
             animator.start();
         } else content.setVisibility(View.VISIBLE);
+        getMainView().requestLayout();
     }
 }
