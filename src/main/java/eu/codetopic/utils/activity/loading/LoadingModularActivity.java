@@ -9,7 +9,17 @@ public abstract class LoadingModularActivity extends ModularActivity {
     private static final String LOG_TAG = "LoadingModularActivity";
 
     public LoadingModularActivity(ActivityCallBackModule... modules) {
-        super(Arrays.addToStart(modules, new LoadingModule()));
+        this(new LoadingModule(), modules);
+    }
+
+    public LoadingModularActivity(Class<? extends LoadingViewHolder> loadingViewHolderClass,
+                                  ActivityCallBackModule... modules) {
+        this(new LoadingModule(loadingViewHolderClass), modules);
+    }
+
+    private LoadingModularActivity(LoadingModule loadingModule,
+                                   ActivityCallBackModule... additionalModules) {
+        super(Arrays.addToStart(additionalModules, loadingModule));
     }
 
     public LoadingViewHolder getLoadingViewHolder() {

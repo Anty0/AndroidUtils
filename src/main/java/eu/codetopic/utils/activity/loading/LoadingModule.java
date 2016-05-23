@@ -11,8 +11,17 @@ public class LoadingModule extends SimpleActivityCallBackModule {
 
     private static final String LOG_TAG = "LoadingModule";
 
+    private final Class<? extends LoadingViewHolder> loadingViewHolderClass;
     private LoadingViewHolder loadingViewHolder = null;
     private LoadingViewHolder.HolderInfo<?> loadingHolderInfo = null;
+
+    public LoadingModule() {
+        this(DefaultLoadingViewHolder.class);
+    }
+
+    public LoadingModule(Class<? extends LoadingViewHolder> loadingViewHolderClass) {
+        this.loadingViewHolderClass = loadingViewHolderClass;
+    }
 
     @Override
     protected void onSetContentView(@LayoutRes final int layoutResID, SetContentViewCallBack callBack) {
@@ -100,15 +109,10 @@ public class LoadingModule extends SimpleActivityCallBackModule {
     }
 
     public LoadingViewHolder.HolderInfo<?> getLoadingHolderInfo() {
-        if (loadingHolderInfo == null) {
+        if (loadingHolderInfo == null)
             loadingHolderInfo = LoadingViewHolder
-                    .getLoadingHolderInfo(getViewHolderClass());
-        }
+                    .getLoadingHolderInfo(loadingViewHolderClass);
         return loadingHolderInfo;
-    }
-
-    protected Class<? extends LoadingViewHolder> getViewHolderClass() {
-        return DefaultLoadingViewHolder.class;
     }
 
 }
