@@ -17,7 +17,7 @@ public class TextMultilineResourceLayoutItem extends TextMultilineItem implement
     }
 
     @Override
-    public int getLayoutResourceId(Context context, int position) {
+    public int getLayoutResourceId(Context context) {
         return layoutRes;
     }
 

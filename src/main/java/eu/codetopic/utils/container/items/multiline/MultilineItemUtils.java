@@ -42,11 +42,11 @@ public final class MultilineItemUtils {
     }
 
     @LayoutRes
-    public static int getLayoutResIdFor(Context context, MultilineItem item, int itemPosition,
+    public static int getLayoutResIdFor(Context context, MultilineItem item,
                                         @Nullable @LayoutRes Integer defaultLayoutRes) {
 
         return item instanceof MultilineResourceLayoutItem ? ((MultilineResourceLayoutItem) item)
-                .getLayoutResourceId(context, itemPosition) : (defaultLayoutRes == null ?
+                .getLayoutResourceId(context) : (defaultLayoutRes == null ?
                 MultilineItem.DEFAULT_ITEM_LAYOUT_ID : defaultLayoutRes);
     }
 
@@ -105,7 +105,7 @@ public final class MultilineItemUtils {
         }
 
         public int getLayoutResId(Context context) {
-            return getLayoutResIdFor(context, mItem, mPosition, mDefaultLayoutResId);
+            return getLayoutResIdFor(context, mItem, mDefaultLayoutResId);
         }
 
         public MultilineItemViewSetup withDefaultLayoutResId(@LayoutRes Integer defaultLayoutResId) {

@@ -23,7 +23,6 @@ import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
-import eu.codetopic.utils.container.items.custom.UseCardViewCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
@@ -190,8 +189,8 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
                     if (CustomItem.class.isAssignableFrom(dataClass)) {
                         setItems((List<? extends CustomItem>) getItems(dao));
                     } else if (MultilineItem.class.isAssignableFrom(dataClass)) {
-                        setItems(UseCardViewCustomItemWrapper.wrapAll(MultilineItemCustomItemWrapper
-                                .wrapAll((Collection<? extends MultilineItem>) getItems(dao))));
+                        setItems(MultilineItemCustomItemWrapper
+                                .wrapAll((Collection<? extends MultilineItem>) getItems(dao)));
                     } else {
                         setItems(Collections.<CustomItem>emptyList());
                         Log.e(LOG_TAG, "notifyDatabaseDataChanged problem detected:" +

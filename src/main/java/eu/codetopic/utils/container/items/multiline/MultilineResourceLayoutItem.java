@@ -6,5 +6,5 @@ import android.support.annotation.LayoutRes;
 public interface MultilineResourceLayoutItem extends MultilineItem {
 
     @LayoutRes
-    int getLayoutResourceId(Context context, int position);
+    int getLayoutResourceId(Context context);
 }

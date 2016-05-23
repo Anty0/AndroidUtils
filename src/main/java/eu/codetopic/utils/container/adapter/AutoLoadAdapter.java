@@ -3,18 +3,19 @@ package eu.codetopic.utils.container.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 
 import java.util.Collection;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.callback.ActionCallback;
+import eu.codetopic.utils.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.container.items.custom.CustomItem;
+import eu.codetopic.utils.container.items.custom.CustomItemWrapper;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
-import eu.codetopic.utils.container.items.custom.UseCardViewCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.TextMultilineResourceLayoutItem;
 import eu.codetopic.utils.thread.JobUtils;
 
@@ -41,11 +42,11 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     }
 
     protected CustomItem generateLoadingItem() {
-        CustomItem loadingItem = new MultilineItemCustomItemWrapper(new
+        CustomItemWrapper[] wrappers = new CustomItemWrapper[0];
+        Arrays.add(wrappers, new CardViewWrapper());
+        return new MultilineItemCustomItemWrapper(new
                 TextMultilineResourceLayoutItem(getContext().getText(R.string.wait_text_loading),
-                null, R.layout.item_multiline_loading));
-        return getBase() instanceof RecyclerView.Adapter ?
-                new UseCardViewCustomItemWrapper(loadingItem) : loadingItem;
+                null, R.layout.item_multiline_loading), wrappers);
     }
 
     protected int getStartingPage() {
