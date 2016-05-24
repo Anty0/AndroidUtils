@@ -13,8 +13,17 @@ public abstract class LoadingFragment extends Fragment {
 
     private static final String LOG_TAG = "LoadingFragment";
 
+    private final Class<? extends LoadingViewHolder> loadingViewHolderClass;
     private LoadingViewHolder loadingViewHolder = null;
     private LoadingViewHolder.HolderInfo<?> loadingHolderInfo = null;
+
+    public LoadingFragment() {
+        this(DefaultLoadingViewHolder.class);
+    }
+
+    public LoadingFragment(Class<? extends LoadingViewHolder> loadingViewHolderClass) {
+        this.loadingViewHolderClass = loadingViewHolderClass;
+    }
 
     @Nullable
     @Override
@@ -70,13 +79,9 @@ public abstract class LoadingFragment extends Fragment {
     public LoadingViewHolder.HolderInfo<?> getLoadingHolderInfo() {
         if (loadingHolderInfo == null) {
             loadingHolderInfo = LoadingViewHolder
-                    .getLoadingHolderInfo(getViewHolderClass());
+                    .getLoadingHolderInfo(loadingViewHolderClass);
         }
         return loadingHolderInfo;
-    }
-
-    protected Class<? extends LoadingViewHolder> getViewHolderClass() {
-        return DefaultLoadingViewHolder.class;
     }
 
 }

@@ -8,13 +8,18 @@ import eu.codetopic.utils.R;
 import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 
-public class DefaultLoadingViewHolder extends LoadingViewHolderImpl {
+/**
+ * Created by anty on 24.5.16.
+ *
+ * @author anty
+ */
+public class SoftKeyboardSupportLoadingViewHolder extends LoadingViewHolderImpl {
 
-    @LayoutRes private static final int LOADING_LAYOUT_ID = R.layout.loading_base;
+    @LayoutRes private static final int LOADING_LAYOUT_ID = R.layout.loading_soft_keyboard_support_base;
     @IdRes private static final int CONTENT_VIEW_ID = R.id.base_loadable_content;
     @IdRes private static final int LOADING_VIEW_ID = R.id.base_loading;
 
-    private static final String LOG_TAG = "DefaultLoadingViewHolder";
+    private static final String LOG_TAG = "SoftKeyboardSupportLoadingViewHolder";
 
     @Keep
     @KeepName
