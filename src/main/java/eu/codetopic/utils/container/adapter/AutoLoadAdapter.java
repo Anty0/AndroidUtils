@@ -69,8 +69,8 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
             synchronized (mPageLock) {
                 page = mPage++;
             }
-            final Editor<CustomItem> editor = getEditor();
             final boolean firstPage = page == getStartingPage();
+            final Editor<CustomItem> editor = getEditor();
             if (firstPage) editor.clear().notifyAllItemsChanged();
             final ActionCallback<Boolean> callback = new ActionCallback<Boolean>() {
                 @Override
@@ -80,8 +80,12 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
                     if (adapter != null) {
                         adapter.setShowLoadingItem(result != null && result);
                         Base base;
-                        if (firstPage && !(base = adapter.getBase()).hasOnlySimpleDataChangedReporting())
-                            base.notifyDataSetChanged();// first page auto scroll down fix
+                        if (firstPage && !(base = adapter.getBase()).hasOnlySimpleDataChangedReporting()) {
+                            // first page auto scroll down fix
+                            int count = adapter.getItemCount();
+                            base.notifyItemRangeRemoved(0, count);
+                            base.notifyItemRangeInserted(0, count);
+                        }
                         adapter.mSuspendLock.unlock();
                     }
                 }

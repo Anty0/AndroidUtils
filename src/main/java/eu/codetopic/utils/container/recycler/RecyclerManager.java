@@ -46,6 +46,11 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
         return self();
     }
 
+    public synchronized T setLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        getRecyclerView().setLayoutManager(layoutManager);
+        return self();
+    }
+
     public synchronized T setItemTouchListener(
             RecyclerItemClickListener.ClickListener itemTouchListener) {
         RecyclerView view = getRecyclerView();
