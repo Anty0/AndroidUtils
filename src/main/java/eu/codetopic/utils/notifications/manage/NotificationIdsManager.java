@@ -34,6 +34,10 @@ public final class NotificationIdsManager {
         mInstance = new NotificationIdsManager(context.getApplicationContext());
     }
 
+    public static boolean isInitialized() {
+        return mInstance != null;
+    }
+
     public static NotificationIdsManager getInstance() {
         return mInstance;
     }

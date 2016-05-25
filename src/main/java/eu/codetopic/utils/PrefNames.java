@@ -15,6 +15,7 @@ public class PrefNames {
     public static final String LAST_NOTIFICATION_REQUEST_CODE = "LAST_NOTIFICATION_REQUEST_CODE";
     //TimingData
     public static final String FILE_NAME_TIMING_DATA = "TimingData";
+    public static final String LAST_LOAD_VERSION_CODE = "LAST_LOAD_VERSION_CODE";
     public static final String ADD_TIME_LAST_START = "_LAST_START";
     public static final String ADD_LAST_BROADCAST_REQUEST_CODE = "_LAST_REQUEST_CODE";
     //LocaleData

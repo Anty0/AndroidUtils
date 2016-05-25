@@ -14,6 +14,9 @@ public class JobUtils {
     private static Thread MAIN_THREAD;
 
     public synchronized static void initialize(Context context) {
+        if (HANDLER != null || MAIN_THREAD != null)
+            throw new IllegalStateException(LOG_TAG + " is still initialized");
+
         Looper looper = context.getApplicationContext().getMainLooper();
         HANDLER = new Handler(looper);
         MAIN_THREAD = looper.getThread();

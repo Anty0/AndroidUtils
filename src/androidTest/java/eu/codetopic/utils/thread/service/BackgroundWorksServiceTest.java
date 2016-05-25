@@ -1,46 +1,62 @@
 package eu.codetopic.utils.thread.service;
 
 import android.content.Context;
+import android.content.Intent;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ServiceTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.app.NotificationCompat;
 
+import com.path.android.jobqueue.JobManager;
 import com.path.android.jobqueue.Params;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.TimeoutException;
+
 import eu.codetopic.utils.Log;
+import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.R;
+import eu.codetopic.utils.broadcast.BroadcastsConnector;
+import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.ProgressReporter;
+
+import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class BackgroundWorksServiceTest {
 
-    /*@Rule
+    @Rule
     public final ServiceTestRule mServiceRule = new ServiceTestRule();
 
     @Before
     public void setUp() throws Exception {
-        JobUtils.initialize(InstrumentationRegistry.getTargetContext());
-        ModulesManager.initialize(new ModulesManager
-                .Configuration(InstrumentationRegistry.getTargetContext())
-                .addModules(TestModule.class, NotificationIdsManager.class)
-                .setDefaultTheme(R.style.Theme_AppCompat));
+        Context context = InstrumentationRegistry.getTargetContext();
+        NetworkManager.init(context);
+        JobUtils.initialize(context);
+        BroadcastsConnector.initialize(context);
     }
 
     @Test
     public void testWithBackgroundWorksService() throws TimeoutException, InterruptedException {
+        Context context = InstrumentationRegistry.getTargetContext();
         BackgroundWorksService.WorkBinder binder = (BackgroundWorksService.WorkBinder)
-                mServiceRule.bindService(new Intent(InstrumentationRegistry
-                        .getTargetContext(), BackgroundWorksService.class));
+                mServiceRule.bindService(new Intent(context, BackgroundWorksService.class));
+
+        JobManager jobManager = new JobManager(context);
 
         for (int i = 1; i < 51; i++) {
-            binder.startWork(TestModule.class, new TestWork(i, 20));
+            binder.startWork(jobManager, new TestWork(i, 20));
         }
 
-        *//*binder.startWork(TestModule.class, new TestWork(1, 30));
-        binder.startWork(TestModule.class, new TestWork(2, 30));
-        binder.startWork(TestModule.class, new TestWork(3, 30));
-        binder.startWork(TestModule.class, new TestWork(4, 30));*//*
+        binder.startWork(jobManager, new TestWork(1, 30));
+        binder.startWork(jobManager, new TestWork(2, 30));
+        binder.startWork(jobManager, new TestWork(3, 30));
+        binder.startWork(jobManager, new TestWork(4, 30));
 
         assertTrue(binder.isRunning());
         while (binder.isRunning()) Thread.sleep(500);
@@ -50,7 +66,7 @@ public class BackgroundWorksServiceTest {
     @After
     public void tearDown() throws Exception {
 
-    }*/
+    }
 
     @ServiceWork.UseProgress
     @ServiceWork.RetryLimit(0)

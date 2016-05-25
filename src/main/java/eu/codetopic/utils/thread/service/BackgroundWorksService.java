@@ -8,7 +8,6 @@ import com.path.android.jobqueue.JobStatus;
 
 import java.util.ArrayList;
 
-import eu.codetopic.utils.exceptions.NoModuleFoundException;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.service.CommandService;
 
@@ -22,9 +21,9 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
     @Override
     public void onCreate() {
         super.onCreate();
-        if (NotificationIdsManager.getInstance() == null) {
+        if (!NotificationIdsManager.isInitialized()) {
             safeStopSelf();
-            throw new NoModuleFoundException("NotificationIdsManager no found please add it to ModulesManager initialization");
+            throw new IllegalStateException("NotificationIdsManager is not initialized, please initialize it");
         }
     }
 

@@ -213,6 +213,18 @@ public class Utils {
         }
     }
 
+    public static int getVersionCode(Context context) {
+        try {
+            return getVersionCode(context, context.getPackageName());
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
+        return -1;
+    }
+
+    public static int getVersionCode(Context context, String packageName) throws PackageManager.NameNotFoundException {
+        return context.getPackageManager().getPackageInfo(packageName, 0).versionCode;
+    }
+
     @CheckResult
     public static CharSequence getApplicationName(Context context) {
         return context.getApplicationInfo().loadLabel(context.getPackageManager());

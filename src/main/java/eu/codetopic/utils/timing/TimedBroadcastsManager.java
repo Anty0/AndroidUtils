@@ -18,8 +18,6 @@ import java.util.HashMap;
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.NetworkManager;
-import eu.codetopic.utils.data.getter.DataGetter;
-import eu.codetopic.utils.exceptions.NoModuleFoundException;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
 public class TimedBroadcastsManager {
@@ -34,19 +32,16 @@ public class TimedBroadcastsManager {
 
     private final Context mContext;
     private final NetworkManager.NetworkType mRequiredNetwork;
-    private final DataGetter<TimingData> mTimingDataGetter;
     private final HashMap<Class<?>, TimedBroadcastInfo> mBroadcastsInfoMap;
 
     private TimedBroadcastsManager(Context context, NetworkManager.NetworkType requiredNetwork,
-                                   @NonNull DataGetter<TimingData> timingDataGetter,
                                    Class<? extends BroadcastReceiver>[] broadcasts) {
 
         mContext = context;
         mRequiredNetwork = requiredNetwork;
-        mTimingDataGetter = timingDataGetter;
 
-        if (NotificationIdsManager.getInstance() == null)
-            throw new NoModuleFoundException("NotificationIdsManager no found please add it to ModulesManager initialization");
+        if (!NotificationIdsManager.isInitialized())
+            throw new IllegalStateException("NotificationIdsManager is not initialized, please initialize it");
 
         mBroadcastsInfoMap = new HashMap<>(broadcasts.length);
         Log.d(LOG_TAG, "<init> initialising for: " + java.util.Arrays.toString(broadcasts));
@@ -65,15 +60,15 @@ public class TimedBroadcastsManager {
      *
      * @param context          application context
      * @param requiredNetwork  required network to execute timed broadcasts that requires internet access
-     * @param timingDataGetter ModuleDataGetter of TimingData for saving required data using SharedPreferences
      * @param timedBroadcasts  Classes of timed broadcasts to use in TimedBroadcastsManager
      */
     @SafeVarargs
     public static void initialize(Context context, NetworkManager.NetworkType requiredNetwork,
-                                  @NonNull DataGetter<TimingData> timingDataGetter,
                                   Class<? extends BroadcastReceiver>... timedBroadcasts) {// TODO: 26.3.16 initialize in ApplicationBase
         if (isInitialized()) throw new IllegalStateException(LOG_TAG + " is still initialized");
         context = context.getApplicationContext();
+        TimingData.initialize(context);
+
         context.getPackageManager().setComponentEnabledSetting(
                 new ComponentName(context, BootConnectivityReceiver.class),
                 PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
@@ -82,8 +77,10 @@ public class TimedBroadcastsManager {
         /*List<Class<?>> broadcasts = CPScanner.scanClasses(new ClassFilter()
                 .superClass(BroadcastReceiver.class).annotation(TimedBroadcast.class));*/
 
-        INSTANCE = new TimedBroadcastsManager(context, requiredNetwork,
-                timingDataGetter, timedBroadcasts);
+        INSTANCE = new TimedBroadcastsManager(context, requiredNetwork, timedBroadcasts);
+
+        if (TimingData.getter.get().isFirstLoad())
+            INSTANCE.reloadAll();
     }
 
     public static TimedBroadcastsManager getInstance() {
@@ -97,7 +94,7 @@ public class TimedBroadcastsManager {
     void notifyIntentReceived(Intent intent) {
         switch (intent.getAction()) {
             case Intent.ACTION_BOOT_COMPLETED:
-                TimingData data = mTimingDataGetter.get();
+                TimingData data = TimingData.getter.get();
                 synchronized (mBroadcastsInfoMap) {
                     for (TimedBroadcastInfo broadcastInfo : mBroadcastsInfoMap.values())
                         if (broadcastInfo.getBroadcastInfo().resetTimingOnBoot())
@@ -180,10 +177,10 @@ public class TimedBroadcastsManager {
     public void reload(TimedBroadcastInfo broadcastInfo) {
         AlarmManager alarms = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         Intent broadcastIntent = TimedBroadcastsExecutor.generateIntent(mContext,
-                ACTION_TIMED_EXECUTE, mTimingDataGetter, broadcastInfo, null);
+                ACTION_TIMED_EXECUTE, broadcastInfo, null);
         Intent reloadIntent = getReloadIntent(broadcastInfo);
 
-        TimingData data = mTimingDataGetter.get();
+        TimingData data = TimingData.getter.get();
         TimedBroadcast broadcast = broadcastInfo.getBroadcastInfo();
         int lastRequestCode = data.getLastRequestCode(broadcastInfo.getBroadcastClass());
         if (lastRequestCode != -1) {
@@ -284,6 +281,6 @@ public class TimedBroadcastsManager {
 
     public void forceExecute(@NonNull TimedBroadcastInfo broadcastInfo, @Nullable Bundle extras) {
         mContext.sendBroadcast(TimedBroadcastsExecutor.generateIntent(mContext,
-                ACTION_FORCED_EXECUTE, mTimingDataGetter, broadcastInfo, extras));
+                ACTION_FORCED_EXECUTE, broadcastInfo, extras));
     }
 }

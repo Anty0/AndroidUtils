@@ -96,10 +96,14 @@ public abstract class SharedPreferencesData {
     }
 
     protected synchronized SharedPreferences getPreferences() {
+        if (!mCreated) throw new IllegalStateException(LOG_TAG + " is not initialized");
+        if (mDestroyed) throw new IllegalStateException(LOG_TAG + " is still destroyed");
         return mPreferences;
     }
 
     protected synchronized SharedPreferences.Editor edit() {
+        if (!mCreated) throw new IllegalStateException(LOG_TAG + " is not initialized");
+        if (mDestroyed) throw new IllegalStateException(LOG_TAG + " is still destroyed");
         return mPreferences.edit();
     }
 
