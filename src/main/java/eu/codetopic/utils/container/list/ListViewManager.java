@@ -11,6 +11,7 @@ import java.util.List;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.container.adapter.CustomItemAdapter;
+import eu.codetopic.utils.container.adapter.UniversalAdapter;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.swipe.SwipeLayoutManager;
 
@@ -31,12 +32,16 @@ public abstract class ListViewManager<T extends ListViewManager<T>> extends Swip
     }
 
     public synchronized <DT extends CustomItem> T setAdapter(List<DT> adapterData) {
-        return setAdapter(new CustomItemAdapter<>(getContext(), adapterData).forListView());
+        return setAdapter(new CustomItemAdapter<>(getContext(), adapterData));
     }
 
     @SafeVarargs
     public final synchronized <DT extends CustomItem> T setAdapter(DT... adapterData) {
-        return setAdapter(new CustomItemAdapter<>(getContext(), adapterData).forListView());
+        return setAdapter(new CustomItemAdapter<>(getContext(), adapterData));
+    }
+
+    public synchronized T setAdapter(UniversalAdapter<?> adapter) {
+        return setAdapter(adapter.forListView());
     }
 
     public synchronized T setAdapter(ListAdapter adapter) {
