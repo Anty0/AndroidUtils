@@ -4,11 +4,6 @@ import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 
-/**
- * Created by anty on 23.5.16.
- *
- * @author anty
- */
 public class LayoutItem extends CustomItem {
 
     private static final String LOG_TAG = "LayoutItem";

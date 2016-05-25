@@ -12,11 +12,6 @@ import java.util.List;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.MultilineItemUtils;
 
-/**
- * Created by anty on 23.5.16.
- *
- * @author anty
- */
 public class MultilineItemCustomItemWrapper extends CustomItem {
 
     private static final String LOG_TAG = "MultilineItemCustomItemWrapper";
@@ -30,10 +25,12 @@ public class MultilineItemCustomItemWrapper extends CustomItem {
         this.wrappers = wrappers;
     }
 
-    public static List<MultilineItemCustomItemWrapper> wrapAll(Collection<? extends MultilineItem> items) {
+    public static List<MultilineItemCustomItemWrapper> wrapAll(Collection<? extends MultilineItem> items,
+                                                               @NonNull CustomItemWrapper... additionalWrappers) {
+
         List<MultilineItemCustomItemWrapper> wrappedItems = new ArrayList<>();
         for (MultilineItem item : items)
-            wrappedItems.add(new MultilineItemCustomItemWrapper(item));
+            wrappedItems.add(new MultilineItemCustomItemWrapper(item, additionalWrappers));
         return wrappedItems;
     }
 

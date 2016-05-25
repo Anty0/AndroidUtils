@@ -13,11 +13,6 @@ import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.container.adapter.UniversalAdapter;
 
-/**
- * Created by anty on 23.5.16.
- *
- * @author anty
- */
 public abstract class CustomItem {
 
     public static final int NO_POSITION = -1;

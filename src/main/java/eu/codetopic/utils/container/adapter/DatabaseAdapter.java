@@ -21,6 +21,7 @@ import java.util.List;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
+import eu.codetopic.utils.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
@@ -190,7 +191,8 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
                         setItems((List<? extends CustomItem>) getItems(dao));
                     } else if (MultilineItem.class.isAssignableFrom(dataClass)) {
                         setItems(MultilineItemCustomItemWrapper
-                                .wrapAll((Collection<? extends MultilineItem>) getItems(dao)));
+                                .wrapAll((Collection<? extends MultilineItem>) getItems(dao),
+                                        new CardViewWrapper()));
                     } else {
                         setItems(Collections.<CustomItem>emptyList());
                         Log.e(LOG_TAG, "notifyDatabaseDataChanged problem detected:" +

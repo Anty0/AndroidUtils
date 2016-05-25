@@ -6,11 +6,6 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 
-/**
- * Created by anty on 23.5.16.
- *
- * @author anty
- */
 public class CardViewWrapper extends LayoutItemWrapper {
 
     private static final String LOG_TAG = "CardViewWrapper";
@@ -23,6 +18,6 @@ public class CardViewWrapper extends LayoutItemWrapper {
     protected void onBindViewHolder(ViewHolder holder, int itemPosition) {
         ViewGroup content = (ViewGroup) holder.itemView.findViewById(getContentViewId(holder.context));
         if (content.getChildCount() == 1)
-            Utils.copyLayoutParamsSizesToView(content, content.getChildAt(0));
+            Utils.copyLayoutParamsToViewParents(content.getChildAt(0), holder.itemView);
     }
 }
