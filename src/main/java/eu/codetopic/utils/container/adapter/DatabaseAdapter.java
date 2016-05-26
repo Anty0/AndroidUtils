@@ -33,7 +33,7 @@ import eu.codetopic.utils.thread.job.DatabaseJob;
 public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
     private static final String LOG_TAG = "DatabaseAdapter";
-    private static final String EDIT_TAG = LOG_TAG + ".EDIT_TAG";
+    private static final Object EDIT_TAG = new Object();//LOG_TAG + ".EDIT_TAG";
 
     private final ItemsGetter<T, ID> mItemsGetter;
     private final BroadcastReceiver mDataChangedReceiver = new BroadcastReceiver() {
@@ -59,45 +59,30 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
     }
 
     @Override
-    public void onBeforeRegisterDataObserver(Object observer) {
-        if (!getBase().hasObservers()) {
-            getContext().registerReceiver(mDataChangedReceiver, mItemsGetter
-                    .getDatabaseItemsChangedIntentFilter(getContext()));
-            notifyDatabaseDataChanged();
-        }
-        super.onBeforeRegisterDataObserver(observer);
+    public void onAttachToContainer(@Nullable Object container) {
+        getContext().registerReceiver(mDataChangedReceiver, mItemsGetter
+                .getDatabaseItemsChangedIntentFilter(getContext()));
+        notifyDatabaseDataChanged();
+        super.onAttachToContainer(container);
     }
 
     @Override
-    public void onAfterUnregisterDataObserver(Object observer) {
-        super.onAfterUnregisterDataObserver(observer);
-        if (!getBase().hasObservers())
-            getContext().unregisterReceiver(mDataChangedReceiver);
+    public void onDetachFromContainer(@Nullable Object container) {
+        super.onDetachFromContainer(container);
+        getContext().unregisterReceiver(mDataChangedReceiver);
     }
 
     @Override
-    public Editor<CustomItem> edit() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
-                " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
-    }
-
-    @Override
-    public void postModifications(@Nullable Object editTag, Collection<Modification<CustomItem>>
-            modifications, Collection<CustomItem> contentModifiedItems) {
-        if (!EDIT_TAG.equals(editTag))
+    protected void assertAllowApplyChanges(@Nullable Object editTag, Collection<Modification<CustomItem>> modifications,
+                                           @Nullable Collection<CustomItem> contentModifiedItems) {
+        super.assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
+        if (EDIT_TAG != editTag)
             throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
-                    " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
-        super.postModifications(editTag, modifications, contentModifiedItems);
-    }
-
-    @Override
-    public void postModifications(Collection<Modification<CustomItem>> modifications, Collection<CustomItem> contentModifiedItems) {
-        throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
                 " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
     }
 
     private synchronized void setItems(@NonNull Collection<? extends CustomItem> items) {
-        super.edit().clear().addAll(items).notifyAllItemsChanged().setTag(EDIT_TAG).apply();
+        edit().clear().addAll(items).notifyAllItemsChanged().setTag(EDIT_TAG).apply();
     }
 
     public static class FilteredItemsGetter<T, ID> extends DefaultItemsGetter<T, ID> {

@@ -3,8 +3,10 @@ package eu.codetopic.utils.container.adapter;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -43,7 +45,9 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
 
     protected CustomItem generateLoadingItem() {
         CustomItemWrapper[] wrappers = new CustomItemWrapper[0];
-        Arrays.add(wrappers, new CardViewWrapper());
+        if (getBase() instanceof RecyclerView.Adapter<?>)
+            Arrays.add(wrappers, new CardViewWrapper());
+
         return new MultilineItemCustomItemWrapper(new
                 TextMultilineResourceLayoutItem(getContext().getText(R.string.wait_text_loading),
                 null, R.layout.item_multiline_loading), wrappers);
@@ -70,7 +74,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
                 page = mPage++;
             }
             final boolean firstPage = page == getStartingPage();
-            final Editor<CustomItem> editor = getEditor();
+            final Editor<CustomItem> editor = edit();
             if (firstPage) editor.clear().notifyAllItemsChanged();
             final ActionCallback<Boolean> callback = new ActionCallback<Boolean>() {
                 @Override
@@ -80,12 +84,8 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
                     if (adapter != null) {
                         adapter.setShowLoadingItem(result != null && result);
                         Base base;
-                        if (firstPage && !(base = adapter.getBase()).hasOnlySimpleDataChangedReporting()) {
-                            // first page auto scroll down fix
-                            int count = adapter.getItemCount();
-                            base.notifyItemRangeRemoved(0, count);
-                            base.notifyItemRangeInserted(0, count);
-                        }
+                        if (firstPage && !(base = adapter.getBase()).hasOnlySimpleDataChangedReporting())
+                            base.notifyDataSetChanged(); // first page auto scroll down fix
                         adapter.mSuspendLock.unlock();
                     }
                 }
@@ -153,34 +153,26 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     }
 
     @Override
+    public CustomItem[] getItems(CustomItem[] contents) {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
+    public List<CustomItem> getItems() {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
     public boolean isEmpty() {
         return !mShowLoadingItem && super.isEmpty();
     }
 
-    private Editor<CustomItem> getEditor() {
-        return super.edit();
-    }
-
     @Override
-    public Editor<CustomItem> edit() throws UnsupportedOperationException {
-        throw new UnsupportedOperationException(LOG_TAG + " can't be edited anytime," +
-                " you can override method onLoadNextPage()");
-    }
-
-    @Override
-    public void postModifications(Collection<Modification<CustomItem>> modifications,
-                                  @Nullable Collection<CustomItem> contentModifiedItems) {
-        throw new UnsupportedOperationException(LOG_TAG + " can't be edited anytime," +
-                " you can override method onLoadNextPage()");
-    }
-
-    @Override
-    public void postModifications(@Nullable Object editTag, Collection<Modification<CustomItem>> modifications,
-                                  @Nullable Collection<CustomItem> contentModifiedItems) {
-        if (EDIT_TAG != editTag)
-            throw new UnsupportedOperationException(LOG_TAG + " can't be edited anytime," +
-                    " you can override method onLoadNextPage()");
-        super.postModifications(editTag, modifications, contentModifiedItems);
+    protected void assertAllowApplyChanges(@Nullable Object editTag, Collection<Modification<CustomItem>> modifications,
+                                           @Nullable Collection<CustomItem> contentModifiedItems) {
+        super.assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
+        if (EDIT_TAG != editTag) throw new UnsupportedOperationException(LOG_TAG +
+                " can't be edited anytime, you can override method onLoadNextPage()");
     }
 
     @Override

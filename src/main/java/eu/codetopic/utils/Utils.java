@@ -25,6 +25,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.WorkerThread;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,20 +61,26 @@ public class Utils {
     private static final String LOG_TAG = "Utils";
     private static final int VIEW_TAG_KEY_TAGS_HASH_MAP = R.id.view_tag_key_tags_hash_map;
 
-    public static void setPadding(View view, int horizontal, int vertical) {
-        setPadding(view, horizontal, vertical, horizontal, vertical);
+    public static void setPaddingInDip(View view, int horizontal, int vertical) {
+        setPaddingInDip(view, horizontal, vertical, horizontal, vertical);
     }
 
-    public static void setPadding(View view, int left, int top, int right, int bottom) {
+    public static void setPaddingInDip(View view, int left, int top, int right, int bottom) {
         Context context = view.getContext();
-        view.setPadding((int) toDP(context, left), (int) toDP(context, top),
-                (int) toDP(context, right), (int) toDP(context, bottom));
+        view.setPadding((int) convertDpToPx(context, left), (int) convertDpToPx(context, top),
+                (int) convertDpToPx(context, right), (int) convertDpToPx(context, bottom));
     }
 
     @CheckResult
-    public static float toDP(Context context, int size) {
+    public static float convertDpToPx(Context context, int dp) {
         return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                size, context.getResources().getDisplayMetrics());
+                dp, context.getResources().getDisplayMetrics());
+    }
+
+    @CheckResult
+    public static float convertPxToDp(Context context, int px) {
+        return px / ((float) context.getResources().getDisplayMetrics().densityDpi
+                / DisplayMetrics.DENSITY_DEFAULT);
     }
 
     @CheckResult

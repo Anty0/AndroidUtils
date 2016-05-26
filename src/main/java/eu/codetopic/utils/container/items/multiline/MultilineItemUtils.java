@@ -175,7 +175,7 @@ public final class MultilineItemUtils {
                     setPaddingFor(holder.text1);
                     holder.text2.setVisibility(View.GONE);
                 } else {
-                    Utils.setPadding(holder.text1, 1, 1, 1, 1);
+                    Utils.setPaddingInDip(holder.text1, 1, 1, 1, 1);
                     holder.text2.setVisibility(View.VISIBLE);
                     holder.text2.setText(text);
                 }
@@ -196,7 +196,7 @@ public final class MultilineItemUtils {
 
         @MainThread
         protected void setPaddingFor(TextView textView) {
-            Utils.setPadding(textView, 1, mUsePadding ? 8 : 1);
+            Utils.setPaddingInDip(textView, 1, mUsePadding ? 8 : 1);
         }
 
         @MainThread

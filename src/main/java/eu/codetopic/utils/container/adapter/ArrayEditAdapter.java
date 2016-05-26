@@ -58,10 +58,10 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         }
     }
 
-    public ArrayList<T> getItems() {
+    public List<T> getItems() {
         synchronized (mLock) {
             //noinspection unchecked
-            return (ArrayList<T>) mData.clone();
+            return (List<T>) mData.clone();
         }
     }
 
@@ -88,6 +88,11 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         };
     }
 
+    protected void assertAllowApplyChanges(@Nullable Object editTag,
+                                           Collection<Modification<T>> modifications,
+                                           @Nullable Collection<T> contentModifiedItems) {
+    }
+
     public Editor<T> edit() {
         return new Editor<>(this);
     }
@@ -102,6 +107,8 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
     @UiThread
     public void postModifications(@Nullable Object editTag, Collection<Modification<T>> modifications,
                                   @Nullable Collection<T> contentModifiedItems) {
+
+        assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
 
         Base base = getBase();
         synchronized (mLock) {

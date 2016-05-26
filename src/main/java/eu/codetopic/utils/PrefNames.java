@@ -21,6 +21,8 @@ public class PrefNames {
     //LocaleData
     public static final String FILE_NAME_LOCALE_DATA = "LocaleData";
     public static final String ACTUAL_LOCALE = "LOCALE";
-
+    //DashboardData
+    public static final String FILE_NAME_DASHBOARD_DATA = "DashboardData";
+    public static final String ADD_ENABLED_STATE = "_ENABLED_STATE";
 
 }

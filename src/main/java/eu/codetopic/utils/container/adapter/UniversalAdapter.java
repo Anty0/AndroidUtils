@@ -4,6 +4,7 @@ import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,6 +73,12 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
 
     public boolean isEmpty() {
         return getItemCount() == 0;
+    }
+
+    public void onAttachToContainer(@Nullable Object container) {
+    }
+
+    public void onDetachFromContainer(@Nullable Object container) {
     }
 
     public void onBeforeRegisterDataObserver(Object observer) {
@@ -189,6 +196,8 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
 
         @Override
         public void registerDataSetObserver(DataSetObserver observer) {
+            if (!mObservable.hasObservers()) mAdapter.onAttachToContainer(null);
+
             mAdapter.onBeforeRegisterDataObserver(observer);
             mObservable.registerObserver(observer);
             mAdapter.onAfterRegisterDataObserver(observer);
@@ -199,6 +208,8 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
             mAdapter.onBeforeUnregisterDataObserver(observer);
             mObservable.unregisterObserver(observer);
             mAdapter.onAfterUnregisterDataObserver(observer);
+
+            if (!mObservable.hasObservers()) mAdapter.onDetachFromContainer(null);
         }
 
         @Override
@@ -315,6 +326,18 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
         @Override
         public int getItemViewType(int position) {
             return mAdapter.getItemViewType(position);
+        }
+
+        @Override
+        public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+            mAdapter.onAttachToContainer(recyclerView);
+            super.onAttachedToRecyclerView(recyclerView);
+        }
+
+        @Override
+        public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+            super.onDetachedFromRecyclerView(recyclerView);
+            mAdapter.onDetachFromContainer(recyclerView);
         }
 
         @Override
