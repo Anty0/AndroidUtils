@@ -3,11 +3,6 @@ package eu.codetopic.utils;
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.view.View;
 
-/**
- * Created by anty on 20.5.16.
- *
- * @author anty
- */
 public class SimpleViewAnimatorListener implements ViewPropertyAnimatorListener {
 
     @Override

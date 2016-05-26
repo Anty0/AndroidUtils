@@ -8,11 +8,6 @@ import eu.codetopic.utils.R;
 import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 
-/**
- * Created by anty on 24.5.16.
- *
- * @author anty
- */
 public class SoftKeyboardSupportLoadingViewHolder extends LoadingViewHolderImpl {
 
     @LayoutRes private static final int LOADING_LAYOUT_ID = R.layout.loading_soft_keyboard_support_base;

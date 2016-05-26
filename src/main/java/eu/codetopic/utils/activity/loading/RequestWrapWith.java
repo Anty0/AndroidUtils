@@ -11,11 +11,6 @@ import java.lang.annotation.Target;
 import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 
-/**
- * Created by anty on 20.5.16.
- *
- * @author anty
- */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Keep

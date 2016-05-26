@@ -11,11 +11,6 @@ import android.view.View;
 
 import eu.codetopic.utils.SimpleAnimatorListener;
 
-/**
- * Created by anty on 24.5.16.
- *
- * @author anty
- */
 public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
 
     private static final String LOG_TAG = "LoadingViewHolderImpl";
