@@ -66,7 +66,7 @@ public abstract class LoadingViewHolder {
 
     final void clearViews() {
         synchronized (lock) {
-            if (loadingDepth > 0) doHideLoading();
+            if (loadingDepth > 0 && hasAttachedView()) doHideLoading();
             mainView = null;
             onUpdateMainView(null);
         }

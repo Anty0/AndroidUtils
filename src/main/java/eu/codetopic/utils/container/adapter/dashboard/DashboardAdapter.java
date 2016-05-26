@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import eu.codetopic.utils.container.adapter.ArrayEditAdapter;
@@ -72,9 +73,10 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         List<ItemInfo> itemInfoList = new ArrayList<>();
         for (ItemsGetter getter : mItemsGetters)
             itemInfoList.addAll(getter.getItems(getContext()));
+        Collections.sort(itemInfoList);
 
         restoreItemsStates(itemInfoList);
-        edit().clear().addAll(itemInfoList).setTag(EDIT_TAG).apply();
+        edit().clear().addAll(itemInfoList).setTag(EDIT_TAG).apply();// FIXME: 26.5.16 add support to hide not enabled items
     }
 
     @Override

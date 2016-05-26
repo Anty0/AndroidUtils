@@ -67,7 +67,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
         }
     }
 
-    protected final void loadNextPage(boolean force) {
+    public final void loadNextPage(boolean force) {
         if (mSuspendLock.tryLock()) {
             int page;
             synchronized (mPageLock) {
@@ -106,6 +106,12 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     protected abstract void onLoadNextPage(int page, Editor<CustomItem> editor,
                                            @NonNull ActionCallback<Boolean> callback);
 
+    @Override
+    public void onAttachToContainer(@Nullable Object container) {
+        if (mPage == getStartingPage() && super.isEmpty()) loadNextPage(false);
+        super.onAttachToContainer(container);
+    }
+
     public boolean isEnabled() {
         return mEnabled;
     }
@@ -116,6 +122,10 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
             if (mEnabled) reset();
             else setShowLoadingItem(false);
         }
+    }
+
+    public int getNextPage() {
+        return mPage;
     }
 
     public void reset() {

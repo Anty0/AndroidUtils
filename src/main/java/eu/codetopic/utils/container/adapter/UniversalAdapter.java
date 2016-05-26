@@ -14,7 +14,7 @@ import android.widget.SpinnerAdapter;
 import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.Utils;
 
-public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
+public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {// TODO: 26.5.16 add WidgetAdapter support
 
     public static final int NO_VIEW_TYPE = 0;
     private static final String LOG_TAG = "UniversalAdapter";

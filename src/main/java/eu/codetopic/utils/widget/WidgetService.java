@@ -15,7 +15,7 @@ public class WidgetService extends RemoteViewsService {
     public RemoteViewsFactory onGetViewFactory(Intent intent) {
         Log.d(LOG_TAG, "onGetViewFactory");
 
-        return (new WidgetMultilineAdapter(getApplicationContext(), intent));
+        return new WidgetMultilineAdapter(getApplicationContext(), intent);
     }
 
 }
