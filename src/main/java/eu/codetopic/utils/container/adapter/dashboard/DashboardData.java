@@ -8,7 +8,7 @@ import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 import eu.codetopic.utils.data.preferences.SharedPreferencesGetterAbs;
 
-class DashboardData extends SharedPreferencesData {
+public class DashboardData extends SharedPreferencesData {
 
     public static final DataGetter<DashboardData> getter = new DashboardDataGetter();
 
@@ -20,7 +20,7 @@ class DashboardData extends SharedPreferencesData {
         super(context, PrefNames.FILE_NAME_DASHBOARD_DATA, SAVE_VERSION);
     }
 
-    static void initialize(Context context) {
+    public static void initialize(Context context) {
         if (mInstance != null) return;
         mInstance = new DashboardData(context);
         mInstance.init();

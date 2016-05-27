@@ -21,6 +21,7 @@ public abstract class ItemInfo implements Comparable<ItemInfo> {
 
     protected void setEnabled(boolean enabled) {
         this.enabled = enabled;
+        DashboardData.getter.get().saveItemState(this);
     }
 
     public boolean getDefaultEnabledState() {
@@ -28,7 +29,7 @@ public abstract class ItemInfo implements Comparable<ItemInfo> {
     }
 
     protected void onRestoreEnabledState(boolean enabled) {
-        setEnabled(enabled);
+        this.enabled = enabled;
     }
 
     public boolean hasPersistentEnabledState() {

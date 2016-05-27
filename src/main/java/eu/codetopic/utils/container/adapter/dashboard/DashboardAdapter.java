@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import eu.codetopic.utils.container.adapter.ArrayEditAdapter;
@@ -24,6 +26,7 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     private static final String LOG_TAG = "DashboardAdapter";
     private static final Object EDIT_TAG = new Object();//LOG_TAG + ".EDIT_TAG";
     private final Context mContext;
+    private final DashboardItemsFilter mFilter;
     private final ItemsGetter[] mItemsGetters;
     private final BroadcastReceiver mItemsChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -32,8 +35,15 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         }
     };
 
-    public DashboardAdapter(Context context, ItemsGetter... itemsGetters) {
+    public DashboardAdapter(@NonNull Context context, ItemsGetter... itemsGetters) {
+        this(context, new DefaultItemsFilter(), itemsGetters);
+    }
+
+    public DashboardAdapter(@NonNull Context context, @NonNull DashboardItemsFilter filter,
+                            ItemsGetter... itemsGetters) {
+
         mContext = context;
+        mFilter = filter;
         DashboardData.initialize(context);
         mItemsGetters = itemsGetters;
     }
@@ -73,10 +83,12 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         List<ItemInfo> itemInfoList = new ArrayList<>();
         for (ItemsGetter getter : mItemsGetters)
             itemInfoList.addAll(getter.getItems(getContext()));
-        Collections.sort(itemInfoList);
 
         restoreItemsStates(itemInfoList);
-        edit().clear().addAll(itemInfoList).setTag(EDIT_TAG).apply();// FIXME: 26.5.16 add support to hide not enabled items
+        mFilter.filter(itemInfoList);
+        Collections.sort(itemInfoList);
+
+        edit().clear().addAll(itemInfoList).setTag(EDIT_TAG).apply();
     }
 
     @Override
@@ -101,5 +113,14 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         if (EDIT_TAG != editTag) throw new UnsupportedOperationException(LOG_TAG +
                 " can't be edited anytime, you can call notifyItemsChanged() or send broadcast" +
                 " with action ACTION_ITEMS_CHANGED if you want to notify about items change.");
+    }
+
+    private static class DefaultItemsFilter implements DashboardItemsFilter {
+
+        @Override
+        public void filter(List<ItemInfo> items) {
+            for (Iterator<ItemInfo> iterator = items.iterator(); iterator.hasNext(); )
+                if (!iterator.next().isEnabled()) iterator.remove();
+        }
     }
 }
