@@ -12,7 +12,8 @@ public class UtilsInitializer extends Application {
     public void onCreate() {
         super.onCreate();
         android.util.Log.d(Utils.getApplicationName(this).toString(),
-                "INITIALIZING - DEBUG=" + BuildConfig.DEBUG);
+                "INITIALIZING - BUILD_TYPE=" + BuildConfig.BUILD_TYPE);
+        Log.initialize(this);
         NetworkManager.init(this);
         JobUtils.initialize(this);
         BroadcastsConnector.initialize(this);

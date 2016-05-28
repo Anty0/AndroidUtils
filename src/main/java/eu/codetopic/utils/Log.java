@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import eu.codetopic.utils.data.DebugProviderData;
 import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.thread.JobUtils;
 
 /**
  * Mock Log implementation for testing on non android host.
@@ -65,8 +67,10 @@ public class Log {
      * @hide
      */
     public static final int LOG_ID_CRASH = 4;
+    private static final String LOG_TAG = "Log";
     private static final List<OnErrorLoggedListener> listeners = new ArrayList<>();
-    private static boolean INITIALIZED = false;
+    private static Context APP_CONTEXT = null;
+    private static boolean DEBUG_MODE_DETECTOR_INITIALIZED = false;
     private static boolean DEBUG_MODE = true;
 
     private Log() {
@@ -186,8 +190,7 @@ public class Log {
         try {
             return println(ERROR, tag, msg);
         } finally {
-            for (OnErrorLoggedListener listener : listeners)
-                listener.onError(tag, msg, null);
+            onErrorLogged(tag, msg, null);
         }
     }
 
@@ -203,8 +206,7 @@ public class Log {
         try {
             return println(LOG_ID_MAIN, ERROR, tag, msg + '\n' + getStackTraceString(tr));
         } finally {
-            for (OnErrorLoggedListener listener : listeners)
-                listener.onError(tag, msg, tr);
+            onErrorLogged(tag, msg, tr);
         }
     }
 
@@ -256,34 +258,37 @@ public class Log {
         return DEBUG_MODE ? android.util.Log.println(priority, tag, msg) : 0;
     }
 
+    public static void initialize(Context context) {
+        if (APP_CONTEXT != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
+        APP_CONTEXT = context.getApplicationContext();
+    }
+
+    public static void initDebugModeDetector(@NonNull final DataGetter
+            <? extends DebugProviderData> debugDataGetter) {// TODO: 8.3.16 initialize Log in ApplicationBase
+        if (DEBUG_MODE_DETECTOR_INITIALIZED)
+            throw new IllegalStateException(LOG_TAG + "'s DebugModeDetector is still initialized");
+        if (!debugDataGetter.hasDataChangedBroadcastAction())
+            throw new IllegalArgumentException("debugDataGetter must have DataChangedBroadcastAction");
+        DEBUG_MODE_DETECTOR_INITIALIZED = true;
+
+        APP_CONTEXT.registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                DEBUG_MODE = debugDataGetter.get().isDebugMode();
+            }
+        }, new IntentFilter(debugDataGetter.getDataChangedBroadcastAction()));
+
+        DEBUG_MODE = debugDataGetter.get().isDebugMode();
+    }
+
+    public static void setDebugModeEnabled(boolean debug) {
+        if (DEBUG_MODE_DETECTOR_INITIALIZED) throw new IllegalStateException(LOG_TAG
+                + " is using DebugModeDetector, so you can't modify DebugMode manually");
+        DEBUG_MODE = debug;
+    }
+
     public static boolean isInDebugMode() {
         return DEBUG_MODE;
-    }
-
-    public static synchronized void initDebugMode(boolean debugMode) {
-        if (INITIALIZED) throw new IllegalStateException("Log is still initialized");
-        INITIALIZED = true;
-        DEBUG_MODE = debugMode;
-    }
-
-    public static synchronized void initDebugMode(@NonNull DebugProviderData debugData) {
-        initDebugMode(debugData.isDebugMode());
-    }
-
-    public static synchronized void initDebugMode(Context context, @NonNull final DataGetter
-            <? extends DebugProviderData> debugDataGetter) {// TODO: 8.3.16 initialize Log in ApplicationBase
-        if (INITIALIZED) throw new IllegalStateException("Log is still initialized");
-        INITIALIZED = true;
-
-        if (debugDataGetter.hasDataChangedBroadcastAction()) {
-            context.getApplicationContext().registerReceiver(new BroadcastReceiver() {
-                @Override
-                public void onReceive(Context context, Intent intent) {
-                    DEBUG_MODE = debugDataGetter.get().isDebugMode();
-                }
-            }, new IntentFilter(debugDataGetter.getDataChangedBroadcastAction()));
-        }
-        DEBUG_MODE = debugDataGetter.get().isDebugMode();
     }
 
     public static synchronized void addOnErrorLoggedListener(OnErrorLoggedListener listener) {// TODO: 25.3.16 add error listener in ApplicationBase
@@ -292,6 +297,29 @@ public class Log {
 
     public static synchronized void removeOnErrorLoggedListener(OnErrorLoggedListener listener) {
         listeners.remove(listener);
+    }
+
+    private static synchronized void onErrorLogged(String tag, String msg, @Nullable Throwable tr) {
+        try {
+            if (APP_CONTEXT == null) return;
+            final StringBuilder sb = new StringBuilder("Error logged:\n")
+                    .append("Tag: ").append(tag)
+                    .append("Msg: ").append(msg).append('\n')
+                    .append("Tr: ").append(tr);
+            if (tr != null)
+                for (StackTraceElement e : tr.getStackTrace())
+                    sb.append('\n').append("  ").append(e);
+
+            JobUtils.runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(APP_CONTEXT, sb.toString(), Toast.LENGTH_LONG).show();
+                }
+            });
+        } finally {
+            for (OnErrorLoggedListener listener : listeners)
+                listener.onError(tag, msg, tr);
+        }
     }
 
     public interface OnErrorLoggedListener {
