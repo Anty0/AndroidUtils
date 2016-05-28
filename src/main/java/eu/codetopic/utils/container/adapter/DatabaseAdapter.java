@@ -28,7 +28,8 @@ import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
-import eu.codetopic.utils.thread.job.DatabaseJob;
+import eu.codetopic.utils.thread.job.database.DatabaseJob;
+import eu.codetopic.utils.thread.job.database.DatabaseWork;
 
 public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
@@ -168,25 +169,24 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         @Override
         @SuppressWarnings("unchecked")
         public void onUpdateItems(Context context) {
-            DatabaseJob.<T, ID>work(mDaoGetter).withLoading(mViewHolder)
-                    .start(new DatabaseJob.DatabaseWork<T, ID>() {
-                        @Override
-                        public void run(Dao<T, ID> dao) throws Throwable {
-                            Class<T> dataClass = dao.getDataClass();
-                            if (CustomItem.class.isAssignableFrom(dataClass)) {
-                                setItems((List<? extends CustomItem>) getItems(dao));
-                            } else if (MultilineItem.class.isAssignableFrom(dataClass)) {
-                                setItems(MultilineItemCustomItemWrapper
-                                        .wrapAll((Collection<? extends MultilineItem>) getItems(dao),
-                                                new CardViewWrapper()));
-                            } else {
-                                setItems(Collections.<CustomItem>emptyList());
-                                Log.e(LOG_TAG, "notifyDatabaseDataChanged problem detected:" +
-                                        " database data class don't implements CustomItem or MultilineItem," +
-                                        " so " + LOG_TAG + " will be empty");
-                            }
-                        }
-                    });
+            DatabaseJob.start(mDaoGetter, mViewHolder, new DatabaseWork<T, ID>() {
+                @Override
+                public void run(Dao<T, ID> dao) throws Throwable {
+                    Class<T> dataClass = dao.getDataClass();
+                    if (CustomItem.class.isAssignableFrom(dataClass)) {
+                        setItems((List<? extends CustomItem>) getItems(dao));
+                    } else if (MultilineItem.class.isAssignableFrom(dataClass)) {
+                        setItems(MultilineItemCustomItemWrapper
+                                .wrapAll((Collection<? extends MultilineItem>) getItems(dao),
+                                        new CardViewWrapper()));
+                    } else {
+                        setItems(Collections.<CustomItem>emptyList());
+                        Log.e(LOG_TAG, "notifyDatabaseDataChanged problem detected:" +
+                                " database data class don't implements CustomItem or MultilineItem," +
+                                " so " + LOG_TAG + " will be empty");
+                    }
+                }
+            });
         }
 
         @Override
@@ -207,7 +207,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         protected abstract void onUpdateItems(Context context);
 
         protected final void setItems(@NonNull final Collection<? extends CustomItem> items) {
-            JobUtils.runOnMainThread(new Runnable() {
+            JobUtils.runOnContextThread(mAdapter.getContext(), new Runnable() {
                 @Override
                 public void run() {
                     mAdapter.setItems(items);

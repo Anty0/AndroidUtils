@@ -15,7 +15,8 @@ import eu.codetopic.utils.activity.modular.ActivityCallBackModule;
 import eu.codetopic.utils.data.database.DatabaseObject;
 import eu.codetopic.utils.data.database.DependencyTextDatabaseObject;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
-import eu.codetopic.utils.thread.job.DatabaseJob;
+import eu.codetopic.utils.thread.job.database.DatabaseCallbackWork;
+import eu.codetopic.utils.thread.job.database.DatabaseJob;
 
 public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extends LoadingModularActivity {
 
@@ -84,16 +85,14 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
     }
 
     private void reloadData(final @Nullable Bundle savedInstanceState) {
-        DatabaseJob.<DT, ID>work(mDaoGetter).start(new DatabaseJob
-                .DatabaseCallbackWork<Void, DT, DT, ID>(this, null) {
+        DatabaseJob.start(mDaoGetter, new DatabaseCallbackWork<Void, DT, DT, ID>(this, null) {
             @Override
-            public DT work(@NonNull Context appContext, Dao<DT, ID> dao) throws Throwable {
+            public DT work(Dao<DT, ID> dao) throws Throwable {
                 return loadData(dao, savedInstanceState);// FIXME: 28.5.16 leak
             }
 
             @Override
-            public void finish(@NonNull Context appContext, @Nullable Context context,
-                               @Nullable Void weakData, DT result, Throwable throwable) {
+            public void finish(@Nullable Void weakData, DT result, Throwable throwable) {
                 onDataLoaded(savedInstanceState == null, mData);// FIXME: 28.5.16 leak
             }
         });
@@ -101,7 +100,7 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
 
     protected void saveData() {
         if (onBeforeSaveData(getData()))
-            DatabaseJob.<DT, ID>work(mDaoGetter).startSave(mData);
+            DatabaseJob.saveData(mDaoGetter, mData);
     }
 
     protected abstract void onDataLoaded(boolean isFirstLoad, DT data);

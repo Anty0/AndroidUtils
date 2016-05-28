@@ -16,7 +16,8 @@ import eu.codetopic.utils.callback.CallbackUtils;
 import eu.codetopic.utils.data.database.holder.BitmapDatabaseObject;
 import eu.codetopic.utils.data.database.holder.BitmapHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
-import eu.codetopic.utils.thread.job.DatabaseJob;
+import eu.codetopic.utils.thread.job.database.DatabaseJob;
+import eu.codetopic.utils.thread.job.database.DatabaseWork;
 
 public abstract class PictureDatabaseObject<BDO extends BitmapDatabaseObject,
         BH extends BitmapHolder<BDO>> extends DatabaseObject {
@@ -36,7 +37,7 @@ public abstract class PictureDatabaseObject<BDO extends BitmapDatabaseObject,
     }
 
     public void getPictureOnBackground(final ActionCallback<Bitmap> callback) {
-        DatabaseJob.<BDO, Long>work(bdoGetter).start(new DatabaseJob.DatabaseWork<BDO, Long>() {
+        DatabaseJob.start(bdoGetter, new DatabaseWork<BDO, Long>() {
             @Override
             public void run(Dao<BDO, Long> dao) throws Throwable {
                 CallbackUtils.doCallbackWorkWithThrow(callback, new CallbackUtils.CallbackWork<Bitmap>() {
@@ -69,7 +70,7 @@ public abstract class PictureDatabaseObject<BDO extends BitmapDatabaseObject,
     }
 
     public void setPictureOnBackground(final Bitmap picture, @Nullable final ActionCallback<Bitmap> callback) {
-        DatabaseJob.<BDO, Long>work(bdoGetter).start(new DatabaseJob.DatabaseWork<BDO, Long>() {
+        DatabaseJob.start(bdoGetter, new DatabaseWork<BDO, Long>() {
             @Override
             public void run(Dao<BDO, Long> dao) throws Throwable {
                 CallbackUtils.doCallbackWorkWithThrow(callback, new CallbackUtils.CallbackWork<Bitmap>() {

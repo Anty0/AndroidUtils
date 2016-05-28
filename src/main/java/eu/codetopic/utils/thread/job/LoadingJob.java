@@ -1,6 +1,7 @@
 package eu.codetopic.utils.thread.job;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.WorkerThread;
 
 import com.birbit.android.jobqueue.CancelReason;
 import com.birbit.android.jobqueue.Job;
@@ -46,6 +47,7 @@ public abstract class LoadingJob extends Job {
         }
     }
 
+    @WorkerThread
     public abstract void onStart() throws Throwable;
 
     @Override
