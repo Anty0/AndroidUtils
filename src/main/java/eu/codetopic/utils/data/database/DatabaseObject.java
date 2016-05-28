@@ -22,11 +22,9 @@ public abstract class DatabaseObject implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        if (getId() == null) {
-            return super.equals(o);
-        } else {
-            return super.equals(o) || o instanceof DatabaseObject && Objects.equals(getClass(),
-                    o.getClass()) && Objects.equals(getId(), ((DatabaseObject) o).getId());
-        }
+        return super.equals(o) || getId() != null
+                && o instanceof DatabaseObject
+                && Objects.equals(getClass(), o.getClass())
+                && Objects.equals(getId(), ((DatabaseObject) o).getId());
     }
 }

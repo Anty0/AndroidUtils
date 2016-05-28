@@ -1,6 +1,5 @@
 package eu.codetopic.utils.data.database;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -14,16 +13,15 @@ import java.sql.SQLException;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.callback.ActionCallback;
 import eu.codetopic.utils.callback.CallbackUtils;
-import eu.codetopic.utils.container.items.multiline.MultilineLoadableImageItem;
 import eu.codetopic.utils.data.database.holder.BitmapDatabaseObject;
 import eu.codetopic.utils.data.database.holder.BitmapHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.job.DatabaseJob;
 
-public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapDatabaseObject,
-        BH extends BitmapHolder<BDO>> extends DependencyTextDatabaseObject implements MultilineLoadableImageItem {
+public abstract class PictureDatabaseObject<BDO extends BitmapDatabaseObject,
+        BH extends BitmapHolder<BDO>> extends DatabaseObject {
 
-    private static final String LOG_TAG = "DependencyPictureTextDatabaseObject";
+    private static final String LOG_TAG = "PictureDatabaseObject";
 
     private final DatabaseDaoGetter<BDO> bdoGetter;
     private final Class<BH> bhClass;
@@ -31,8 +29,8 @@ public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapData
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private BH picture;
 
-    public DependencyPictureTextDatabaseObject(DatabaseDaoGetter<BDO> bitmapDatabaseObjectDaoGetter,
-                                               Class<BH> bitmapHolderClass) {
+    public PictureDatabaseObject(DatabaseDaoGetter<BDO> bitmapDatabaseObjectDaoGetter,
+                                 Class<BH> bitmapHolderClass) {
         bdoGetter = bitmapDatabaseObjectDaoGetter;
         bhClass = bitmapHolderClass;
     }
@@ -84,10 +82,4 @@ public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapData
             }
         });
     }
-
-    @Override
-    public void loadImage(Context context, int position, final ActionCallback<Bitmap> callback) {
-        getPictureOnBackground(callback);
-    }
-
 }

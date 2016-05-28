@@ -168,24 +168,25 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         @Override
         @SuppressWarnings("unchecked")
         public void onUpdateItems(Context context) {
-            DatabaseJob.start(mViewHolder, mDaoGetter, new DatabaseJob.DatabaseWork<T, ID>() {
-                @Override
-                public void run(Dao<T, ID> dao) throws Throwable {
-                    Class<T> dataClass = dao.getDataClass();
-                    if (CustomItem.class.isAssignableFrom(dataClass)) {
-                        setItems((List<? extends CustomItem>) getItems(dao));
-                    } else if (MultilineItem.class.isAssignableFrom(dataClass)) {
-                        setItems(MultilineItemCustomItemWrapper
-                                .wrapAll((Collection<? extends MultilineItem>) getItems(dao),
-                                        new CardViewWrapper()));
-                    } else {
-                        setItems(Collections.<CustomItem>emptyList());
-                        Log.e(LOG_TAG, "notifyDatabaseDataChanged problem detected:" +
-                                " database data class don't implements CustomItem or MultilineItem," +
-                                " so " + LOG_TAG + " will be empty");
-                    }
-                }
-            });
+            DatabaseJob.<T, ID>work(mDaoGetter).withLoading(mViewHolder)
+                    .start(new DatabaseJob.DatabaseWork<T, ID>() {
+                        @Override
+                        public void run(Dao<T, ID> dao) throws Throwable {
+                            Class<T> dataClass = dao.getDataClass();
+                            if (CustomItem.class.isAssignableFrom(dataClass)) {
+                                setItems((List<? extends CustomItem>) getItems(dao));
+                            } else if (MultilineItem.class.isAssignableFrom(dataClass)) {
+                                setItems(MultilineItemCustomItemWrapper
+                                        .wrapAll((Collection<? extends MultilineItem>) getItems(dao),
+                                                new CardViewWrapper()));
+                            } else {
+                                setItems(Collections.<CustomItem>emptyList());
+                                Log.e(LOG_TAG, "notifyDatabaseDataChanged problem detected:" +
+                                        " database data class don't implements CustomItem or MultilineItem," +
+                                        " so " + LOG_TAG + " will be empty");
+                            }
+                        }
+                    });
         }
 
         @Override

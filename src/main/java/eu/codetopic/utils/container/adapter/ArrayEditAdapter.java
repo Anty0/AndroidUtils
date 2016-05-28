@@ -99,14 +99,14 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
 
     @UiThread
     public void postModifications(Collection<Modification<T>> modifications,
-                                  @Nullable Collection<T> contentModifiedItems) {
+                                  @Nullable Collection<T> contentModifiedItems, boolean fastMode) {
 
-        postModifications(null, modifications, contentModifiedItems);
+        postModifications(null, modifications, contentModifiedItems, fastMode);
     }
 
     @UiThread
     public void postModifications(@Nullable Object editTag, Collection<Modification<T>> modifications,
-                                  @Nullable Collection<T> contentModifiedItems) {
+                                  @Nullable Collection<T> contentModifiedItems, boolean fastMode) {
 
         assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
 
@@ -114,14 +114,19 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         synchronized (mLock) {
             if (base.hasOnlySimpleDataChangedReporting()) {
                 for (Modification<T> modification : modifications)
-                    modification.modify(mData);
+                    modification.modify(null, mData);
 
                 base.notifyDataSetChanged();
+
+            } else if (fastMode) {
+                for (Modification<T> modification : modifications)
+                    modification.modify(base, mData);
+
             } else {
                 //noinspection unchecked
                 List<T> dataBackup = (List<T>) mData.clone();
                 for (Modification<T> modification : modifications)
-                    modification.modify(mData);
+                    modification.modify(null, mData);
 
                 for (Iterator<T> iterator = dataBackup.iterator(); iterator.hasNext(); ) {
                     T obj = iterator.next();
@@ -155,9 +160,8 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
                 } else base.notifyItemRangeChanged(0, mData.size());
 
                 if (Log.isInDebugMode() && !Objects.equals(dataBackup, mData))
-                    Log.e(LOG_TAG, "apply",
-                        new InternalError("Detected problem in " + LOG_TAG + " while applying changes" +
-                                " -> !dataBackup.equals(newData)"));
+                    Log.e(LOG_TAG, "apply", new InternalError("Detected problem in " + LOG_TAG
+                            + " while applying changes -> !dataBackup.equals(newData)"));
             }
 
             onDataEdited(editTag);
@@ -169,7 +173,7 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
     }
 
     public interface Modification<T> {
-        void modify(List<T> toModify);
+        void modify(@Nullable Base adapterBase, List<T> toModify);
     }
 
     public static class Editor<T> {
@@ -210,8 +214,9 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> add(final T object) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
                     toModify.add(object);
+                    if (adapterBase != null) adapterBase.notifyItemInserted(toModify.size() - 1);
                 }
             });
         }
@@ -219,8 +224,9 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> add(final int index, final T object) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
                     toModify.add(index, object);
+                    if (adapterBase != null) adapterBase.notifyItemInserted(index);
                 }
             });
         }
@@ -228,8 +234,12 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> addAll(final Collection<? extends T> collection) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
                     toModify.addAll(collection);
+                    if (adapterBase != null) {
+                        int count = collection.size();
+                        adapterBase.notifyItemRangeInserted(toModify.size() - count, count);
+                    }
                 }
             });
         }
@@ -237,8 +247,10 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> addAll(final int index, final Collection<? extends T> collection) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
                     toModify.addAll(index, collection);
+                    if (adapterBase != null) adapterBase
+                            .notifyItemRangeInserted(index, collection.size());
                 }
             });
         }
@@ -246,8 +258,15 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> clear() {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
+                    if (adapterBase == null) {
+                        toModify.clear();
+                        return;
+                    }
+
+                    int count = toModify.size();
                     toModify.clear();
+                    adapterBase.notifyItemRangeRemoved(0, count);
                 }
             });
         }
@@ -255,8 +274,9 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> remove(final int index) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
                     toModify.remove(index);
+                    if (adapterBase != null) adapterBase.notifyItemRemoved(index);
                 }
             });
         }
@@ -264,9 +284,18 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> remove(final Object object) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
+                    if (adapterBase == null) {
+                        //noinspection SuspiciousMethodCalls
+                        toModify.remove(object);
+                        return;
+                    }
+
                     //noinspection SuspiciousMethodCalls
-                    toModify.remove(object);
+                    int index = toModify.indexOf(object);
+                    if (index == -1) return;
+                    toModify.remove(index);
+                    adapterBase.notifyItemRemoved(index);
                 }
             });
         }
@@ -274,8 +303,9 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> set(final int index, final T object) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
                     toModify.set(index, object);
+                    if (adapterBase != null) adapterBase.notifyItemChanged(index);
                 }
             });
         }
@@ -283,9 +313,23 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> removeAll(final Collection<?> collection) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
+                    if (adapterBase == null) {
+                        //noinspection SuspiciousMethodCalls
+                        toModify.removeAll(collection);
+                        return;
+                    }
+
+                    List<Integer> ids = new ArrayList<>();
+                    for (Object o : collection) {
+                        //noinspection SuspiciousMethodCalls
+                        int index = toModify.indexOf(o);
+                        if (index != -1) ids.add(index);
+                    }
                     //noinspection SuspiciousMethodCalls
                     toModify.removeAll(collection);
+                    for (Integer i : ids)
+                        adapterBase.notifyItemRemoved(i);
                 }
             });
         }
@@ -293,8 +337,19 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         public Editor<T> retainAll(final Collection<?> collection) {
             return post(new Modification<T>() {
                 @Override
-                public void modify(List<T> toModify) {
-                    toModify.retainAll(collection);
+                public void modify(@Nullable Base adapterBase, List<T> toModify) {
+                    if (adapterBase == null) {
+                        toModify.retainAll(collection);
+                        return;
+                    }
+
+                    for (Iterator<T> iterator = toModify.iterator(); iterator.hasNext(); ) {
+                        T item = iterator.next();
+                        if (!collection.contains(item)) {
+                            adapterBase.notifyItemRemoved(toModify.indexOf(item));
+                            iterator.remove();
+                        }
+                    }
                 }
             });
         }
@@ -315,12 +370,16 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
             return this;
         }
 
-        @UiThread
         public synchronized boolean apply() {
+            return apply(false);
+        }
+
+        @UiThread
+        public synchronized boolean apply(boolean fastMode) {
             ArrayEditAdapter<T, ?> adapter = getAdapter();
             if (adapter != null) {
                 adapter.postModifications(getTag(), mModifications,
-                        mAllItemsChanged ? null : mChangedItems);
+                        mAllItemsChanged ? null : mChangedItems, fastMode);
                 mModifications.clear();
                 mChangedItems.clear();
                 mAllItemsChanged = false;
