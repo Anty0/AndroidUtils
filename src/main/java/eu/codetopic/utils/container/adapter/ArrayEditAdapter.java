@@ -112,43 +112,62 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
 
         Base base = getBase();
         synchronized (mLock) {
-            if (base.hasOnlySimpleDataChangedReporting()) {
-                for (Modification<T> modification : modifications)
-                    modification.modify(null, mData);
+            try {
+                if (base.hasOnlySimpleDataChangedReporting()) {
+                    for (Modification<T> modification : modifications)
+                        modification.modify(null, mData);
 
-                base.notifyDataSetChanged();
+                    base.notifyDataSetChanged();
+                    return;
 
-            } else if (fastMode) {
-                for (Modification<T> modification : modifications)
-                    modification.modify(base, mData);
+                } else if (fastMode) {
+                    for (Modification<T> modification : modifications)
+                        modification.modify(base, mData);
 
-            } else {
-                //noinspection unchecked
-                List<T> dataBackup = (List<T>) mData.clone();
-                for (Modification<T> modification : modifications)
-                    modification.modify(null, mData);
+                } else {
+                    //noinspection unchecked
+                    List<T> dataBackup = (List<T>) mData.clone();
+                    for (Modification<T> modification : modifications)
+                        modification.modify(null, mData);
 
-                for (Iterator<T> iterator = dataBackup.iterator(); iterator.hasNext(); ) {
-                    T obj = iterator.next();
-                    if (!mData.contains(obj)) {
-                        base.notifyItemRemoved(dataBackup.indexOf(obj));
-                        iterator.remove();
-                    }
-                }
+                    boolean oldEmpty = dataBackup.isEmpty();
+                    boolean newEmpty = mData.isEmpty();
+                    if (!oldEmpty || !newEmpty) {
+                        if (oldEmpty) {
+                            base.notifyItemRangeInserted(0, mData.size());
 
-                for (int i = 0, size = mData.size(); i < size; i++) {
-                    T obj = mData.get(i);
-                    if (!dataBackup.contains(obj)) {
-                        dataBackup.add(i, obj);
-                        base.notifyItemInserted(i);
-                        continue;
-                    }
+                        } else if (newEmpty) {
+                            base.notifyItemRangeRemoved(0, dataBackup.size());
 
-                    int oldIndex = dataBackup.indexOf(obj);
-                    if (oldIndex != i) {
-                        base.notifyItemMoved(oldIndex, i);
-                        dataBackup.remove(obj);
-                        dataBackup.add(i, obj);
+                        } else {
+                            for (Iterator<T> iterator = dataBackup.iterator(); iterator.hasNext(); ) {
+                                T obj = iterator.next();
+                                if (!mData.contains(obj)) {
+                                    base.notifyItemRemoved(dataBackup.indexOf(obj));
+                                    iterator.remove();
+                                }
+                            }
+
+                            for (int i = 0, size = mData.size(); i < size; i++) {
+                                T obj = mData.get(i);
+                                if (!dataBackup.contains(obj)) {
+                                    dataBackup.add(i, obj);
+                                    base.notifyItemInserted(i);
+                                    continue;
+                                }
+
+                                int oldIndex = dataBackup.indexOf(obj);
+                                if (oldIndex != i) {
+                                    base.notifyItemMoved(oldIndex, i);
+                                    dataBackup.remove(obj);
+                                    dataBackup.add(i, obj);
+                                }
+                            }
+
+                            if (Log.isInDebugMode() && !Objects.equals(dataBackup, mData))
+                                Log.e(LOG_TAG, "apply", new InternalError("Detected problem in " + LOG_TAG
+                                        + " while applying changes -> !dataBackup.equals(newData)"));
+                        }
                     }
                 }
 
@@ -158,13 +177,9 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
                         if (index != -1) base.notifyItemChanged(index);
                     }
                 } else base.notifyItemRangeChanged(0, mData.size());
-
-                if (Log.isInDebugMode() && !Objects.equals(dataBackup, mData))
-                    Log.e(LOG_TAG, "apply", new InternalError("Detected problem in " + LOG_TAG
-                            + " while applying changes -> !dataBackup.equals(newData)"));
+            } finally {
+                onDataEdited(editTag);
             }
-
-            onDataEdited(editTag);
         }
     }
 

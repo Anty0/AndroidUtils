@@ -306,9 +306,6 @@ public class Log {
                     .append("Tag: ").append(tag)
                     .append("Msg: ").append(msg).append('\n')
                     .append("Tr: ").append(tr);
-            if (tr != null)
-                for (StackTraceElement e : tr.getStackTrace())
-                    sb.append('\n').append("  ").append(e);
 
             JobUtils.runOnMainThread(new Runnable() {
                 @Override
