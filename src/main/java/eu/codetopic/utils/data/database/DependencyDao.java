@@ -41,10 +41,12 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
 
     void removeUnneededData() throws SQLException {
         if (Log.isInDebugMode())
-            Log.d(LOG_TAG, "removeUnneededData before: " + queryForAllWithTemp());
+            Log.d(LOG_TAG, "removeUnneededData for " + getDataClass()
+                    .getName() + " before:\n" + queryForAllWithTemp());
         mDependencyObjectManager.removeUnneededData(this);
         if (Log.isInDebugMode())
-            Log.d(LOG_TAG, "removeUnneededData after: " + queryForAllWithTemp());
+            Log.d(LOG_TAG, "removeUnneededData for " + getDataClass()
+                    .getName() + " after:\n" + queryForAllWithTemp());
     }
 
     private List<T> filterDeleted(List<T> toFilter) {
