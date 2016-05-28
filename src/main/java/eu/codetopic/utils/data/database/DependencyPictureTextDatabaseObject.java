@@ -18,8 +18,8 @@ import eu.codetopic.utils.container.items.multiline.MultilineLoadableImageItem;
 import eu.codetopic.utils.data.database.holder.BitmapDatabaseObject;
 import eu.codetopic.utils.data.database.holder.BitmapHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
-import eu.codetopic.utils.thread.job.database.DatabaseJob;
 import eu.codetopic.utils.thread.job.database.DatabaseWork;
+import eu.codetopic.utils.thread.job.database.DbJob;
 
 public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapDatabaseObject,
         BH extends BitmapHolder<BDO>> extends DependencyTextDatabaseObject implements MultilineLoadableImageItem {
@@ -39,7 +39,7 @@ public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapData
     }
 
     public void getPictureOnBackground(final ActionCallback<Bitmap> callback) {
-        DatabaseJob.start(bdoGetter, new DatabaseWork<BDO, Long>() {
+        DbJob.work(bdoGetter).start(new DatabaseWork<BDO, Long>() {
             @Override
             public void run(Dao<BDO, Long> dao) throws Throwable {
                 CallbackUtils.doCallbackWorkWithThrow(callback, new CallbackUtils.CallbackWork<Bitmap>() {
@@ -72,7 +72,7 @@ public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapData
     }
 
     public void setPictureOnBackground(final Bitmap picture, @Nullable final ActionCallback<Bitmap> callback) {
-        DatabaseJob.start(bdoGetter, new DatabaseWork<BDO, Long>() {
+        DbJob.work(bdoGetter).start(new DatabaseWork<BDO, Long>() {
             @Override
             public void run(Dao<BDO, Long> dao) throws Throwable {
                 CallbackUtils.doCallbackWorkWithThrow(callback, new CallbackUtils.CallbackWork<Bitmap>() {

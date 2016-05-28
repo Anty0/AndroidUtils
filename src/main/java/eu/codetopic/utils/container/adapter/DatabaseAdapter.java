@@ -28,8 +28,8 @@ import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
-import eu.codetopic.utils.thread.job.database.DatabaseJob;
 import eu.codetopic.utils.thread.job.database.DatabaseWork;
+import eu.codetopic.utils.thread.job.database.DbJob;
 
 public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
@@ -169,7 +169,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         @Override
         @SuppressWarnings("unchecked")
         public void onUpdateItems(Context context) {
-            DatabaseJob.start(mDaoGetter, mViewHolder, new DatabaseWork<T, ID>() {
+            DbJob.work(mDaoGetter).withLoading(mViewHolder).start(new DatabaseWork<T, ID>() {
                 @Override
                 public void run(Dao<T, ID> dao) throws Throwable {
                     Class<T> dataClass = dao.getDataClass();

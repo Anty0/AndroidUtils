@@ -30,29 +30,6 @@ public class DatabaseJob<T, ID> extends LoadingJob {
         this.job = job;
     }
 
-    @SafeVarargs
-    public static <T, ID> String saveData(DatabaseDaoGetter<T> daoGetter, T... toSave) {
-        return start(daoGetter, Modification.CREATE_OR_UPDATE.<T, ID>generateWork(toSave));
-    }
-
-    @SafeVarargs
-    public static <T, ID> String deleteData(DatabaseDaoGetter<T> daoGetter, T... toDelete) {
-        return start(daoGetter, Modification.DELETE.<T, ID>generateWork(toDelete));
-    }
-
-    public static <T, ID> String start(DatabaseDaoGetter<T> daoGetter, DatabaseWork<T, ID> work) {
-        return start(daoGetter, null, work);
-    }
-
-    public static <T, ID> String start(DatabaseDaoGetter<T> daoGetter,
-                                       @Nullable LoadingViewHolder loadingHolder,
-                                       DatabaseWork<T, ID> work) {
-
-        DatabaseJob<T, ID> job = new DatabaseJob<>(loadingHolder, daoGetter, work);
-        daoGetter.getJobManager().addJobInBackground(job);
-        return job.getId();
-    }
-
     public static String generateDatabaseJobGroupNameFor(Class<?> databaseObject) {
         return databaseObject.getName() + JOB_DATABASE_GROUP_NAME_ADD;
     }
