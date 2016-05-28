@@ -3,7 +3,8 @@ package eu.codetopic.utils.thread.job;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.path.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.config.Configuration;
 
 import eu.codetopic.utils.data.getter.JobManagerGetter;
 
@@ -19,7 +20,7 @@ public final class SingletonJobManager {
 
     public static void initialize(@NonNull Context context) {
         context = context.getApplicationContext();
-        initialize(new JobManager(context, context.getPackageName() + ".JOB_MANAGER"));
+        initialize(new JobManager(new Configuration.Builder(context).build()));
     }
 
     public static void initialize(@NonNull JobManager jobManagerInstance) {

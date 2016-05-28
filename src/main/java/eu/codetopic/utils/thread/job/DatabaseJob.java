@@ -7,9 +7,9 @@ import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 import android.widget.Toast;
 
+import com.birbit.android.jobqueue.CancelReason;
+import com.birbit.android.jobqueue.Params;
 import com.j256.ormlite.dao.Dao;
-import com.path.android.jobqueue.Params;
-import com.path.android.jobqueue.RetryConstraint;
 
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -59,14 +59,8 @@ public class DatabaseJob<T, ID> extends LoadingJob {
     }
 
     @Override
-    protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
-        Log.e(LOG_TAG, "shouldReRunOnThrowable", throwable);
-        return super.shouldReRunOnThrowable(throwable, runCount, maxRunCount);
-    }
-
-    @Override
-    protected void onCancel() {
-        super.onCancel();
+    protected void onCancel(@CancelReason int cancelReason) {
+        super.onCancel(cancelReason);
         Toast.makeText(getApplicationContext(), R.string.toast_text_database_exception,
                 Toast.LENGTH_LONG).show();
     }
@@ -137,22 +131,24 @@ public class DatabaseJob<T, ID> extends LoadingJob {
         }
 
         @SafeVarargs
-        public final long startSave(T... toSave) {
+        public final String startSave(T... toSave) {
             return start(Modification.CREATE_OR_UPDATE, toSave);
         }
 
         @SafeVarargs
-        public final long startDelete(T... toDelete) {
+        public final String startDelete(T... toDelete) {
             return start(Modification.DELETE, toDelete);
         }
 
         @SafeVarargs
-        public final long start(Modification modification, T... toModify) {
+        public final String start(Modification modification, T... toModify) {
             return start(modification.<T, ID>generateWork(toModify));
         }
 
-        public long start(DatabaseWork<T, ID> work) {
-            return daoGetter.getJobManager().addJob(new DatabaseJob<>(loadingHolder, daoGetter, work));
+        public String start(DatabaseWork<T, ID> work) {
+            DatabaseJob<T, ID> job = new DatabaseJob<>(loadingHolder, daoGetter, work);
+            daoGetter.getJobManager().addJobInBackground(job);
+            return job.getId();
         }
     }
 

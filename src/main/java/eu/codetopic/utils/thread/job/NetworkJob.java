@@ -4,12 +4,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
-import com.path.android.jobqueue.JobManager;
-import com.path.android.jobqueue.Params;
-import com.path.android.jobqueue.RetryConstraint;
+import com.birbit.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.Params;
 
 import eu.codetopic.utils.Constants;
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.data.getter.JobManagerGetter;
 
@@ -34,12 +32,13 @@ public class NetworkJob extends LoadingJob {
         job = work;
     }
 
-    public static long start(@NonNull JobManagerGetter jobManagerGetter, @NonNull NetworkJob job) {
+    public static String start(@NonNull JobManagerGetter jobManagerGetter, @NonNull NetworkJob job) {
         return start(jobManagerGetter.getJobManager(), job);
     }
 
-    public static long start(@NonNull JobManager jobManager, @NonNull NetworkJob job) {
-        return jobManager.addJob(job);
+    public static String start(@NonNull JobManager jobManager, @NonNull NetworkJob job) {
+        jobManager.addJobInBackground(job);
+        return job.getId();
     }
 
     public static String generateNetworkJobGroupNameFor(Class<?> syncObj) {
@@ -60,12 +59,6 @@ public class NetworkJob extends LoadingJob {
     @Override
     protected int getRetryLimit() {
         return getViewHolder() == null ? super.getRetryLimit() : Constants.JOB_REPEAT_COUNT_NETWORK;
-    }
-
-    @Override
-    protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
-        Log.e(LOG_TAG, "shouldReRunOnThrowable", throwable);
-        return super.shouldReRunOnThrowable(throwable, runCount, maxRunCount);
     }
 
     public interface NetworkWork {

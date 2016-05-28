@@ -1,6 +1,6 @@
 package eu.codetopic.utils.data.getter;
 
-import com.path.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.JobManager;
 
 public interface JobManagerGetter extends BaseGetter {
 

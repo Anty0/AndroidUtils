@@ -3,11 +3,13 @@ package eu.codetopic.utils.thread.service;
 import android.content.Intent;
 import android.support.annotation.Nullable;
 
-import com.path.android.jobqueue.JobManager;
-import com.path.android.jobqueue.JobStatus;
+import com.birbit.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.JobStatus;
 
 import java.util.ArrayList;
 
+import eu.codetopic.utils.Objects;
+import eu.codetopic.utils.data.getter.JobManagerGetter;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.service.CommandService;
 
@@ -52,7 +54,9 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
                     if (!isRunning()) safeStopSelf();
                 }
             };
-            info.setWorkId(jobManager.addJob(new Work(this, info)));
+            Work job = new Work(this, info);
+            info.setWorkId(job.getId());
+            jobManager.addJobInBackground(job);
             works.add(info);
             if (actualForegroundId == -1) findNewForegroundNotification();
             return info;
@@ -62,8 +66,8 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
     private void findNewForegroundNotification() {
         synchronized (works) {
             for (WorkInfo info : works) {
-                if (info.getJobManager().getJobStatus(info.getWorkId(),
-                        false) == JobStatus.UNKNOWN) continue;
+                if (info.getJobManager().getJobStatus(info.getWorkId())
+                        == JobStatus.UNKNOWN) continue;
                 actualForegroundId = info.getNotificationId();
                 startForeground(info.getNotificationId(),
                         info.getNotification().build());
@@ -72,10 +76,10 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
         }
     }
 
-    private WorkInfo getWork(long id) {
+    private WorkInfo getWork(String id) {
         synchronized (works) {
             for (WorkInfo work : works) {
-                if (work.getWorkId() == id)
+                if (Objects.equals(work.getWorkId(), id))
                     return work;
             }
         }
@@ -115,6 +119,17 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
         /**
          * Start work on jobManager and show progress notification
          *
+         * @param jobManagerGetter JobManager to run work
+         * @param work             work to run
+         * @return info for created work
+         */
+        public WorkInfo startWork(JobManagerGetter jobManagerGetter, ServiceWork work) {
+            return startWork(jobManagerGetter.getJobManager(), work);
+        }
+
+        /**
+         * Start work on jobManager and show progress notification
+         *
          * @param jobManager JobManager to run work
          * @param work       work to run
          * @return info for created work
@@ -129,7 +144,7 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
          * @param workId id of work
          * @return found work info
          */
-        public WorkInfo findWorkById(long workId) {
+        public WorkInfo findWorkById(String workId) {
             return getWork(workId);
         }
 

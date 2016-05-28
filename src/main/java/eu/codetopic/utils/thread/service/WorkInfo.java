@@ -3,7 +3,7 @@ package eu.codetopic.utils.thread.service;
 import android.content.Context;
 import android.support.v7.app.NotificationCompat;
 
-import com.path.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.JobManager;
 
 import eu.codetopic.utils.thread.NotificationProgressReporter;
 import eu.codetopic.utils.thread.ProgressInfo;
@@ -17,7 +17,7 @@ public abstract class WorkInfo {
     private final boolean hasProgress;
     private final JobManager jobManager;
     private final ServiceWork work;
-    private long workId = -1;
+    private String workId = null;
 
     WorkInfo(Context context, JobManager jobManager, int notificationId, ServiceWork work) {
         this(notificationId, new NotificationCompat.Builder(context), jobManager, work);
@@ -36,11 +36,11 @@ public abstract class WorkInfo {
         this.work = work;
     }
 
-    public long getWorkId() {
+    public String getWorkId() {
         return workId;
     }
 
-    void setWorkId(long id) {
+    void setWorkId(String id) {
         this.workId = id;
     }
 

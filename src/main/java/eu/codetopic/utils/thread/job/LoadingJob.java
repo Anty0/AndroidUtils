@@ -2,13 +2,18 @@ package eu.codetopic.utils.thread.job;
 
 import android.support.annotation.Nullable;
 
-import com.path.android.jobqueue.Job;
-import com.path.android.jobqueue.Params;
+import com.birbit.android.jobqueue.CancelReason;
+import com.birbit.android.jobqueue.Job;
+import com.birbit.android.jobqueue.Params;
+import com.birbit.android.jobqueue.RetryConstraint;
 
 import eu.codetopic.utils.Constants;
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 
 public abstract class LoadingJob extends Job {
+
+    private static final String LOG_TAG = "LoadingJob";
 
     private final LoadingViewHolder mLoadingViewHolder;
     private boolean mLoadingShowed = false;
@@ -32,8 +37,13 @@ public abstract class LoadingJob extends Job {
 
     @Override
     public final void onRun() throws Throwable {
-        onStart();
-        hideLoading();
+        try {
+            onStart();
+            hideLoading();
+        } catch (Throwable t) {
+            Log.d(LOG_TAG, "onRun", t);
+            throw t;
+        }
     }
 
     public abstract void onStart() throws Throwable;
@@ -44,7 +54,12 @@ public abstract class LoadingJob extends Job {
     }
 
     @Override
-    protected void onCancel() {
+    protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
+        return new RetryConstraint(true);
+    }
+
+    @Override
+    protected void onCancel(@CancelReason int cancelReason) {
         hideLoading();
     }
 

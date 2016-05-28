@@ -3,8 +3,8 @@ package eu.codetopic.utils.thread.service;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 
-import com.path.android.jobqueue.Job;
-import com.path.android.jobqueue.Params;
+import com.birbit.android.jobqueue.Job;
+import com.birbit.android.jobqueue.Params;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

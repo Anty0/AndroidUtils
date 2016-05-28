@@ -7,8 +7,7 @@ import android.support.test.rule.ServiceTestRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v4.app.NotificationCompat;
 
-import com.path.android.jobqueue.JobManager;
-import com.path.android.jobqueue.Params;
+import com.birbit.android.jobqueue.Params;
 
 import org.junit.After;
 import org.junit.Before;
@@ -24,6 +23,7 @@ import eu.codetopic.utils.R;
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.ProgressReporter;
+import eu.codetopic.utils.thread.job.SingletonJobManager;
 
 import static org.junit.Assert.assertTrue;
 
@@ -47,16 +47,16 @@ public class BackgroundWorksServiceTest {
         BackgroundWorksService.WorkBinder binder = (BackgroundWorksService.WorkBinder)
                 mServiceRule.bindService(new Intent(context, BackgroundWorksService.class));
 
-        JobManager jobManager = new JobManager(context);
+        SingletonJobManager.initialize(context);
 
         for (int i = 1; i < 51; i++) {
-            binder.startWork(jobManager, new TestWork(i, 20));
+            binder.startWork(SingletonJobManager.getter, new TestWork(i, 20));
         }
 
-        binder.startWork(jobManager, new TestWork(1, 30));
-        binder.startWork(jobManager, new TestWork(2, 30));
-        binder.startWork(jobManager, new TestWork(3, 30));
-        binder.startWork(jobManager, new TestWork(4, 30));
+        binder.startWork(SingletonJobManager.getter, new TestWork(1, 30));
+        binder.startWork(SingletonJobManager.getter, new TestWork(2, 30));
+        binder.startWork(SingletonJobManager.getter, new TestWork(3, 30));
+        binder.startWork(SingletonJobManager.getter, new TestWork(4, 30));
 
         assertTrue(binder.isRunning());
         while (binder.isRunning()) Thread.sleep(500);

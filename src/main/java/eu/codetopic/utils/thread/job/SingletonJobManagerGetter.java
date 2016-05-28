@@ -1,6 +1,6 @@
 package eu.codetopic.utils.thread.job;
 
-import com.path.android.jobqueue.JobManager;
+import com.birbit.android.jobqueue.JobManager;
 
 import eu.codetopic.utils.data.getter.JobManagerGetter;
 

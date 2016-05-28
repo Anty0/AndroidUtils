@@ -3,12 +3,17 @@ package eu.codetopic.utils.thread.service;
 import android.app.NotificationManager;
 import android.content.Context;
 
-import com.path.android.jobqueue.Job;
+import com.birbit.android.jobqueue.CancelReason;
+import com.birbit.android.jobqueue.Job;
+import com.birbit.android.jobqueue.RetryConstraint;
 
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.ProgressReporter;
 
 class Work extends Job {
+
+    private static final String LOG_TAG = "Work";
 
     private final Context mContext;
     private final WorkInfo mWorkInfo;
@@ -42,12 +47,22 @@ class Work extends Job {
 
     @Override
     public void onRun() throws Throwable {
-        mWorkInfo.getWork().run(mContext, mWorkInfo.getProgressReporter());
-        stopProgress();
+        try {
+            mWorkInfo.getWork().run(mContext, mWorkInfo.getProgressReporter());
+            stopProgress();
+        } catch (Throwable t) {
+            Log.d(LOG_TAG, "shouldReRunOnThrowable", t);
+            throw t;
+        }
     }
 
     @Override
-    protected void onCancel() {
+    protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
+        return new RetryConstraint(true);
+    }
+
+    @Override
+    protected void onCancel(@CancelReason int cancelReason) {
         stopProgress();
     }
 
