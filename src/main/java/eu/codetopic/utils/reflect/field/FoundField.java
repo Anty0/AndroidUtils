@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-import eu.codetopic.utils.IteratorWrapper;
 import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.simple.IteratorWrapper;
 
 public class FoundField implements Iterable<FoundField> {
 

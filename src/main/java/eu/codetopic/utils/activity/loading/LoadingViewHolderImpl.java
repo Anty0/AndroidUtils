@@ -9,7 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
 
-import eu.codetopic.utils.SimpleAnimatorListener;
+import eu.codetopic.utils.simple.SimpleAnimatorListener;
 
 public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
 

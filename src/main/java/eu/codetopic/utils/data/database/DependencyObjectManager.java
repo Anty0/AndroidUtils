@@ -3,10 +3,12 @@ package eu.codetopic.utils.data.database;
 import android.content.Context;
 import android.support.annotation.WorkerThread;
 
+import com.j256.ormlite.dao.CloseableIterator;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
+import java.util.List;
 
 public class DependencyObjectManager<T extends DependencyDatabaseObject> {
 
@@ -45,15 +47,16 @@ public class DependencyObjectManager<T extends DependencyDatabaseObject> {
 
         DependenciesDetector<T> dependenciesDetector = getDependenciesDetector();
         for (Class clazz : getDependencies()) {
+            if (!DependencyTextDatabaseObject.class.isAssignableFrom(clazz)) continue;
             //noinspection RedundantCast
             DependencyDao foundDao = (DependencyDao) mDatabase.getDao(clazz);
-            for (Object o : foundDao)
-                if (o instanceof DependencyTextDatabaseObject &&
-                        dependenciesDetector.depends(object, (DependencyTextDatabaseObject) o)) {
+            for (Object o : foundDao.queryForAll()) {
+                if (dependenciesDetector.depends(object, (DependencyTextDatabaseObject) o)) {
                     ((DependencyTextDatabaseObject) o).updateText(mContext);
                     //noinspection unchecked
                     foundDao.saveWithOutUpdate((DependencyTextDatabaseObject) o);
                 }
+            }
         }
 
         mChangeDetector.onChange();
@@ -66,11 +69,10 @@ public class DependencyObjectManager<T extends DependencyDatabaseObject> {
 
         DependenciesDetector<T> dependenciesDetector = getDependenciesDetector();
         Class[] dependencies = getDependencies();
-        DependencyDao[] daos = new DependencyDao[dependencies.length];
-        for (int i = 0; i < dependencies.length; i++) {
-            //noinspection RedundantCast
-            daos[i] = (DependencyDao) mDatabase.getDao(dependencies[i]);
-        }
+        List<DependencyDao> daos = new ArrayList<>();
+        for (Class daoClass : dependencies)
+            if (DependencyTextDatabaseObject.class.isAssignableFrom(daoClass))
+                daos.add((DependencyDao) mDatabase.getDao(daoClass));
 
         for (T object : objects) {
             if (object instanceof DependencyTextDatabaseObject) {
@@ -79,13 +81,13 @@ public class DependencyObjectManager<T extends DependencyDatabaseObject> {
             }
 
             for (DependencyDao foundDao : daos) {
-                for (Object o : foundDao)
-                    if (o instanceof DependencyTextDatabaseObject &&
-                            dependenciesDetector.depends(object, (DependencyTextDatabaseObject) o)) {
+                for (Object o : foundDao.queryForAll()) {
+                    if (dependenciesDetector.depends(object, (DependencyTextDatabaseObject) o)) {
                         ((DependencyTextDatabaseObject) o).updateText(mContext);
                         //noinspection unchecked
                         foundDao.saveWithOutUpdate((DependencyTextDatabaseObject) o);
                     }
+                }
             }
         }
 
@@ -100,12 +102,13 @@ public class DependencyObjectManager<T extends DependencyDatabaseObject> {
     @WorkerThread
     public void removeUnneededData(DependencyDao<T> dao) throws SQLException {
         ArrayList<T> toDelete = new ArrayList<>();
-        Iterator<T> iterator = dao.iteratorWithTemp();
+        CloseableIterator<T> iterator = dao.iteratorWithTemp();
         while (iterator.hasNext()) {
             T data = iterator.next();
             if (data.isDeleted() && !data.isRequired())
                 toDelete.add(data);
         }
+        iterator.close();
 
         dao.deleteFromTemp(toDelete);
         mChangeDetector.onChange();

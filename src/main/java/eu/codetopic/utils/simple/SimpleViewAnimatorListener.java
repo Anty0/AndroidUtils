@@ -1,4 +1,4 @@
-package eu.codetopic.utils;
+package eu.codetopic.utils.simple;
 
 import android.support.v4.view.ViewPropertyAnimatorListener;
 import android.view.View;

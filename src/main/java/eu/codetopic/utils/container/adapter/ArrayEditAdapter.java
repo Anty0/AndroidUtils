@@ -10,9 +10,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.codetopic.utils.IteratorWrapper;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
+import eu.codetopic.utils.simple.IteratorWrapper;
 
 public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder>
         extends UniversalAdapter<VH> implements Iterable<T> {

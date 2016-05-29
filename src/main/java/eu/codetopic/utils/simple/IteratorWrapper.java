@@ -1,4 +1,4 @@
-package eu.codetopic.utils;
+package eu.codetopic.utils.simple;
 
 import java.util.Iterator;
 

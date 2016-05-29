@@ -1,5 +1,6 @@
 package eu.codetopic.utils.data.database;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
@@ -8,6 +9,7 @@ import com.j256.ormlite.dao.Dao;
 import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 
+import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 
 import eu.codetopic.utils.Log;
@@ -36,11 +38,16 @@ public abstract class PictureDatabaseObject<BDO extends BitmapDatabaseObject,
         bhClass = bitmapHolderClass;
     }
 
-    public void getPictureOnBackground(final ActionCallback<Bitmap> callback) {
+    public void getPictureOnBackground(Context context, ActionCallback<Bitmap> callback) {
+        getPictureOnBackground(new WeakReference<>(context), callback);
+    }
+
+    public void getPictureOnBackground(final WeakReference<Context> contextRef,
+                                       final ActionCallback<Bitmap> callback) {
         DbJob.work(bdoGetter).start(new DatabaseWork<BDO, Long>() {
             @Override
             public void run(Dao<BDO, Long> dao) throws Throwable {
-                CallbackUtils.doCallbackWorkWithThrow(callback, new CallbackUtils.CallbackWork<Bitmap>() {
+                CallbackUtils.doCallbackWorkWithThrow(contextRef, callback, new CallbackUtils.CallbackWork<Bitmap>() {
                     @Override
                     public Bitmap work() throws Throwable {
                         return getPicture();
@@ -69,11 +76,17 @@ public abstract class PictureDatabaseObject<BDO extends BitmapDatabaseObject,
         this.picture.setBitmap(picture);
     }
 
-    public void setPictureOnBackground(final Bitmap picture, @Nullable final ActionCallback<Bitmap> callback) {
+    public void setPictureOnBackground(Bitmap picture, Context context,
+                                       @Nullable ActionCallback<Bitmap> callback) {
+        setPictureOnBackground(picture, new WeakReference<>(context), callback);
+    }
+
+    public void setPictureOnBackground(final Bitmap picture, final WeakReference<Context> contextRef,
+                                       @Nullable final ActionCallback<Bitmap> callback) {
         DbJob.work(bdoGetter).start(new DatabaseWork<BDO, Long>() {
             @Override
             public void run(Dao<BDO, Long> dao) throws Throwable {
-                CallbackUtils.doCallbackWorkWithThrow(callback, new CallbackUtils.CallbackWork<Bitmap>() {
+                CallbackUtils.doCallbackWorkWithThrow(contextRef, callback, new CallbackUtils.CallbackWork<Bitmap>() {
                     @Override
                     public Bitmap work() throws Throwable {
                         setPicture(picture);
