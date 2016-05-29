@@ -63,13 +63,23 @@ public final class DbJob<T> {
         return start(new DatabaseWork<T, ID>() {
             @Override
             public void run(Dao<T, ID> dao) throws Throwable {
-                final D result = work.run(dao);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        callback.onResult(result);
-                    }
-                });
+                try {
+                    final D result = work.run(dao);
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onResult(result);
+                        }
+                    });
+                } catch (final Throwable t) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onException(t);
+                        }
+                    });
+                    throw t;
+                }
             }
         });
     }
@@ -95,9 +105,12 @@ public final class DbJob<T> {
         D run(Dao<T, ID> dao) throws Throwable;
     }
 
-    public interface Callback<T> {
+    public static abstract class Callback<T> {
 
-        void onResult(T result);
+        public abstract void onResult(T result);
+
+        public void onException(Throwable t) {
+        }
     }
 
 }

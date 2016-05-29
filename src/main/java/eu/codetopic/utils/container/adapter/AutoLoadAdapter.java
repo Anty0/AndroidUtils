@@ -46,7 +46,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     protected CustomItem generateLoadingItem() {
         CustomItemWrapper[] wrappers = new CustomItemWrapper[0];
         if (getBase() instanceof RecyclerView.Adapter<?>)
-            Arrays.add(wrappers, new CardViewWrapper());
+            wrappers = Arrays.add(wrappers, new CardViewWrapper());
 
         return new MultilineItemCustomItemWrapper(new
                 TextMultilineResourceLayoutItem(getContext().getText(R.string.wait_text_loading),

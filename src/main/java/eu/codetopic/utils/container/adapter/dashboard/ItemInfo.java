@@ -1,6 +1,8 @@
 package eu.codetopic.utils.container.adapter.dashboard;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 
 import eu.codetopic.utils.container.items.custom.CustomItem;
 
@@ -40,5 +42,7 @@ public abstract class ItemInfo implements Comparable<ItemInfo> {
         return null;
     }
 
-    public abstract CustomItem getItem();
+    @NonNull
+    @UiThread
+    public abstract CustomItem getItem(Context context);
 }

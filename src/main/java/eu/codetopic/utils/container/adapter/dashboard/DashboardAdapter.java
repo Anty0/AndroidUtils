@@ -98,12 +98,12 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        getItem(position).getItem().bindViewHolder(holder, position);
+        getItem(position).getItem(getContext()).bindViewHolder(holder, position);
     }
 
     @Override
     public int getItemViewType(int position) {
-        return getItem(position).getItem().getLayoutResId(getContext());
+        return getItem(position).getItem(getContext()).getLayoutResId(getContext());
     }
 
     @Override

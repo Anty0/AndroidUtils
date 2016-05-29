@@ -1,5 +1,7 @@
 package eu.codetopic.utils;
 
+import android.support.annotation.CheckResult;
+
 import java.lang.reflect.Array;
 
 public class Arrays {
@@ -11,6 +13,7 @@ public class Arrays {
      * @param i    int to add
      * @return new array with specified int
      */
+    @CheckResult
     public static int[] add(int[] ints, int i) {
         int[] newInts = new int[ints.length + 1];
         System.arraycopy(ints, 0, newInts, 0, ints.length);
@@ -25,6 +28,7 @@ public class Arrays {
      * @param l     long to add
      * @return new array with specified long
      */
+    @CheckResult
     public static long[] add(long[] longs, long l) {
         long[] newInts = new long[longs.length + 1];
         System.arraycopy(longs, 0, newInts, 0, longs.length);
@@ -39,6 +43,7 @@ public class Arrays {
      * @param s       String to add
      * @return new array with specified String
      */
+    @CheckResult
     public static String[] add(String[] strings, String s) {
         String[] newStrings = new String[strings.length + 1];
         System.arraycopy(strings, 0, newStrings, 0, strings.length);
@@ -53,6 +58,7 @@ public class Arrays {
      * @param object  object to add
      * @return new array with specified object
      */
+    @CheckResult
     public static <T> T[] add(T[] objects, T object) {
         T[] newObjects = java.util.Arrays.copyOf(objects, objects.length + 1);
         newObjects[objects.length] = object;
@@ -66,6 +72,7 @@ public class Arrays {
      * @param object  object to add
      * @return new array with specified object
      */
+    @CheckResult
     public static <T> T[] addToStart(T[] objects, T object) {
         //noinspection unchecked
         T[] newObjects = (T[]) Array.newInstance(objects.getClass()
@@ -82,6 +89,7 @@ public class Arrays {
      * @param i    int to remove
      * @return new array without specified int (if found)
      */
+    @CheckResult
     public static int[] remove(int[] ints, int i) {
         int index = indexOf(ints, i);
         if (index == -1) return ints;
@@ -101,6 +109,7 @@ public class Arrays {
      * @param l     long to remove
      * @return new array without specified long (if found)
      */
+    @CheckResult
     public static long[] remove(long[] longs, long l) {
         int index = indexOf(longs, l);
         if (index == -1) return longs;
@@ -120,6 +129,7 @@ public class Arrays {
      * @param s       String to remove
      * @return new array without specified String (if found)
      */
+    @CheckResult
     public static String[] remove(String[] strings, String s) {
         int index = indexOf(strings, s);
         if (index == -1) return strings;
@@ -140,6 +150,7 @@ public class Arrays {
      * @param <T>     type of array to modify
      * @return new array without specified T (if found)
      */
+    @CheckResult
     public static <T> T[] remove(T[] objects, T o) {
         int index = indexOf(objects, o);
         return index == -1 ? objects : remove(objects, index);
@@ -153,6 +164,7 @@ public class Arrays {
      * @param <T>     type of array to modify
      * @return new array without object on specified index
      */
+    @CheckResult
     public static <T> T[] remove(T[] objects, int index) {
         //noinspection unchecked
         T[] newObjects = (T[]) Array.newInstance(objects.getClass()
@@ -171,6 +183,7 @@ public class Arrays {
      * @param i    to find
      * @return true if specified array contains specified int
      */
+    @CheckResult
     public static boolean contains(int[] ints, int i) {
         for (int j : ints)
             if (i == j) return true;
@@ -184,6 +197,7 @@ public class Arrays {
      * @param l     to find
      * @return true if specified array contains specified long
      */
+    @CheckResult
     public static boolean contains(long[] longs, long l) {
         for (long j : longs)
             if (l == j) return true;
@@ -197,6 +211,7 @@ public class Arrays {
      * @param o       to find
      * @return true if specified array contains specified object
      */
+    @CheckResult
     public static boolean contains(Object[] objects, Object o) {
         for (Object obj : objects)
             if (Objects.equals(o, obj)) return true;
@@ -211,6 +226,7 @@ public class Arrays {
      * @param i    to find
      * @return index of specified int in specified array or -1
      */
+    @CheckResult
     public static int indexOf(int[] ints, int i) {
         for (int j = 0; j < ints.length; j++) {
             if (i == ints[j]) return j;
@@ -226,6 +242,7 @@ public class Arrays {
      * @param l     to find
      * @return index of specified long in specified array or -1
      */
+    @CheckResult
     public static int indexOf(long[] longs, long l) {
         for (int i = 0; i < longs.length; i++) {
             if (l == longs[i]) return i;
@@ -241,6 +258,7 @@ public class Arrays {
      * @param o       to find
      * @return index of specified object in specified array or -1
      */
+    @CheckResult
     public static int indexOf(Object[] objects, Object o) {
         for (int i = 0; i < objects.length; i++) {
             if (Objects.equals(o, objects[i])) return i;
@@ -255,6 +273,7 @@ public class Arrays {
      * @param longs2 second array to concat
      * @return concatenated first specified array and second specified array
      */
+    @CheckResult
     public static long[] concat(long[] longs1, long[] longs2) {
         long[] longs = java.util.Arrays.copyOf(longs1, longs1.length + longs2.length);
         System.arraycopy(longs2, 0, longs, longs1.length, longs2.length);
@@ -269,6 +288,7 @@ public class Arrays {
      * @param <T>      type of arrays to concatenate
      * @return concatenated first specified array and second specified array
      */
+    @CheckResult
     public static <T> T[] concat(T[] objects1, T[] objects2) {
         T[] objects = java.util.Arrays.copyOf(objects1, objects1.length + objects2.length);
         System.arraycopy(objects2, 0, objects, objects1.length, objects2.length);
