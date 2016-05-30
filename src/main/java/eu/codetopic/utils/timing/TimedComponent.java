@@ -12,8 +12,8 @@ import proguard.annotation.KeepClassMembers;
 import proguard.annotation.KeepName;
 
 /**
- * Annotation for Broadcasts that using any repeating or timed starting.
- * Class annotated using this annotation must be registered in TimingBroadcastsManager
+ * Annotation for components that uses any repeating or timed starting.
+ * Class annotated using this annotation must be registered in TimingComponentsManager
  * and must have KeepName annotation.
  *
  * @author anty
@@ -22,7 +22,7 @@ import proguard.annotation.KeepName;
 @Target(ElementType.TYPE)
 @Keep
 @KeepName
-public @interface TimedBroadcast {
+public @interface TimedComponent {
 
     long time();
 

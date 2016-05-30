@@ -32,7 +32,7 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".timing.TimedBroadcastsExecutor"
+            android:name=".timing.TimedComponentExecutor"
             android:enabled="true"
             android:exported="false"
             android:label="TimedBroadcastsExecutor"/>

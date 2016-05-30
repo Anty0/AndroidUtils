@@ -17,7 +17,7 @@ import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.thread.JobUtils;
 
 @RunWith(AndroidJUnit4.class)
-public class TimedBroadcastsManagerTest {
+public class TimedComponentsManagerTest {
 
     @Before
     public void setUp() throws Exception {
@@ -27,22 +27,22 @@ public class TimedBroadcastsManagerTest {
     @Test
     public void testIt() throws Exception {
         Context context = InstrumentationRegistry.getTargetContext();
-        TimedBroadcastsManager.initialize(context, NetworkManager
+        TimedComponentsManager.initialize(context, NetworkManager
                 .NetworkType.ANY, TestTimedBroadcast.class);
-        TimedBroadcastsManager.getInstance()
-                .setBroadcastEnabled(TestTimedBroadcast.class, true);
+        TimedComponentsManager.getInstance()
+                .setComponentEnabled(TestTimedBroadcast.class, true);
 
         JobUtils.threadSleep(60000);
 
-        TimedBroadcastsManager.getInstance()
-                .setBroadcastEnabled(TestTimedBroadcast.class, false);
+        TimedComponentsManager.getInstance()
+                .setComponentEnabled(TestTimedBroadcast.class, false);
     }
 
     @After
     public void tearDown() throws Exception {
     }
 
-    @TimedBroadcast(time = 1000, repeatingMode = TimedBroadcast.RepeatingMode.REPEATING_WAKE_UP)
+    @TimedComponent(time = 1000, repeatingMode = TimedComponent.RepeatingMode.REPEATING_WAKE_UP)
     public static class TestTimedBroadcast extends BroadcastReceiver {
 
         @Override
