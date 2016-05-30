@@ -8,6 +8,7 @@ import eu.codetopic.utils.Utils;
 
 public class CardViewWrapper extends LayoutItemWrapper {
 
+    public static final CustomItemWrapper[] WRAPPER = new CustomItemWrapper[]{new CardViewWrapper()};
     private static final String LOG_TAG = "CardViewWrapper";
 
     public CardViewWrapper(@NonNull CustomItemWrapper... wrappers) {
