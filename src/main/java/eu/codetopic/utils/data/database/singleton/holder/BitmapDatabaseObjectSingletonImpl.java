@@ -10,7 +10,7 @@ public class BitmapDatabaseObjectSingletonImpl extends BitmapDatabaseObject {
     public static DatabaseDaoGetter<BitmapDatabaseObjectSingletonImpl> getter =
             SingletonDatabase.getGetterFor(BitmapDatabaseObjectSingletonImpl.class);
 
-    protected BitmapDatabaseObjectSingletonImpl() {
+    public BitmapDatabaseObjectSingletonImpl() {
         super(BitmapHolderSingletonImpl.class);
     }
 

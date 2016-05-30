@@ -16,8 +16,12 @@ public abstract class DatabaseObject implements Serializable {
     }
 
     public void setId(Long id) {
-        if (this.id != null) throw new IllegalStateException("Can't set 'id': id is already set");
+        if (hasId()) throw new IllegalStateException("Can't set 'id': id is already set");
         this.id = id;
+    }
+
+    public boolean hasId() {
+        return id != null;
     }
 
     @Override

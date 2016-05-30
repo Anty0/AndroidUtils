@@ -38,6 +38,10 @@ public abstract class PictureDatabaseObject<BDO extends BitmapDatabaseObject,
         bhClass = bitmapHolderClass;
     }
 
+    public boolean hasPicture() {
+        return picture != null && picture.getObjectId() != null;
+    }
+
     public void getPictureOnBackground(Context context, ActionCallback<Bitmap> callback) {
         getPictureOnBackground(new WeakReference<>(context), callback);
     }

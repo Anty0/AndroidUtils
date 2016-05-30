@@ -20,7 +20,7 @@ public abstract class BitmapDatabaseObject extends DependencyDatabaseObject {
     @DatabaseField(dataType = DataType.BYTE_ARRAY)
     private byte[] bitmapBytes = null;
 
-    protected BitmapDatabaseObject(Class<? extends BitmapHolder<?>> bitmapHolderClass) {
+    public BitmapDatabaseObject(Class<? extends BitmapHolder<?>> bitmapHolderClass) {
         this.bitmapHolderClass = bitmapHolderClass;
     }
 

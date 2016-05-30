@@ -1,6 +1,7 @@
 package eu.codetopic.utils.data.database.holder;
 
 import android.graphics.Bitmap;
+import android.support.annotation.Keep;
 import android.support.annotation.WorkerThread;
 
 import java.io.IOException;
@@ -15,6 +16,10 @@ public abstract class BitmapHolder<T extends BitmapDatabaseObject> extends Datab
 
     private Bitmap bitmap = null;
 
+    /**
+     * @hide
+     */
+    @Keep
     public BitmapHolder() {
     }
 
