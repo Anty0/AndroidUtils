@@ -11,13 +11,12 @@ public class LayoutItemWrapper extends CustomItemWrapper {
 
     @LayoutRes private final int layoutRes;
     @IdRes private final int contentViewId;
-    private final CustomItemWrapper[] wrappers;
 
     public LayoutItemWrapper(@LayoutRes int layoutRes, @IdRes int contentViewId,
                              @NonNull CustomItemWrapper... wrappers) {
+        super(wrappers);
         this.layoutRes = layoutRes;
         this.contentViewId = contentViewId;
-        this.wrappers = wrappers;
     }
 
     @Override
@@ -32,11 +31,5 @@ public class LayoutItemWrapper extends CustomItemWrapper {
     @Override
     protected int getContentViewId(Context context) {
         return contentViewId;
-    }
-
-    @NonNull
-    @Override
-    protected CustomItemWrapper[] getWrappers(Context context) {
-        return wrappers;
     }
 }

@@ -17,12 +17,11 @@ public class MultilineItemCustomItemWrapper extends CustomItem {
     private static final String LOG_TAG = "MultilineItemCustomItemWrapper";
 
     private final MultilineItem item;
-    private final CustomItemWrapper[] wrappers;
 
     public MultilineItemCustomItemWrapper(@Nullable MultilineItem item, @NonNull CustomItemWrapper... wrappers) {
+        super(wrappers);
         if (item == null && this instanceof MultilineItem) this.item = (MultilineItem) this;
         else this.item = item;
-        this.wrappers = wrappers;
     }
 
     public static List<MultilineItemCustomItemWrapper> wrapAll(Collection<? extends MultilineItem> items,
@@ -45,11 +44,5 @@ public class MultilineItemCustomItemWrapper extends CustomItem {
     @LayoutRes
     public int getItemLayoutResId(Context context) {
         return MultilineItemUtils.getLayoutResIdFor(context, item, null);
-    }
-
-    @NonNull
-    @Override
-    protected CustomItemWrapper[] getWrappers(Context context) {
-        return wrappers;
     }
 }

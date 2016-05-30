@@ -19,6 +19,12 @@ public abstract class CustomItem {
     private static final String LOG_TAG = "CustomItem";
     private static final String VIEW_TAG_KEY_CONTENT_VIEW_HOLDER = LOG_TAG + ".WRAPPER_VIEW_HOLDER";
 
+    private CustomItemWrapper[] wrappers;
+
+    public CustomItem(@NonNull CustomItemWrapper... wrappers) {
+        this.wrappers = wrappers;
+    }
+
     public static ViewHolder createViewHolder(Context context, @Nullable ViewGroup parent,
                                               @LayoutRes int itemLayoutId) {
         return new ViewHolder(context, LayoutInflater.from(context)
@@ -90,9 +96,13 @@ public abstract class CustomItem {
         return false;
     }
 
+    public final void setWrappers(@NonNull CustomItemWrapper... wrappers) {
+        this.wrappers = wrappers;
+    }
+
     @NonNull
-    protected CustomItemWrapper[] getWrappers(Context context) {
-        return new CustomItemWrapper[0];
+    protected final CustomItemWrapper[] getWrappers(Context context) {
+        return wrappers;
     }
 
     public static final class ViewHolder {
