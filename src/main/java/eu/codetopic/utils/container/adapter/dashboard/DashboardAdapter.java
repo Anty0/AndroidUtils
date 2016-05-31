@@ -88,7 +88,7 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         mFilter.filter(itemInfoList);
         Collections.sort(itemInfoList);
 
-        edit().clear().addAll(itemInfoList).setTag(EDIT_TAG).apply();
+        edit().clear().addAll(itemInfoList).notifyAllItemsChanged().setTag(EDIT_TAG).apply();
     }
 
     @Override

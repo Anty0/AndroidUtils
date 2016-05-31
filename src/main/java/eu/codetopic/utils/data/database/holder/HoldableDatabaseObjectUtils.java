@@ -77,6 +77,7 @@ public final class HoldableDatabaseObjectUtils {
 
                     try {
                         Object fieldObject = foundField.getFieldObjectFrom(obj);
+                        if (fieldObject == null) continue;
                         if (check(id, fieldObject.getClass().isArray()
                                 ? (DatabaseObjectHolder[]) fieldObject
                                 : new DatabaseObjectHolder[]{(DatabaseObjectHolder) fieldObject}))
