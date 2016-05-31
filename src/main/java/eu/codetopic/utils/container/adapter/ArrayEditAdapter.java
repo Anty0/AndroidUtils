@@ -1,5 +1,6 @@
 package eu.codetopic.utils.container.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
@@ -98,33 +99,36 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
     }
 
     @UiThread
-    public void postModifications(Collection<Modification<T>> modifications,
-                                  @Nullable Collection<T> contentModifiedItems, boolean fastMode) {
+    public void postModifications(@NonNull CalculatingMode mode,
+                                  Collection<Modification<T>> modifications,
+                                  @Nullable Collection<T> contentModifiedItems) {
 
-        postModifications(null, modifications, contentModifiedItems, fastMode);
+        postModifications(null, mode, modifications, contentModifiedItems);
     }
 
     @UiThread
-    public void postModifications(@Nullable Object editTag, Collection<Modification<T>> modifications,
-                                  @Nullable Collection<T> contentModifiedItems, boolean fastMode) {
+    public void postModifications(@Nullable Object editTag, @NonNull CalculatingMode mode,
+                                  Collection<Modification<T>> modifications,
+                                  @Nullable Collection<T> contentModifiedItems) {
 
         assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
 
         Base base = getBase();
         synchronized (mLock) {
             try {
-                if (base.hasOnlySimpleDataChangedReporting()) {
+                if (mode == CalculatingMode.NO_ANIMATIONS
+                        || base.hasOnlySimpleDataChangedReporting()) {
                     for (Modification<T> modification : modifications)
                         modification.modify(null, mData);
 
                     base.notifyDataSetChanged();
                     return;
 
-                } else if (fastMode) {
+                } else if (mode == CalculatingMode.FROM_MODIFICATIONS) {
                     for (Modification<T> modification : modifications)
                         modification.modify(base, mData);
 
-                } else {
+                } else if (mode == CalculatingMode.EQUALS_DETECTION) {
                     //noinspection unchecked
                     List<T> dataBackup = (List<T>) mData.clone();
                     for (Modification<T> modification : modifications)
@@ -166,9 +170,12 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
 
                             if (Log.isInDebugMode() && !Objects.equals(dataBackup, mData))
                                 Log.e(LOG_TAG, "apply", new InternalError("Detected problem in " + LOG_TAG
-                                        + " while applying changes -> !dataBackup.equals(newData)"));
+                                        + " while applying changes -> !dataBackup.equals(newData)" +
+                                        "\ndataBackup: " + dataBackup + "\nmData: " + mData));
                         }
                     }
+                } else {
+                    throw new IllegalArgumentException("Unknown mode: " + mode);
                 }
 
                 if (contentModifiedItems != null) {
@@ -185,6 +192,10 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
 
     protected void onDataEdited(@Nullable Object editTag) {
 
+    }
+
+    public enum CalculatingMode {
+        NO_ANIMATIONS, EQUALS_DETECTION, FROM_MODIFICATIONS
     }
 
     public interface Modification<T> {
@@ -386,15 +397,15 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         }
 
         public synchronized boolean apply() {
-            return apply(false);
+            return apply(CalculatingMode.EQUALS_DETECTION);
         }
 
         @UiThread
-        public synchronized boolean apply(boolean fastMode) {
+        public synchronized boolean apply(@NonNull CalculatingMode mode) {
             ArrayEditAdapter<T, ?> adapter = getAdapter();
             if (adapter != null) {
-                adapter.postModifications(getTag(), mModifications,
-                        mAllItemsChanged ? null : mChangedItems, fastMode);
+                adapter.postModifications(getTag(), mode, mModifications,
+                        mAllItemsChanged ? null : mChangedItems);
                 mModifications.clear();
                 mChangedItems.clear();
                 mAllItemsChanged = false;
