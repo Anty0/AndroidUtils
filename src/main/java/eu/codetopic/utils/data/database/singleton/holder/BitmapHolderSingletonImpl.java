@@ -20,7 +20,7 @@ public class BitmapHolderSingletonImpl extends BitmapHolder<BitmapDatabaseObject
     }
 
     @Override
-    public DatabaseDaoGetter<BitmapDatabaseObjectSingletonImpl> getDaoGetter() {
+    public DatabaseDaoGetter<BitmapDatabaseObjectSingletonImpl, Long> getDaoGetter() {
         return BitmapDatabaseObjectSingletonImpl.getter;
     }
 }

@@ -20,7 +20,6 @@ import com.j256.ormlite.support.DatabaseResults;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -58,13 +57,14 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
         return toReturn;
     }
 
-    private List<T> filterDeleted(Iterator<T> toFilter) {
+    private List<T> filterDeleted(CloseableIterator<T> toFilter) throws SQLException {
         ArrayList<T> toReturn = new ArrayList<>();
         while (toFilter.hasNext()) {
-            T object = toFilter.next();
+            T object = toFilter.nextThrow();
             if (!object.isDeleted())
                 toReturn.add(object);
         }
+        toFilter.close();
         return toReturn;
     }
 
@@ -187,7 +187,7 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
     }
 
     @Override
-    public List<T> queryForAll() {
+    public List<T> queryForAll() throws SQLException {
         return filterDeleted(super.iterator());
     }
 
@@ -417,8 +417,15 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
     }
 
     @Override
-    public long countOf() {
-        throw new UnsupportedOperationException("Unsupported");// TODO: 22.3.16 maybe support
+    public long countOf() throws SQLException {
+        int count = 0;
+        CloseableIterator<T> iterator = iterator();
+        while (iterator.hasNext()) {
+            iterator.nextThrow();
+            count++;
+        }
+        iterator.close();
+        return count;
     }
 
     public long countOfWithTemp() throws SQLException {

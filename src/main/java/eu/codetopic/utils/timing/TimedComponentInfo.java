@@ -1,5 +1,6 @@
 package eu.codetopic.utils.timing;
 
+import android.content.ComponentName;
 import android.content.Context;
 
 import java.io.Serializable;
@@ -22,6 +23,10 @@ public class TimedComponentInfo implements Serializable {
 
     public Class<?> getComponentClass() {
         return mComponent;
+    }
+
+    public ComponentName getComponentName(Context context) {
+        return new ComponentName(context, mComponent);
     }
 
     public boolean isEnabled(Context context) {

@@ -13,8 +13,7 @@ import proguard.annotation.KeepName;
 
 /**
  * Annotation for components that uses any repeating or timed starting.
- * Class annotated using this annotation must be registered in TimingComponentsManager
- * and must have KeepName annotation.
+ * Class annotated using this annotation must be registered in TimingComponentsManager.
  *
  * @author anty
  */

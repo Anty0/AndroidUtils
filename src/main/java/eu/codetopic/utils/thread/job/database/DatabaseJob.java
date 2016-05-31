@@ -5,7 +5,6 @@ import android.widget.Toast;
 
 import com.birbit.android.jobqueue.CancelReason;
 import com.birbit.android.jobqueue.Params;
-import com.j256.ormlite.dao.Dao;
 
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.R;
@@ -18,11 +17,11 @@ public class DatabaseJob<T, ID> extends LoadingJob {
 
     private static final String LOG_TAG = "DatabaseJob";
     private static final String JOB_DATABASE_GROUP_NAME_ADD = ".DATABASE_GROUP";
-    private final DatabaseDaoGetter<T> daoGetter;
+    private final DatabaseDaoGetter<T, ID> daoGetter;
     private final DatabaseWork<T, ID> job;
 
     public DatabaseJob(@Nullable LoadingViewHolder loadingViewHolder,
-                       DatabaseDaoGetter<T> daoGetter, DatabaseWork<T, ID> job) {
+                       DatabaseDaoGetter<T, ID> daoGetter, DatabaseWork<T, ID> job) {
         super(new Params(Constants.JOB_PRIORITY_DATABASE)
                 .groupBy(generateDatabaseJobGroupNameFor(daoGetter
                         .getDaoObjectClass())), loadingViewHolder);
@@ -36,8 +35,7 @@ public class DatabaseJob<T, ID> extends LoadingJob {
 
     @Override
     public void onStart() throws Throwable {
-        //noinspection unchecked
-        job.run((Dao<T, ID>) daoGetter.get());
+        job.run(daoGetter.get());
     }
 
     @Override

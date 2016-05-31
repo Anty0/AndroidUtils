@@ -27,13 +27,13 @@ public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapData
 
     private static final String LOG_TAG = "DependencyPictureTextDatabaseObject";
 
-    private final DatabaseDaoGetter<BDO> bdoGetter;
+    private final DatabaseDaoGetter<BDO, Long> bdoGetter;
     private final Class<BH> bhClass;
 
     @DatabaseField(dataType = DataType.SERIALIZABLE)
     private BH picture;
 
-    public DependencyPictureTextDatabaseObject(DatabaseDaoGetter<BDO> bitmapDatabaseObjectDaoGetter,
+    public DependencyPictureTextDatabaseObject(DatabaseDaoGetter<BDO, Long> bitmapDatabaseObjectDaoGetter,
                                                Class<BH> bitmapHolderClass) {
         bdoGetter = bitmapDatabaseObjectDaoGetter;
         bhClass = bitmapHolderClass;

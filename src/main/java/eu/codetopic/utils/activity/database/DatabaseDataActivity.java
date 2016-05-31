@@ -26,7 +26,7 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
     private static final String EXTRA_SERIALIZED_DATA =
             "DatabaseDataActivity.EXTRA_DATA_KEY";
 
-    private DatabaseDaoGetter<DT> mDaoGetter = null;
+    private DatabaseDaoGetter<DT, ID> mDaoGetter = null;
     private DT mData = null;
     private ID mDataId = null;
 
@@ -36,7 +36,7 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
 
     public static <DT extends DatabaseObject, ID> Intent generateDataActivityIntent
             (Context context, Class<? extends DatabaseDataActivity<DT, ID>> clazz,
-             @NonNull DatabaseDaoGetter<DT> daoGetter, @Nullable DT data) {
+             @NonNull DatabaseDaoGetter<DT, ID> daoGetter, @Nullable DT data) {
         return new Intent(context, clazz)
                 .putExtra(EXTRA_DATA_ID, data == null ? null : data.getId())
                 .putExtra(EXTRA_DAO_GETTER, daoGetter);
@@ -44,13 +44,13 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
 
     public static <DT extends DatabaseObject, ID> void startDataActivity
             (Context context, Class<? extends DatabaseDataActivity<DT, ID>> clazz,
-             @NonNull DatabaseDaoGetter<DT> daoGetter, @Nullable DT data) {
+             @NonNull DatabaseDaoGetter<DT, ID> daoGetter, @Nullable DT data) {
         context.startActivity(generateDataActivityIntent(context, clazz, daoGetter, data));
     }
 
     public static <DT extends DatabaseObject, ID> void startDataActivityForResult
             (Activity activity, int requestCode, Class<? extends DatabaseDataActivity<DT, ID>> clazz,
-             @NonNull DatabaseDaoGetter<DT> daoGetter, @Nullable DT data) {
+             @NonNull DatabaseDaoGetter<DT, ID> daoGetter, @Nullable DT data) {
         activity.startActivityForResult(generateDataActivityIntent(activity, clazz, daoGetter, data), requestCode);
     }
 
@@ -59,7 +59,7 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDataId = (ID) getIntent().getSerializableExtra(EXTRA_DATA_ID);
-        mDaoGetter = (DatabaseDaoGetter<DT>) getIntent().getSerializableExtra(EXTRA_DAO_GETTER);
+        mDaoGetter = (DatabaseDaoGetter<DT, ID>) getIntent().getSerializableExtra(EXTRA_DAO_GETTER);
 
         reloadData(savedInstanceState);
     }
@@ -129,7 +129,7 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
         return mData;
     }
 
-    public DatabaseDaoGetter<DT> getDaoGetter() {
+    public DatabaseDaoGetter<DT, ID> getDaoGetter() {
         return mDaoGetter;
     }
 }

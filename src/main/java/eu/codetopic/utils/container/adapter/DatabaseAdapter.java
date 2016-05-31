@@ -44,9 +44,9 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         }
     };
 
-    public DatabaseAdapter(Context context, DatabaseDaoGetter<T> daoGetter,
+    public DatabaseAdapter(Context context, DatabaseDaoGetter<T, ID> daoGetter,
                            @Nullable LoadingViewHolder viewHolder) {
-        this(context, new DefaultItemsGetter<T, ID>(daoGetter, viewHolder));
+        this(context, new DefaultItemsGetter<>(daoGetter, viewHolder));
     }
 
     public DatabaseAdapter(Context context, @NonNull ItemsGetter<T, ID> itemsGetter) {
@@ -92,7 +92,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         private PreparedQuery<T> mPreparedQuery = null;
         private Comparator<T> mComparator = null;
 
-        public FilteredItemsGetter(DatabaseDaoGetter<T> daoGetter,
+        public FilteredItemsGetter(DatabaseDaoGetter<T, ID> daoGetter,
                                    @Nullable LoadingViewHolder viewHolder) {
             super(daoGetter, viewHolder);
         }
@@ -144,16 +144,16 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
     public static class DefaultItemsGetter<T, ID> extends ItemsGetter<T, ID> {
 
-        private final DatabaseDaoGetter<T> mDaoGetter;
+        private final DatabaseDaoGetter<T, ID> mDaoGetter;
         private final LoadingViewHolder mViewHolder;
 
-        public DefaultItemsGetter(DatabaseDaoGetter<T> daoGetter,
+        public DefaultItemsGetter(DatabaseDaoGetter<T, ID> daoGetter,
                                   @Nullable LoadingViewHolder viewHolder) {
             mDaoGetter = daoGetter;
             mViewHolder = viewHolder;
         }
 
-        public DatabaseDaoGetter<T> getDaoGetter() {
+        public DatabaseDaoGetter<T, ID> getDaoGetter() {
             return mDaoGetter;
         }
 

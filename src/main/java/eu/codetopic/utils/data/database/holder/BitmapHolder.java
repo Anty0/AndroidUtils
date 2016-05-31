@@ -29,7 +29,7 @@ public abstract class BitmapHolder<T extends BitmapDatabaseObject> extends Datab
 
     @WorkerThread
     public static <BH extends BitmapHolder<T>, T extends BitmapDatabaseObject> BH create
-            (DatabaseDaoGetter<T> daoGetter, Class<BH> holderClass, Bitmap bitmap)
+            (DatabaseDaoGetter<T, Long> daoGetter, Class<BH> holderClass, Bitmap bitmap)
             throws IllegalAccessException, InstantiationException, SQLException,
             NoSuchMethodException, InvocationTargetException {
         T obj = daoGetter.getDaoObjectClass().newInstance();

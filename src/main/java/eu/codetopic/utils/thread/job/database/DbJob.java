@@ -10,28 +10,28 @@ import java.util.List;
 import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
-public final class DbJob<T> {
+public final class DbJob<T, ID> {
 
     private static final String LOG_TAG = "DbJob";
 
-    private final DatabaseDaoGetter<T> daoGetter;
+    private final DatabaseDaoGetter<T, ID> daoGetter;
     private LoadingViewHolder loadingHolder = null;
 
-    private DbJob(DatabaseDaoGetter<T> daoGetter) {
+    private DbJob(DatabaseDaoGetter<T, ID> daoGetter) {
         this.daoGetter = daoGetter;
     }
 
-    public static <T> DbJob<T> work(DatabaseDaoGetter<T> daoGetter) {
+    public static <T, ID> DbJob<T, ID> work(DatabaseDaoGetter<T, ID> daoGetter) {
         return new DbJob<>(daoGetter);
     }
 
-    public DbJob<T> withLoading(LoadingViewHolder loadingHolder) {
+    public DbJob<T, ID> withLoading(LoadingViewHolder loadingHolder) {
         this.loadingHolder = loadingHolder;
         return this;
     }
 
-    public <ID> String forEq(final String fieldName, final Object value,
-                             final Callback<List<T>> callback) {
+    public String forEq(final String fieldName, final Object value,
+                        final Callback<List<T>> callback) {
         return startCallback(new CallbackWork<List<T>, T, ID>() {
             @Override
             public List<T> run(Dao<T, ID> dao) throws Throwable {
@@ -40,7 +40,7 @@ public final class DbJob<T> {
         }, callback);
     }
 
-    public <ID> String forId(final ID id, final Callback<T> callback) {
+    public String forId(final ID id, final Callback<T> callback) {
         return startCallback(new CallbackWork<T, T, ID>() {
             @Override
             public T run(Dao<T, ID> dao) throws Throwable {
@@ -49,7 +49,7 @@ public final class DbJob<T> {
         }, callback);
     }
 
-    public <ID> String forAll(final Callback<List<T>> callback) {
+    public String forAll(final Callback<List<T>> callback) {
         return startCallback(new CallbackWork<List<T>, T, ID>() {
             @Override
             public List<T> run(Dao<T, ID> dao) throws Throwable {
@@ -58,7 +58,7 @@ public final class DbJob<T> {
         }, callback);
     }
 
-    public <D, ID> String startCallback(final CallbackWork<D, T, ID> work, final Callback<D> callback) {
+    public <D> String startCallback(final CallbackWork<D, T, ID> work, final Callback<D> callback) {
         final Handler handler = new Handler(Looper.myLooper());
         return start(new DatabaseWork<T, ID>() {
             @Override
@@ -85,16 +85,16 @@ public final class DbJob<T> {
     }
 
     @SafeVarargs
-    public final <ID> String save(T... toSave) {
+    public final String save(T... toSave) {
         return start(Modification.CREATE_OR_UPDATE.<T, ID>generateWork(toSave));
     }
 
     @SafeVarargs
-    public final <ID> String delete(T... toDelete) {
+    public final String delete(T... toDelete) {
         return start(Modification.DELETE.<T, ID>generateWork(toDelete));
     }
 
-    public <ID> String start(DatabaseWork<T, ID> work) {
+    public String start(DatabaseWork<T, ID> work) {
         DatabaseJob<T, ID> job = new DatabaseJob<>(loadingHolder, daoGetter, work);
         daoGetter.getJobManager().addJobInBackground(job);
         return job.getId();

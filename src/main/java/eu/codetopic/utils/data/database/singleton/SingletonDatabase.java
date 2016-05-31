@@ -12,6 +12,7 @@ public final class SingletonDatabase {
     private static final String LOG_TAG = "SingletonDatabase";
 
     private static DatabaseBase mInstance = null;
+    private static boolean mDatabaseReady = false;
 
     private SingletonDatabase() {
     }
@@ -33,6 +34,7 @@ public final class SingletonDatabase {
                     // FIXME: 27.5.16 find way to report this error to application to solve this problem
                 } finally {
                     SingletonJobManager.getInstance().start();
+                    mDatabaseReady = true;
                 }
             }
         }).start();
@@ -42,11 +44,15 @@ public final class SingletonDatabase {
         return mInstance != null;
     }
 
+    public static boolean isDatabaseReady() {
+        return mDatabaseReady;
+    }
+
     public static DatabaseBase getInstance() {
         return mInstance;
     }
 
-    public static <DT> DatabaseDaoGetter<DT> getGetterFor(Class<DT> dataClass) {
+    public static <DT, ID> DatabaseDaoGetter<DT, ID> getGetterFor(Class<DT> dataClass) {
         return new SingletonDatabaseDaoGetter<>(dataClass);
     }
 }

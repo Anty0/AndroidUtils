@@ -8,7 +8,7 @@ import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.job.SingletonJobManagerGetter;
 
-public class SingletonDatabaseDaoGetter<DT> extends SingletonJobManagerGetter implements DatabaseDaoGetter<DT> {
+public class SingletonDatabaseDaoGetter<DT, ID> extends SingletonJobManagerGetter implements DatabaseDaoGetter<DT, ID> {
 
     private static final String LOG_TAG = "SingletonDatabaseDaoGetter";
 
@@ -19,7 +19,7 @@ public class SingletonDatabaseDaoGetter<DT> extends SingletonJobManagerGetter im
     }
 
     @Override
-    public Dao<DT, ?> get() throws SQLException {
+    public Dao<DT, ID> get() throws SQLException {
         return getDatabase().getDao(getDaoObjectClass());
     }
 

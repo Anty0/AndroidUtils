@@ -51,6 +51,6 @@ public abstract class DatabaseObjectHolder<T extends DependencyDatabaseObject> i
                 .queryForIdWithTemp(getObjectId());
     }
 
-    public abstract DatabaseDaoGetter<T> getDaoGetter();
+    public abstract DatabaseDaoGetter<T, Long> getDaoGetter();
 
 }

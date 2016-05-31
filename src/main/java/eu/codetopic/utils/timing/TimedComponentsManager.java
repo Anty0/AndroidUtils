@@ -30,8 +30,8 @@ public class TimedComponentsManager {
     private static TimedComponentsManager INSTANCE = null;
 
     private final Context mContext;
-    private final NetworkManager.NetworkType mRequiredNetwork;
     private final HashMap<Class<?>, TimedComponentInfo> mComponentsInfoMap;
+    private NetworkManager.NetworkType mRequiredNetwork;
 
     private TimedComponentsManager(Context context, NetworkManager.NetworkType requiredNetwork,
                                    Class<?>[] components) {
@@ -104,20 +104,12 @@ public class TimedComponentsManager {
                     for (TimedComponentInfo componentInfo : mComponentsInfoMap.values())
                         if (componentInfo.getComponentInfo().resetTimingOnBoot())
                             data.clear(componentInfo.getComponentClass());
+
                     reloadAll();
                 }
                 break;
             case ConnectivityManager.CONNECTIVITY_ACTION:
-                synchronized (mComponentsInfoMap) {
-                    for (TimedComponentInfo componentInfo : mComponentsInfoMap.values())
-                        if (componentInfo.getComponentInfo().requiresInternetAccess())
-                            try {
-                                reload(componentInfo);
-                            } catch (Exception e) {
-                                Log.e(LOG_TAG, "reload - problem detected while reloading timed component: "
-                                        + componentInfo.getComponentClass().getName(), e);
-                            }
-                }
+                reloadAllNetwork();
                 break;
             case ACTION_RELOAD_COMPONENT:
                 TimedComponentInfo componentInfo = (TimedComponentInfo) intent
@@ -132,6 +124,15 @@ public class TimedComponentsManager {
         }
     }
 
+    public NetworkManager.NetworkType getRequiredNetwork() {
+        return mRequiredNetwork;
+    }
+
+    public void setRequiredNetwork(NetworkManager.NetworkType requiredNetwork) {
+        this.mRequiredNetwork = requiredNetwork;
+        reloadAllNetwork();
+    }
+
     public void setComponentEnabled(Class<?> componentClass, boolean enabled) {
         TimedComponentInfo componentInfo = getComponentInfo(componentClass);
         if (componentInfo == null)
@@ -140,8 +141,12 @@ public class TimedComponentsManager {
     }
 
     public void setComponentEnabled(TimedComponentInfo componentInfo, boolean enabled) {
-        mContext.getPackageManager().setComponentEnabledSetting(
-                new ComponentName(mContext, componentInfo.getComponentClass()),
+        PackageManager pm = mContext.getPackageManager();
+        if (pm.getComponentEnabledSetting(componentInfo.getComponentName(mContext))
+                != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+                && enabled == componentInfo.isEnabled(mContext)) return;
+
+        pm.setComponentEnabledSetting(componentInfo.getComponentName(mContext),
                 enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                         : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
@@ -161,6 +166,19 @@ public class TimedComponentsManager {
                 .putExtra(EXTRA_TIMED_COMPONENT_INFO, componentInfo);
     }
 
+    public void reloadAllNetwork() {
+        synchronized (mComponentsInfoMap) {
+            for (TimedComponentInfo componentInfo : mComponentsInfoMap.values())
+                if (componentInfo.getComponentInfo().requiresInternetAccess())
+                    try {
+                        reload(componentInfo);
+                    } catch (Exception e) {
+                        Log.e(LOG_TAG, "reload - problem detected while reloading timed component: "
+                                + componentInfo.getComponentClass().getName(), e);
+                    }
+        }
+    }
+
     public void reloadAll() {
         synchronized (mComponentsInfoMap) {
             for (TimedComponentInfo componentInfo : mComponentsInfoMap.values())
@@ -174,92 +192,96 @@ public class TimedComponentsManager {
     }
 
     public void reload(Class<?> componentClass) {
-        TimedComponentInfo componentInfo = getComponentInfo(componentClass);
-        if (componentInfo == null)
-            throw new NullPointerException(componentClass.getName() + " no found");
-        reload(componentInfo);
+        synchronized (mComponentsInfoMap) {
+            TimedComponentInfo componentInfo = getComponentInfo(componentClass);
+            if (componentInfo == null)
+                throw new NullPointerException(componentClass.getName() + " no found");
+            reload(componentInfo);
+        }
     }
 
     public void reload(TimedComponentInfo componentInfo) {
-        AlarmManager alarms = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-        Intent componentIntent = TimedComponentExecutor.generateIntent(mContext,
-                ACTION_TIMED_EXECUTE, componentInfo, null);
-        Intent reloadIntent = getReloadIntent(componentInfo);
+        synchronized (mComponentsInfoMap) {
+            AlarmManager alarms = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+            Intent componentIntent = TimedComponentExecutor.generateIntent(mContext,
+                    ACTION_TIMED_EXECUTE, componentInfo, null);
+            Intent reloadIntent = getReloadIntent(componentInfo);
 
-        TimingData data = TimingData.getter.get();
-        TimedComponent component = componentInfo.getComponentInfo();
-        int lastRequestCode = data.getLastRequestCode(componentInfo.getComponentClass());
-        if (lastRequestCode != -1) {
-            alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, componentIntent, 0));
-            alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, reloadIntent, 0));
-        }
-
-        if (!componentInfo.isEnabled(mContext) || (component.requiresInternetAccess()
-                && !NetworkManager.isConnected(mRequiredNetwork))) {
-            data.setLastRequestCode(componentInfo.getComponentClass(), -1);
-            return;
-        }
-
-        int newRequestCode = NotificationIdsManager.getInstance().obtainRequestCode();
-        data.setLastRequestCode(componentInfo.getComponentClass(), newRequestCode);
-        TimedComponent.RepeatingMode repeatingMode = component.repeatingMode();
-        Calendar calendar = Calendar.getInstance();
-        int[] usableDays = component.usableDays();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int startHour = component.startHour();
-        int stopHour = component.stopHour();
-        if ((startHour != stopHour && !(startHour < stopHour
-                ? (hour >= startHour && hour < stopHour)
-                : (hour >= startHour || hour < stopHour)))
-                || !Arrays.contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK))) {
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 1);
-
-            while (!Arrays.contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK)))
-                calendar.add(Calendar.DAY_OF_WEEK, 1);
-
-            while (!(startHour < stopHour ? (hour >= startHour && hour < stopHour)
-                    : (hour >= startHour || hour < stopHour))) {
-                calendar.add(Calendar.HOUR_OF_DAY, 1);
-                hour = calendar.get(Calendar.HOUR_OF_DAY);
+            TimingData data = TimingData.getter.get();
+            TimedComponent component = componentInfo.getComponentInfo();
+            int lastRequestCode = data.getLastRequestCode(componentInfo.getComponentClass());
+            if (lastRequestCode != -1) {
+                alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, componentIntent, 0));
+                alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, reloadIntent, 0));
             }
 
-            alarms.set(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                    calendar.getTimeInMillis(), PendingIntent.getBroadcast(mContext,
-                            newRequestCode, reloadIntent, PendingIntent.FLAG_CANCEL_CURRENT));
-            return;
-        }
-
-        long lastStart = data.getLastExecuteTime(componentInfo.getComponentClass());
-        long startInterval = component.time();
-        if (lastStart == -1L) lastStart = calendar.getTimeInMillis() - startInterval;
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, newRequestCode,
-                componentIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-        if (repeatingMode.inexact()) {
-            alarms.setInexactRepeating(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                    lastStart + startInterval, startInterval, pendingIntent);
-        } else {
-            alarms.setRepeating(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                    lastStart + startInterval, startInterval, pendingIntent);
-        }
-
-        if (startHour != stopHour) {
-            calendar.set(Calendar.MILLISECOND, 0);
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MINUTE, 5);
-
-            hour = calendar.get(Calendar.HOUR_OF_DAY);
-            while ((startHour < stopHour ? (hour >= startHour && hour < stopHour)
-                    : (hour >= startHour || hour < stopHour)) && Arrays
-                    .contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK))) {
-                calendar.add(Calendar.HOUR_OF_DAY, 1);
-                hour = calendar.get(Calendar.HOUR_OF_DAY);
+            if (!componentInfo.isEnabled(mContext) || (component.requiresInternetAccess()
+                    && !NetworkManager.isConnected(mRequiredNetwork))) {
+                data.setLastRequestCode(componentInfo.getComponentClass(), -1);
+                return;
             }
 
-            alarms.set(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                    calendar.getTimeInMillis(), PendingIntent.getBroadcast(mContext,
-                            newRequestCode, reloadIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+            int newRequestCode = NotificationIdsManager.getInstance().obtainRequestCode();
+            data.setLastRequestCode(componentInfo.getComponentClass(), newRequestCode);
+            TimedComponent.RepeatingMode repeatingMode = component.repeatingMode();
+            Calendar calendar = Calendar.getInstance();
+            int[] usableDays = component.usableDays();
+            int hour = calendar.get(Calendar.HOUR_OF_DAY);
+            int startHour = component.startHour();
+            int stopHour = component.stopHour();
+            if ((startHour != stopHour && !(startHour < stopHour
+                    ? (hour >= startHour && hour < stopHour)
+                    : (hour >= startHour || hour < stopHour)))
+                    || !Arrays.contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK))) {
+                calendar.set(Calendar.MILLISECOND, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MINUTE, 1);
+
+                while (!Arrays.contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK)))
+                    calendar.add(Calendar.DAY_OF_WEEK, 1);
+
+                while (!(startHour < stopHour ? (hour >= startHour && hour < stopHour)
+                        : (hour >= startHour || hour < stopHour))) {
+                    calendar.add(Calendar.HOUR_OF_DAY, 1);
+                    hour = calendar.get(Calendar.HOUR_OF_DAY);
+                }
+
+                alarms.set(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
+                        calendar.getTimeInMillis(), PendingIntent.getBroadcast(mContext,
+                                newRequestCode, reloadIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+                return;
+            }
+
+            long lastStart = data.getLastExecuteTime(componentInfo.getComponentClass());
+            long startInterval = component.time();
+            if (lastStart == -1L) lastStart = calendar.getTimeInMillis() - startInterval;
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, newRequestCode,
+                    componentIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+            if (repeatingMode.inexact()) {
+                alarms.setInexactRepeating(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
+                        lastStart + startInterval, startInterval, pendingIntent);
+            } else {
+                alarms.setRepeating(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
+                        lastStart + startInterval, startInterval, pendingIntent);
+            }
+
+            if (startHour != stopHour) {
+                calendar.set(Calendar.MILLISECOND, 0);
+                calendar.set(Calendar.SECOND, 0);
+                calendar.set(Calendar.MINUTE, 5);
+
+                hour = calendar.get(Calendar.HOUR_OF_DAY);
+                while ((startHour < stopHour ? (hour >= startHour && hour < stopHour)
+                        : (hour >= startHour || hour < stopHour)) && Arrays
+                        .contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK))) {
+                    calendar.add(Calendar.HOUR_OF_DAY, 1);
+                    hour = calendar.get(Calendar.HOUR_OF_DAY);
+                }
+
+                alarms.set(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
+                        calendar.getTimeInMillis(), PendingIntent.getBroadcast(mContext,
+                                newRequestCode, reloadIntent, PendingIntent.FLAG_CANCEL_CURRENT));
+            }
         }
     }
 

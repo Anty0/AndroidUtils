@@ -8,10 +8,10 @@ import java.sql.SQLException;
 
 import eu.codetopic.utils.data.database.DatabaseBase;
 
-public interface DatabaseDaoGetter<DT> extends BaseGetter, JobManagerGetter {
+public interface DatabaseDaoGetter<DT, ID> extends BaseGetter, JobManagerGetter {
 
     @WorkerThread
-    Dao<DT, ?> get() throws SQLException;
+    Dao<DT, ID> get() throws SQLException;
 
     Class<DT> getDaoObjectClass();
 

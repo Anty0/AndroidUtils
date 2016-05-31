@@ -7,7 +7,7 @@ import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
 public class BitmapDatabaseObjectSingletonImpl extends BitmapDatabaseObject {
 
-    public static DatabaseDaoGetter<BitmapDatabaseObjectSingletonImpl> getter =
+    public static DatabaseDaoGetter<BitmapDatabaseObjectSingletonImpl, Long> getter =
             SingletonDatabase.getGetterFor(BitmapDatabaseObjectSingletonImpl.class);
 
     public BitmapDatabaseObjectSingletonImpl() {
