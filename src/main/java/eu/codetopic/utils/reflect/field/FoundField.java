@@ -122,7 +122,7 @@ public class FoundField implements Iterable<FoundField> {
             StringBuilder csb = new StringBuilder();
             for (FoundField contentField : content)
                 if (showHidden || !contentField.isHidden() || contentField.getContentFields().length > 0)
-                    csb.append("\n").append(contentField.hierarchyToString(fieldsObject));
+                    csb.append("\n").append(contentField.hierarchyToString(showHidden, fieldsObject));
             sb.append(Utils.addBeforeEveryLine(csb.toString(), "    "));
             sb.append("\n}");
         }

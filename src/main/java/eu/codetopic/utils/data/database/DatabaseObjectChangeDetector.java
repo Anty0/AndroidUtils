@@ -53,7 +53,7 @@ public class DatabaseObjectChangeDetector<T> {
         return clazz.getName() + ".ACTION_CHANGED_IN_DATABASE";
     }
 
-    public static <T extends DatabaseObject> void sendChangeBroadcast(Context context, Class<T> clazz) {
+    public static void sendChangeBroadcast(Context context, Class<? extends DatabaseObject> clazz) {
         sendChangeBroadcast(context, generateBroadcastActionChanged(clazz));
     }
 

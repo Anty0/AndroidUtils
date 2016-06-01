@@ -1,4 +1,4 @@
-package eu.codetopic.utils;
+package eu.codetopic.utils.broadcast;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
