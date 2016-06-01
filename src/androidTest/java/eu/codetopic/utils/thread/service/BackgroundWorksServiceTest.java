@@ -22,8 +22,8 @@ import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
 import eu.codetopic.utils.thread.JobUtils;
-import eu.codetopic.utils.thread.ProgressReporter;
 import eu.codetopic.utils.thread.job.SingletonJobManager;
+import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 import static org.junit.Assert.assertTrue;
 

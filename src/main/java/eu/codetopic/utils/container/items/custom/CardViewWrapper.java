@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.view.ViewUtils;
 
 public class CardViewWrapper extends LayoutItemWrapper {
 
@@ -19,6 +19,6 @@ public class CardViewWrapper extends LayoutItemWrapper {
     protected void onBindViewHolder(ViewHolder holder, int itemPosition) {
         ViewGroup content = (ViewGroup) holder.itemView.findViewById(getContentViewId(holder.context));
         if (content.getChildCount() == 1)
-            Utils.copyLayoutParamsToViewParents(content.getChildAt(0), holder.itemView);
+            ViewUtils.copyLayoutParamsToViewParents(content.getChildAt(0), holder.itemView);
     }
 }

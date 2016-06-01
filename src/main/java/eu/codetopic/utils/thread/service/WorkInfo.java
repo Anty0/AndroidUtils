@@ -5,9 +5,9 @@ import android.support.v7.app.NotificationCompat;
 
 import com.birbit.android.jobqueue.JobManager;
 
-import eu.codetopic.utils.thread.NotificationProgressReporter;
-import eu.codetopic.utils.thread.ProgressInfo;
-import eu.codetopic.utils.thread.ProgressReporter;
+import eu.codetopic.utils.thread.progress.NotificationProgressReporter;
+import eu.codetopic.utils.thread.progress.ProgressInfo;
+import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 public abstract class WorkInfo {
 

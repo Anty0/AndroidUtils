@@ -1,4 +1,4 @@
-package eu.codetopic.utils.thread;
+package eu.codetopic.utils.thread.progress;
 
 public interface ProgressReporter {
 

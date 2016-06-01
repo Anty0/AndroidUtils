@@ -12,7 +12,7 @@ import android.widget.ListAdapter;
 import android.widget.SpinnerAdapter;
 
 import eu.codetopic.utils.Objects;
-import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.view.ViewUtils;
 
 public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {// TODO: 26.5.16 add WidgetAdapter support
 
@@ -225,7 +225,7 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             //noinspection unchecked
-            VH viewHolder = convertView != null ? (VH) Utils.getViewTag(convertView,
+            VH viewHolder = convertView != null ? (VH) ViewUtils.getViewTag(convertView,
                     VIEW_TAG_KEY_VIEW_HOLDER) : null;
             int requestedViewType = mAdapter.getItemViewType(position);
             if (viewHolder == null || !Objects.equals(requestedViewType, viewHolder.viewType)) {
@@ -234,7 +234,7 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
                     throw new IllegalArgumentException("ViewHolder returned by " +
                             "UniversalAdapter.onCreateViewHolder() has invalid viewType.");
                 convertView = viewHolder.itemView;
-                Utils.setViewTag(convertView, VIEW_TAG_KEY_VIEW_HOLDER, viewHolder);
+                ViewUtils.setViewTag(convertView, VIEW_TAG_KEY_VIEW_HOLDER, viewHolder);
             }
             mAdapter.onBindViewHolder(viewHolder, position);
             return convertView;

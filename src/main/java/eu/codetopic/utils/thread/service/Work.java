@@ -9,7 +9,7 @@ import com.birbit.android.jobqueue.RetryConstraint;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.thread.JobUtils;
-import eu.codetopic.utils.thread.ProgressReporter;
+import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 class Work extends Job {
 

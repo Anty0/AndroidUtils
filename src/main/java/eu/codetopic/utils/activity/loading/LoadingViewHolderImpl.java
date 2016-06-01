@@ -8,15 +8,27 @@ import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
+import android.widget.ProgressBar;
 
 import eu.codetopic.utils.simple.SimpleAnimatorListener;
+import eu.codetopic.utils.thread.progress.ProgressBarReporter;
+import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
 
     private static final String LOG_TAG = "LoadingViewHolderImpl";
 
-    private View loading;
-    private View content;
+    private ProgressBarReporter progressReporter = null;
+    private View loading = null;
+    private View content = null;
+
+    public ProgressReporter getProgressReporter() {
+        if (progressReporter == null) {
+            progressReporter = new ProgressBarReporter(loading instanceof ProgressBar
+                    ? (ProgressBar) loading : null);
+        }
+        return progressReporter;
+    }
 
     @IdRes
     protected abstract int getContentViewId(Context context);
@@ -29,9 +41,17 @@ public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
         if (newMainView != null) {
             content = newMainView.findViewById(getContentViewId(newMainView.getContext()));
             loading = newMainView.findViewById(getLoadingViewId(newMainView.getContext()));
-            if (loading == null || content == null) {
+
+            if (loading == null || content == null)
                 throw new NullPointerException("Used view is not usable for " + LOG_TAG);
-            }
+
+            if (progressReporter != null)
+                progressReporter.setProgressBar(loading instanceof ProgressBar
+                        ? (ProgressBar) loading : null);
+        } else {
+            content = null;
+            loading = null;
+            if (progressReporter != null) progressReporter.setProgressBar((ProgressBar) null);
         }
     }
 

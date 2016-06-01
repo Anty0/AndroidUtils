@@ -10,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import eu.codetopic.utils.Arrays;
-import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.container.adapter.UniversalAdapter;
+import eu.codetopic.utils.view.ViewUtils;
 
 public abstract class CustomItem {
 
@@ -52,11 +52,11 @@ public abstract class CustomItem {
         if (this instanceof CustomItemWrapper) {
             @IdRes int contentId = ((CustomItemWrapper) this).getContentViewId(holder.context);
             ViewGroup content = (ViewGroup) holder.itemView.findViewById(contentId);
-            contentHolder = (ViewHolder) Utils.getViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER);
+            contentHolder = (ViewHolder) ViewUtils.getViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER);
 
             if (contentItem == null || (contentHolder != null && contentHolder.layoutResId
                     != contentItem.getItemLayoutResId(contentHolder.context))) {
-                Utils.setViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER, null);
+                ViewUtils.setViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER, null);
                 content.removeAllViews();
                 contentHolder = null;
             }
@@ -64,7 +64,7 @@ public abstract class CustomItem {
                 contentHolder = createViewHolder(holder.context, content,
                         contentItem.getItemLayoutResId(holder.context));
                 content.addView(contentHolder.itemView);
-                Utils.setViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER, contentHolder);
+                ViewUtils.setViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER, contentHolder);
             }
         }
 

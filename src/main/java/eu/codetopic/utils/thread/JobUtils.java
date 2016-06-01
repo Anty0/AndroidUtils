@@ -3,6 +3,8 @@ package eu.codetopic.utils.thread;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
+import android.view.View;
 
 import eu.codetopic.utils.Log;
 
@@ -38,7 +40,12 @@ public class JobUtils {
         HANDLER.post(action);
     }
 
-    public static void runOnContextThread(Context context, Runnable action) {
+    public static void runOnContextThread(@Nullable Context context, Runnable action) {
+        if (context == null) {
+            runOnMainThread(action);
+            return;
+        }
+
         if (!isOnContextThread(context)) {
             postOnContextThread(context, action);
             return;
@@ -46,12 +53,27 @@ public class JobUtils {
         action.run();
     }
 
-    public static boolean isOnContextThread(Context context) {
+    public static boolean isOnContextThread(@Nullable Context context) {
+        if (context == null) return isOnMainThread();
         return Thread.currentThread() == context.getMainLooper().getThread();
     }
 
-    public static void postOnContextThread(Context context, Runnable action) {
+    public static void postOnContextThread(@Nullable Context context, Runnable action) {
+        if (context == null) {
+            postOnMainThread(action);
+            return;
+        }
+
         new Handler(context.getMainLooper()).post(action);
+    }
+
+    public static void postOnViewThread(@Nullable View view, Runnable action) {
+        if (view == null) {
+            postOnMainThread(action);
+            return;
+        }
+
+        view.post(action);
     }
 
     public static boolean threadSleep(long time) {

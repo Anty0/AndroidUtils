@@ -57,6 +57,11 @@ public abstract class LoadableItemsGetter implements ItemsGetter {
         return null;
     }
 
+    public void reload() {
+        if (loadingStarted) return;
+        items = null;
+    }
+
     @NonNull
     @UiThread
     @Override
@@ -91,6 +96,8 @@ public abstract class LoadableItemsGetter implements ItemsGetter {
 
                             context.sendBroadcast(new Intent(DashboardAdapter.ACTION_ITEMS_CHANGED));
                         } else items = Collections.emptySet();
+
+                        loadingStarted = false;
                     }
                 });
             }

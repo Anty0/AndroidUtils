@@ -11,7 +11,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import eu.codetopic.utils.thread.ProgressReporter;
+import eu.codetopic.utils.thread.progress.ProgressReporter;
 import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 

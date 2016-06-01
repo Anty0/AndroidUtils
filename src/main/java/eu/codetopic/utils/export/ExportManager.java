@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
-import eu.codetopic.utils.thread.ProgressReporter;
+import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 public class ExportManager {
 

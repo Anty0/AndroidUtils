@@ -29,7 +29,7 @@ public abstract class LoadableItemInfo extends ItemInfo {
     public abstract CharSequence getLoadingName(Context context);
 
     @UiThread
-    protected abstract void loadItems(Context context, ActionCallback<CustomItem> callback);
+    protected abstract void loadItem(Context context, ActionCallback<CustomItem> callback);
 
     @NonNull
     private CustomItem getLoadingItem(Context context) {
@@ -58,15 +58,15 @@ public abstract class LoadableItemInfo extends ItemInfo {
             if (!loadingStarted) {
                 loadingStarted = true;
                 final WeakReference<Context> contextRef = new WeakReference<>(context);
-                loadItems(context, new ActionCallback<CustomItem>() {
+                loadItem(context, new ActionCallback<CustomItem>() {
                     @Override
                     public void onActionCompleted(@Nullable CustomItem result,
                                                   @Nullable Throwable caughtThrowable) {
                         if (caughtThrowable != null)
-                            Log.d(LOG_TAG, "getItems -> loadItems", caughtThrowable);
+                            Log.d(LOG_TAG, "getItems -> loadItem", caughtThrowable);
 
                         if (item != null) {
-                            Log.e(LOG_TAG, "getItems -> loadItems: " +
+                            Log.e(LOG_TAG, "getItems -> loadItem: " +
                                     "onActionCompleted was called more then one time!");
                             return;
                         }
