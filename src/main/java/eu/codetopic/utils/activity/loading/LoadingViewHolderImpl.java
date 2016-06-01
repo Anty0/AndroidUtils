@@ -56,7 +56,7 @@ public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
             animator.addListener(new SimpleAnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    loading.setVisibility(View.VISIBLE);
+                    if (loading != null) loading.setVisibility(View.VISIBLE);
                 }
             });
             animator.setTarget(loading);
@@ -71,12 +71,12 @@ public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
             animator.addListener(new SimpleAnimatorListener() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    loading.setVisibility(View.GONE);
+                    if (loading != null) loading.setVisibility(View.GONE);
                 }
 
                 @Override
                 public void onAnimationCancel(Animator animation) {
-                    loading.setVisibility(View.GONE);
+                    if (loading != null) loading.setVisibility(View.GONE);
                 }
             });
             animator.setTarget(loading);
@@ -89,7 +89,7 @@ public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
             animator.addListener(new SimpleAnimatorListener() {
                 @Override
                 public void onAnimationStart(Animator animation) {
-                    content.setVisibility(View.VISIBLE);
+                    if (content != null) content.setVisibility(View.VISIBLE);
                 }
             });
             animator.setTarget(content);

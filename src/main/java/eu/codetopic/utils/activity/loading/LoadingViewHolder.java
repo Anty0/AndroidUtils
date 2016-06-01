@@ -116,6 +116,12 @@ public abstract class LoadingViewHolder {
 
     protected abstract void doHideLoading();
 
+    public final boolean isLoadingShowed() {
+        synchronized (lock) {
+            return loadingDepth > 0;
+        }
+    }
+
     public static final class HolderInfo<T extends LoadingViewHolder> {
 
         public static final int NO_RES_OR_ID = -1;
