@@ -39,16 +39,16 @@ public abstract class ProgressReporterImpl implements ProgressReporter {
         max = 100;
         progress = 0;
         intermediate = false;
-        update();
+        onChange(getProgressInfo());
     }
 
     @Override
     public synchronized void stopShowingProgress() {
+        showingProgress = false;
         max = 100;
         progress = 0;
         intermediate = true;
-        update();
-        showingProgress = false;
+        onChange(getProgressInfo());
     }
 
     @Override
@@ -75,13 +75,12 @@ public abstract class ProgressReporterImpl implements ProgressReporter {
         return new ProgressInfoImpl(showingProgress, max, progress, intermediate);
     }
 
-    @WorkerThread
     protected final synchronized void update() {
         if (!showingProgress) return;
-        onChange();
+        onChange(getProgressInfo());
     }
 
     @WorkerThread
-    protected abstract void onChange();
+    protected abstract void onChange(ProgressInfo info);
 
 }

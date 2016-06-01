@@ -8,33 +8,29 @@ import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.view.View;
-import android.widget.ProgressBar;
 
 import eu.codetopic.utils.simple.SimpleAnimatorListener;
-import eu.codetopic.utils.thread.progress.ProgressBarReporter;
-import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
 
     private static final String LOG_TAG = "LoadingViewHolderImpl";
 
-    private ProgressBarReporter progressReporter = null;
     private View loading = null;
     private View content = null;
-
-    public ProgressReporter getProgressReporter() {
-        if (progressReporter == null) {
-            progressReporter = new ProgressBarReporter(loading instanceof ProgressBar
-                    ? (ProgressBar) loading : null);
-        }
-        return progressReporter;
-    }
 
     @IdRes
     protected abstract int getContentViewId(Context context);
 
     @IdRes
     protected abstract int getLoadingViewId(Context context);
+
+    public View getContentView() {
+        return content;
+    }
+
+    public View getLoadingView() {
+        return loading;
+    }
 
     @Override
     protected void onUpdateMainView(@Nullable View newMainView) {
@@ -44,14 +40,9 @@ public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
 
             if (loading == null || content == null)
                 throw new NullPointerException("Used view is not usable for " + LOG_TAG);
-
-            if (progressReporter != null)
-                progressReporter.setProgressBar(loading instanceof ProgressBar
-                        ? (ProgressBar) loading : null);
         } else {
             content = null;
             loading = null;
-            if (progressReporter != null) progressReporter.setProgressBar((ProgressBar) null);
         }
     }
 

@@ -33,8 +33,10 @@ public class NotificationProgressReporter extends ProgressReporterImpl {
     }
 
     @Override
-    protected void onChange() {
-        mNotification.setProgress(getMax(), getProgress(), isIntermediate());
+    protected void onChange(ProgressInfo info) {
+        mNotification.setProgress(info.getMaxProgress(),
+                info.getProgress(), info.isIntermediate());
+
         JobUtils.runOnMainThread(new Runnable() {
             @Override
             public void run() {

@@ -28,15 +28,16 @@ public class ProgressBarReporter extends ProgressReporterImpl {
 
     public void setProgressBar(@Nullable ProgressBar progressBar) {
         setProgressBar(new WeakReference<>(progressBar));
+        update();
     }
 
     public void setProgressBar(@NonNull WeakReference<ProgressBar> progressBarRef) {
         this.progressBarRef = progressBarRef;
+        update();
     }
 
     @Override
-    protected void onChange() {
-        final ProgressInfo info = getProgressInfo();
+    protected void onChange(final ProgressInfo info) {
         JobUtils.postOnViewThread(progressBarRef.get(), new Runnable() {
             @Override
             public void run() {
