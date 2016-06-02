@@ -11,8 +11,12 @@ public class UtilsInitializer extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        android.util.Log.d(Utils.getApplicationName(this).toString(),
-                "INITIALIZING - BUILD_TYPE=" + BuildConfig.BUILD_TYPE);
+        android.util.Log.d(Utils.getApplicationLabel(this).toString(), "INITIALIZING {"
+                + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE
+                + "\n    - VERSION_NAME=" + Utils.getApplicationVersionName(this)
+                + "\n    - VERSION_CODE=" + Utils.getApplicationVersionCode(this)
+                + "\n}");
+
         Log.initialize(this);
         NetworkManager.init(this);
         JobUtils.initialize(this);

@@ -81,7 +81,7 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
         }
 
         if (currentFragment != null) ft.remove(currentFragment);
-        setTitle(Utils.getApplicationName(this));
+        setTitle(Utils.getApplicationLabel(this));
         return null;
     }
 

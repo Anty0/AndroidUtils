@@ -104,7 +104,7 @@ public abstract class WidgetProvider extends AppWidgetProvider {
     }
 
     protected CharSequence getTitle(Context context, int[] appWidgetIds) {
-        return Utils.getApplicationName(context);
+        return Utils.getApplicationLabel(context);
     }
 
     @ColorInt

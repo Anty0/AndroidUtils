@@ -103,7 +103,7 @@ public class WidgetBuilder {
         hasHeader = true;
         headerIntent = null;
         refreshIntent = null;
-        headerTitle = Utils.getApplicationName(mContext);
+        headerTitle = Utils.getApplicationLabel(mContext);
         headerBackgroundColor = Utils.getColorFromAttr(mContext, R.attr.colorPrimary,
                 ContextCompat.getColor(mContext, R.color.primary_material_dark));
 

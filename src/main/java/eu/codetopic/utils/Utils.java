@@ -209,25 +209,41 @@ public class Utils {
     //////REGION - APP_INFO//////
     /////////////////////////////
 
-    public static int getVersionCode(Context context) {
+    @CheckResult
+    public static int getApplicationVersionCode(Context context) {
         try {
-            return getVersionCode(context, context.getPackageName());
+            return getApplicationVersionCode(context, context.getPackageName());
         } catch (PackageManager.NameNotFoundException ignored) {
         }
         return -1;
     }
 
-    public static int getVersionCode(Context context, String packageName) throws PackageManager.NameNotFoundException {
+    @CheckResult
+    public static int getApplicationVersionCode(Context context, String packageName) throws PackageManager.NameNotFoundException {
         return context.getPackageManager().getPackageInfo(packageName, 0).versionCode;
     }
 
     @CheckResult
-    public static CharSequence getApplicationName(Context context) {
+    public static String getApplicationVersionName(Context context) {
+        try {
+            return getApplicationVersionName(context, context.getPackageName());
+        } catch (PackageManager.NameNotFoundException ignored) {
+        }
+        return "unknown";
+    }
+
+    @CheckResult
+    public static String getApplicationVersionName(Context context, String packageName) throws PackageManager.NameNotFoundException {
+        return context.getPackageManager().getPackageInfo(packageName, 0).versionName;
+    }
+
+    @CheckResult
+    public static CharSequence getApplicationLabel(Context context) {
         return context.getApplicationInfo().loadLabel(context.getPackageManager());
     }
 
     @CheckResult
-    public static CharSequence getApplicationName(Context context, String packageName) throws PackageManager.NameNotFoundException {
+    public static CharSequence getApplicationLabel(Context context, String packageName) throws PackageManager.NameNotFoundException {
         PackageManager pm = context.getPackageManager();
         return pm.getApplicationInfo(packageName, 0).loadLabel(pm);
     }
