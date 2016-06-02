@@ -19,7 +19,7 @@ import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.TextMultilineResourceLayoutItem;
 
-public abstract class LoadableItemsGetter implements ItemsGetter {
+public abstract class LoadableItemsGetter implements ItemsGetter, ReloadableItemsGetter {
 
     private static final String LOG_TAG = "LoadableItemsGetter";
 
@@ -57,9 +57,12 @@ public abstract class LoadableItemsGetter implements ItemsGetter {
         return null;
     }
 
-    public void reload() {
+    @UiThread
+    @Override
+    public void reload(Context context) {
         if (loadingStarted) return;
         items = null;
+        getItems(context);
     }
 
     @NonNull

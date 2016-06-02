@@ -23,15 +23,34 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
 
     public static final String ACTION_ITEMS_CHANGED =
             "eu.codetopic.utils.container.adapter.dashboard.DashboardAdapter.ITEMS_CHANGED";
+    public static final String ACTION_RELOAD_ITEM =
+            "eu.codetopic.utils.container.adapter.dashboard.DashboardAdapter.RELOAD_ITEM";
+    public static final String EXTRA_CLASS_OF_ITEM_TO_RELOAD =
+            "eu.codetopic.utils.container.adapter.dashboard.DashboardAdapter.CLASS_OF_ITEM_TO_RELOAD";
+
     private static final String LOG_TAG = "DashboardAdapter";
     private static final Object EDIT_TAG = new Object();//LOG_TAG + ".EDIT_TAG";
+
     private final Context mContext;
     private final DashboardItemsFilter mFilter;
     private final ItemsGetter[] mItemsGetters;
+
     private final BroadcastReceiver mItemsChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             notifyItemsChanged();
+        }
+    };
+
+    private final BroadcastReceiver mReloadItemsReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            //noinspection unchecked
+            Class<? extends ItemsGetter> classToReload = (Class<? extends ItemsGetter>) intent
+                    .getSerializableExtra(EXTRA_CLASS_OF_ITEM_TO_RELOAD);
+
+            if (classToReload == null) notifyReloadItems();
+            else notifyReloadItem(classToReload);
         }
     };
 
@@ -56,11 +75,13 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     public void onAttachToContainer(@Nullable Object container) {
         super.onAttachToContainer(container);
         getContext().registerReceiver(mItemsChangedReceiver, new IntentFilter(ACTION_ITEMS_CHANGED));
+        getContext().registerReceiver(mReloadItemsReceiver, new IntentFilter(ACTION_RELOAD_ITEM));
         notifyItemsChanged();
     }
 
     @Override
     public void onDetachFromContainer(@Nullable Object container) {
+        getContext().unregisterReceiver(mReloadItemsReceiver);
         getContext().unregisterReceiver(mItemsChangedReceiver);
         super.onDetachFromContainer(container);
         saveItemsStates();
@@ -75,6 +96,25 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     private void restoreItemsStates(Collection<ItemInfo> items) {
         DashboardData data = DashboardData.getter.get();
         for (ItemInfo item : items) data.restoreItemState(item);
+    }
+
+    @UiThread
+    public void notifyReloadItem(Class<? extends ItemsGetter> itemsGetterClass) {
+        if (!ReloadableItemsGetter.class.isAssignableFrom(itemsGetterClass))
+            throw new IllegalArgumentException("ItemsGetter must implement ReloadableItemsGetter.");
+
+        for (ItemsGetter getter : mItemsGetters)
+            if (itemsGetterClass.equals(getter.getClass()))
+                ((ReloadableItemsGetter) getter).reload(getContext());
+        notifyItemsChanged();
+    }
+
+    @UiThread
+    public void notifyReloadItems() {
+        for (ItemsGetter getter : mItemsGetters)
+            if (getter instanceof ReloadableItemsGetter)
+                ((ReloadableItemsGetter) getter).reload(getContext());
+        notifyItemsChanged();
     }
 
     @UiThread
