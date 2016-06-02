@@ -102,6 +102,15 @@ public class Utils {
                         Location.convert(longitude, Location.FORMAT_DEGREES);
     }
 
+    @CheckResult
+    public static double parseDouble(String string) {
+        try {
+            return Double.parseDouble(string.replace(",", ".").replaceAll("[^\\d.]", ""));
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
     ////////////////////////////
     //////REGION - BITMAPS//////
     ////////////////////////////
