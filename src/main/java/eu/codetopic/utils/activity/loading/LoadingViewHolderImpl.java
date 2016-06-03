@@ -66,6 +66,7 @@ public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
 
     protected void doHideLoading() {
         if (Build.VERSION.SDK_INT > 10) {
+            // FIXME: 3.6.16 loading is NULL when activity closed before load
             Animator animator = AnimatorInflater.loadAnimator(loading.getContext(), android.R.animator.fade_out);
             animator.setDuration(loading.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
             animator.addListener(new SimpleAnimatorListener() {
