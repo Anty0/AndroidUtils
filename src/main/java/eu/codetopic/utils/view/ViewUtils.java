@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
@@ -169,6 +170,22 @@ public class ViewUtils {
         view.draw(new Canvas(bitmap));
         view.destroyDrawingCache();
         return bitmap;
+    }
+
+    public static void drawViewToImageView(final Activity activity, final View view, final ImageView imageView) {
+        imageView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (!activity.isFinishing()) {
+                    if (imageView.getMeasuredWidth() == 0 || imageView.getMeasuredHeight() == 0) {
+                        imageView.post(this);
+                    } else {
+                        imageView.setImageBitmap(ViewUtils.drawViewToBitmap(view,
+                                imageView.getMeasuredWidth(), imageView.getMeasuredHeight()));
+                    }
+                }
+            }
+        });
     }
 
     @CheckResult
