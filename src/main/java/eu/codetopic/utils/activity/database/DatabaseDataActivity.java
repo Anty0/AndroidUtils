@@ -85,6 +85,7 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
 
     private void reloadData(final @Nullable Bundle savedInstanceState) {
         DbJob.work(mDaoGetter).startCallback(new DbJob.CallbackWork<DT, DT, ID>() {
+            @WorkerThread
             @Override
             public DT run(Dao<DT, ID> dao) throws Throwable {
                 return loadData(dao, savedInstanceState);// FIXME: 28.5.16 leak

@@ -21,8 +21,14 @@ public abstract class CustomItem {
 
     public static ViewHolder createViewHolder(Context context, @Nullable ViewGroup parent,
                                               @LayoutRes int itemLayoutId) {
+        return createViewHolder(context, parent, null, itemLayoutId);
+    }
+
+    private static ViewHolder createViewHolder(Context context, @Nullable ViewGroup parent,
+                                               @Nullable ViewHolder parentHolder,
+                                               @LayoutRes int itemLayoutId) {
         return new ViewHolder(context, LayoutInflater.from(context)
-                .inflate(itemLayoutId, parent, false), itemLayoutId);
+                .inflate(itemLayoutId, parent, false), parentHolder, itemLayoutId);
     }
 
     public final ViewHolder createViewHolder(Context context, @Nullable ViewGroup parent) {
@@ -61,7 +67,7 @@ public abstract class CustomItem {
                 contentHolder = null;
             }
             if (contentItem != null && contentHolder == null) {
-                contentHolder = createViewHolder(holder.context, content,
+                contentHolder = createViewHolder(holder.context, content, holder,
                         contentItem.getItemLayoutResId(holder.context));
                 content.addView(contentHolder.itemView);
                 ViewUtils.setViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER, contentHolder);
@@ -99,13 +105,27 @@ public abstract class CustomItem {
 
         public final Context context;
         public final View itemView;
+        public final ViewHolder parentHolder;
         @LayoutRes public final int layoutResId;
         private UniversalHolder universalHolder = null;
 
-        private ViewHolder(Context context, View itemView, @LayoutRes int layoutResId) {
+        private ViewHolder(Context context, View itemView, @Nullable ViewHolder parentHolder,
+                           @LayoutRes int layoutResId) {
             this.context = context;
             this.itemView = itemView;
+            this.parentHolder = parentHolder;
             this.layoutResId = layoutResId;
+        }
+
+        @Nullable
+        public ViewHolder getParentHolder() {
+            return parentHolder;
+        }
+
+        public ViewHolder getTopParentHolder() {
+            ViewHolder parentHolder = getParentHolder();
+            if (parentHolder == null) return this;
+            return parentHolder.getTopParentHolder();
         }
 
         public UniversalAdapter.ViewHolder forUniversalAdapter() {

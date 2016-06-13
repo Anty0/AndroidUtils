@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.container.adapter.ArrayEditAdapter;
 import eu.codetopic.utils.container.adapter.UniversalAdapter;
 import eu.codetopic.utils.container.items.custom.CustomItem;
@@ -32,8 +33,11 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     private static final Object EDIT_TAG = new Object();//LOG_TAG + ".EDIT_TAG";
 
     private final Context mContext;
+    private final LoadingViewHolder mLoadingHolder;
     private final DashboardItemsFilter mFilter;
     private final ItemsGetter[] mItemsGetters;
+
+    private boolean loadingShowed = true;
 
     private final BroadcastReceiver mItemsChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -54,14 +58,17 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         }
     };
 
-    public DashboardAdapter(@NonNull Context context, ItemsGetter... itemsGetters) {
-        this(context, new DefaultItemsFilter(), itemsGetters);
+    public DashboardAdapter(@NonNull Context context, LoadingViewHolder loadingHolder,
+                            ItemsGetter... itemsGetters) {
+        this(context, loadingHolder, new DefaultItemsFilter(), itemsGetters);
     }
 
-    public DashboardAdapter(@NonNull Context context, @NonNull DashboardItemsFilter filter,
-                            ItemsGetter... itemsGetters) {
+    public DashboardAdapter(@NonNull Context context, LoadingViewHolder loadingHolder,
+                            @NonNull DashboardItemsFilter filter, ItemsGetter... itemsGetters) {
 
         mContext = context;
+        mLoadingHolder = loadingHolder;
+        mLoadingHolder.showLoading();
         mFilter = filter;
         DashboardData.initialize(context);
         mItemsGetters = itemsGetters;
@@ -100,26 +107,38 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
 
     @UiThread
     public void notifyReloadItem(Class<? extends ItemsGetter> itemsGetterClass) {
-        if (!ReloadableItemsGetter.class.isAssignableFrom(itemsGetterClass))
-            throw new IllegalArgumentException("ItemsGetter must implement ReloadableItemsGetter.");
+        if (!LoadableItemsGetter.class.isAssignableFrom(itemsGetterClass))
+            throw new IllegalArgumentException("ItemsGetter must implement LoadableItemsGetter.");
 
         for (ItemsGetter getter : mItemsGetters)
             if (itemsGetterClass.equals(getter.getClass()))
-                ((ReloadableItemsGetter) getter).reload(getContext());
+                ((LoadableItemsGetter) getter).reload(getContext());
         notifyItemsChanged();
     }
 
     @UiThread
     public void notifyReloadItems() {
         for (ItemsGetter getter : mItemsGetters)
-            if (getter instanceof ReloadableItemsGetter)
-                ((ReloadableItemsGetter) getter).reload(getContext());
+            if (getter instanceof LoadableItemsGetter)
+                ((LoadableItemsGetter) getter).reload(getContext());
         notifyItemsChanged();
     }
 
     @UiThread
     public void notifyItemsChanged() {
         saveItemsStates();
+
+        if (loadingShowed) {
+            boolean loading = false;
+            for (ItemsGetter getter : mItemsGetters)
+                loading |= getter instanceof LoadableItemsGetter &&
+                        ((LoadableItemsGetter) getter).isLoaded(getContext());
+            if (!loading) {
+                mLoadingHolder.hideLoading();
+                loadingShowed = false;
+            }
+        }
+
         List<ItemInfo> itemInfoList = new ArrayList<>();
         for (ItemsGetter getter : mItemsGetters)
             itemInfoList.addAll(getter.getItems(getContext()));

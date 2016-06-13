@@ -2,6 +2,7 @@ package eu.codetopic.utils.thread.job.database;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.WorkerThread;
 
 import com.j256.ormlite.dao.Dao;
 
@@ -33,6 +34,7 @@ public final class DbJob<T, ID> {
     public String forEq(final String fieldName, final Object value,
                         final Callback<List<T>> callback) {
         return startCallback(new CallbackWork<List<T>, T, ID>() {
+            @WorkerThread
             @Override
             public List<T> run(Dao<T, ID> dao) throws Throwable {
                 return dao.queryForEq(fieldName, value);
@@ -42,6 +44,7 @@ public final class DbJob<T, ID> {
 
     public String forId(final ID id, final Callback<T> callback) {
         return startCallback(new CallbackWork<T, T, ID>() {
+            @WorkerThread
             @Override
             public T run(Dao<T, ID> dao) throws Throwable {
                 return dao.queryForId(id);
@@ -51,6 +54,7 @@ public final class DbJob<T, ID> {
 
     public String forAll(final Callback<List<T>> callback) {
         return startCallback(new CallbackWork<List<T>, T, ID>() {
+            @WorkerThread
             @Override
             public List<T> run(Dao<T, ID> dao) throws Throwable {
                 return dao.queryForAll();
@@ -102,6 +106,7 @@ public final class DbJob<T, ID> {
 
     public interface CallbackWork<D, T, ID> {
 
+        @WorkerThread
         D run(Dao<T, ID> dao) throws Throwable;
     }
 
