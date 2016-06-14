@@ -1,4 +1,4 @@
-package eu.codetopic.utils.timing;
+package eu.codetopic.utils.timing.info;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,7 +23,7 @@ import proguard.annotation.KeepName;
 @KeepName
 public @interface TimedComponent {
 
-    long time();
+    long repeatTime();
 
     int[] usableDays() default {Calendar.SUNDAY, Calendar.MONDAY, Calendar.TUESDAY,
             Calendar.WEDNESDAY, Calendar.THURSDAY, Calendar.FRIDAY, Calendar.SATURDAY};
@@ -32,11 +32,13 @@ public @interface TimedComponent {
 
     int stopHour() default 0;
 
-    boolean resetTimingOnBoot() default false;
+    boolean resetRepeatingOnBoot() default false;
 
     boolean requiresInternetAccess() default false;
 
     RepeatingMode repeatingMode() default RepeatingMode.INEXACT_REPEATING_WAKE_UP;
+
+    Class<? extends TimCompInfoModifier>[] infoModifiers() default {};
 
     @Keep
     @KeepName
@@ -45,7 +47,7 @@ public @interface TimedComponent {
     enum RepeatingMode {
         INEXACT_REPEATING_WAKE_UP, INEXACT_REPEATING, REPEATING_WAKE_UP, REPEATING;
 
-        boolean inexact() {
+        public boolean inexact() {
             switch (this) {
                 case INEXACT_REPEATING:
                 case INEXACT_REPEATING_WAKE_UP:
@@ -57,7 +59,7 @@ public @interface TimedComponent {
             }
         }
 
-        boolean wakeUp() {
+        public boolean wakeUp() {
             switch (this) {
                 case INEXACT_REPEATING_WAKE_UP:
                 case REPEATING_WAKE_UP:

@@ -1,4 +1,4 @@
-package eu.codetopic.utils.timing;
+package eu.codetopic.utils.timing.info;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -6,19 +6,18 @@ import android.content.Context;
 import java.io.Serializable;
 
 import eu.codetopic.utils.Utils;
-import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 
-public class TimedComponentInfo implements Serializable {
+public class TimCompInfo implements Serializable {
 
     private final Class<?> mComponent;
-    private final TimedComponent mComponentInfo;
+    private final TimCompInfoData mComponentInfo;
 
-    TimedComponentInfo(Class<?> componentClass) {
+    /**
+     * @hide
+     */
+    public TimCompInfo(Class<?> componentClass) {
         mComponent = componentClass;
-        mComponentInfo = componentClass.getAnnotation(TimedComponent.class);
-        if (mComponentInfo == null)
-            throw new NoAnnotationPresentException("TimedComponent annotation is not present in "
-                    + componentClass.getName());
+        mComponentInfo = new TimCompInfoData(componentClass);
     }
 
     public Class<?> getComponentClass() {
@@ -33,7 +32,7 @@ public class TimedComponentInfo implements Serializable {
         return Utils.isComponentEnabled(context, mComponent);
     }
 
-    public TimedComponent getComponentInfo() {
+    public TimCompInfoData getComponentInfo() {
         return mComponentInfo;
     }
 }

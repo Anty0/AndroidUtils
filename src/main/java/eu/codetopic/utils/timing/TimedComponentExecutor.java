@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.Log;
+import eu.codetopic.utils.timing.info.TimCompInfo;
 
 public class TimedComponentExecutor extends BroadcastReceiver {
 
@@ -19,7 +20,7 @@ public class TimedComponentExecutor extends BroadcastReceiver {
     private static final String EXTRA_EXECUTE_EXTRAS =
             "eu.codetopic.utils.timing.TimedComponentExecutor.EXECUTE_EXTRAS";
 
-    static Intent generateIntent(Context context, String action, TimedComponentInfo componentInfo,
+    static Intent generateIntent(Context context, String action, TimCompInfo componentInfo,
                                  @Nullable Bundle executeExtras) {
 
         return new Intent(context, TimedComponentExecutor.class).setAction(action)
@@ -32,7 +33,7 @@ public class TimedComponentExecutor extends BroadcastReceiver {
         Bundle extras = intent.getBundleExtra(EXTRA_EXECUTE_EXTRAS);
         if (extras == null) extras = new Bundle();
 
-        Class<?> componentClass = ((TimedComponentInfo) intent
+        Class<?> componentClass = ((TimCompInfo) intent
                 .getSerializableExtra(EXTRA_TIMED_COMPONENT_INFO)).getComponentClass();
 
         TimingData.getter.get().setLastExecuteTime(componentClass, System.currentTimeMillis());

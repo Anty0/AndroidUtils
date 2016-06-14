@@ -15,7 +15,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.JobUtils;
 
@@ -36,7 +35,7 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
         mSwipeRefreshLayout = (SwipeRefreshLayout) mainView
                 .findViewById(R.id.swipe_refresh_layout);
 
-        Log.d(LOG_TAG, "<init> for " + mContext.getClass().getName());
+        //Log.d(LOG_TAG, "<init> for " + mContext.getClass().getName());
 
         /*ArrayList<Module> modules = new ArrayList<>(ModulesManager.getInstance().getModules());
         Collections.sort(modules);// TODO: 9.5.16 use it to init modules colors (and use to obtaining styles attributes method in Utils)

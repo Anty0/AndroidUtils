@@ -143,6 +143,21 @@ public class Arrays {
     }
 
     /**
+     * Remove all null values from T[].
+     *
+     * @param objects array to modify
+     * @param <T>     type of array to modify
+     * @return new array without null values
+     */
+    @CheckResult
+    public static <T> T[] removeNulls(T[] objects) {
+        int index = indexOf(objects, null);
+        while (index != -1)
+            objects = remove(objects, index);
+        return objects;
+    }
+
+    /**
      * Remove object T from T[].
      *
      * @param objects array to modify

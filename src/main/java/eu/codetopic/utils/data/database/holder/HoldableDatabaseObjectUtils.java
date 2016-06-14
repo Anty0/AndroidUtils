@@ -2,8 +2,10 @@ package eu.codetopic.utils.data.database.holder;
 
 import android.support.annotation.WorkerThread;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
@@ -17,7 +19,8 @@ public final class HoldableDatabaseObjectUtils {
 
     private static final String LOG_TAG = "HoldableDatabaseObjectUtils";
 
-    private static final HashMap<Class, FoundField> cache = new HashMap<>();
+    private static final Cache<Class, FoundField> cache = CacheBuilder
+            .newBuilder().softValues().build();
 
     public static FoundField[] getAllHolderFieldsFor(DatabaseBase database) {
         Class[] dataClasses = database.getDataClasses();
@@ -29,11 +32,12 @@ public final class HoldableDatabaseObjectUtils {
     }
 
     public synchronized static FoundField getHolderFieldsOf(final Class clazz) {
-        FoundField result = cache.get(clazz);
+        FoundField result = cache.getIfPresent(clazz);
         if (result == null) {
             result = FieldsSearch.getFields(new SimpleFieldsFilter(clazz)
                     .addClassesToFind(DatabaseObjectHolder.class, DatabaseObjectHolder[].class)
                     .addAnnotationsToDeepSearch(ScanForHolders.class));
+
             if (Log.isInDebugMode())
                 Log.d(LOG_TAG, "getHolderFieldsOf for " + clazz.getName() + ":\n"
                         + result.hierarchyToString());

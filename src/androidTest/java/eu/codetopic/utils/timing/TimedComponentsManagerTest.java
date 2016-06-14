@@ -15,6 +15,7 @@ import org.junit.runner.RunWith;
 import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.timing.info.TimedComponent;
 
 @RunWith(AndroidJUnit4.class)
 public class TimedComponentsManagerTest {
@@ -42,7 +43,7 @@ public class TimedComponentsManagerTest {
     public void tearDown() throws Exception {
     }
 
-    @TimedComponent(time = 1000, repeatingMode = TimedComponent.RepeatingMode.REPEATING_WAKE_UP)
+    @TimedComponent(repeatTime = 1000, repeatingMode = TimedComponent.RepeatingMode.REPEATING_WAKE_UP)
     public static class TestTimedBroadcast extends BroadcastReceiver {
 
         @Override

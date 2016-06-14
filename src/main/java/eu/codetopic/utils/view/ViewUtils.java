@@ -5,6 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.CheckResult;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -229,6 +232,12 @@ public class ViewUtils {
         });
     }
 
+    @SuppressWarnings("deprecation")
+    public static void setBackground(View view, Drawable background) {
+        if (Build.VERSION.SDK_INT >= 16) view.setBackground(background);
+        else view.setBackgroundDrawable(background);
+    }
+
     public static void setPaddingInDip(View view, int horizontal, int vertical) {
         setPaddingInDip(view, horizontal, vertical, horizontal, vertical);
     }
@@ -249,6 +258,14 @@ public class ViewUtils {
     public static float convertPxToDp(Context context, int px) {
         return px / ((float) context.getResources().getDisplayMetrics().densityDpi
                 / DisplayMetrics.DENSITY_DEFAULT);
+    }
+
+    public static void makeViewContentStatic(View view) {
+        Bitmap b = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.RGB_565);
+        Canvas c = new Canvas(b);
+        view.layout(0, 0, view.getWidth(), view.getHeight());
+        view.draw(c);
+        setBackground(view, new BitmapDrawable(view.getContext().getResources(), b));
     }
 
 }

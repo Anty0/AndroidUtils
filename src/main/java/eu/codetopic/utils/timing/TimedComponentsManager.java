@@ -18,6 +18,9 @@ import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
+import eu.codetopic.utils.timing.info.TimCompInfo;
+import eu.codetopic.utils.timing.info.TimCompInfoData;
+import eu.codetopic.utils.timing.info.TimedComponent;
 
 public class TimedComponentsManager {
 
@@ -30,7 +33,7 @@ public class TimedComponentsManager {
     private static TimedComponentsManager INSTANCE = null;
 
     private final Context mContext;
-    private final HashMap<Class<?>, TimedComponentInfo> mComponentsInfoMap;
+    private final HashMap<Class<?>, TimCompInfo> mComponentsInfoMap;
     private NetworkManager.NetworkType mRequiredNetwork;
 
     private TimedComponentsManager(Context context, NetworkManager.NetworkType requiredNetwork,
@@ -47,7 +50,7 @@ public class TimedComponentsManager {
         synchronized (mComponentsInfoMap) {
             for (Class<?> component : components)
                 try {
-                    mComponentsInfoMap.put(component, new TimedComponentInfo(component));
+                    mComponentsInfoMap.put(component, new TimCompInfo(component));
                 } catch (Throwable t) {
                     Log.e(LOG_TAG, "<init>", t);
                 }
@@ -101,8 +104,8 @@ public class TimedComponentsManager {
             case Intent.ACTION_BOOT_COMPLETED:
                 TimingData data = TimingData.getter.get();
                 synchronized (mComponentsInfoMap) {
-                    for (TimedComponentInfo componentInfo : mComponentsInfoMap.values())
-                        if (componentInfo.getComponentInfo().resetTimingOnBoot())
+                    for (TimCompInfo componentInfo : mComponentsInfoMap.values())
+                        if (componentInfo.getComponentInfo().isResetRepeatingOnBoot())
                             data.clear(componentInfo.getComponentClass());
 
                     reloadAll();
@@ -112,7 +115,7 @@ public class TimedComponentsManager {
                 reloadAllNetwork();
                 break;
             case ACTION_RELOAD_COMPONENT:
-                TimedComponentInfo componentInfo = (TimedComponentInfo) intent
+                TimCompInfo componentInfo = (TimCompInfo) intent
                         .getSerializableExtra(EXTRA_TIMED_COMPONENT_INFO);
                 try {
                     reload(componentInfo);
@@ -134,13 +137,13 @@ public class TimedComponentsManager {
     }
 
     public void setComponentEnabled(Class<?> componentClass, boolean enabled) {
-        TimedComponentInfo componentInfo = getComponentInfo(componentClass);
+        TimCompInfo componentInfo = getComponentInfo(componentClass);
         if (componentInfo == null)
             throw new NullPointerException(componentClass.getName() + " no found");
         setComponentEnabled(componentInfo, enabled);
     }
 
-    public void setComponentEnabled(TimedComponentInfo componentInfo, boolean enabled) {
+    public void setComponentEnabled(TimCompInfo componentInfo, boolean enabled) {
         PackageManager pm = mContext.getPackageManager();
         if (pm.getComponentEnabledSetting(componentInfo.getComponentName(mContext))
                 != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
@@ -154,13 +157,13 @@ public class TimedComponentsManager {
     }
 
     public Intent getReloadIntent(Class<?> componentClass) {
-        TimedComponentInfo componentInfo = getComponentInfo(componentClass);
+        TimCompInfo componentInfo = getComponentInfo(componentClass);
         if (componentInfo == null)
             throw new NullPointerException(componentClass.getName() + " no found");
         return getReloadIntent(componentInfo);
     }
 
-    public Intent getReloadIntent(TimedComponentInfo componentInfo) {
+    public Intent getReloadIntent(TimCompInfo componentInfo) {
         return new Intent(mContext, BootConnectivityReceiver.class)
                 .setAction(ACTION_RELOAD_COMPONENT)
                 .putExtra(EXTRA_TIMED_COMPONENT_INFO, componentInfo);
@@ -168,8 +171,8 @@ public class TimedComponentsManager {
 
     public void reloadAllNetwork() {
         synchronized (mComponentsInfoMap) {
-            for (TimedComponentInfo componentInfo : mComponentsInfoMap.values())
-                if (componentInfo.getComponentInfo().requiresInternetAccess())
+            for (TimCompInfo componentInfo : mComponentsInfoMap.values())
+                if (componentInfo.getComponentInfo().isRequiresInternetAccess())
                     try {
                         reload(componentInfo);
                     } catch (Exception e) {
@@ -181,7 +184,7 @@ public class TimedComponentsManager {
 
     public void reloadAll() {
         synchronized (mComponentsInfoMap) {
-            for (TimedComponentInfo componentInfo : mComponentsInfoMap.values())
+            for (TimCompInfo componentInfo : mComponentsInfoMap.values())
                 try {
                     reload(componentInfo);
                 } catch (Exception e) {
@@ -193,14 +196,14 @@ public class TimedComponentsManager {
 
     public void reload(Class<?> componentClass) {
         synchronized (mComponentsInfoMap) {
-            TimedComponentInfo componentInfo = getComponentInfo(componentClass);
+            TimCompInfo componentInfo = getComponentInfo(componentClass);
             if (componentInfo == null)
                 throw new NullPointerException(componentClass.getName() + " no found");
             reload(componentInfo);
         }
     }
 
-    public void reload(TimedComponentInfo componentInfo) {
+    public void reload(TimCompInfo componentInfo) {
         synchronized (mComponentsInfoMap) {
             AlarmManager alarms = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
             Intent componentIntent = TimedComponentExecutor.generateIntent(mContext,
@@ -208,14 +211,14 @@ public class TimedComponentsManager {
             Intent reloadIntent = getReloadIntent(componentInfo);
 
             TimingData data = TimingData.getter.get();
-            TimedComponent component = componentInfo.getComponentInfo();
+            TimCompInfoData component = componentInfo.getComponentInfo();
             int lastRequestCode = data.getLastRequestCode(componentInfo.getComponentClass());
             if (lastRequestCode != -1) {
                 alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, componentIntent, 0));
                 alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, reloadIntent, 0));
             }
 
-            if (!componentInfo.isEnabled(mContext) || (component.requiresInternetAccess()
+            if (!componentInfo.isEnabled(mContext) || (component.isRequiresInternetAccess()
                     && !NetworkManager.isConnected(mRequiredNetwork))) {
                 data.setLastRequestCode(componentInfo.getComponentClass(), -1);
                 return;
@@ -223,12 +226,12 @@ public class TimedComponentsManager {
 
             int newRequestCode = NotificationIdsManager.getInstance().obtainRequestCode();
             data.setLastRequestCode(componentInfo.getComponentClass(), newRequestCode);
-            TimedComponent.RepeatingMode repeatingMode = component.repeatingMode();
+            TimedComponent.RepeatingMode repeatingMode = component.getRepeatingMode();
             Calendar calendar = Calendar.getInstance();
-            int[] usableDays = component.usableDays();
+            int[] usableDays = component.getUsableDays();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int startHour = component.startHour();
-            int stopHour = component.stopHour();
+            int startHour = component.getStartHour();
+            int stopHour = component.getStopHour();
             if ((startHour != stopHour && !(startHour < stopHour
                     ? (hour >= startHour && hour < stopHour)
                     : (hour >= startHour || hour < stopHour)))
@@ -253,7 +256,7 @@ public class TimedComponentsManager {
             }
 
             long lastStart = data.getLastExecuteTime(componentInfo.getComponentClass());
-            long startInterval = component.time();
+            long startInterval = component.getRepeatTime();
             if (lastStart == -1L) lastStart = calendar.getTimeInMillis() - startInterval;
             PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, newRequestCode,
                     componentIntent, PendingIntent.FLAG_CANCEL_CURRENT);
@@ -286,7 +289,7 @@ public class TimedComponentsManager {
     }
 
     @Nullable
-    public TimedComponentInfo getComponentInfo(Class<?> componentClass) {
+    public TimCompInfo getComponentInfo(Class<?> componentClass) {
         synchronized (mComponentsInfoMap) {
             return mComponentsInfoMap.get(componentClass);
         }
@@ -297,17 +300,17 @@ public class TimedComponentsManager {
     }
 
     public void forceExecute(Class<?> componentClass, @Nullable Bundle extras) {
-        TimedComponentInfo componentInfo = getComponentInfo(componentClass);
+        TimCompInfo componentInfo = getComponentInfo(componentClass);
         if (componentInfo == null)
             throw new NullPointerException(componentClass.getName() + " no found");
         forceExecute(componentInfo, extras);
     }
 
-    public void forceExecute(@NonNull TimedComponentInfo componentInfo) {
+    public void forceExecute(@NonNull TimCompInfo componentInfo) {
         forceExecute(componentInfo, null);
     }
 
-    public void forceExecute(@NonNull TimedComponentInfo componentInfo, @Nullable Bundle extras) {
+    public void forceExecute(@NonNull TimCompInfo componentInfo, @Nullable Bundle extras) {
         mContext.sendBroadcast(TimedComponentExecutor.generateIntent(mContext,
                 ACTION_FORCED_EXECUTE, componentInfo, extras));
     }
