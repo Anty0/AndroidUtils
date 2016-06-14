@@ -5,6 +5,7 @@ import android.os.Looper;
 import android.support.annotation.WorkerThread;
 
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.stmt.SelectArg;
 
 import java.util.List;
 
@@ -37,7 +38,8 @@ public final class DbJob<T, ID> {
             @WorkerThread
             @Override
             public List<T> run(Dao<T, ID> dao) throws Throwable {
-                return dao.queryForEq(fieldName, value);
+                SelectArg arg = new SelectArg(value);
+                return dao.query(dao.queryBuilder().where().eq(fieldName, arg).prepare());
             }
         }, callback);
     }
