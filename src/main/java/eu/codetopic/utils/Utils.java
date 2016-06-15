@@ -42,6 +42,9 @@ public class Utils {
 
     private static final String LOG_TAG = "Utils";
 
+    private Utils() {
+    }
+
     //////////////////////////////////////
     //////REGION - TEXTS_AND_STRINGS//////
     //////////////////////////////////////

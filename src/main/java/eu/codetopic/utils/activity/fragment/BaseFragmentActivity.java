@@ -97,7 +97,7 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
                 CURRENT_FRAGMENT_TAG.equals(fragment.getTag()))
             setTitle(((TitleProvider) fragment).getTitle());
 
-        System.runFinalization();
-        System.gc();
+        //System.runFinalization();
+        //System.gc();
     }
 }

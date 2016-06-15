@@ -33,19 +33,16 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     private static final Object EDIT_TAG = new Object();//LOG_TAG + ".EDIT_TAG";
 
     private final Context mContext;
-    private final LoadingViewHolder mLoadingHolder;
     private final DashboardItemsFilter mFilter;
     private final ItemsGetter[] mItemsGetters;
-
-    private boolean loadingShowed = true;
-
+    private final LoadingViewHolder mLoadingHolder;
+    private boolean mLoadingShowed;
     private final BroadcastReceiver mItemsChangedReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             notifyItemsChanged();
         }
     };
-
     private final BroadcastReceiver mReloadItemsReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -57,6 +54,7 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
             else notifyReloadItem(classToReload);
         }
     };
+    private boolean mActivated = false;
 
     public DashboardAdapter(@NonNull Context context, LoadingViewHolder loadingHolder,
                             ItemsGetter... itemsGetters) {
@@ -67,8 +65,11 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
                             @NonNull DashboardItemsFilter filter, ItemsGetter... itemsGetters) {
 
         mContext = context;
+
         mLoadingHolder = loadingHolder;
         mLoadingHolder.showLoading();
+        mLoadingShowed = true;
+
         mFilter = filter;
         DashboardData.initialize(context);
         mItemsGetters = itemsGetters;
@@ -78,18 +79,30 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         return mContext;
     }
 
-    @Override
-    public void onAttachToContainer(@Nullable Object container) {
-        super.onAttachToContainer(container);
+    public void activate() {
+        if (mActivated) throw new IllegalStateException(LOG_TAG + " is still activated");
         getContext().registerReceiver(mItemsChangedReceiver, new IntentFilter(ACTION_ITEMS_CHANGED));
         getContext().registerReceiver(mReloadItemsReceiver, new IntentFilter(ACTION_RELOAD_ITEM));
+        mActivated = true;
+    }
+
+    public void deactivate() {
+        if (!mActivated) throw new IllegalStateException(LOG_TAG + " is not activated");
+        getContext().unregisterReceiver(mReloadItemsReceiver);
+        getContext().unregisterReceiver(mItemsChangedReceiver);
+        mActivated = false;
+    }
+
+    @Override
+    public void onAttachToContainer(@Nullable Object container) {
+        if (!mActivated) throw new IllegalStateException("Can't attach to container, "
+                + LOG_TAG + " is not activated");
+        super.onAttachToContainer(container);
         notifyItemsChanged();
     }
 
     @Override
     public void onDetachFromContainer(@Nullable Object container) {
-        getContext().unregisterReceiver(mReloadItemsReceiver);
-        getContext().unregisterReceiver(mItemsChangedReceiver);
         super.onDetachFromContainer(container);
         saveItemsStates();
         edit().clear().setTag(EDIT_TAG).apply();
@@ -128,14 +141,15 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     public void notifyItemsChanged() {
         saveItemsStates();
 
-        if (loadingShowed) {
+        synchronized (mLoadingHolder) {
             boolean loading = false;
             for (ItemsGetter getter : mItemsGetters)
                 loading |= getter instanceof LoadableItemsGetter &&
-                        ((LoadableItemsGetter) getter).isLoaded(getContext());
-            if (!loading) {
-                mLoadingHolder.hideLoading();
-                loadingShowed = false;
+                        !((LoadableItemsGetter) getter).isLoaded(getContext());
+            if (mLoadingShowed != loading) {
+                if (mLoadingShowed) mLoadingHolder.hideLoading();
+                else mLoadingHolder.showLoading();
+                mLoadingShowed = !mLoadingShowed;
             }
         }
 

@@ -1,10 +1,12 @@
 package eu.codetopic.utils.timing.info;
 
+import java.io.Serializable;
+
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 
-public class TimCompInfoData {
+public class TimCompInfoData implements Serializable {
 
     private static final String LOG_TAG = "TimCompInfoData";
 

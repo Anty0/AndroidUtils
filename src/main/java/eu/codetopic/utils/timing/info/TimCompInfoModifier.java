@@ -1,6 +1,8 @@
 package eu.codetopic.utils.timing.info;
 
-public interface TimCompInfoModifier {
+import java.io.Serializable;
+
+public interface TimCompInfoModifier extends Serializable {
 
     void modify(TimCompInfoData toModify);
 }

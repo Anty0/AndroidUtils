@@ -117,12 +117,7 @@ public class TimedComponentsManager {
             case ACTION_RELOAD_COMPONENT:
                 TimCompInfo componentInfo = (TimCompInfo) intent
                         .getSerializableExtra(EXTRA_TIMED_COMPONENT_INFO);
-                try {
-                    reload(componentInfo);
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "reload - problem detected while reloading timed component: "
-                            + componentInfo.getComponentClass().getName(), e);
-                }
+                tryReload(componentInfo);
                 break;
         }
     }
@@ -153,7 +148,7 @@ public class TimedComponentsManager {
                 enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                         : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                 PackageManager.DONT_KILL_APP);
-        reload(componentInfo);
+        tryReload(componentInfo);
     }
 
     public Intent getReloadIntent(Class<?> componentClass) {
@@ -173,24 +168,32 @@ public class TimedComponentsManager {
         synchronized (mComponentsInfoMap) {
             for (TimCompInfo componentInfo : mComponentsInfoMap.values())
                 if (componentInfo.getComponentInfo().isRequiresInternetAccess())
-                    try {
-                        reload(componentInfo);
-                    } catch (Exception e) {
-                        Log.e(LOG_TAG, "reload - problem detected while reloading timed component: "
-                                + componentInfo.getComponentClass().getName(), e);
-                    }
+                    tryReload(componentInfo);
         }
     }
 
     public void reloadAll() {
         synchronized (mComponentsInfoMap) {
             for (TimCompInfo componentInfo : mComponentsInfoMap.values())
-                try {
-                    reload(componentInfo);
-                } catch (Exception e) {
-                    Log.e(LOG_TAG, "reloadAll - problem detected while reloading timed component: "
-                            + componentInfo.getComponentClass().getName(), e);
-                }
+                tryReload(componentInfo);
+        }
+    }
+
+    public void tryReload(Class<?> componentClass) {
+        try {
+            reload(componentClass);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "tryReload - problem detected while reloading timed component: "
+                    + componentClass.getName(), e);
+        }
+    }
+
+    public void tryReload(TimCompInfo componentInfo) {
+        try {
+            reload(componentInfo);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "tryReload - problem detected while reloading timed component: "
+                    + componentInfo.getComponentClass().getName(), e);
         }
     }
 

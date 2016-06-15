@@ -3,12 +3,14 @@ package eu.codetopic.utils.view;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.CheckResult;
+import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
@@ -33,12 +36,14 @@ import eu.codetopic.utils.thread.JobUtils;
 public class ViewUtils {
 
     private static final String LOG_TAG = "ViewUtils";
+    private static final int VIEW_TAG_KEY_TAGS_HASH_MAP = R.id.view_tag_key_tags_hash_map;
 
     /////////////////////////
     //////REGION - TAGS//////
     /////////////////////////
 
-    private static final int VIEW_TAG_KEY_TAGS_HASH_MAP = R.id.view_tag_key_tags_hash_map;
+    private ViewUtils() {
+    }
 
     private static Map<String, Object> getTags(View view) {
         //noinspection unchecked
@@ -109,9 +114,14 @@ public class ViewUtils {
 
     @CheckResult
     public static String layoutParamsSizeToString(int size) {
-        if (size == ViewGroup.LayoutParams.WRAP_CONTENT) return "wrap_content";
-        if (size == ViewGroup.LayoutParams.MATCH_PARENT) return "match_parent";
-        return String.valueOf(size);
+        switch (size) {
+            case ViewGroup.LayoutParams.WRAP_CONTENT:
+                return "wrap_content";
+            case ViewGroup.LayoutParams.MATCH_PARENT:
+                return "match_parent";
+            default:
+                return String.valueOf(size);
+        }
     }
 
     public static void copyLayoutParamsToViewParents(@NonNull View view, @Nullable View maxParent) {
@@ -148,12 +158,69 @@ public class ViewUtils {
     //////////////////////////
 
     @CheckResult
+    public static String visibilityToString(int visibility) {
+        switch (visibility) {
+            case View.VISIBLE:
+                return "visible";
+            case View.INVISIBLE:
+                return "invisible";
+            case View.GONE:
+                return "gone";
+            default:
+                return "unknown";
+        }
+    }
+
+    @CheckResult
+    public static String viewIdToString(@NonNull View view) {
+        return viewIdToString(view.getContext(), view.getId());
+    }
+
+    @CheckResult
+    public static String viewIdToString(@NonNull Context context, @IdRes int id) {
+        return viewIdToString(context.getResources(), id);
+    }
+
+    @CheckResult
+    public static String viewIdToString(@NonNull Resources res, @IdRes int id) {
+        if (id == View.NO_ID) return "NO_ID";
+        StringBuilder out = new StringBuilder("#")
+                .append(Integer.toHexString(id));
+
+        try {
+            String pkg;
+            switch (id & 0xff000000) {
+                case 0x7f000000:
+                    pkg = "app";
+                    break;
+                case 0x01000000:
+                    pkg = "android";
+                    break;
+                default:
+                    pkg = res.getResourcePackageName(id);
+                    break;
+            }
+            String typeName = res.getResourceTypeName(id);
+            String entryName = res.getResourceEntryName(id);
+            out.append(" ");
+            out.append(pkg);
+            out.append(":");
+            out.append(typeName);
+            out.append("/");
+            out.append(entryName);
+        } catch (Resources.NotFoundException e) {
+            Log.d(LOG_TAG, "viewIdToString");
+        }
+        return out.toString();
+    }
+
+    @CheckResult
     public static <T extends View> List<T> findViewsByClass(Class<T> clazz, Activity activity) {
         return findViewsByClass(clazz, activity.getWindow().getDecorView());
     }
 
-    @SuppressWarnings("unchecked")
     @CheckResult
+    @SuppressWarnings("unchecked")
     public static <T extends View> List<T> findViewsByClass(Class<T> clazz, View view) {
         List<T> views = new ArrayList<>();
         if (Objects.equals(view.getClass(), clazz)) views.add((T) view);
@@ -162,6 +229,15 @@ public class ViewUtils {
             views.addAll(findViewsByClass(clazz, ((ViewGroup) view).getChildAt(i)));
         }
         return views;
+    }
+
+    public static View getLastViewParent(View view) {
+        ViewParent parent = view.getParent();
+        while (parent instanceof View) {
+            view = (View) parent;
+            parent = parent.getParent();
+        }
+        return view;
     }
 
     @CheckResult
@@ -192,26 +268,34 @@ public class ViewUtils {
     }
 
     @CheckResult
-    public static String drawViewHierarchy(View view, boolean showId, boolean showSizes) {
-        StringBuilder sb = new StringBuilder("-");
-        if (showId) sb.append(Utils.fillToMaxLen(view.getId())).append(" -> ");
-        if (showSizes) {
-            ViewGroup.LayoutParams params = view.getLayoutParams();
-            if (params != null) {
-                sb.append("H: ").append(layoutParamsSizeToString(view.getLayoutParams().height))
-                        .append("|").append("W: ")
-                        .append(layoutParamsSizeToString(view.getLayoutParams().width))
-                        .append(" -> ");
-            }
+    public static String drawViewHierarchy(View view) {
+        StringBuilder sb = new StringBuilder("-->");
+
+        //draw visibility
+        sb.append(Utils.fillToLen(visibilityToString(view.getVisibility()), 9)).append(" -> ");
+
+        //draw id
+        sb.append(viewIdToString(view)).append(" -> ");
+
+        //draw sizes
+        ViewGroup.LayoutParams params = view.getLayoutParams();
+        if (params != null) {
+            sb.append("H: ").append(layoutParamsSizeToString(view.getLayoutParams().height))
+                    .append("|").append("W: ")
+                    .append(layoutParamsSizeToString(view.getLayoutParams().width))
+                    .append(" -> ");
         }
+
+        //draw view name and info
         sb.append(view.getClass().getSimpleName()).append(" -> ")
                 .append(view.getClass().getName());
+
+        //draw children
         if (view instanceof ViewGroup) {
             sb.append(" {");
             StringBuilder csb = new StringBuilder();
             for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++)
-                csb.append("\n").append(drawViewHierarchy(((ViewGroup) view)
-                        .getChildAt(i), showId, showSizes));
+                csb.append("\n").append(drawViewHierarchy(((ViewGroup) view).getChildAt(i)));
             sb.append(Utils.addBeforeEveryLine(csb.toString(), "    "));
             sb.append("\n}");
         }
@@ -260,7 +344,7 @@ public class ViewUtils {
                 / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-    public static void makeViewContentStatic(View view) {
+    public static void setViewContentAsBackground(View view) {
         Bitmap b = Bitmap.createBitmap(view.getWidth(), view.getHeight(), Bitmap.Config.RGB_565);
         Canvas c = new Canvas(b);
         view.layout(0, 0, view.getWidth(), view.getHeight());

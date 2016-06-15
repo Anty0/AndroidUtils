@@ -3,6 +3,7 @@ package eu.codetopic.utils.activity.loading;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.view.View;
 
 import java.lang.reflect.Method;
@@ -85,7 +86,7 @@ public abstract class LoadingViewHolder {
     public final void showLoading() {
         synchronized (lock) {
             if (loadingDepth == 0 && hasAttachedView())
-                JobUtils.postOnMainThread(new Runnable() {
+                JobUtils.postOnContextThread(getMainView().getContext(), new Runnable() {
                     @Override
                     public void run() {
                         synchronized (lock) {
@@ -97,13 +98,14 @@ public abstract class LoadingViewHolder {
         }
     }
 
+    @UiThread
     protected abstract void doShowLoading();
 
     public final void hideLoading() {
         synchronized (lock) {
             loadingDepth--;
             if (loadingDepth == 0 && hasAttachedView())
-                JobUtils.postOnMainThread(new Runnable() {
+                JobUtils.postOnContextThread(getMainView().getContext(), new Runnable() {
                     @Override
                     public void run() {
                         synchronized (lock) {
@@ -114,6 +116,7 @@ public abstract class LoadingViewHolder {
         }
     }
 
+    @UiThread
     protected abstract void doHideLoading();
 
     public final boolean isLoadingShowed() {

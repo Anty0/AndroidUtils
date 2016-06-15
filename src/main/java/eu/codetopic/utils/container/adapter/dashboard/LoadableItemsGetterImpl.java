@@ -47,22 +47,22 @@ public abstract class LoadableItemsGetterImpl implements LoadableItemsGetter {
                             "onActionCompleted was called more then one time!");
                     return;
                 }
-
                 called = true;
 
                 Context context = contextRef.get();
-                if (context != null) {
-                    if (result != null) {
-                        items = result;
-                    } else {
+                if (result != null) {
+                    items = result;
+                } else {
+                    if (context != null) {
                         ItemInfo exceptionItem = generateExceptionItem(context);
                         items = exceptionItem != null
                                 ? Collections.singleton(exceptionItem)
                                 : Collections.<ItemInfo>emptySet();
-                    }
-
+                    } else items = Collections.emptySet();
+                }
+                if (context != null)
                     context.sendBroadcast(new Intent(DashboardAdapter.ACTION_ITEMS_CHANGED));
-                } else items = Collections.emptySet();
+
 
                 loadingStarted = false;
             }

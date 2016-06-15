@@ -5,6 +5,8 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
+import eu.codetopic.utils.animation.AnimationsUtils;
+
 public class EmptyRecyclerView extends RecyclerView {
 
     private View mEmptyView;
@@ -52,9 +54,9 @@ public class EmptyRecyclerView extends RecyclerView {
             Adapter adapter = getAdapter();
             final boolean emptyViewVisible = adapter == null
                     || adapter.getItemCount() == 0;
-            mEmptyView.setVisibility(emptyViewVisible ? VISIBLE : GONE);
-            setVisibility(emptyViewVisible ? GONE : VISIBLE);
-        } else setVisibility(VISIBLE);
+            AnimationsUtils.animateVisibilityChange(mEmptyView, emptyViewVisible);
+            AnimationsUtils.animateVisibilityChange(this, !emptyViewVisible);
+        } else AnimationsUtils.animateVisibilityChange(this, true);
     }
 
     @Override
