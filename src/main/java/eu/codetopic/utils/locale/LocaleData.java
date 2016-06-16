@@ -15,8 +15,7 @@ public final class LocaleData extends SharedPreferencesData {
     }
 
     public String getActualLanguage() {
-        return getPreferences().getString(PrefNames.ACTUAL_LOCALE,
-                getContext().getResources().getConfiguration().locale.getLanguage());
+        return getPreferences().getString(PrefNames.ACTUAL_LOCALE, "unknown");// TODO: 16.6.16 find way to detect actual language
     }
 
     @Nullable

@@ -6,12 +6,15 @@ import android.content.Intent;
 import android.content.pm.ComponentInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.AnyRes;
 import android.support.annotation.AttrRes;
@@ -22,6 +25,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.annotation.WorkerThread;
 import android.text.Html;
+import android.text.Spanned;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -34,6 +38,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import eu.codetopic.utils.data.database.DatabaseObject;
@@ -81,6 +86,13 @@ public class Utils {
     }
 
     @CheckResult
+    public static Spanned fromHtml(String source) {
+        if (Build.VERSION.SDK_INT >= 24) return Html.fromHtml(source, 0);
+        //noinspection deprecation
+        return Html.fromHtml(source);
+    }
+
+    @CheckResult
     public static CharSequence getFormattedText(Context context, @StringRes int stringId,
                                                 Object... args) {
         return getFormattedText(context.getString(stringId), args);
@@ -88,7 +100,7 @@ public class Utils {
 
     @CheckResult
     public static CharSequence getFormattedText(String text, Object... args) {
-        return Html.fromHtml(String.format(text, args));
+        return fromHtml(String.format(text, args));
     }
 
     @CheckResult
@@ -304,6 +316,26 @@ public class Utils {
                 }
                 return false;
         }
+    }
+
+    /////////////////////////////
+    //////REGION - LOCALE////////
+    /////////////////////////////
+
+    public static void setLocale(Context context, Locale locale) {
+        setLocale(context.getResources(), locale);
+    }
+
+    public static void setLocale(Resources res, Locale locale) {
+        Configuration conf = res.getConfiguration();
+        setLocale(conf, locale);
+        res.updateConfiguration(conf, res.getDisplayMetrics());
+    }
+
+    @SuppressWarnings("deprecation")
+    public static void setLocale(Configuration conf, Locale locale) {
+        if (Build.VERSION.SDK_INT >= 24) conf.setLocale(locale);
+        else conf.locale = locale;
     }
 
     /////////////////////////////

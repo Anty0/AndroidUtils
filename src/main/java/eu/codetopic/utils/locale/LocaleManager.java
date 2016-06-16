@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
@@ -16,6 +14,7 @@ import android.widget.RadioGroup;
 import java.util.Locale;
 
 import eu.codetopic.utils.R;
+import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.getter.DataGetterNoBroadcastImpl;
 
@@ -103,10 +102,7 @@ public class LocaleManager {
     }
 
     private static void applyLocale(String language) {
-        Resources res = mContext.getResources();
-        Configuration conf = res.getConfiguration();
-        conf.locale = new Locale(language);
-        res.updateConfiguration(conf, res.getDisplayMetrics());
+        Utils.setLocale(mContext, new Locale(language));
     }
 
 }
