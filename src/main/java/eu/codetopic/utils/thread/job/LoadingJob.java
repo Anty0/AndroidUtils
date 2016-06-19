@@ -10,21 +10,21 @@ import com.birbit.android.jobqueue.RetryConstraint;
 
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.Log;
-import eu.codetopic.utils.activity.loading.LoadingViewHolder;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public abstract class LoadingJob extends Job {
 
     private static final String LOG_TAG = "LoadingJob";
 
-    private final LoadingViewHolder mLoadingViewHolder;
+    private final LoadingVH mLoadingViewHolder;
     private boolean mLoadingShowed = false;
 
-    protected LoadingJob(Params params, @Nullable LoadingViewHolder loadingViewHolder) {
+    protected LoadingJob(Params params, @Nullable LoadingVH loadingViewHolder) {
         super(params);
         mLoadingViewHolder = loadingViewHolder;
     }
 
-    public LoadingViewHolder getViewHolder() {
+    public LoadingVH getViewHolder() {
         return mLoadingViewHolder;
     }
 

@@ -1,14 +1,14 @@
 package eu.codetopic.utils.activity.navigation;
 
-import eu.codetopic.utils.activity.loading.LoadingFragment;
-import eu.codetopic.utils.activity.loading.LoadingViewHolder;
+import eu.codetopic.utils.view.holder.loading.LoadingFragment;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public abstract class NavigationFragment extends LoadingFragment {
 
     public NavigationFragment() {
     }
 
-    public NavigationFragment(Class<? extends LoadingViewHolder> loadingViewHolderClass) {
+    public NavigationFragment(Class<? extends LoadingVH> loadingViewHolderClass) {
         super(loadingViewHolderClass);
     }
 

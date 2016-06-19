@@ -9,15 +9,15 @@ import com.j256.ormlite.stmt.SelectArg;
 
 import java.util.List;
 
-import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public final class DbJob<T, ID> {
 
     private static final String LOG_TAG = "DbJob";
 
     private final DatabaseDaoGetter<T, ID> daoGetter;
-    private LoadingViewHolder loadingHolder = null;
+    private LoadingVH loadingHolder = null;
 
     private DbJob(DatabaseDaoGetter<T, ID> daoGetter) {
         this.daoGetter = daoGetter;
@@ -27,7 +27,7 @@ public final class DbJob<T, ID> {
         return new DbJob<>(daoGetter);
     }
 
-    public DbJob<T, ID> withLoading(LoadingViewHolder loadingHolder) {
+    public DbJob<T, ID> withLoading(LoadingVH loadingHolder) {
         this.loadingHolder = loadingHolder;
         return this;
     }

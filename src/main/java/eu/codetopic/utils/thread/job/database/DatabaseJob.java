@@ -8,10 +8,10 @@ import com.birbit.android.jobqueue.Params;
 
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.LoadingJob;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public class DatabaseJob<T, ID> extends LoadingJob {
 
@@ -20,7 +20,7 @@ public class DatabaseJob<T, ID> extends LoadingJob {
     private final DatabaseDaoGetter<T, ID> daoGetter;
     private final DatabaseWork<T, ID> job;
 
-    public DatabaseJob(@Nullable LoadingViewHolder loadingViewHolder,
+    public DatabaseJob(@Nullable LoadingVH loadingViewHolder,
                        DatabaseDaoGetter<T, ID> daoGetter, DatabaseWork<T, ID> job) {
         super(new Params(Constants.JOB_PRIORITY_DATABASE)
                 .groupBy(generateDatabaseJobGroupNameFor(daoGetter

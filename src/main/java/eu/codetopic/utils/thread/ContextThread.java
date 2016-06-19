@@ -9,7 +9,7 @@ import android.support.annotation.WorkerThread;
 import java.lang.ref.WeakReference;
 
 import eu.codetopic.utils.Log;
-import eu.codetopic.utils.activity.loading.LoadingViewHolder;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public final class ContextThread<C extends Context> {
 
@@ -17,9 +17,9 @@ public final class ContextThread<C extends Context> {
 
     private final Context appContext;
     private final WeakReference<C> reference;
-    private final LoadingViewHolder loadingHolder;
+    private final LoadingVH loadingHolder;
 
-    private ContextThread(@NonNull C context, @Nullable LoadingViewHolder loadingHolder) {
+    private ContextThread(@NonNull C context, @Nullable LoadingVH loadingHolder) {
         this.appContext = context.getApplicationContext();
         this.reference = new WeakReference<>(context);
         this.loadingHolder = loadingHolder;
@@ -30,7 +30,7 @@ public final class ContextThread<C extends Context> {
         work(context, null, runnable);
     }
 
-    public static <C extends Context, D> void work(@NonNull C context, @Nullable LoadingViewHolder loadingHolder,
+    public static <C extends Context, D> void work(@NonNull C context, @Nullable LoadingVH loadingHolder,
                                                    @NonNull final Work<C, D> runnable) {
         new ContextThread<>(context, loadingHolder).start(runnable);
     }

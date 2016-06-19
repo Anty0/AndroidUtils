@@ -10,12 +10,13 @@ import android.support.annotation.WorkerThread;
 
 import com.j256.ormlite.dao.Dao;
 
-import eu.codetopic.utils.activity.loading.LoadingModularActivity;
 import eu.codetopic.utils.activity.modular.ActivityCallBackModule;
 import eu.codetopic.utils.data.database.DatabaseObject;
 import eu.codetopic.utils.data.database.DependencyTextDatabaseObject;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.job.database.DbJob;
+import eu.codetopic.utils.view.holder.loading.LoadingModularActivity;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extends LoadingModularActivity {
 
@@ -30,8 +31,15 @@ public abstract class DatabaseDataActivity<DT extends DatabaseObject, ID> extend
     private DT mData = null;
     private ID mDataId = null;
 
+    public DatabaseDataActivity() {
+    }
+
     public DatabaseDataActivity(ActivityCallBackModule... modules) {
         super(modules);
+    }
+
+    public DatabaseDataActivity(Class<? extends LoadingVH> holderClass, ActivityCallBackModule... modules) {
+        super(holderClass, modules);
     }
 
     public static <DT extends DatabaseObject, ID> Intent generateDataActivityIntent

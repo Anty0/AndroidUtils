@@ -9,6 +9,11 @@ import android.view.ViewGroup;
 
 import eu.codetopic.utils.Log;
 
+/**
+ * Use eu.codetopic.utils.view.holder.loading.LoadingFragment instead
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class LoadingFragment extends Fragment {
 
     private static final String LOG_TAG = "LoadingFragment";

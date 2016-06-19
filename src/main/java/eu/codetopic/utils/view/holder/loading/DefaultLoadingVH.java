@@ -1,25 +1,21 @@
-package eu.codetopic.utils.activity.loading;
+package eu.codetopic.utils.view.holder.loading;
 
-import android.content.Context;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import java.lang.ref.WeakReference;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.progress.ProgressInfo;
 import eu.codetopic.utils.thread.progress.ProgressReporter;
 import eu.codetopic.utils.thread.progress.ProgressReporterImpl;
-import proguard.annotation.Keep;
-import proguard.annotation.KeepName;
 
-/**
- * Use eu.codetopic.utils.view.holder.loading.DefaultLoadingVH instead
- */
-@Deprecated
-@SuppressWarnings("deprecation")
-public class DefaultLoadingViewHolder extends LoadingViewHolderWithProgress {
+public class DefaultLoadingVH extends ProgressLoadingVH {
 
     @LayoutRes protected static final int LOADING_LAYOUT_ID = R.layout.loading_base;
     @IdRes protected static final int CONTENT_VIEW_ID = R.id.base_loadable_content;
@@ -27,30 +23,20 @@ public class DefaultLoadingViewHolder extends LoadingViewHolderWithProgress {
     @IdRes protected static final int CIRCLE_LOADING_VIEW_ID = R.id.base_loading_circle;
     @IdRes protected static final int HORIZONTAL_LOADING_VIEW_ID = R.id.base_loading_horizontal;
 
-    private static final String LOG_TAG = "DefaultLoadingViewHolder";
+    private static final String LOG_TAG = "DefaultLoadingVH";
 
-    @Keep
-    @KeepName
-    private static HolderInfo<DefaultLoadingViewHolder> getHolderInfo() {
-        return new HolderInfo<>(DefaultLoadingViewHolder.class, true,
-                LOADING_LAYOUT_ID, CONTENT_VIEW_ID);
+    @NonNull
+    @Override
+    protected LoadingWrappingInfo getWrappingInfo() {
+        return new LoadingWrappingInfo(LOADING_LAYOUT_ID, CONTENT_VIEW_ID, LOADING_VIEW_ID);
     }
 
     @Override
-    protected int getContentViewId(Context context) {
-        return CONTENT_VIEW_ID;
-    }
-
-    @Override
-    protected int getLoadingViewId(Context context) {
-        return LOADING_VIEW_ID;
-    }
-
-    @Override
-    protected ProgressReporter generateProgressReporter() {
+    protected DualProgressReporter generateProgressReporter() {
         return doUpdateReporter(new DualProgressReporter());
     }
 
+    @UiThread
     @Override
     protected void updateProgressReporter(ProgressReporter reporter) {
         if (!(reporter instanceof DualProgressReporter))
@@ -61,20 +47,21 @@ public class DefaultLoadingViewHolder extends LoadingViewHolderWithProgress {
     }
 
     private DualProgressReporter doUpdateReporter(DualProgressReporter reporter) {
-        reporter.loadingView = getLoadingView();
+        reporter.loadingViewRef = getLoadingViewRef();
         reporter.onChange(reporter.getProgressInfo());
         return reporter;
     }
 
     private static class DualProgressReporter extends ProgressReporterImpl {
 
-        View loadingView;
+        WeakReference<View> loadingViewRef;
 
         @Override
         protected void onChange(final ProgressInfo info) {
-            JobUtils.postOnViewThread(loadingView, new Runnable() {
+            JobUtils.postOnViewThread(loadingViewRef.get(), new Runnable() {
                 @Override
                 public void run() {
+                    View loadingView = loadingViewRef.get();
                     if (loadingView != null) {
                         View circleProgress = loadingView.findViewById(CIRCLE_LOADING_VIEW_ID);
                         ProgressBar horizontalProgress = (ProgressBar) loadingView

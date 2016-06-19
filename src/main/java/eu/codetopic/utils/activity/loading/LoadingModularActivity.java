@@ -4,6 +4,11 @@ import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.activity.modular.ActivityCallBackModule;
 import eu.codetopic.utils.activity.modular.ModularActivity;
 
+/**
+ * Use eu.codetopic.utils.view.holder.loading.LoadingModularActivity instead
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class LoadingModularActivity extends ModularActivity {
 
     private static final String LOG_TAG = "LoadingModularActivity";

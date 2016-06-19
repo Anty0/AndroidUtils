@@ -11,6 +11,11 @@ import java.lang.annotation.Target;
 import proguard.annotation.Keep;
 import proguard.annotation.KeepName;
 
+/**
+ * Migrate to eu.codetopic.utils.view.holder.loading.* instead
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Keep

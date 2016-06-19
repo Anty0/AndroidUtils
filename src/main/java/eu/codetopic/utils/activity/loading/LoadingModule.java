@@ -7,6 +7,11 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.activity.modular.ModularActivity;
 import eu.codetopic.utils.activity.modular.SimpleActivityCallBackModule;
 
+/**
+ * Use eu.codetopic.utils.view.holder.loading.LoadingModule instead
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public class LoadingModule extends SimpleActivityCallBackModule {
 
     private static final String LOG_TAG = "LoadingModule";

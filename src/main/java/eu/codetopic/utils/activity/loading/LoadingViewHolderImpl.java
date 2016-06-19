@@ -7,6 +7,11 @@ import android.view.View;
 
 import eu.codetopic.utils.animation.AnimationsUtils;
 
+/**
+ * Use eu.codetopic.utils.view.holder.loading.LoadingVHImpl instead
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
 
     private static final String LOG_TAG = "LoadingViewHolderImpl";

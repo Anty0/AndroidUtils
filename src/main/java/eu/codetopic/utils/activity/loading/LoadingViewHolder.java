@@ -11,6 +11,11 @@ import java.lang.reflect.Method;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
+/**
+ * Use eu.codetopic.utils.view.holder.loading.LoadingVH instead
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class LoadingViewHolder {
 
     private static final String LOG_TAG = "LoadingViewHolder";

@@ -113,7 +113,13 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
 
         assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
 
+        if (!isBaseAttached()) {
+            for (Modification<T> modification : modifications)
+                modification.modify(null, mData);
+            return;
+        }
         Base base = getBase();
+
         synchronized (mLock) {
             try {
                 if (mode == CalculatingMode.NO_ANIMATIONS

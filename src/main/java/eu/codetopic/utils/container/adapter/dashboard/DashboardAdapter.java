@@ -15,10 +15,10 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.container.adapter.ArrayEditAdapter;
 import eu.codetopic.utils.container.adapter.UniversalAdapter;
 import eu.codetopic.utils.container.items.custom.CustomItem;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapter.ViewHolder> {
 
@@ -35,7 +35,7 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     private final Context mContext;
     private final DashboardItemsFilter mFilter;
     private final ItemsGetter[] mItemsGetters;
-    private final LoadingViewHolder mLoadingHolder;
+    private final LoadingVH mLoadingHolder;
     private boolean mLoadingShowed;
     private final BroadcastReceiver mItemsChangedReceiver = new BroadcastReceiver() {
         @Override
@@ -56,12 +56,12 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     };
     private boolean mActivated = false;
 
-    public DashboardAdapter(@NonNull Context context, LoadingViewHolder loadingHolder,
+    public DashboardAdapter(@NonNull Context context, LoadingVH loadingHolder,
                             ItemsGetter... itemsGetters) {
         this(context, loadingHolder, new DefaultItemsFilter(), itemsGetters);
     }
 
-    public DashboardAdapter(@NonNull Context context, LoadingViewHolder loadingHolder,
+    public DashboardAdapter(@NonNull Context context, LoadingVH loadingHolder,
                             @NonNull DashboardItemsFilter filter, ItemsGetter... itemsGetters) {
 
         mContext = context;

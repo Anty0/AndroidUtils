@@ -1,20 +1,16 @@
-package eu.codetopic.utils.activity.loading;
+package eu.codetopic.utils.view.holder.loading;
 
 import android.support.annotation.Nullable;
+import android.support.annotation.UiThread;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import eu.codetopic.utils.thread.progress.ProgressBarReporter;
 import eu.codetopic.utils.thread.progress.ProgressReporter;
 
-/**
- * Use eu.codetopic.utils.view.holder.loading.ProgressLoadingVH instead
- */
-@Deprecated
-@SuppressWarnings("deprecation")
-public abstract class LoadingViewHolderWithProgress extends LoadingViewHolderImpl {
+public abstract class ProgressLoadingVH extends LoadingVHImpl {
 
-    private static final String LOG_TAG = "LoadingViewHolderWithProgress";
+    private static final String LOG_TAG = "ProgressLoadingVH";
 
     private ProgressReporter progressReporter = null;
 
@@ -31,6 +27,7 @@ public abstract class LoadingViewHolderWithProgress extends LoadingViewHolderImp
                 ? (ProgressBar) loading : null);
     }
 
+    @UiThread
     protected void updateProgressReporter(ProgressReporter reporter) {
         if (!(reporter instanceof ProgressBarReporter))
             throw new ClassCastException("Can't update progress of " + reporter
@@ -41,10 +38,12 @@ public abstract class LoadingViewHolderWithProgress extends LoadingViewHolderImp
                 ? (ProgressBar) loading : null);
     }
 
+    @UiThread
     @Override
-    protected void onUpdateMainView(@Nullable View newMainView) {
-        super.onUpdateMainView(newMainView);
+    protected void onUpdateView(@Nullable View view) {
+        super.onUpdateView(view);
         if (progressReporter != null)
             updateProgressReporter(progressReporter);
     }
+
 }

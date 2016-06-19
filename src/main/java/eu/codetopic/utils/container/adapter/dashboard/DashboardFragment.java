@@ -6,10 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import eu.codetopic.utils.activity.loading.LoadingFragment;
+import eu.codetopic.utils.activity.navigation.NavigationFragment;
 import eu.codetopic.utils.container.recycler.Recycler;
 
-public abstract class DashboardFragment extends LoadingFragment {
+public abstract class DashboardFragment extends NavigationFragment {
 
     private final ItemsGetter[] mItemsGetters;
     private DashboardAdapter mAdapter = null;
@@ -21,7 +21,7 @@ public abstract class DashboardFragment extends LoadingFragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new DashboardAdapter(getContext(), getLoadingViewHolder(), mItemsGetters);
+        mAdapter = new DashboardAdapter(getContext(), getHolder(), mItemsGetters);
         mAdapter.activate();
     }
 

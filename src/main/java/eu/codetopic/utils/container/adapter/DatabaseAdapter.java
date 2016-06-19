@@ -20,7 +20,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import eu.codetopic.utils.Log;
-import eu.codetopic.utils.activity.loading.LoadingViewHolder;
 import eu.codetopic.utils.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
@@ -30,6 +29,7 @@ import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.database.DatabaseWork;
 import eu.codetopic.utils.thread.job.database.DbJob;
+import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
@@ -45,7 +45,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
     };
 
     public DatabaseAdapter(Context context, DatabaseDaoGetter<T, ID> daoGetter,
-                           @Nullable LoadingViewHolder viewHolder) {
+                           @Nullable LoadingVH viewHolder) {
         this(context, new DefaultItemsGetter<>(daoGetter, viewHolder));
     }
 
@@ -93,7 +93,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         private Comparator<T> mComparator = null;
 
         public FilteredItemsGetter(DatabaseDaoGetter<T, ID> daoGetter,
-                                   @Nullable LoadingViewHolder viewHolder) {
+                                   @Nullable LoadingVH viewHolder) {
             super(daoGetter, viewHolder);
         }
 
@@ -145,10 +145,10 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
     public static class DefaultItemsGetter<T, ID> extends ItemsGetter<T, ID> {
 
         private final DatabaseDaoGetter<T, ID> mDaoGetter;
-        private final LoadingViewHolder mViewHolder;
+        private final LoadingVH mViewHolder;
 
         public DefaultItemsGetter(DatabaseDaoGetter<T, ID> daoGetter,
-                                  @Nullable LoadingViewHolder viewHolder) {
+                                  @Nullable LoadingVH viewHolder) {
             mDaoGetter = daoGetter;
             mViewHolder = viewHolder;
         }
@@ -157,7 +157,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
             return mDaoGetter;
         }
 
-        public LoadingViewHolder getViewHolder() {
+        public LoadingVH getViewHolder() {
             return mViewHolder;
         }
 
