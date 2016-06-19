@@ -1,6 +1,7 @@
 package eu.codetopic.utils;
 
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ComponentInfo;
@@ -14,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.AnyRes;
@@ -124,6 +126,14 @@ public class Utils {
         } catch (Exception e) {
             return 0;
         }
+    }
+
+    public static Uri getResourceUri(@NonNull Context context, @AnyRes int resource) {
+        Resources resources = context.getResources();
+        return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
+                + resources.getResourcePackageName(resource) + "/"
+                + resources.getResourceTypeName(resource) + "/"
+                + resources.getResourceEntryName(resource));
     }
 
     ////////////////////////////
