@@ -24,33 +24,29 @@ public class JobUtils {
         MAIN_THREAD = looper.getThread();
     }
 
-    public static void runOnMainThread(Runnable action) {
-        if (!isOnMainThread()) {
-            postOnMainThread(action);
-            return;
-        }
+    public static boolean runOnMainThread(Runnable action) {
+        if (!isOnMainThread()) return postOnMainThread(action);
+
         action.run();
+        return true;
     }
 
     public static boolean isOnMainThread() {
         return Thread.currentThread() == MAIN_THREAD;
     }
 
-    public static void postOnMainThread(Runnable action) {
-        HANDLER.post(action);
+    public static boolean postOnMainThread(Runnable action) {
+        return HANDLER.post(action);
     }
 
-    public static void runOnContextThread(@Nullable Context context, Runnable action) {
-        if (context == null) {
-            runOnMainThread(action);
-            return;
-        }
+    public static boolean runOnContextThread(@Nullable Context context, Runnable action) {
+        if (context == null) return runOnMainThread(action);
 
-        if (!isOnContextThread(context)) {
-            postOnContextThread(context, action);
-            return;
-        }
+        if (!isOnContextThread(context))
+            return postOnContextThread(context, action);
+
         action.run();
+        return true;
     }
 
     public static boolean isOnContextThread(@Nullable Context context) {
@@ -58,22 +54,14 @@ public class JobUtils {
         return Thread.currentThread() == context.getMainLooper().getThread();
     }
 
-    public static void postOnContextThread(@Nullable Context context, Runnable action) {
-        if (context == null) {
-            postOnMainThread(action);
-            return;
-        }
-
-        new Handler(context.getMainLooper()).post(action);
+    public static boolean postOnContextThread(@Nullable Context context, Runnable action) {
+        return context != null && new Handler(context.getMainLooper()).post(action)
+                || postOnMainThread(action);
     }
 
-    public static void postOnViewThread(@Nullable View view, Runnable action) {
-        if (view == null) {
-            postOnMainThread(action);
-            return;
-        }
-
-        view.post(action);
+    public static boolean postOnViewThread(@Nullable View view, Runnable action) {
+        return view != null && view.post(action)
+                || postOnMainThread(action);
     }
 
     public static boolean threadSleep(long time) {

@@ -73,6 +73,11 @@ public class ViewHolder {
 
     }
 
+    @UiThread
+    protected void onViewUpdated() {
+
+    }
+
     @NonNull
     public Reference<View> getViewRef() {
         synchronized (lock) {
@@ -91,6 +96,7 @@ public class ViewHolder {
         synchronized (lock) {
             viewRef = new WeakReference<>(view);
             onUpdateView(view);
+            onViewUpdated();
         }
     }
 
@@ -187,10 +193,13 @@ public class ViewHolder {
             ViewGroup parent = (ViewGroup) baseView.findViewById(wrappingInfo.getContentViewId());
             View result = viewCreator.createView(context, parent);
             if (result != null) parent.addView(result);
+            setView(baseView);
         }
 
         public void applyOnBaseLayout(@NonNull Activity activity, @NonNull ViewCreator viewCreator) {
-            applyOnBaseLayout(activity, activity.getWindow().getDecorView(), viewCreator);
+            ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+            applyOnBaseLayout(activity, decorView.getChildCount() == 1
+                    ? decorView.getChildAt(0) : decorView, viewCreator);
         }
     }
 }

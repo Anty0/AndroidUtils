@@ -35,8 +35,9 @@ public class ViewHolderModule<VH extends ViewHolder> extends SimpleActivityCallB
     protected void onSetContentView(@LayoutRes final int layoutResID, SetContentViewCallBack callBack) {
         final ViewHolder.ViewUpdater updater = mHolder.getViewUpdater();
         if (!updater.requiresBaseLayout()) {
-            callBack.pass();
-            return;
+            throw new IllegalStateException("Can't create contentView for ViewHolder without base layout");
+            //callBack.pass();
+            //return;
         }
 
         callBack.set(updater.getBaseLayoutResId());
@@ -53,8 +54,9 @@ public class ViewHolderModule<VH extends ViewHolder> extends SimpleActivityCallB
     protected void onSetContentView(final View view, SetContentViewCallBack callBack) {
         final ViewHolder.ViewUpdater updater = mHolder.getViewUpdater();
         if (!updater.requiresBaseLayout()) {
-            callBack.pass();
-            return;
+            throw new IllegalStateException("Can't create contentView for ViewHolder without base layout");
+            //callBack.pass();
+            //return;
         }
 
         callBack.set(updater.getBaseLayoutResId());

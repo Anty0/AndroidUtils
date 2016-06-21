@@ -1,7 +1,10 @@
 package eu.codetopic.utils.view.holder.loading;
 
+import android.content.Context;
 import android.support.annotation.UiThread;
+import android.view.View;
 
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.view.holder.ViewHolder;
 
@@ -11,10 +14,24 @@ public abstract class LoadingVH extends ViewHolder {
 
     private int loadingDepth = 0;
 
+    @UiThread
+    @Override
+    protected void onViewUpdated() {
+        super.onViewUpdated();
+
+        if (loadingDepth == 0) doHideLoading();
+        else doShowLoading();
+    }
+
+    private Context getViewContext() {
+        View view = getView();
+        return view == null ? null : view.getContext();
+    }
+
     public final void showLoading() {
         synchronized (getViewLock()) {
-            if (loadingDepth == 0)
-                JobUtils.postOnViewThread(getView(), new Runnable() {
+            if (loadingDepth == 0) {
+                JobUtils.postOnContextThread(getViewContext(), new Runnable() {
                     @Override
                     public void run() {
                         synchronized (getViewLock()) {
@@ -22,6 +39,7 @@ public abstract class LoadingVH extends ViewHolder {
                         }
                     }
                 });
+            }
             loadingDepth++;
         }
     }
@@ -33,7 +51,7 @@ public abstract class LoadingVH extends ViewHolder {
         synchronized (getViewLock()) {
             loadingDepth--;
             if (loadingDepth == 0) {
-                JobUtils.postOnViewThread(getView(), new Runnable() {
+                JobUtils.postOnContextThread(getViewContext(), new Runnable() {
                     @Override
                     public void run() {
                         synchronized (getViewLock()) {
@@ -42,6 +60,9 @@ public abstract class LoadingVH extends ViewHolder {
                     }
                 });
             }
+            if (loadingDepth < 0)
+                Log.e(LOG_TAG, "hideLoading: Called hideLoading()" +
+                        " without calling showLoading() before.");
         }
     }
 
