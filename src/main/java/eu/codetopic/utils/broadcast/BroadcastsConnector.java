@@ -12,11 +12,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import eu.codetopic.utils.Objects;
+
 public final class BroadcastsConnector extends BroadcastReceiver {
 
     private static final String LOG_TAG = "BroadcastsConnector";
     private static final BroadcastsConnector mInstance = new BroadcastsConnector();
     private static final HashMap<String, List<Connection>> mConnections = new HashMap<>();
+    private static final HashMap<String, List<Connection>> mGroups = new HashMap<>();
     private static Context mContext = null;
     private static boolean mRegistered = false;
 
@@ -28,19 +31,6 @@ public final class BroadcastsConnector extends BroadcastReceiver {
         mContext = context.getApplicationContext();
     }
 
-    public static void connect(@NonNull String actionFrom, @NonNull String actionTo) {
-        connect(actionFrom, actionTo, null);
-    }
-
-    public static void connect(@NonNull String actionFrom, @NonNull String actionTo,
-                               @Nullable Bundle additionalIntentData) {
-        connect(actionFrom, new Connection(actionTo, additionalIntentData));
-    }
-
-    public static void connect(@NonNull String actionFrom, @NonNull Intent intent) {
-        connect(actionFrom, new Connection(intent));
-    }
-
     public static synchronized void connect(@NonNull String actionFrom, @NonNull Connection connection) {
         try {
             List<Connection> connections = mConnections.get(actionFrom);
@@ -49,17 +39,64 @@ public final class BroadcastsConnector extends BroadcastReceiver {
                 mConnections.put(actionFrom, connections);
             }
             connections.add(connection);
+
+            String groupName = connection.getGroupName();
+            if (groupName != null) {
+                connections = mGroups.get(groupName);
+                if (connections == null) {
+                    connections = new ArrayList<>();
+                    mGroups.put(groupName, connections);
+                }
+                connections.add(connection);
+            }
         } finally {
             registerBroadcast();
         }
     }
 
-    public static synchronized void disconnectAll(@NonNull String actionFrom) {
+    public static synchronized boolean disconnect(@NonNull String actionFrom, @NonNull Connection connection) {
         try {
-            mConnections.remove(actionFrom);
+            List<Connection> connections = mGroups.get(connection.getGroupName());
+            if (connections != null) connections.remove(connection);
+
+            connections = mConnections.get(actionFrom);
+            return connections != null && connections.remove(connection);
         } finally {
             registerBroadcast();
         }
+    }
+
+    public static synchronized boolean disconnectAll(@NonNull String actionFrom) {
+        try {
+            List<Connection> connections = mConnections.remove(actionFrom);
+            if (connections == null) return false;
+            for (Connection connection : connections) {
+                List<Connection> groupConnections = mGroups.get(connection.getGroupName());
+                if (groupConnections != null) groupConnections.remove(connection);
+            }
+            return true;
+        } finally {
+            registerBroadcast();
+        }
+    }
+
+    public static synchronized void setGroupEnabled(@NonNull String groupName, boolean enabled) {
+        List<Connection> connections = mGroups.get(groupName);
+        if (connections == null) return;
+        for (Connection connection : connections)
+            connection.setEnabled(enabled);
+    }
+
+    public static synchronized void skipOneIntent(@NonNull String actionFrom, @NonNull String actionTo) {
+        List<Connection> connections = mConnections.get(actionFrom);
+        if (connections == null) return;
+        for (Connection connection : connections)
+            if (Objects.equals(connection.getIntent().getAction(), actionTo))
+                connection.addSkip();
+    }
+
+    public static synchronized List<Connection> getConnections(@NonNull String actionFrom) {
+        return mConnections.get(actionFrom);
     }
 
     private static synchronized void registerBroadcast() {
@@ -80,6 +117,7 @@ public final class BroadcastsConnector extends BroadcastReceiver {
         List<Connection> connections = mConnections.get(intent.getAction());
         if (connections == null) return;
         for (Connection connection : connections) {
+            if (!connection.isEnabled() || connection.skip()) continue;
             Intent intentTo = new Intent(connection.getIntent());
             Bundle extras = intentTo.getExtras();
             intentTo.putExtras(intent);
@@ -90,23 +128,64 @@ public final class BroadcastsConnector extends BroadcastReceiver {
 
     public static class Connection {
 
-        private final Intent mIntent;
+        @NonNull private final Intent intent;
+        @Nullable private final String groupName;
+        private int toSkip = 0;
+        private boolean enabled = true;
 
         public Connection(@NonNull String actionTo) {
-            this(actionTo, null);
+            this(actionTo, (String) null);
+        }
+
+        public Connection(@NonNull String actionTo, @Nullable String groupName) {
+            this(actionTo, null, groupName);
         }
 
         public Connection(@NonNull String actionTo, @Nullable Bundle additionalIntentData) {
+            this(actionTo, additionalIntentData, null);
+        }
+
+        public Connection(@NonNull String actionTo, @Nullable Bundle additionalIntentData,
+                          @Nullable String groupName) {
             this(new Intent(actionTo).putExtras(additionalIntentData != null
-                    ? additionalIntentData : new Bundle()));
+                    ? additionalIntentData : new Bundle()), groupName);
         }
 
         public Connection(@NonNull Intent intentTo) {
-            mIntent = intentTo;
+            this(intentTo, null);
         }
 
+        public Connection(@NonNull Intent intentTo, @Nullable String groupName) {
+            this.intent = intentTo;
+            this.groupName = groupName;
+        }
+
+        @Nullable
+        public String getGroupName() {
+            return groupName;
+        }
+
+        @NonNull
         public Intent getIntent() {
-            return mIntent;
+            return intent;
+        }
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public void addSkip() {
+            toSkip++;
+        }
+
+        boolean skip() {
+            if (toSkip <= 0) return false;
+            toSkip--;
+            return true;
         }
     }
 }

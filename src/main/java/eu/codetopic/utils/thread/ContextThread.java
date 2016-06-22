@@ -39,7 +39,7 @@ public final class ContextThread<C extends Context> {
         if (loadingHolder != null) loadingHolder.showLoading();
         new Thread(new Runnable() {
             @Override
-            public void run() {
+            public void run() {// FIXME: 21.6.16 maybe replace Thread with NetworkJob for protect users against ip bans
                 D result = null;
                 Throwable throwable = null;
                 try {
