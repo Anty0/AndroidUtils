@@ -3,10 +3,13 @@ package eu.codetopic.utils.data.preferences;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.annotation.CallSuper;
+import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 
 import eu.codetopic.utils.PrefNames;
+import eu.codetopic.utils.data.getter.DataGetter;
 
 public abstract class SharedPreferencesData {
 
@@ -40,7 +43,11 @@ public abstract class SharedPreferencesData {
         mSaveVersion = saveVersion;
     }
 
-    public static String getBroadcastActionChanged(SharedPreferencesData data) {
+    public static String getBroadcastActionChanged(@NonNull DataGetter<? extends SharedPreferencesData> dataGetter) {
+        return getBroadcastActionChanged(dataGetter.get());
+    }
+
+    public static String getBroadcastActionChanged(@NonNull SharedPreferencesData data) {
         return SharedPreferencesData.class.getName() + ".PREFERENCES_CHANGED." + data.getFileName();
     }
 
@@ -64,6 +71,7 @@ public abstract class SharedPreferencesData {
         return mDestroyed;
     }
 
+    @CallSuper
     protected synchronized void onCreate() {
         mPreferences = createSharedPreferences();
         mPreferences.registerOnSharedPreferenceChangeListener(mPreferenceChangeListener);
@@ -111,10 +119,12 @@ public abstract class SharedPreferencesData {
         editor.clear();
     }
 
+    @CallSuper
     protected synchronized void onChanged(String key) {
         mContext.sendBroadcast(generateIntentActionChanged(key));
     }
 
+    @CallSuper
     protected synchronized void onDestroy() {
         mPreferences.unregisterOnSharedPreferenceChangeListener(mPreferenceChangeListener);
         mPreferences = null;
