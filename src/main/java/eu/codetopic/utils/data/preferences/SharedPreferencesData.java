@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
 
@@ -121,7 +122,7 @@ public abstract class SharedPreferencesData {
 
     @CallSuper
     protected synchronized void onChanged(String key) {
-        mContext.sendBroadcast(generateIntentActionChanged(key));
+        LocalBroadcastManager.getInstance(mContext).sendBroadcast(generateIntentActionChanged(key));
     }
 
     @CallSuper

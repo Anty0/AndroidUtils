@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.CloseableWrappedIterable;
@@ -61,7 +62,8 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
 
     @Override
     public void onAttachToContainer(@Nullable Object container) {
-        getContext().registerReceiver(mDataChangedReceiver, mItemsGetter
+        LocalBroadcastManager.getInstance(getContext())
+                .registerReceiver(mDataChangedReceiver, mItemsGetter
                 .getDatabaseItemsChangedIntentFilter(getContext()));
         notifyDatabaseDataChanged();
         super.onAttachToContainer(container);
@@ -70,7 +72,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
     @Override
     public void onDetachFromContainer(@Nullable Object container) {
         super.onDetachFromContainer(container);
-        getContext().unregisterReceiver(mDataChangedReceiver);
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mDataChangedReceiver);
     }
 
     @Override

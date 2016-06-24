@@ -7,11 +7,13 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 
 public final class BroadcastsConnector extends BroadcastReceiver {
@@ -104,58 +106,111 @@ public final class BroadcastsConnector extends BroadcastReceiver {
         for (String action : mConnections.keySet())
             filter.addAction(action);
 
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(mContext);
         if (mRegistered) {
+            lbm.unregisterReceiver(mInstance);
             mContext.unregisterReceiver(mInstance);
             mRegistered = false;
         }
+        lbm.registerReceiver(mInstance, filter);
         mContext.registerReceiver(mInstance, filter);
         mRegistered = true;
+
+        /*IntentFilter globalFilter = new IntentFilter();
+        IntentFilter localFilter = new IntentFilter();
+        for (String action : mConnections.keySet()) {
+            boolean local = false, global = false;
+            List<Connection> connections = mConnections.get(action);
+            for (Connection connection : connections) {
+                switch (connection.getTargetingType()) {
+                    case All: local = true;
+                    case GLOBAL: global = true; break;
+                    case LOCAL: local = true; break;
+                }
+                if (global && local) break;
+            }
+
+            if (global) globalFilter.addAction(action);
+            if (local) localFilter.addAction(action);
+        }
+
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(mContext);
+        if (mRegistered) {
+            lbm.unregisterReceiver(mInstance);
+            mContext.unregisterReceiver(mInstance);
+            mRegistered = false;
+        }
+        lbm.registerReceiver(mInstance, localFilter);
+        mContext.registerReceiver(mInstance, globalFilter);
+        mRegistered = true;*/
     }
 
     @Override
     public synchronized void onReceive(Context context, Intent intent) {
         List<Connection> connections = mConnections.get(intent.getAction());
         if (connections == null) return;
+
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(mContext);
         for (Connection connection : connections) {
             if (!connection.isEnabled() || connection.skip()) continue;
             Intent intentTo = new Intent(connection.getIntent());
             Bundle extras = intentTo.getExtras();
             intentTo.putExtras(intent);
             if (extras != null) intentTo.putExtras(extras);
-            context.sendBroadcast(intentTo);
+            switch (connection.getTargetingType()) {
+                case GLOBAL:
+                    context.sendBroadcast(intentTo);
+                    break;
+                case LOCAL:
+                    lbm.sendBroadcast(intentTo);
+                    break;
+                default:
+                    Log.e(LOG_TAG, "Detected problem in " + LOG_TAG
+                            + ": can't recognise BroadcastTargetingType in " + connection);
+                    break;
+            }
         }
+    }
+
+    public enum BroadcastTargetingType {
+        GLOBAL, LOCAL
     }
 
     public static class Connection {
 
+        private final BroadcastTargetingType targetingType;
         @NonNull private final Intent intent;
         @Nullable private final String groupName;
         private int toSkip = 0;
         private boolean enabled = true;
 
-        public Connection(@NonNull String actionTo) {
-            this(actionTo, (String) null);
+        public Connection(@NonNull BroadcastTargetingType targetingType, @NonNull String actionTo) {
+            this(targetingType, actionTo, (String) null);
         }
 
-        public Connection(@NonNull String actionTo, @Nullable String groupName) {
-            this(actionTo, null, groupName);
-        }
-
-        public Connection(@NonNull String actionTo, @Nullable Bundle additionalIntentData) {
-            this(actionTo, additionalIntentData, null);
-        }
-
-        public Connection(@NonNull String actionTo, @Nullable Bundle additionalIntentData,
+        public Connection(@NonNull BroadcastTargetingType targetingType, @NonNull String actionTo,
                           @Nullable String groupName) {
-            this(new Intent(actionTo).putExtras(additionalIntentData != null
+            this(targetingType, actionTo, null, groupName);
+        }
+
+        public Connection(@NonNull BroadcastTargetingType targetingType, @NonNull String actionTo,
+                          @Nullable Bundle additionalIntentData) {
+            this(targetingType, actionTo, additionalIntentData, null);
+        }
+
+        public Connection(@NonNull BroadcastTargetingType targetingType, @NonNull String actionTo,
+                          @Nullable Bundle additionalIntentData, @Nullable String groupName) {
+            this(targetingType, new Intent(actionTo).putExtras(additionalIntentData != null
                     ? additionalIntentData : new Bundle()), groupName);
         }
 
-        public Connection(@NonNull Intent intentTo) {
-            this(intentTo, null);
+        public Connection(@NonNull BroadcastTargetingType targetingType, @NonNull Intent intentTo) {
+            this(targetingType, intentTo, null);
         }
 
-        public Connection(@NonNull Intent intentTo, @Nullable String groupName) {
+        public Connection(@NonNull BroadcastTargetingType targetingType, @NonNull Intent intentTo,
+                          @Nullable String groupName) {
+            this.targetingType = targetingType;
             this.intent = intentTo;
             this.groupName = groupName;
         }
@@ -163,6 +218,11 @@ public final class BroadcastsConnector extends BroadcastReceiver {
         @Nullable
         public String getGroupName() {
             return groupName;
+        }
+
+        @NonNull
+        public BroadcastTargetingType getTargetingType() {
+            return targetingType;
         }
 
         @NonNull
@@ -186,6 +246,17 @@ public final class BroadcastsConnector extends BroadcastReceiver {
             if (toSkip <= 0) return false;
             toSkip--;
             return true;
+        }
+
+        @Override
+        public String toString() {
+            return "Connection{" +
+                    "targetingType=" + targetingType +
+                    ", intent=" + intent +
+                    ", groupName='" + groupName + '\'' +
+                    ", toSkip=" + toSkip +
+                    ", enabled=" + enabled +
+                    '}';
         }
     }
 }

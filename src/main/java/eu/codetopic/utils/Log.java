@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
 import java.io.PrintWriter;
@@ -271,7 +272,7 @@ public class Log {
             throw new IllegalArgumentException("debugDataGetter must have DataChangedBroadcastAction");
         DEBUG_MODE_DETECTOR_INITIALIZED = true;
 
-        APP_CONTEXT.registerReceiver(new BroadcastReceiver() {
+        LocalBroadcastManager.getInstance(APP_CONTEXT).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 DEBUG_MODE = debugDataGetter.get().isDebugMode();

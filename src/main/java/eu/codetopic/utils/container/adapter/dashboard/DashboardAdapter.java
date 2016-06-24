@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.ViewGroup;
 
 import java.util.ArrayList;
@@ -81,15 +82,16 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
 
     public void activate() {
         if (mActivated) throw new IllegalStateException(LOG_TAG + " is still activated");
-        getContext().registerReceiver(mItemsChangedReceiver, new IntentFilter(ACTION_ITEMS_CHANGED));
-        getContext().registerReceiver(mReloadItemsReceiver, new IntentFilter(ACTION_RELOAD_ITEM));
+        LocalBroadcastManager lbm = LocalBroadcastManager.getInstance(getContext());
+        lbm.registerReceiver(mItemsChangedReceiver, new IntentFilter(ACTION_ITEMS_CHANGED));
+        lbm.registerReceiver(mReloadItemsReceiver, new IntentFilter(ACTION_RELOAD_ITEM));
         mActivated = true;
     }
 
     public void deactivate() {
         if (!mActivated) throw new IllegalStateException(LOG_TAG + " is not activated");
-        getContext().unregisterReceiver(mReloadItemsReceiver);
-        getContext().unregisterReceiver(mItemsChangedReceiver);
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mReloadItemsReceiver);
+        LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(mItemsChangedReceiver);
         mActivated = false;
     }
 

@@ -3,6 +3,7 @@ package eu.codetopic.utils.data.database;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 
@@ -58,7 +59,8 @@ public class DatabaseObjectChangeDetector<T> {
     }
 
     private static void sendChangeBroadcast(Context context, String broadcastActionChangedName) {
-        context.sendBroadcast(new Intent(broadcastActionChangedName));
+        LocalBroadcastManager.getInstance(context)
+                .sendBroadcast(new Intent(broadcastActionChangedName));
     }
 
     public void onChange() {
