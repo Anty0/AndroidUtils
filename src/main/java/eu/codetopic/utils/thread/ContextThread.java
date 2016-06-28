@@ -11,6 +11,11 @@ import java.lang.ref.WeakReference;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
+/**
+ * Deprecated. Use NetworkJob instead.
+ */
+@Deprecated
+@SuppressWarnings("deprecation")
 public final class ContextThread<C extends Context> {
 
     private static final String LOG_TAG = "ContextThread";
@@ -39,7 +44,7 @@ public final class ContextThread<C extends Context> {
         if (loadingHolder != null) loadingHolder.showLoading();
         new Thread(new Runnable() {
             @Override
-            public void run() {// FIXME: 21.6.16 maybe replace Thread with NetworkJob for protect users against ip bans
+            public void run() {
                 D result = null;
                 Throwable throwable = null;
                 try {

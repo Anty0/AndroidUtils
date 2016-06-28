@@ -34,7 +34,9 @@ public abstract class ModularActivity extends AppCompatActivity {
     }
 
     public ModularActivity(ActivityCallBackModule... modules) {
-        Log.d(LOG_TAG, "<init> using modules: " + Arrays.toString(modules));
+        if (Log.isInDebugMode())
+            Log.d(LOG_TAG, "<init> using modules: " + Arrays.toString(modules));
+
         for (ActivityCallBackModule module : modules) {
             try {
                 module.init(this);

@@ -8,11 +8,16 @@ import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.Params;
 import com.birbit.android.jobqueue.RetryConstraint;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.Log;
 import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
-public abstract class LoadingJob extends Job {
+public abstract class LoadingJob extends Job implements Serializable {
 
     private static final String LOG_TAG = "LoadingJob";
 
@@ -22,6 +27,13 @@ public abstract class LoadingJob extends Job {
     protected LoadingJob(Params params, @Nullable LoadingVH loadingViewHolder) {
         super(params);
         mLoadingViewHolder = loadingViewHolder;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+    }
+
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
     }
 
     public LoadingVH getViewHolder() {
@@ -57,7 +69,7 @@ public abstract class LoadingJob extends Job {
 
     @Override
     protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
-        return new RetryConstraint(true);
+        return RetryConstraint.RETRY;
     }
 
     @Override
