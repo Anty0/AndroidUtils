@@ -6,14 +6,12 @@ import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.support.annotation.WorkerThread;
 
-import com.birbit.android.jobqueue.JobManager;
 import com.birbit.android.jobqueue.Params;
 
 import java.lang.ref.WeakReference;
 
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.Log;
-import eu.codetopic.utils.data.getter.JobManagerGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
@@ -39,12 +37,8 @@ public class NetworkJob extends LoadingJob {
         job = work;
     }
 
-    public static String start(@NonNull JobManagerGetter jobManagerGetter, @NonNull NetworkJob job) {
-        return start(jobManagerGetter.getJobManager(), job);
-    }
-
-    public static String start(@NonNull JobManager jobManager, @NonNull NetworkJob job) {
-        jobManager.addJobInBackground(job);
+    public static String start(@NonNull NetworkJob job) {
+        SingletonJobManager.getInstance().addJobInBackground(job);
         return job.getId();
     }
 
