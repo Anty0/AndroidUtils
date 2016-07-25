@@ -1,5 +1,6 @@
 package eu.codetopic.utils.thread.job;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.WorkerThread;
 
@@ -68,12 +69,12 @@ public abstract class LoadingJob extends Job implements Serializable {
     }
 
     @Override
-    protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
+    protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
         return RetryConstraint.RETRY;
     }
 
     @Override
-    protected void onCancel(@CancelReason int cancelReason) {
+    protected void onCancel(@CancelReason int cancelReason, Throwable throwable) {
         hideLoading();
     }
 

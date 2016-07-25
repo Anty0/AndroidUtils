@@ -18,11 +18,3 @@
 
 # Preserve annotations, line numbers, and source file names
 -keepattributes *Annotation*,SourceFile,LineNumberTable
-
--keep class com.j256.ormlite.** { *; }
-
--keep enum com.j256.ormlite.** { *; }
-
--keep public class org.jsoup.** {
-public *;
-}

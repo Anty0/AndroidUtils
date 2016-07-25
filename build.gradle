@@ -4,7 +4,7 @@ android {
     defaultPublishConfig 'release'
     publishNonDefault true
     compileSdkVersion 24
-    buildToolsVersion "24.0.0"
+    buildToolsVersion "24.0.1"
 
     defaultConfig {
         minSdkVersion 14
@@ -16,13 +16,14 @@ android {
     }
     buildTypes {
         release {
-            consumerProguardFiles 'proguard-rules.pro'
+            FileCollection proGuardFileCollection = files { file('./proguard/').listFiles() }
+            consumerProguardFiles getDefaultProguardFile('proguard-android.txt'), proGuardFileCollection, 'proguard-rules.pro'
             debuggable false
             jniDebuggable false
             renderscriptDebuggable false
             renderscriptOptimLevel 14
+            minifyEnabled false
             zipAlignEnabled true
-            shrinkResources true
         }
         debug {
             debuggable true
@@ -31,15 +32,15 @@ android {
             renderscriptOptimLevel 14
             minifyEnabled false
             zipAlignEnabled true
-            shrinkResources false
         }
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_7
         targetCompatibility JavaVersion.VERSION_1_7
     }
-    //noinspection GroovyMissingReturnStatement
+
     productFlavors {
+        //noinspection GroovyMissingReturnStatement
         utils {}
     }
 }
@@ -61,12 +62,12 @@ dependencies {
     releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
     androidTestCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4-beta2'
 
-    compile 'org.jsoup:jsoup:1.9.1'
+    compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.google.guava:guava:19.0'
     compile 'com.infstory:proguard-annotations:1.0.2'
     compile 'com.j256.ormlite:ormlite-android:4.48'
-    compile 'com.birbit:android-priority-jobqueue:2.0.0-alpha2'
+    compile 'com.birbit:android-priority-jobqueue:2.0.0-beta1'
     compile 'com.scottyab:secure-preferences-lib:0.1.4'
-    compile 'com.google.code.gson:gson:2.6.2'
+    compile 'com.google.code.gson:gson:2.7'
     //compile 'net.sf.corn:corn-cps:1.1.7'
 }

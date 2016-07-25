@@ -48,7 +48,7 @@ public class NetworkJob extends LoadingJob {
     }
 
     private static Params generateParams(@Nullable Class<?> syncCls) {
-        Params params = new Params(Constants.JOB_PRIORITY_NETWORK);
+        Params params = new Params(Constants.JOB_PRIORITY_NETWORK);// TODO: 24.7.16 add way to specify if this work requires network
         if (syncCls != null) params.groupBy(generateNetworkJobGroupNameFor(syncCls));
         return params;
     }

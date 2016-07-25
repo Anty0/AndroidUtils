@@ -44,8 +44,8 @@ public class DatabaseJob<T, ID> extends LoadingJob {
     }
 
     @Override
-    protected void onCancel(@CancelReason int cancelReason) {
-        super.onCancel(cancelReason);
+    protected void onCancel(@CancelReason int cancelReason, Throwable throwable) {
+        super.onCancel(cancelReason, throwable);
         JobUtils.runOnMainThread(new Runnable() {
             @Override
             public void run() {

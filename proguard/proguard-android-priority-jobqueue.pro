@@ -1,0 +1,2 @@
+-dontwarn com.birbit.android.jobqueue.scheduling.**
+-dontwarn okio.**

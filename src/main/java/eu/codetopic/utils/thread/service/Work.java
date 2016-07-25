@@ -2,6 +2,7 @@ package eu.codetopic.utils.thread.service;
 
 import android.app.NotificationManager;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.birbit.android.jobqueue.CancelReason;
 import com.birbit.android.jobqueue.Job;
@@ -57,12 +58,12 @@ class Work extends Job {
     }
 
     @Override
-    protected RetryConstraint shouldReRunOnThrowable(Throwable throwable, int runCount, int maxRunCount) {
+    protected RetryConstraint shouldReRunOnThrowable(@NonNull Throwable throwable, int runCount, int maxRunCount) {
         return new RetryConstraint(true);
     }
 
     @Override
-    protected void onCancel(@CancelReason int cancelReason) {
+    protected void onCancel(@CancelReason int cancelReason, Throwable throwable) {
         stopProgress();
     }
 
