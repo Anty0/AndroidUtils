@@ -12,7 +12,7 @@ import eu.codetopic.utils.container.recycler.Recycler;
 public abstract class DashboardFragment extends NavigationFragment {
 
     private final ItemsGetter[] mItemsGetters;
-    private DashboardAdapter mAdapter = null;
+    protected DashboardAdapter mAdapter = null;
 
     public DashboardFragment(ItemsGetter... itemsGetters) {
         mItemsGetters = itemsGetters;
