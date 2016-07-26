@@ -7,7 +7,7 @@ import java.util.Arrays;
 import eu.codetopic.utils.data.database.DependencyDao;
 
 public enum Modification {
-    CREATE, CREATE_OR_UPDATE, DELETE, DELETE_FROM_TEMP;
+    CREATE, UPDATE, CREATE_OR_UPDATE, DELETE, DELETE_FROM_TEMP;
 
     @SafeVarargs
     public final <T, ID> DatabaseWork<T, ID> generateWork(final T... toModify) {
@@ -16,18 +16,21 @@ public enum Modification {
                 return new DatabaseWork<T, ID>() {
                     @Override
                     public void run(Dao<T, ID> dao) throws Throwable {
-                        for (T object : toModify) {
-                            dao.create(object);
-                        }
+                        for (T object : toModify) dao.create(object);
+                    }
+                };
+            case UPDATE:
+                return new DatabaseWork<T, ID>() {
+                    @Override
+                    public void run(Dao<T, ID> dao) throws Throwable {
+                        for (T object : toModify) dao.update(object);
                     }
                 };
             case CREATE_OR_UPDATE:
                 return new DatabaseWork<T, ID>() {
                     @Override
                     public void run(Dao<T, ID> dao) throws Throwable {
-                        for (T object : toModify) {
-                            dao.createOrUpdate(object);
-                        }
+                        for (T object : toModify) dao.createOrUpdate(object);
                     }
                 };
             case DELETE:
@@ -46,7 +49,7 @@ public enum Modification {
                     }
                 };
             default:
-                throw new UnknownError();
+                throw new EnumConstantNotPresentException(Modification.class, this.name());
         }
     }
 }

@@ -152,8 +152,10 @@ public class Arrays {
     @CheckResult
     public static <T> T[] removeNulls(T[] objects) {
         int index = indexOf(objects, null);
-        while (index != -1)
+        while (index != -1) {
             objects = remove(objects, index);
+            index = indexOf(objects, null);
+        }
         return objects;
     }
 

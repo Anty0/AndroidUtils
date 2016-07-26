@@ -296,7 +296,7 @@ public class ViewUtils {
             StringBuilder csb = new StringBuilder();
             for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++)
                 csb.append("\n").append(drawViewHierarchy(((ViewGroup) view).getChildAt(i)));
-            sb.append(Utils.addBeforeEveryLine(csb.toString(), "    "));
+            sb.append(Utils.addBeforeEveryLine(csb.toString(), "\t"));
             sb.append("\n}");
         }
         return sb.toString();

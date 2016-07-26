@@ -11,7 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.exceptions.WrongIdException;
 
-public final class NotificationIdsManager {
+public final class NotificationIdsManager {// TODO: 26.7.16 add support for retaining notifications after reboot
 
     private static final String LOG_TAG = "NotificationIdsManager";
 

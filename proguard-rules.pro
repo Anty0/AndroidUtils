@@ -18,3 +18,21 @@
 
 # Preserve annotations, line numbers, and source file names
 -keepattributes *Annotation*,SourceFile,LineNumberTable
+
+# Serializables
+-keepnames class * implements java.io.Serializable
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    !static !transient <fields>;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    java.lang.Object writeReplace();
+    java.lang.Object readResolve();
+}
+
+-keep interface eu.codetopic.utils.timing.info.TimCompInfoModifier { <methods>; }
+-keepclassmembers class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier {
+    public <init>();
+    public void modify(eu.codetopic.utils.timing.info.TimCompInfoData);
+}

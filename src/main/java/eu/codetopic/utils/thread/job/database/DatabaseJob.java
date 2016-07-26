@@ -40,7 +40,7 @@ public class DatabaseJob<T, ID> extends LoadingJob {
 
     @Override
     protected int getRetryLimit() {
-        return Constants.JOB_REPEAT_COUNT_DATABASE;
+        return Constants.JOB_REPEAT_COUNT_DATABASE;// don't change!! (otherwise it cause lot's of problems)
     }
 
     @Override
