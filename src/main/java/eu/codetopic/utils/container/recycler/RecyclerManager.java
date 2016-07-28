@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 
 import java.util.Collection;
@@ -20,6 +21,8 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
 
     private static final String LOG_TAG = "RecyclerManager";
     private final EmptyRecyclerView mRecyclerView;
+    private RecyclerView.OnItemTouchListener mLastTouchListener = null;
+    private ItemTouchHelper mLastTouchHelper = null;
 
     protected RecyclerManager(@NonNull View mainView, @Nullable int[] swipeSchemeColors,
                               boolean useSwipeRefresh, boolean useFloatingActionButton) {
@@ -56,11 +59,21 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
         return self();
     }
 
-    public synchronized T setItemTouchListener(
-            RecyclerItemClickListener.ClickListener itemTouchListener) {
+    public synchronized T setItemTouchListener(@Nullable RecyclerItemClickListener.ClickListener
+                                                       itemTouchListener) {
         RecyclerView view = getRecyclerView();
-        view.addOnItemTouchListener(new RecyclerItemClickListener(
-                getContext(), view, itemTouchListener));
+        if (mLastTouchListener != null) view.removeOnItemTouchListener(mLastTouchListener);
+        mLastTouchListener = itemTouchListener == null ? null :
+                new RecyclerItemClickListener(getContext(), view, itemTouchListener);
+        if (mLastTouchListener != null) view.addOnItemTouchListener(mLastTouchListener);
+        return self();
+    }
+
+    public synchronized T setItemTouchHelper(@Nullable ItemTouchHelper.Callback itemTouchHelperCallback) {
+        if (mLastTouchHelper != null) mLastTouchHelper.attachToRecyclerView(null);
+        mLastTouchHelper = itemTouchHelperCallback == null ? null
+                : new ItemTouchHelper(itemTouchHelperCallback);
+        if (mLastTouchHelper != null) mLastTouchHelper.attachToRecyclerView(getRecyclerView());
         return self();
     }
 

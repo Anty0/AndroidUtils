@@ -1,6 +1,8 @@
 package eu.codetopic.utils.container.recycler.utils;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -10,7 +12,8 @@ public class RecyclerItemClickListener implements RecyclerView.OnItemTouchListen
     private final GestureDetector gestureDetector;
     private final ClickListener clickListener;
 
-    public RecyclerItemClickListener(Context context, final RecyclerView recyclerView, final ClickListener clickListener) {
+    public RecyclerItemClickListener(Context context, @NonNull final RecyclerView recyclerView,
+                                     @Nullable final ClickListener clickListener) {
         this.clickListener = clickListener;
         gestureDetector = new GestureDetector(context, new GestureDetector.SimpleOnGestureListener() {
             @Override
