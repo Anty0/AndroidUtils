@@ -13,6 +13,7 @@ public abstract class DashboardFragment extends NavigationFragment {
 
     private final ItemsGetter[] mItemsGetters;
     protected DashboardAdapter mAdapter = null;
+    protected Recycler.RecyclerManagerImpl recyclerManager;
 
     public DashboardFragment(ItemsGetter... itemsGetters) {
         mItemsGetters = itemsGetters;
@@ -27,9 +28,11 @@ public abstract class DashboardFragment extends NavigationFragment {
 
     @Override
     public View onCreateContentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return Recycler.inflate().withoutSwipeToRefresh()
+        recyclerManager = Recycler.inflate().withoutSwipeToRefresh()
                 .on(inflater, container, false)
-                .setAdapter(mAdapter).getBaseView();
+                .setAdapter(mAdapter);
+
+        return recyclerManager.getBaseView();
     }
 
     @Override
