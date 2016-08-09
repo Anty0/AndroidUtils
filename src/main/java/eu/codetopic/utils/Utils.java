@@ -37,6 +37,7 @@ import org.jsoup.Jsoup;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -236,6 +237,30 @@ public class Utils {
             return a.getResourceId(0, defValue);
         } finally {
             if (a != null) a.recycle();
+        }
+    }
+
+    public static int[] getSystemStyleableInts(String styleableName) {
+        try {
+            Field field = Class.forName("com.android.internal.R$styleable")
+                    .getDeclaredField(styleableName);
+            field.setAccessible(true);
+            return (int[]) field.get(null);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "getSystemStyleableInts -> can't access internal styleable " + styleableName, e);
+            return new int[0];
+        }
+    }
+
+    public static int getSystemStyleableInt(String styleableName) {
+        try {
+            Field field = Class.forName("com.android.internal.R$styleable")
+                    .getDeclaredField(styleableName);
+            field.setAccessible(true);
+            return (int) field.get(null);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "getSystemStyleableInts -> can't access internal styleable " + styleableName, e);
+            return 0;
         }
     }
 

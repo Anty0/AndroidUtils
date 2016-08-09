@@ -9,11 +9,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.widget.Toast;
 
+import com.birbit.android.jobqueue.log.CustomLogger;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import eu.codetopic.utils.data.DebugProviderData;
 import eu.codetopic.utils.data.getter.DataGetter;
@@ -259,6 +262,10 @@ public class Log {
         return DEBUG_MODE ? android.util.Log.println(priority, tag, msg) : 0;
     }
 
+    public static CustomLogger getLoggerForJobQueue() {
+        return new JobQueueLogger();
+    }
+
     public static void initialize(Context context) {
         if (APP_CONTEXT != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
         APP_CONTEXT = context.getApplicationContext();
@@ -323,5 +330,35 @@ public class Log {
     public interface OnErrorLoggedListener {
 
         void onError(String tag, String msg, @Nullable Throwable t);
+    }
+
+    private static final class JobQueueLogger implements CustomLogger {
+
+        private static final String LOG_TAG = "JobQueue";
+
+        @Override
+        public boolean isDebugEnabled() {
+            return isInDebugMode();
+        }
+
+        @Override
+        public void e(Throwable t, String text, Object... args) {
+            Log.e(LOG_TAG, String.format(Locale.ENGLISH, text, args), t);
+        }
+
+        @Override
+        public void e(String text, Object... args) {
+            Log.e(LOG_TAG, String.format(Locale.ENGLISH, text, args));
+        }
+
+        @Override
+        public void d(String text, Object... args) {
+            Log.d(LOG_TAG, String.format(Locale.ENGLISH, text, args));
+        }
+
+        @Override
+        public void v(String text, Object... args) {
+            Log.v(LOG_TAG, String.format(Locale.ENGLISH, text, args));
+        }
     }
 }

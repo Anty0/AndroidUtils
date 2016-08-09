@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 import android.os.UserManager;
 
+import com.birbit.android.jobqueue.log.JqLog;
 import com.squareup.leakcanary.LeakCanary;
 
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
@@ -29,6 +30,7 @@ public class UtilsInitializer extends Application {
         LeakCanary.install(this);
 
         Log.initialize(this);
+        JqLog.setCustomLogger(Log.getLoggerForJobQueue());
         NetworkManager.init(this);
         JobUtils.initialize(this);
         BroadcastsConnector.initialize(this);

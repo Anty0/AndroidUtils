@@ -5,7 +5,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import eu.codetopic.utils.animation.AnimationsUtils;
+import eu.codetopic.utils.animation.ViewVisibilityAnimator;
 
 /**
  * Use eu.codetopic.utils.view.holder.loading.LoadingVHImpl instead
@@ -48,15 +48,15 @@ public abstract class LoadingViewHolderImpl extends LoadingViewHolder {
     }
 
     protected void doShowLoading() {
-        AnimationsUtils.cancelAnimationsFor(content);
+        ViewVisibilityAnimator.getAnimatorFor(content).cancelAnimations();
         content.setVisibility(View.GONE);
-        AnimationsUtils.fadeIn(loading, loading.getContext().getResources()
-                .getInteger(android.R.integer.config_shortAnimTime));
+        ViewVisibilityAnimator.getAnimatorFor(loading).animateVisibilityChange(true, loading
+                .getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
     }
 
     protected void doHideLoading() {
-        AnimationsUtils.fadeOut(loading, loading.getContext().getResources()
-                .getInteger(android.R.integer.config_shortAnimTime));
-        AnimationsUtils.fadeIn(content);
+        ViewVisibilityAnimator.getAnimatorFor(loading).animateVisibilityChange(false, loading
+                .getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
+        ViewVisibilityAnimator.getAnimatorFor(content).animateVisibilityChange(true);
     }
 }

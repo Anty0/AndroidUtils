@@ -5,12 +5,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.view.View;
 
-import eu.codetopic.utils.animation.AnimationsUtils;
+import eu.codetopic.utils.animation.ViewVisibilityAnimator;
 
 public class EmptyRecyclerView extends RecyclerView {
 
     private View mEmptyView;
-    final private AdapterDataObserver observer = new AdapterDataObserver() {
+    private final AdapterDataObserver observer = new AdapterDataObserver() {
         @Override
         public void onChanged() {
             updateEmptyView();
@@ -28,12 +28,10 @@ public class EmptyRecyclerView extends RecyclerView {
 
         @Override
         public void onItemRangeChanged(int positionStart, int itemCount) {
-            updateEmptyView();
         }
 
         @Override
         public void onItemRangeMoved(int fromPosition, int toPosition, int itemCount) {
-            updateEmptyView();
         }
     };
 
@@ -50,13 +48,15 @@ public class EmptyRecyclerView extends RecyclerView {
     }
 
     void updateEmptyView() {
+        ViewVisibilityAnimator animator = ViewVisibilityAnimator.getAnimatorFor(this);
         if (mEmptyView != null) {
             Adapter adapter = getAdapter();
             final boolean emptyViewVisible = adapter == null
                     || adapter.getItemCount() == 0;
-            AnimationsUtils.animateVisibilityChange(mEmptyView, emptyViewVisible);
-            AnimationsUtils.animateVisibilityChange(this, !emptyViewVisible);
-        } else AnimationsUtils.animateVisibilityChange(this, true);
+            ViewVisibilityAnimator.getAnimatorFor(mEmptyView)
+                    .animateVisibilityChange(emptyViewVisible);
+            animator.animateVisibilityChange(!emptyViewVisible);
+        } else animator.animateVisibilityChange(true);
     }
 
     @Override

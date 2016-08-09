@@ -11,7 +11,7 @@ import android.view.View;
 import java.lang.ref.WeakReference;
 
 import eu.codetopic.utils.Log;
-import eu.codetopic.utils.animation.AnimationsUtils;
+import eu.codetopic.utils.animation.ViewVisibilityAnimator;
 
 public abstract class LoadingVHImpl extends LoadingVH {
 
@@ -62,11 +62,11 @@ public abstract class LoadingVHImpl extends LoadingVH {
         View content = getContentView(), loading = getLoadingView();
         if (content == null || loading == null) return;
 
-        AnimationsUtils.cancelAnimationsFor(content);
+        ViewVisibilityAnimator.getAnimatorFor(content).cancelAnimations();
         content.setVisibility(View.GONE);
 
-        AnimationsUtils.fadeIn(loading, loading.getContext().getResources()
-                .getInteger(android.R.integer.config_shortAnimTime));
+        ViewVisibilityAnimator.getAnimatorFor(loading).animateVisibilityChange(true, loading
+                .getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
     }
 
     @UiThread
@@ -75,10 +75,10 @@ public abstract class LoadingVHImpl extends LoadingVH {
         View content = getContentView(), loading = getLoadingView();
         if (content == null || loading == null) return;
 
-        AnimationsUtils.fadeOut(loading, loading.getContext().getResources()
-                .getInteger(android.R.integer.config_shortAnimTime));
+        ViewVisibilityAnimator.getAnimatorFor(loading).animateVisibilityChange(false, loading
+                .getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
 
-        AnimationsUtils.fadeIn(content);
+        ViewVisibilityAnimator.getAnimatorFor(content).animateVisibilityChange(true);
     }
 
     @NonNull
