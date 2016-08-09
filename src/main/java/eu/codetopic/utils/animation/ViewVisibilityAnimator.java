@@ -67,7 +67,8 @@ public class ViewVisibilityAnimator {
     }
 
     public static ViewVisibilityAnimator getAnimatorFor(View view) {
-        ViewVisibilityAnimator animator = (ViewVisibilityAnimator) ViewUtils.getViewTag(view, VIEW_ANIMATOR_TAG);
+        ViewVisibilityAnimator animator = (ViewVisibilityAnimator)
+                ViewUtils.getViewTag(view, VIEW_ANIMATOR_TAG);
         if (animator != null) return animator;
         animator = new ViewVisibilityAnimator(view);
         ViewUtils.setViewTag(view, VIEW_ANIMATOR_TAG, animator);
@@ -104,6 +105,7 @@ public class ViewVisibilityAnimator {
     }
 
     public void fadeOut(int duration) {
+        cancelAnimations();
         fadeOutAnim.setDuration(duration);
         fadeOutAnim.start();
     }
@@ -113,6 +115,7 @@ public class ViewVisibilityAnimator {
     }
 
     public void fadeIn(int duration) {
+        cancelAnimations();
         fadeInAnim.setDuration(duration);
         fadeInAnim.start();
     }

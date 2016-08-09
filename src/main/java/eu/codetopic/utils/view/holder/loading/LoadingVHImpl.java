@@ -65,8 +65,8 @@ public abstract class LoadingVHImpl extends LoadingVH {
         ViewVisibilityAnimator.getAnimatorFor(content).cancelAnimations();
         content.setVisibility(View.GONE);
 
-        ViewVisibilityAnimator.getAnimatorFor(loading).animateVisibilityChange(true, loading
-                .getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
+        ViewVisibilityAnimator.getAnimatorFor(loading).fadeIn(loading.getContext()
+                .getResources().getInteger(android.R.integer.config_shortAnimTime));
     }
 
     @UiThread
@@ -75,10 +75,10 @@ public abstract class LoadingVHImpl extends LoadingVH {
         View content = getContentView(), loading = getLoadingView();
         if (content == null || loading == null) return;
 
-        ViewVisibilityAnimator.getAnimatorFor(loading).animateVisibilityChange(false, loading
-                .getContext().getResources().getInteger(android.R.integer.config_shortAnimTime));
+        ViewVisibilityAnimator.getAnimatorFor(loading).fadeOut(loading.getContext()
+                .getResources().getInteger(android.R.integer.config_shortAnimTime));
 
-        ViewVisibilityAnimator.getAnimatorFor(content).animateVisibilityChange(true);
+        ViewVisibilityAnimator.getAnimatorFor(content).fadeIn();
     }
 
     @NonNull
