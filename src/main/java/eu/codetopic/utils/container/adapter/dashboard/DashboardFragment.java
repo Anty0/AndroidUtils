@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.activity.navigation.NavigationFragment;
 import eu.codetopic.utils.container.recycler.Recycler;
 
@@ -39,7 +38,8 @@ public abstract class DashboardFragment extends NavigationFragment {
                 .setItemTouchHelper(new ItemTouchHelper.Callback() {
                     @Override
                     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
-                        ItemInfo item = mAdapter.getItem(viewHolder.getAdapterPosition());
+                        int position = viewHolder.getAdapterPosition();
+                        ItemInfo item = position == -1 ? null : mAdapter.getItem(position);
                         return makeMovementFlags(0, item instanceof SwipeableItemInfo ? ((SwipeableItemInfo) item)
                                 .getSwipeDirections(recyclerView, viewHolder) : 0);
                     }
@@ -52,14 +52,15 @@ public abstract class DashboardFragment extends NavigationFragment {
 
                     @Override
                     public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                        ItemInfo item = mAdapter.getItem(viewHolder.getAdapterPosition());
+                        int position = viewHolder.getAdapterPosition();
+                        ItemInfo item = position == -1 ? null : mAdapter.getItem(position);
                         if (item instanceof SwipeableItemInfo) {
                             ((SwipeableItemInfo) mAdapter.getItem(viewHolder.getAdapterPosition()))
                                     .onSwiped(viewHolder, direction);
-                            return;
+                            //return;
                         }
-                        Log.e(LOG_TAG, "Detected problem in " + LOG_TAG +
-                                ": received onSwiped on unsupported item -> " + item);
+                        /*Log.e(LOG_TAG, "Detected problem in " + LOG_TAG + ": " +
+                                "received onSwiped on unsupported item -> " + item);*/
                     }
                 });
 
