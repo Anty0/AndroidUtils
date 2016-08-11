@@ -1,0 +1,363 @@
+package com.codetopic.utils;
+
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
+import android.widget.Toast;
+
+import com.birbit.android.jobqueue.log.CustomLogger;
+import com.codetopic.utils.data.DebugProviderData;
+import com.codetopic.utils.data.getter.DataGetter;
+import com.codetopic.utils.thread.JobUtils;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+/**
+ * Mock Log implementation for testing on non android host.
+ */
+public class Log {
+
+    /**
+     * Priority constant for the println method; use Log.v.
+     */
+    public static final int VERBOSE = 2;
+    /**
+     * Priority constant for the println method; use Log.d.
+     */
+    public static final int DEBUG = 3;
+    /**
+     * Priority constant for the println method; use Log.i.
+     */
+    public static final int INFO = 4;
+    /**
+     * Priority constant for the println method; use Log.w.
+     */
+    public static final int WARN = 5;
+    /**
+     * Priority constant for the println method; use Log.e.
+     */
+    public static final int ERROR = 6;
+    /**
+     * Priority constant for the println method.
+     */
+    public static final int ASSERT = 7;
+    /**
+     * @hide
+     */
+    public static final int LOG_ID_MAIN = 0;
+    /**
+     * @hide
+     */
+    public static final int LOG_ID_RADIO = 1;
+    /**
+     * @hide
+     */
+    public static final int LOG_ID_EVENTS = 2;
+    /**
+     * @hide
+     */
+    public static final int LOG_ID_SYSTEM = 3;
+    /**
+     * @hide
+     */
+    public static final int LOG_ID_CRASH = 4;
+    private static final String LOG_TAG = "Log";
+    private static final List<OnErrorLoggedListener> listeners = new ArrayList<>();
+    private static Context APP_CONTEXT = null;
+    private static boolean DEBUG_MODE_DETECTOR_INITIALIZED = false;
+    private static boolean DEBUG_MODE = true;
+
+    private Log() {
+    }
+
+    /**
+     * Send a {@link #VERBOSE} log message.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     */
+    public static int v(String tag, String msg) {
+        return println(VERBOSE, tag, msg);
+    }
+
+    /**
+     * Send a {@link #VERBOSE} log message and log the exception.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     * @param tr  An exception to log
+     */
+    public static int v(String tag, String msg, Throwable tr) {
+        return println(VERBOSE, tag, msg + '\n' + getStackTraceString(tr));
+    }
+
+    /**
+     * Send a {@link #DEBUG} log message.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     */
+    public static int d(String tag, String msg) {
+        return println(DEBUG, tag, msg);
+    }
+
+    /**
+     * Send a {@link #DEBUG} log message and log the exception.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     * @param tr  An exception to log
+     */
+    public static int d(String tag, String msg, Throwable tr) {
+        return println(DEBUG, tag, msg + '\n' + getStackTraceString(tr));
+    }
+
+    /**
+     * Send an {@link #INFO} log message.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     */
+    public static int i(String tag, String msg) {
+        return println(INFO, tag, msg);
+    }
+
+    /**
+     * Send a {@link #INFO} log message and log the exception.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     * @param tr  An exception to log
+     */
+    public static int i(String tag, String msg, Throwable tr) {
+        return println(INFO, tag, msg + '\n' + getStackTraceString(tr));
+    }
+
+    /**
+     * Send a {@link #WARN} log message.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     */
+    public static int w(String tag, String msg) {
+        return println(WARN, tag, msg);
+    }
+
+    /**
+     * Send a {@link #WARN} log message and log the exception.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     * @param tr  An exception to log
+     */
+    public static int w(String tag, String msg, Throwable tr) {
+        return println(WARN, tag, msg + '\n' + getStackTraceString(tr));
+    }
+
+    /**
+     * Send a {@link #WARN} log message and log the exception.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param tr  An exception to log
+     */
+    public static int w(String tag, Throwable tr) {
+        return println(WARN, tag, getStackTraceString(tr));
+    }
+
+    /**
+     * Send an {@link #ERROR} log message.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     */
+    public static int e(String tag, String msg) {
+        try {
+            return println(ERROR, tag, msg);
+        } finally {
+            onErrorLogged(tag, msg, null);
+        }
+    }
+
+    /**
+     * Send a {@link #ERROR} log message and log the exception.
+     *
+     * @param tag Used to identify the source of a log message.  It usually identifies
+     *            the class or activity where the log call occurs.
+     * @param msg The message you would like logged.
+     * @param tr  An exception to log
+     */
+    public static int e(String tag, String msg, Throwable tr) {
+        try {
+            return println(LOG_ID_MAIN, ERROR, tag, msg + '\n' + getStackTraceString(tr));
+        } finally {
+            onErrorLogged(tag, msg, tr);
+        }
+    }
+
+    /**
+     * Handy function to get a loggable stack trace from a Throwable
+     *
+     * @param tr An exception to log
+     */
+    public static String getStackTraceString(Throwable tr) {
+        if (tr == null) {
+            return "";
+        }
+
+        // This is to reduce the amount of log spew that apps do in the non-error
+        // condition of the network being unavailable.
+        Throwable t = tr;
+        while (t != null) {
+            if (t instanceof UnknownHostException) {
+                return "";
+            }
+            t = t.getCause();
+        }
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        tr.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
+    }
+
+    /**
+     * Low-level logging call.
+     *
+     * @param priority The priority/type of this log message
+     * @param tag      Used to identify the source of a log message.  It usually identifies
+     *                 the class or activity where the log call occurs.
+     * @param msg      The message you would like logged.
+     * @return The number of bytes written.
+     */
+    public static int println(int priority, String tag, String msg) {
+        return println(LOG_ID_MAIN, priority, tag, msg);
+    }
+
+    /**
+     * @hide
+     */
+    @SuppressWarnings("unused")
+    public static int println(int bufID, int priority, String tag, String msg) {
+        return DEBUG_MODE ? android.util.Log.println(priority, tag, msg) : 0;
+    }
+
+    public static CustomLogger getLoggerForJobQueue() {
+        return new JobQueueLogger();
+    }
+
+    public static void initialize(Context context) {
+        if (APP_CONTEXT != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
+        APP_CONTEXT = context.getApplicationContext();
+    }
+
+    public static void initDebugModeDetector(@NonNull final DataGetter
+            <? extends DebugProviderData> debugDataGetter) {// TODO: 8.3.16 initialize Log in ApplicationBase
+        if (DEBUG_MODE_DETECTOR_INITIALIZED)
+            throw new IllegalStateException(LOG_TAG + "'s DebugModeDetector is still initialized");
+        if (!debugDataGetter.hasDataChangedBroadcastAction())
+            throw new IllegalArgumentException("debugDataGetter must have DataChangedBroadcastAction");
+        DEBUG_MODE_DETECTOR_INITIALIZED = true;
+
+        LocalBroadcastManager.getInstance(APP_CONTEXT).registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                DEBUG_MODE = debugDataGetter.get().isDebugMode();
+            }
+        }, new IntentFilter(debugDataGetter.getDataChangedBroadcastAction()));
+
+        DEBUG_MODE = debugDataGetter.get().isDebugMode();
+    }
+
+    public static void setDebugModeEnabled(boolean debug) {
+        if (DEBUG_MODE_DETECTOR_INITIALIZED) throw new IllegalStateException(LOG_TAG
+                + " is using DebugModeDetector, so you can't modify DebugMode manually");
+        DEBUG_MODE = debug;
+    }
+
+    public static boolean isInDebugMode() {
+        return DEBUG_MODE;
+    }
+
+    public static synchronized void addOnErrorLoggedListener(OnErrorLoggedListener listener) {// TODO: 25.3.16 add error listener in ApplicationBase
+        listeners.add(listener);
+    }
+
+    public static synchronized void removeOnErrorLoggedListener(OnErrorLoggedListener listener) {
+        listeners.remove(listener);
+    }
+
+    private static synchronized void onErrorLogged(String tag, String msg, @Nullable Throwable tr) {
+        try {
+            if (APP_CONTEXT == null) return;
+            final StringBuilder sb = new StringBuilder("Error logged:\n")
+                    .append("Tag: ").append(tag)
+                    .append("Msg: ").append(msg).append('\n')
+                    .append("Tr: ").append(tr);
+
+            JobUtils.runOnMainThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(APP_CONTEXT, sb.toString(), Toast.LENGTH_LONG).show();
+                }
+            });
+        } finally {
+            for (OnErrorLoggedListener listener : listeners)
+                listener.onError(tag, msg, tr);
+        }
+    }
+
+    public interface OnErrorLoggedListener {
+
+        void onError(String tag, String msg, @Nullable Throwable t);
+    }
+
+    private static final class JobQueueLogger implements CustomLogger {
+
+        private static final String LOG_TAG = "JobQueue";
+
+        @Override
+        public boolean isDebugEnabled() {
+            return isInDebugMode();
+        }
+
+        @Override
+        public void e(Throwable t, String text, Object... args) {
+            Log.e(LOG_TAG, String.format(Locale.ENGLISH, text, args), t);
+        }
+
+        @Override
+        public void e(String text, Object... args) {
+            Log.e(LOG_TAG, String.format(Locale.ENGLISH, text, args));
+        }
+
+        @Override
+        public void d(String text, Object... args) {
+            Log.d(LOG_TAG, String.format(Locale.ENGLISH, text, args));
+        }
+
+        @Override
+        public void v(String text, Object... args) {
+            Log.v(LOG_TAG, String.format(Locale.ENGLISH, text, args));
+        }
+    }
+}

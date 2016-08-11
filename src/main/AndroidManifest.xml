@@ -1,4 +1,4 @@
-<manifest package="eu.codetopic.utils"
+<manifest package="com.codetopic.utils"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
@@ -7,22 +7,22 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <application android:name=".UtilsInitializer">
+    <application android:name="com.codetopic.utils.UtilsInitializer">
 
         <service
-            android:name=".thread.service.BackgroundWorksService"
+            android:name="com.codetopic.utils.thread.service.BackgroundWorksService"
             android:enabled="true"
             android:exported="false"
             android:label="BackgroundWorks"/>
         <service
-            android:name=".widget.WidgetService"
+            android:name="com.codetopic.utils.widget.WidgetService"
             android:enabled="true"
             android:exported="false"
             android:label="WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
         <receiver
-            android:name=".timing.BootConnectivityReceiver"
+            android:name="com.codetopic.utils.timing.BootConnectivityReceiver"
             android:enabled="false"
             android:exported="false"
             android:label="TimingBootConnectivityReceiver">
@@ -32,24 +32,24 @@
             </intent-filter>
         </receiver>
         <receiver
-            android:name=".timing.TimedComponentExecutor"
+            android:name="com.codetopic.utils.timing.TimedComponentExecutor"
             android:enabled="true"
             android:exported="false"
             android:label="TimedBroadcastsExecutor"/>
 
         <receiver
-            android:name=".notifications.manage.NotificationDeleteReceiver"
+            android:name="com.codetopic.utils.notifications.manage.NotificationDeleteReceiver"
             android:enabled="true"
             android:exported="false"
             android:label="NotificationDeleteReceiver"/>
 
         <receiver
-            android:name=".notifications.PostNotificationCanceler"
+            android:name="com.codetopic.utils.notifications.PostNotificationCanceler"
             android:enabled="true"
             android:exported="false"
             android:label="PostNotificationCanceler"/>
         <receiver
-            android:name=".notifications.manage.ClearOnBootReceiver"
+            android:name="com.codetopic.utils.notifications.manage.ClearOnBootReceiver"
             android:enabled="false"
             android:exported="false"
             android:label="NotificationsClearOnBootReceiver">
