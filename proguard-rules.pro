@@ -31,8 +31,8 @@
     java.lang.Object readResolve();
 }
 
--keep class * implements com.codetopic.utils.timing.info.TimCompInfoModifier
--keepclassmembers class * implements com.codetopic.utils.timing.info.TimCompInfoModifier {
+-keep class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier
+-keepclassmembers class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier {
     public <init>();
-    public void modify(com.codetopic.utils.timing.info.TimCompInfoData);
+    public void modify(eu.codetopic.utils.timing.info.TimCompInfoData);
 }
