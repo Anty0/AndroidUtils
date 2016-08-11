@@ -47,7 +47,7 @@ public final class NotificationIdsManager {// TODO: 26.7.16 add support for reta
     }
 
     /**
-     * if you call this method, you must call notifyIdRemoved() if you don't need this id any more
+     * if you call this method, you must call notifyIdRemoved() if you don't need this id anymore
      *
      * @param group group
      * @return new notification id
