@@ -27,7 +27,7 @@ import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
-public class WidgetBuilder {
+public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of WidgetMultilineAdapter
 
     private static final String LOG_TAG = "WidgetBuilder";
 

@@ -6,6 +6,8 @@ import android.widget.RemoteViewsService;
 
 import eu.codetopic.utils.log.Log;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 @TargetApi(11)
 public class WidgetService extends RemoteViewsService {
 

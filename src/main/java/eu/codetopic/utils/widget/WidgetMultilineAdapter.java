@@ -15,6 +15,8 @@ import eu.codetopic.utils.R;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.log.Log;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 @TargetApi(11)
 public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFactory {
 

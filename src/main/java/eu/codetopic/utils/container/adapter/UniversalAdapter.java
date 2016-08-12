@@ -1,5 +1,8 @@
 package eu.codetopic.utils.container.adapter;
 
+import android.annotation.TargetApi;
+import android.appwidget.AppWidgetManager;
+import android.content.Context;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.support.annotation.LayoutRes;
@@ -9,9 +12,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
+import android.widget.RemoteViews;
+import android.widget.RemoteViewsService;
 import android.widget.SpinnerAdapter;
 
 import eu.codetopic.utils.Objects;
+import eu.codetopic.utils.R;
 import eu.codetopic.utils.view.ViewUtils;
 
 public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {// TODO: 26.5.16 add WidgetAdapter support
@@ -45,6 +51,10 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
 
     public final SpinnerAdapter forSpinner() {
         return new ListBase<>(this);
+    }
+
+    public final RemoteViewsService.RemoteViewsFactory forWidget(Context context, int[] appWidgetIds) {
+        return new WidgetBase<>(context, this, appWidgetIds);
     }
 
     protected void onBaseAttached(Base base) {
@@ -170,8 +180,8 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
         }
     }
 
-    public static class ListBase<VH extends ViewHolder>
-            extends SimpleReportingBase implements ListAdapter, SpinnerAdapter {
+    public static class ListBase<VH extends ViewHolder> extends SimpleReportingBase
+            implements ListAdapter, SpinnerAdapter {
 
         private static final String LOG_TAG = UniversalAdapter.LOG_TAG + "$ListBase";
         private static final String VIEW_TAG_KEY_VIEW_HOLDER = LOG_TAG + ".VIEW_HOLDER";
@@ -367,6 +377,85 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
                 super(universalHolder.itemView);
                 this.universalHolder = universalHolder;
             }
+        }
+    }
+
+    @TargetApi(11)
+    public static class WidgetBase<VH extends ViewHolder> extends SimpleReportingBase
+            implements RemoteViewsService.RemoteViewsFactory {
+
+        private final Context mContext;
+        private final UniversalAdapter<VH> mAdapter;
+        private final int[] mAppWidgetIds;
+
+        private RemoteViews mLoadingView = null;
+
+        public WidgetBase(Context context, UniversalAdapter<VH> adapter, int[] appWidgetIds) {
+            mContext = context;
+            mAppWidgetIds = appWidgetIds;
+            mAdapter = adapter;
+            mAdapter.attachBase(this);
+        }
+
+        @Override
+        public boolean hasObservers() {
+            return false;
+        }
+
+        @Override
+        public void notifyDataSetChanged() {
+            AppWidgetManager.getInstance(mContext)
+                    .notifyAppWidgetViewDataChanged(mAppWidgetIds, R.id.content_list_view);
+        }
+
+        @Override
+        public void onCreate() {
+            mAdapter.onAttachToContainer(null);
+        }
+
+        @Override
+        public void onDestroy() {
+            mAdapter.onDetachFromContainer(null);
+        }
+
+        @Override
+        public void onDataSetChanged() {
+        }
+
+        @Override
+        public int getCount() {
+            return mAdapter.getItemCount();
+        }
+
+        @Override
+        public RemoteViews getViewAt(int i) {
+            return null;
+            /*return ViewUtils.drawViewToBitmap(mAdapter.onCreateViewHolder(null,
+                    mAdapter.getItemViewType(i)).itemView, 0, 0);*/// TODO: 12.8.16 Complete implementation
+        }
+
+        @Override
+        public RemoteViews getLoadingView() {
+            return mLoadingView;
+        }
+
+        public void setLoadingView(RemoteViews loadingView) {
+            mLoadingView = loadingView;
+        }
+
+        @Override
+        public int getViewTypeCount() {
+            return 1;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return mAdapter.getItemId(i);
+        }
+
+        @Override
+        public boolean hasStableIds() {
+            return mAdapter.hasStableIds();
         }
     }
 }
