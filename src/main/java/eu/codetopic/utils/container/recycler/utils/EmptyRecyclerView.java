@@ -53,8 +53,14 @@ public class EmptyRecyclerView extends RecyclerView {
             Adapter adapter = getAdapter();
             final boolean emptyViewVisible = adapter == null
                     || adapter.getItemCount() == 0;
-            ViewVisibilityAnimator.getAnimatorFor(mEmptyView)
-                    .animateVisibilityChange(emptyViewVisible);
+            if (emptyViewVisible) {
+                ViewVisibilityAnimator.getAnimatorFor(mEmptyView)
+                        .animateVisibilityChange(true);
+            } else {
+                ViewVisibilityAnimator.getAnimatorFor(mEmptyView)
+                        .cancelAnimations();
+                mEmptyView.setVisibility(GONE);
+            }
             animator.animateVisibilityChange(!emptyViewVisible);
         } else animator.animateVisibilityChange(true);
     }
