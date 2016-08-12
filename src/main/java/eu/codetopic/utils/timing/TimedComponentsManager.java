@@ -15,8 +15,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 
 import eu.codetopic.utils.Arrays;
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.NetworkManager;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 import eu.codetopic.utils.timing.info.TimCompInfoData;
@@ -74,8 +74,7 @@ public class TimedComponentsManager {
      * @param requiredNetwork required network to execute timed components that requires internet access
      * @param timedComponents Classes of timed components to use in TimedComponentsManager
      */
-    public static void initialize(Context context, NetworkManager.NetworkType requiredNetwork,
-                                  Class<?>... timedComponents) {// TODO: 26.3.16 initialize in ApplicationBase
+    public static void initialize(Context context, NetworkManager.NetworkType requiredNetwork, Class<?>... timedComponents) {
         if (isInitialized()) throw new IllegalStateException(LOG_TAG + " is still initialized");
         context = context.getApplicationContext();
         TimingData.initialize(context);

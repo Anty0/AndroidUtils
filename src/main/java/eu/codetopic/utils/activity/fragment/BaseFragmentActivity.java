@@ -8,10 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.log.Log;
 
 public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 12.5.16 rework fragment replacing
 

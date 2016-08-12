@@ -7,10 +7,10 @@ import com.google.common.cache.CacheBuilder;
 
 import java.sql.SQLException;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.database.DependencyDatabaseObject;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.reflect.field.FieldsSearch;
 import eu.codetopic.utils.reflect.field.FoundField;
 import eu.codetopic.utils.reflect.field.SimpleFieldsFilter;

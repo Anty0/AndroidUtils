@@ -11,8 +11,8 @@ import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.Collections;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.callback.ActionCallback;
+import eu.codetopic.utils.log.Log;
 
 public abstract class LoadableItemsGetterImpl implements LoadableItemsGetter {
 

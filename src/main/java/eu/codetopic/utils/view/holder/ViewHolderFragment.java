@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 
 public abstract class ViewHolderFragment extends Fragment {
 

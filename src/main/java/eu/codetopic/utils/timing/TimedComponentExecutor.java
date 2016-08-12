@@ -8,7 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 
 public class TimedComponentExecutor extends BroadcastReceiver {
@@ -38,7 +38,6 @@ public class TimedComponentExecutor extends BroadcastReceiver {
 
         TimingData.getter.get().setLastExecuteTime(componentClass, System.currentTimeMillis());
 
-        // FIXME: 30.5.16 detect component type
         try {
             Intent targetIntent = new Intent(context, componentClass)
                     .setAction(intent.getAction()).putExtras(extras);

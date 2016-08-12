@@ -3,8 +3,8 @@ package eu.codetopic.utils.timing.info;
 import java.io.Serializable;
 
 import eu.codetopic.utils.Arrays;
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
+import eu.codetopic.utils.log.Log;
 
 public class TimCompInfoData implements Serializable {
 

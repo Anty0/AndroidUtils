@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
 public class ViewUtils {

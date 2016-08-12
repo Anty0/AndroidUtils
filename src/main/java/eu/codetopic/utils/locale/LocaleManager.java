@@ -52,7 +52,7 @@ public class LocaleManager {
      * @param app              application
      * @param localeDataGetter DataGetter of LocaleData for saving changes
      */
-    public static void initialize(@NonNull Application app, @NonNull DataGetter<LocaleData> localeDataGetter) {// TODO: 26.3.16 initialize in ApplicationBase
+    public static void initialize(@NonNull Application app, @NonNull DataGetter<LocaleData> localeDataGetter) {
         if (mContext != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
         mContext = app.getBaseContext();
         mLocaleDataGetter = localeDataGetter;

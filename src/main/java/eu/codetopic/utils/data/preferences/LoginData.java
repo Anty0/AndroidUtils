@@ -2,8 +2,8 @@ package eu.codetopic.utils.data.preferences;
 
 import android.content.Context;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.PrefNames;
+import eu.codetopic.utils.log.Log;
 
 public class LoginData extends SecuredPreferencesData {
 

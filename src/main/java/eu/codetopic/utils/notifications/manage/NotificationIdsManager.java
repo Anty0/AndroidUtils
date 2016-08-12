@@ -29,7 +29,7 @@ public final class NotificationIdsManager {// TODO: 26.7.16 add support for reta
         mData.init();
     }
 
-    public static void initialize(Context context) {// TODO: 6.3.16 initialize in ApplicationBase
+    public static void initialize(Context context) {
         if (mInstance != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
         mInstance = new NotificationIdsManager(context.getApplicationContext());
     }

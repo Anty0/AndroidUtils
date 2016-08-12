@@ -45,6 +45,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import eu.codetopic.utils.data.database.DatabaseObject;
+import eu.codetopic.utils.log.Log;
 
 public class Utils {
 

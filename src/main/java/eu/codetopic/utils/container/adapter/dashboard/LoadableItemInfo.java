@@ -9,7 +9,6 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import java.lang.ref.WeakReference;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.callback.ActionCallback;
 import eu.codetopic.utils.container.items.custom.CardViewWrapper;
@@ -18,6 +17,7 @@ import eu.codetopic.utils.container.items.custom.EmptyCustomItem;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.container.items.multiline.TextMultilineResourceLayoutItem;
+import eu.codetopic.utils.log.Log;
 
 public abstract class LoadableItemInfo extends ItemInfo {
 

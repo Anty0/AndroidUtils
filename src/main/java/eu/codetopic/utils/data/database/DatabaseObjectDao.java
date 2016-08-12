@@ -7,7 +7,7 @@ import com.j256.ormlite.stmt.PreparedUpdate;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 
 public class DatabaseObjectDao<T> extends DaoWrapper<T, Long> {
 

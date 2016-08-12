@@ -5,7 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 
 public class NotificationDeleteReceiver extends BroadcastReceiver {
 

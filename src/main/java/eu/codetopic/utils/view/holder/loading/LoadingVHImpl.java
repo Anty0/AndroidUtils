@@ -10,8 +10,8 @@ import android.view.View;
 
 import java.lang.ref.WeakReference;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.animation.ViewVisibilityAnimator;
+import eu.codetopic.utils.log.Log;
 
 public abstract class LoadingVHImpl extends LoadingVH {
 

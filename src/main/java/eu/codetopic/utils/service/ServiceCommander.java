@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
 // TODO: 4.4.16 find way to stop unneeded services (try use timeout and CommandBinder to make it)

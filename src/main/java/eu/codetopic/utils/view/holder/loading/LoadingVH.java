@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.annotation.UiThread;
 import android.view.View;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.view.holder.ViewHolder;
 

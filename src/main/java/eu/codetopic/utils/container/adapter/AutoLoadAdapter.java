@@ -11,7 +11,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import eu.codetopic.utils.Arrays;
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.callback.ActionCallback;
 import eu.codetopic.utils.container.items.custom.CardViewWrapper;
@@ -19,6 +18,7 @@ import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.CustomItemWrapper;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.TextMultilineResourceLayoutItem;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
 public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {

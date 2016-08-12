@@ -7,9 +7,9 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import java.util.ArrayList;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.data.database.holder.DatabaseObjectHolder;
 import eu.codetopic.utils.data.database.holder.HoldableDatabaseObjectUtils;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.reflect.field.FoundField;
 
 public class DatabaseObjectChangeDetector<T> {

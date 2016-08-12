@@ -8,7 +8,7 @@ import android.support.annotation.WorkerThread;
 
 import java.lang.ref.WeakReference;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.view.holder.loading.LoadingVH;
 
 /**

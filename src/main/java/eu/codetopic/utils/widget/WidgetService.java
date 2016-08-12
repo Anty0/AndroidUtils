@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.widget.RemoteViewsService;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 
 @TargetApi(11)
 public class WidgetService extends RemoteViewsService {

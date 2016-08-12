@@ -11,9 +11,9 @@ import android.widget.RemoteViewsService;
 import java.util.ArrayList;
 import java.util.List;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
+import eu.codetopic.utils.log.Log;
 
 @TargetApi(11)
 public class WidgetMultilineAdapter implements RemoteViewsService.RemoteViewsFactory {

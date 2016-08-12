@@ -23,11 +23,11 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.activity.fragment.BaseFragmentActivity;
+import eu.codetopic.utils.log.Log;
 
 public abstract class NavigationActivity extends BaseFragmentActivity
         implements NavigationView.OnNavigationItemSelectedListener {

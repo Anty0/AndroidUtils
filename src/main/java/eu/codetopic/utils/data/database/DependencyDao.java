@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 
 public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrapper<T, Long> {
 

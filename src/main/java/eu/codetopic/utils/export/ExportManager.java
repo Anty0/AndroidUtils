@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.Objects;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 public class ExportManager {

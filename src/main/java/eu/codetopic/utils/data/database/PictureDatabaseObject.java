@@ -12,12 +12,12 @@ import com.j256.ormlite.field.DatabaseField;
 import java.lang.ref.WeakReference;
 import java.sql.SQLException;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.callback.ActionCallback;
 import eu.codetopic.utils.callback.CallbackUtils;
 import eu.codetopic.utils.data.database.holder.BitmapDatabaseObject;
 import eu.codetopic.utils.data.database.holder.BitmapHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.job.database.DatabaseWork;
 import eu.codetopic.utils.thread.job.database.DbJob;
 

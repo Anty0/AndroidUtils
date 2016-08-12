@@ -15,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.HashMap;
 
-import eu.codetopic.utils.Log;
+import eu.codetopic.utils.log.Log;
 
 public abstract class DatabaseBase extends OrmLiteSqliteOpenHelper {
 

@@ -20,13 +20,13 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import eu.codetopic.utils.Log;
 import eu.codetopic.utils.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.container.items.custom.CustomItem;
 import eu.codetopic.utils.container.items.custom.MultilineItemCustomItemWrapper;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
 import eu.codetopic.utils.data.database.DatabaseObjectChangeDetector;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
+import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.database.DatabaseWork;
 import eu.codetopic.utils.thread.job.database.DbJob;
