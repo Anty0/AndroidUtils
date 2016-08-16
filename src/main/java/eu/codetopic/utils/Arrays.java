@@ -4,7 +4,10 @@ import android.support.annotation.CheckResult;
 
 import java.lang.reflect.Array;
 
-public class Arrays {
+public final class Arrays {
+
+    private Arrays() {
+    }
 
     /**
      * Add int to array of ints.
