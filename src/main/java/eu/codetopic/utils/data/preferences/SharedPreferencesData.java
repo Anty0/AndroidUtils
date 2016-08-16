@@ -87,7 +87,8 @@ public abstract class SharedPreferencesData {
         int actualVersion = getPreferences().getInt(PrefNames.DATA_SAVE_VERSION, -1);
         if (actualVersion != saveVersion) {
             SharedPreferences.Editor editor = edit();
-            onUpgrade(editor, actualVersion, saveVersion);
+            if (saveVersion > actualVersion) onUpgrade(editor, actualVersion, saveVersion);
+            else onDowngrade(editor, actualVersion, saveVersion);
             editor.putInt(PrefNames.DATA_SAVE_VERSION, saveVersion).apply();
         }
     }
@@ -118,6 +119,10 @@ public abstract class SharedPreferencesData {
 
     protected synchronized void onUpgrade(SharedPreferences.Editor editor, int from, int to) {
         editor.clear();
+    }
+
+    protected synchronized void onDowngrade(SharedPreferences.Editor editor, int from, int to) {
+        throw new UnsupportedOperationException("Version code cannot be downgraded");
     }
 
     @CallSuper
