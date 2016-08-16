@@ -20,7 +20,7 @@ public final class HoldableDatabaseObjectUtils {
     private static final String LOG_TAG = "HoldableDatabaseObjectUtils";
 
     private static final Cache<Class, FoundField> cache = CacheBuilder
-            .newBuilder().softValues().build();
+            .newBuilder()/*.softValues()*/.build();
 
     public static FoundField[] getAllHolderFieldsFor(DatabaseBase database) {
         Class[] dataClasses = database.getDataClasses();

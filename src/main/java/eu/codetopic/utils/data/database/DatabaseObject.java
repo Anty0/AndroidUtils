@@ -1,5 +1,6 @@
 package eu.codetopic.utils.data.database;
 
+import com.j256.ormlite.field.DataType;
 import com.j256.ormlite.field.DatabaseField;
 
 import java.io.Serializable;
@@ -8,7 +9,7 @@ import eu.codetopic.utils.Objects;
 
 public abstract class DatabaseObject implements Serializable {
 
-    @DatabaseField(generatedId = true)
+    @DatabaseField(generatedId = true, dataType = DataType.LONG_OBJ)
     private Long id = null;
 
     public Long getId() {
@@ -26,7 +27,7 @@ public abstract class DatabaseObject implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o) || getId() != null
+        return super.equals(o) || hasId()
                 && o instanceof DatabaseObject
                 && Objects.equals(getClass(), o.getClass())
                 && Objects.equals(getId(), ((DatabaseObject) o).getId());
