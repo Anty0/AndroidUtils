@@ -32,9 +32,7 @@ public abstract class DashboardFragment extends NavigationFragment {
 
     @Override
     public View onCreateContentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mRecyclerManager = Recycler.inflate().withoutSwipeToRefresh()
-                .on(inflater, container, false)
-                .setAdapter(mAdapter)
+        mRecyclerManager = Recycler.inflate().on(inflater, container, false).setAdapter(mAdapter)
                 .setItemTouchHelper(new ItemTouchHelper.Callback() {
                     @Override
                     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
