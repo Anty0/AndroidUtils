@@ -16,8 +16,8 @@ import java.util.HashMap;
 
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.NetworkManager;
+import eu.codetopic.utils.ids.RequestCodes;
 import eu.codetopic.utils.log.Log;
-import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 import eu.codetopic.utils.timing.info.TimCompInfoData;
 import eu.codetopic.utils.timing.info.TimedComponent;
@@ -42,11 +42,8 @@ public class TimedComponentsManager {
         mContext = context;
         mRequiredNetwork = requiredNetwork;
 
-        if (!NotificationIdsManager.isInitialized())
-            throw new IllegalStateException("NotificationIdsManager is not initialized, please initialize it");
-
         mComponentsInfoMap = new HashMap<>(components.length);
-        Log.d(LOG_TAG, "<init> initialising for: " + java.util.Arrays.toString(components));
+        Log.d(LOG_TAG, "<init> initializing for: " + java.util.Arrays.toString(components));
         synchronized (mComponentsInfoMap) {
             for (Class<?> component : components)
                 try {
@@ -226,7 +223,7 @@ public class TimedComponentsManager {
                 return;
             }
 
-            int newRequestCode = NotificationIdsManager.getInstance().obtainRequestCode();
+            int newRequestCode = RequestCodes.requestCode();
             data.setLastRequestCode(componentInfo.getComponentClass(), newRequestCode);
             TimedComponent.RepeatingMode repeatingMode = component.getRepeatingMode();
             Calendar calendar = Calendar.getInstance();

@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import eu.codetopic.utils.NetworkManager;
-import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.timing.info.TimedComponent;
 
@@ -22,7 +21,6 @@ public class TimedComponentsManagerTest {
 
     @Before
     public void setUp() throws Exception {
-        NotificationIdsManager.initialize(InstrumentationRegistry.getTargetContext());
     }
 
     @Test

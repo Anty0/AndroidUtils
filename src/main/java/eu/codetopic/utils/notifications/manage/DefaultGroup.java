@@ -1,5 +1,7 @@
 package eu.codetopic.utils.notifications.manage;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public class DefaultGroup extends Group {
 
     private static final String LOG_TAG = "DefaultGroup";

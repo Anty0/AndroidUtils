@@ -9,6 +9,8 @@ import java.io.Serializable;
 
 import eu.codetopic.utils.Arrays;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class Group implements Serializable {
 
     private static final String LOG_TAG = "Group";

@@ -1,5 +1,7 @@
 package eu.codetopic.utils.notifications.manage;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public abstract class SingleIdGroup extends Group {
 
     public static final int NO_ID = -1;

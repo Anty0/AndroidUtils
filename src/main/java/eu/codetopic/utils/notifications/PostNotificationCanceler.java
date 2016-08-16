@@ -1,32 +1,40 @@
 package eu.codetopic.utils.notifications;
 
 import android.app.AlarmManager;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationManagerCompat;
 
-import eu.codetopic.utils.notifications.manage.Group;
-import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
+import java.util.List;
+
+import eu.codetopic.utils.ids.RequestCodes;
+import eu.codetopic.utils.notifications.ids.NotificationCase;
+import eu.codetopic.utils.notifications.ids.NotificationsData;
 
 public class PostNotificationCanceler extends BroadcastReceiver {
 
-    private static final String DEFAULT_GROUP_NAME = "DEFAULT_GROUP";
-    private static final String ACTION_ADD_NAME = "eu.codetopic.utils.notifications.PostNotificationCanceler.";
     private static final String EXTRA_GROUP = "eu.codetopic.utils.notifications.PostNotificationCanceler.GROUP";
     private static final String EXTRA_NOTIFICATION_ID = "eu.codetopic.utils.notifications.PostNotificationCanceler.NOTIFICATION_ID";
 
-    public static void postNotificationCancel(Context context, @Nullable Group group, int notificationId, long waitTime) {
+    public static void postNotificationCancel(Context context, int notificationId, long waitTime) {
+        postNotificationCancel(context, notificationId, null, waitTime);
+    }
+
+    public static void postNotificationCancel(Context context, @NonNull String group, long waitTime) {
+        postNotificationCancel(context, -1, group, waitTime);
+    }
+
+    private static void postNotificationCancel(Context context, int notificationId, @Nullable String group, long waitTime) {
         ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
-                .set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + waitTime, PendingIntent
-                        .getBroadcast(context, notificationId,
+                .set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + waitTime,
+                        PendingIntent.getBroadcast(context, RequestCodes.requestCode(),
                                 new Intent(context, PostNotificationCanceler.class)
-                                        .setAction(ACTION_ADD_NAME + (group == null ?
-                                                DEFAULT_GROUP_NAME : group.getName()))
-                                        .putExtra(EXTRA_GROUP, group)
-                                        .putExtra(EXTRA_NOTIFICATION_ID, notificationId),
+                                        .putExtra(EXTRA_NOTIFICATION_ID, notificationId)
+                                        .putExtra(EXTRA_GROUP, group),
                                 PendingIntent.FLAG_CANCEL_CURRENT));
     }
 
@@ -34,13 +42,23 @@ public class PostNotificationCanceler extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (!intent.hasExtra(EXTRA_NOTIFICATION_ID)) return;
 
-        Group group = (Group) intent.getSerializableExtra(EXTRA_GROUP);
         int id = intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1);
+        String group = intent.getStringExtra(EXTRA_GROUP);
+
         if (group != null) {
-            NotificationIdsManager.getInstance().cancelNotification(group, id);
+            List<NotificationCase> notifications = NotificationsData.getter.get().findNotifications(group);
+            for (NotificationCase notification : notifications)
+                notification.cancel(context);
             return;
         }
-        ((NotificationManager) context.getSystemService(Context
-                .NOTIFICATION_SERVICE)).cancel(id);
+
+        if (id != -1) {
+            NotificationCase notification = NotificationsData.getter.get().findNotification(id);
+            if (notification != null) {
+                notification.cancel(context);
+                return;
+            }
+            NotificationManagerCompat.from(context).cancel(id);
+        }
     }
 }

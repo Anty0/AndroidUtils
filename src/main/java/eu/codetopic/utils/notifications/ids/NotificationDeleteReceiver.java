@@ -1,4 +1,4 @@
-package eu.codetopic.utils.notifications.manage;
+package eu.codetopic.utils.notifications.ids;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -7,21 +7,22 @@ import android.content.Intent;
 
 import eu.codetopic.utils.log.Log;
 
-@Deprecated
-@SuppressWarnings("deprecation")
 public class NotificationDeleteReceiver extends BroadcastReceiver {
 
-    static final String EXTRA_GROUP = "eu.codetopic.utils.notifications.manage.NotificationDeleteReceiver.GROUP";
-    static final String EXTRA_NOTIFICATION_ID = "eu.codetopic.utils.notifications.manage.NotificationDeleteReceiver.NOTIFICATION_ID";
-    static final String EXTRA_PENDING_INTENT_TO_START = "eu.codetopic.utils.notifications.manage.NotificationDeleteReceiver.PENDING_INTENT";
+    static final String EXTRA_NOTIFICATION_CASE_ID = "eu.codetopic.utils.notifications.ids.NotificationDeleteReceiver.NOTIFICATION_CASE_ID";
+    static final String EXTRA_PENDING_INTENT_TO_START = "eu.codetopic.utils.notifications.ids.NotificationDeleteReceiver.PENDING_INTENT";
     private static final String LOG_TAG = "NotificationDeleteReceiver";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         try {
-            NotificationIdsManager.getInstance()
-                    .notifyIdRemoved((Group) intent.getSerializableExtra(EXTRA_GROUP),
-                            intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1));
+            if (!NotificationCase.isInitialized()) {
+                Log.e(LOG_TAG, "NotificationCase is not initialized, can't remove notification.");
+            } else {
+                //noinspection ConstantConditions
+                NotificationsData.getter.get().findNotification(intent
+                        .getIntExtra(EXTRA_NOTIFICATION_CASE_ID, -1)).notifyCanceled();
+            }
         } catch (Exception e) {
             Log.e(LOG_TAG, "onReceive", e);
         }

@@ -14,6 +14,8 @@ import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 import eu.codetopic.utils.service.CommandService;
 
 public final class BackgroundWorksService extends CommandService<BackgroundWorksService.WorkBinder> {
+    // TODO: 13.8.16 rework to use new notifications base
+    // TODO: 13.8.16 add support for dialog works
 
     private static final String LOG_TAG = "BackgroundWorksService";
     private final ArrayList<WorkInfo> works = new ArrayList<>();

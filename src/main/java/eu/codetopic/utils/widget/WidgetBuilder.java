@@ -24,8 +24,8 @@ import java.util.List;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.container.items.multiline.MultilineItem;
+import eu.codetopic.utils.ids.RequestCodes;
 import eu.codetopic.utils.log.Log;
-import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
 
 public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of WidgetMultilineAdapter
 
@@ -286,7 +286,7 @@ public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of
         BROADCAST, SERVICE, ACTIVITY;
 
         public PendingIntent toPendingIntent(Context context, Intent intent) {
-            int requestCode = NotificationIdsManager.getInstance().obtainRequestCode();
+            int requestCode = RequestCodes.requestCode();
             switch (this) {
                 case BROADCAST:
                     return PendingIntent.getBroadcast(context, requestCode,

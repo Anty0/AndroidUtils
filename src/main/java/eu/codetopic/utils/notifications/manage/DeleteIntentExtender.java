@@ -4,6 +4,8 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public class DeleteIntentExtender implements NotificationCompat.Extender {
 
     private static final String LOG_TAG = "DeleteIntentExtender";

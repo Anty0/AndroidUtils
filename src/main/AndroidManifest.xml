@@ -38,18 +38,33 @@
             android:label="TimedBroadcastsExecutor"/>
 
         <receiver
-            android:name=".notifications.manage.NotificationDeleteReceiver"
-            android:enabled="true"
-            android:exported="false"
-            android:label="NotificationDeleteReceiver"/>
-
-        <receiver
             android:name=".notifications.PostNotificationCanceler"
             android:enabled="true"
             android:exported="false"
             android:label="PostNotificationCanceler"/>
+
+        <receiver
+            android:name=".notifications.manage.NotificationDeleteReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="NotificationDeleteReceiver"/>
         <receiver
             android:name=".notifications.manage.ClearOnBootReceiver"
+            android:enabled="false"
+            android:exported="false"
+            android:label="NotificationsClearOnBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".notifications.ids.NotificationDeleteReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="NotificationDeleteReceiver"/>
+        <receiver
+            android:name=".notifications.ids.ClearOnBootReceiver"
             android:enabled="false"
             android:exported="false"
             android:label="NotificationsClearOnBootReceiver">

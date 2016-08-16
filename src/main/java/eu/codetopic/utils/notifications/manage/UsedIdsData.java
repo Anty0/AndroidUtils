@@ -7,6 +7,8 @@ import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 import eu.codetopic.utils.exceptions.WrongIdException;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 final class UsedIdsData extends SharedPreferencesData {
 
     private static final int SAVE_VERSION = 0;
