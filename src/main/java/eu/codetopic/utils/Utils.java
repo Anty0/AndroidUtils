@@ -28,6 +28,7 @@ import android.support.annotation.StringRes;
 import android.support.annotation.WorkerThread;
 import android.text.Html;
 import android.text.Spanned;
+import android.util.Base64;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,8 +36,12 @@ import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 import eu.codetopic.utils.data.database.DatabaseObject;
 import eu.codetopic.utils.log.Log;
 
-public class Utils {
+public final class Utils {
 
     private static final String LOG_TAG = "Utils";
 
@@ -428,5 +433,29 @@ public class Utils {
         }
 
         return true;
+    }
+
+    ////////////////////////////
+    //////REGION - SERIALIZABLE/
+    ////////////////////////////
+
+    @CheckResult
+    public static Object fromString(String s) throws IOException,
+            ClassNotFoundException {
+        byte[] data = Base64.decode(s, Base64.DEFAULT);
+        ObjectInputStream ois = new ObjectInputStream(
+                new ByteArrayInputStream(data));
+        Object o = ois.readObject();
+        ois.close();
+        return o;
+    }
+
+    @CheckResult
+    public static String toString(Serializable o) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(o);
+        oos.close();
+        return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
     }
 }
