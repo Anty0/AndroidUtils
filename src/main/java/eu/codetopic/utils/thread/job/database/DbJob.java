@@ -38,8 +38,8 @@ public final class DbJob<T, ID> {
             @WorkerThread
             @Override
             public List<T> run(Dao<T, ID> dao) throws Throwable {
-                SelectArg arg = new SelectArg(value);
-                return dao.query(dao.queryBuilder().where().eq(fieldName, arg).prepare());
+                return dao.query(dao.queryBuilder().where()
+                        .eq(fieldName, new SelectArg(value)).prepare());
             }
         }, callback);
     }
