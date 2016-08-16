@@ -11,11 +11,14 @@ import android.os.PowerManager;
  *
  * @author ladas
  */
-public class NetworkManager {
+public final class NetworkManager {
 
     private static final String LOG_TAG = "NetworkManager";
 
     private static Context mContext;
+
+    private NetworkManager() {
+    }
 
     public static void init(Context context) {
         if (mContext != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
