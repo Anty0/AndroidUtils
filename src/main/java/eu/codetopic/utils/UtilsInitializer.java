@@ -1,8 +1,6 @@
 package eu.codetopic.utils;
 
 import android.app.Application;
-import android.content.Context;
-import android.os.UserManager;
 
 import com.birbit.android.jobqueue.log.JqLog;
 import com.squareup.leakcanary.LeakCanary;
@@ -32,11 +30,6 @@ public class UtilsInitializer extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        try {
-            UserManager.class.getMethod("get", Context.class).invoke(null, this);//fixes system leak in android
-        } catch (Exception ignored) {
-        }
-
         android.util.Log.d(Utils.getApplicationLabel(this).toString(), "INITIALIZING {"
                 + "\n    - DEBUG=" + BuildConfig.DEBUG
                 + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE

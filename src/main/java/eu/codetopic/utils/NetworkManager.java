@@ -6,11 +6,6 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.PowerManager;
 
-/**
- * Check device's network connectivity
- *
- * @author ladas
- */
 public final class NetworkManager {
 
     private static final String LOG_TAG = "NetworkManager";
