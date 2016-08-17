@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread;
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DatabaseResultsMapper;
 import com.j256.ormlite.dao.ForeignCollection;
 import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.dao.ObjectCache;
@@ -24,6 +25,7 @@ import com.j256.ormlite.support.DatabaseConnection;
 import com.j256.ormlite.support.DatabaseResults;
 import com.j256.ormlite.table.ObjectFactory;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.List;
@@ -42,6 +44,11 @@ public class DaoWrapper<T, ID> implements Dao<T, ID> {
     @Override
     public int create(T data) throws SQLException {
         return mBase.create(data);
+    }
+
+    @Override
+    public int create(Collection<T> datas) throws SQLException {
+        return mBase.create(datas);
     }
 
     @Override
@@ -190,7 +197,7 @@ public class DaoWrapper<T, ID> implements Dao<T, ID> {
     }
 
     @Override
-    public void closeLastIterator() throws SQLException {
+    public void closeLastIterator() throws IOException {
         mBase.closeLastIterator();
     }
 
@@ -228,6 +235,11 @@ public class DaoWrapper<T, ID> implements Dao<T, ID> {
     @Override
     public GenericRawResults<Object[]> queryRaw(String query, DataType[] columnTypes, String... arguments) throws SQLException {
         return mBase.queryRaw(query, columnTypes, arguments);
+    }
+
+    @Override
+    public <UO> GenericRawResults<UO> queryRaw(String query, DatabaseResultsMapper<UO> mapper, String... arguments) throws SQLException {
+        return mBase.queryRaw(query, mapper, arguments);
     }
 
     @Override
@@ -361,20 +373,6 @@ public class DaoWrapper<T, ID> implements Dao<T, ID> {
     }
 
     @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public boolean isAutoCommit() throws SQLException {
-        return mBase.isAutoCommit();
-    }
-
-    @Override
-    @Deprecated
-    @SuppressWarnings("deprecation")
-    public void setAutoCommit(boolean autoCommit) throws SQLException {
-        mBase.setAutoCommit(autoCommit);
-    }
-
-    @Override
     public boolean isAutoCommit(DatabaseConnection connection) throws SQLException {
         return mBase.isAutoCommit(connection);
     }
@@ -397,5 +395,25 @@ public class DaoWrapper<T, ID> implements Dao<T, ID> {
     @Override
     public void setObjectFactory(ObjectFactory<T> objectFactory) {
         mBase.setObjectFactory(objectFactory);
+    }
+
+    @Override
+    public void registerObserver(DaoObserver observer) {
+        mBase.registerObserver(observer);
+    }
+
+    @Override
+    public void unregisterObserver(DaoObserver observer) {
+        mBase.unregisterObserver(observer);
+    }
+
+    @Override
+    public String getTableName() {
+        return mBase.getTableName();
+    }
+
+    @Override
+    public void notifyChanges() {
+        mBase.notifyChanges();
     }
 }

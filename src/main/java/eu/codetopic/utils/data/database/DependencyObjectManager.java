@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread;
 
 import com.j256.ormlite.dao.CloseableIterator;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,7 +109,11 @@ public class DependencyObjectManager<T extends DependencyDatabaseObject> {
             if (data.isDeleted() && !data.isRequired())
                 toDelete.add(data);
         }
-        iterator.close();
+        try {
+            iterator.close();
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
 
         dao.deleteFromTemp(toDelete);
         mChangeDetector.onChange();

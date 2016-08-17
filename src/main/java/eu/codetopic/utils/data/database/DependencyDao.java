@@ -5,6 +5,7 @@ import android.support.annotation.WorkerThread;
 import com.j256.ormlite.dao.CloseableIterator;
 import com.j256.ormlite.dao.CloseableWrappedIterable;
 import com.j256.ormlite.dao.Dao;
+import com.j256.ormlite.dao.DatabaseResultsMapper;
 import com.j256.ormlite.dao.GenericRawResults;
 import com.j256.ormlite.dao.RawRowMapper;
 import com.j256.ormlite.dao.RawRowObjectMapper;
@@ -17,6 +18,7 @@ import com.j256.ormlite.stmt.QueryBuilder;
 import com.j256.ormlite.stmt.UpdateBuilder;
 import com.j256.ormlite.support.DatabaseResults;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +28,7 @@ import java.util.concurrent.Callable;
 
 import eu.codetopic.utils.log.Log;
 
-public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrapper<T, Long> {
+public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrapper<T, Long> {// TODO: 17.8.16 rework
 
     private static final String LOG_TAG = "DependencyDao";
 
@@ -62,7 +64,18 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
             if (!object.isDeleted())
                 toReturn.add(object);
         }
-        toFilter.close();
+        try {
+            toFilter.close();
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+        return toReturn;
+    }
+
+    @Override
+    public int create(Collection<T> datas) throws SQLException {
+        int toReturn = super.create(datas);
+        mDependencyObjectManager.onUpdateObjects(this, datas);
         return toReturn;
     }
 
@@ -325,7 +338,7 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
     }
 
     @Override
-    public void closeLastIterator() throws SQLException {
+    public void closeLastIterator() throws IOException {
         super.closeLastIterator();
     }
 
@@ -395,6 +408,15 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
     }
 
     @Override
+    public <UO> GenericRawResults<UO> queryRaw(String query, DatabaseResultsMapper<UO> mapper, String... arguments) throws SQLException {
+        throw new UnsupportedOperationException("Unsupported");
+    }
+
+    public <UO> GenericRawResults<UO> queryRawWithTemp(String query, DatabaseResultsMapper<UO> mapper, String... arguments) throws SQLException {
+        return super.queryRaw(query, mapper, arguments);
+    }
+
+    @Override
     public int executeRaw(String statement, String... arguments) {
         throw new UnsupportedOperationException("Unsupported");
     }
@@ -422,7 +444,11 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
             iterator.nextThrow();
             count++;
         }
-        iterator.close();
+        try {
+            iterator.close();
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
         return count;
     }
 
@@ -485,7 +511,7 @@ public class DependencyDao<T extends DependencyDatabaseObject> extends DaoWrappe
         }
 
         @Override
-        public void close() throws SQLException {
+        public void close() throws IOException {
             parent.close();
         }
 

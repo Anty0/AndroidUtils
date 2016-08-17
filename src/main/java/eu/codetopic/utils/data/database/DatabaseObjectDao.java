@@ -9,7 +9,7 @@ import java.util.Collection;
 
 import eu.codetopic.utils.log.Log;
 
-public class DatabaseObjectDao<T> extends DaoWrapper<T, Long> {
+public class DatabaseObjectDao<T> extends DaoWrapper<T, Long> {// TODO: 17.8.16 use new DaoObserver replacing this
 
     private static final String LOG_TAG = "DatabaseObjectDao";
 
@@ -23,6 +23,13 @@ public class DatabaseObjectDao<T> extends DaoWrapper<T, Long> {
 
     public DatabaseObjectChangeDetector<T> getChangeDetector() {
         return mChangeDetector;
+    }
+
+    @Override
+    public int create(Collection<T> datas) throws SQLException {
+        int toReturn = super.create(datas);
+        mChangeDetector.onChange();
+        return toReturn;
     }
 
     @Override
