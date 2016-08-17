@@ -6,7 +6,7 @@ import com.birbit.android.jobqueue.log.JqLog;
 import com.squareup.leakcanary.LeakCanary;
 
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
-import eu.codetopic.utils.ids.RequestCodes;
+import eu.codetopic.utils.ids.Identifiers;
 import eu.codetopic.utils.log.Logger;
 import eu.codetopic.utils.log.base.JobQueueLogger;
 import eu.codetopic.utils.service.ServiceCommander;
@@ -22,8 +22,6 @@ public class UtilsInitializer extends Application {
      * - {@code eu.codetopic.utils.log.DebugModeManager.initDebugModeDetector() } using {@code Logger.getDebugModeManager() }
      * - {@code eu.codetopic.utils.log.DebugModeManager.setDebugModeEnabled() } using {@code Logger.getDebugModeManager() }
      * - {@code eu.codetopic.utils.log.ErrorLogsHandler.addOnErrorLoggedListener() } using {@code Logger.getErrorLogsHandler }
-     * - @Deprecated {@code eu.codetopic.utils.notifications.manage.NotificationIdsManager.initialize() }
-     * - {@code eu.codetopic.utils.notifications.ids.NotificationCase.initialize() }
      * - {@code eu.codetopic.utils.timing.TimedComponentsManager.initialize() }
      * - {@code eu.codetopic.utils.broadcast.BroadcastsConnector.connect() }
      */
@@ -44,7 +42,7 @@ public class UtilsInitializer extends Application {
         NetworkManager.init(this);
         JobUtils.initialize(this);
         BroadcastsConnector.initialize(this);
-        RequestCodes.initialize(this);
+        Identifiers.initialize(this);
     }
 
     @Override

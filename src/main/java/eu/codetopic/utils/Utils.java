@@ -1,5 +1,7 @@
 package eu.codetopic.utils;
 
+import android.annotation.TargetApi;
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -18,6 +20,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.service.notification.StatusBarNotification;
 import android.support.annotation.AnyRes;
 import android.support.annotation.AttrRes;
 import android.support.annotation.CheckResult;
@@ -143,9 +146,9 @@ public final class Utils {
                 + resources.getResourceEntryName(resource));
     }
 
-    ////////////////////////////
-    //////REGION - BITMAPS//////
-    ////////////////////////////
+    //////////////////////////////////////
+    //////REGION - BITMAPS////////////////
+    //////////////////////////////////////
 
     @CheckResult
     public static byte[] getBitmapBytes(Bitmap bitmap) {
@@ -172,9 +175,9 @@ public final class Utils {
             return Bitmap.createBitmap(bitmap, 0, height / 2 - width / 2, width, width);
     }
 
-    /////////////////////////////
-    //////REGION - DATABASE//////
-    /////////////////////////////
+    ///////////////////////////////////////
+    //////REGION - DATABASE////////////////
+    ///////////////////////////////////////
 
     @CheckResult
     public static <T extends DatabaseObject> int findIndexById(Long id, List<T> databaseObjects) {
@@ -194,9 +197,9 @@ public final class Utils {
         return -1;
     }
 
-    ///////////////////////////
-    //////REGION - COLORS//////
-    ///////////////////////////
+    /////////////////////////////////////
+    //////REGION - COLORS////////////////
+    /////////////////////////////////////
 
     @ColorInt
     @CheckResult
@@ -218,9 +221,9 @@ public final class Utils {
         );
     }
 
-    ///////////////////////////////
-    //////REGION - ATTRIBUTES//////
-    ///////////////////////////////
+    /////////////////////////////////////////
+    //////REGION - ATTRIBUTES////////////////
+    /////////////////////////////////////////
 
     @ColorInt
     @CheckResult
@@ -270,9 +273,9 @@ public final class Utils {
         }
     }
 
-    /////////////////////////////
-    //////REGION - APP_INFO//////
-    /////////////////////////////
+    ///////////////////////////////////////
+    //////REGION - APP_INFO////////////////
+    ///////////////////////////////////////
 
     @CheckResult
     public static int getApplicationVersionCode(Context context) {
@@ -359,9 +362,9 @@ public final class Utils {
         }
     }
 
-    /////////////////////////////
-    //////REGION - LOCALE////////
-    /////////////////////////////
+    ///////////////////////////////////////
+    //////REGION - LOCALE//////////////////
+    ///////////////////////////////////////
 
     public static void setLocale(Context context, Locale locale) {
         setLocale(context.getResources(), locale);
@@ -379,9 +382,9 @@ public final class Utils {
         else conf.locale = locale;
     }
 
-    /////////////////////////////
-    //////REGION - LOCATION//////
-    /////////////////////////////
+    ///////////////////////////////////////
+    //////REGION - LOCATION////////////////
+    ///////////////////////////////////////
 
     @WorkerThread
     @CheckResult
@@ -408,9 +411,9 @@ public final class Utils {
         return context.getString(R.string.location_none);
     }
 
-    ////////////////////////////
-    //////REGION - BUNDLES//////
-    ////////////////////////////
+    //////////////////////////////////////
+    //////REGION - BUNDLES////////////////
+    //////////////////////////////////////
 
     @CheckResult
     public static boolean equalBundles(@Nullable Bundle first, @Nullable Bundle second) {
@@ -435,9 +438,9 @@ public final class Utils {
         return true;
     }
 
-    ////////////////////////////
-    //////REGION - SERIALIZABLE/
-    ////////////////////////////
+    //////////////////////////////////////
+    //////REGION - SERIALIZABLE///////////
+    //////////////////////////////////////
 
     @CheckResult
     public static Object fromString(String s) throws IOException,
@@ -457,5 +460,24 @@ public final class Utils {
         oos.writeObject(o);
         oos.close();
         return Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+    }
+
+    //////////////////////////////////////
+    //////REGION - NOTIFICATIONS//////////
+    //////////////////////////////////////
+
+    @TargetApi(23)
+    public static int cancelNotificationsByTag(Context context, @NonNull String tag) {
+        int canceled = 0;
+        NotificationManager manager = (NotificationManager) context
+                .getSystemService(Context.NOTIFICATION_SERVICE);
+        for (StatusBarNotification notification : manager.getActiveNotifications()) {
+            String nTag = notification.getTag();
+            if (tag.equals(nTag)) {
+                manager.cancel(nTag, notification.getId());
+                canceled++;
+            }
+        }
+        return canceled;
     }
 }

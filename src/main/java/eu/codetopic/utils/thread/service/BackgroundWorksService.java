@@ -10,26 +10,16 @@ import java.util.ArrayList;
 
 import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.data.getter.JobManagerGetter;
-import eu.codetopic.utils.notifications.manage.NotificationIdsManager;
+import eu.codetopic.utils.ids.Identifiers;
 import eu.codetopic.utils.service.CommandService;
 
 public final class BackgroundWorksService extends CommandService<BackgroundWorksService.WorkBinder> {
-    // TODO: 13.8.16 rework to use new notifications base
     // TODO: 13.8.16 add support for dialog works
 
     private static final String LOG_TAG = "BackgroundWorksService";
     private final ArrayList<WorkInfo> works = new ArrayList<>();
     private int actualForegroundId = -1;
     private boolean stopped = false;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        if (!NotificationIdsManager.isInitialized()) {
-            safeStopSelf();
-            throw new IllegalStateException("NotificationIdsManager is not initialized, please initialize it");
-        }
-    }
 
     private WorkInfo execute(JobManager jobManager, ServiceWork work) {
         if (jobManager == null || work == null)
@@ -38,19 +28,15 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
         synchronized (works) {
             if (isStopped()) throw new IllegalStateException(LOG_TAG + " is stopped (what?)");
 
-            WorkInfo info = new WorkInfo(this, jobManager, NotificationIdsManager.getInstance()
-                    .obtainNewId(new WorksIdsGroup()), work) {
+            WorkInfo info = new WorkInfo(this, jobManager, Identifiers
+                    .next(Identifiers.TYPE_NOTIFICATION_ID), work) {
                 @Override
                 public void onBeforeNotificationRemoved() {
                     synchronized (works) {
-                        if (works.remove(this)) {
-                            NotificationIdsManager.getInstance().notifyIdRemoved(
-                                    new WorksIdsGroup(), getNotificationId());
-                            if (getNotificationId() == actualForegroundId) {
-                                stopForeground(false);
-                                actualForegroundId = -1;
-                                findNewForegroundNotification();
-                            }
+                        if (works.remove(this) && getNotificationId() == actualForegroundId) {
+                            stopForeground(false);
+                            actualForegroundId = -1;
+                            findNewForegroundNotification();
                         }
                     }
                     if (!isRunning()) safeStopSelf();

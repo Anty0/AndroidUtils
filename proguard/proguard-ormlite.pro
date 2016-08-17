@@ -9,7 +9,7 @@
 # Keep the helper class and its constructor
 -keep class * extends com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper
 -keepclassmembers class * extends com.j256.ormlite.android.apptools.OrmLiteSqliteOpenHelper {
-  public <init>(android.content.Context);
+    public <init>(android.content.Context);
 }
 
 # Keep the annotations
@@ -28,3 +28,5 @@
     <init>(long);
     long getMillis();
 }
+
+-dontwarn com.j256.**

@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.NetworkManager;
-import eu.codetopic.utils.ids.RequestCodes;
+import eu.codetopic.utils.ids.Identifiers;
 import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 import eu.codetopic.utils.timing.info.TimCompInfoData;
@@ -223,7 +223,7 @@ public class TimedComponentsManager {
                 return;
             }
 
-            int newRequestCode = RequestCodes.requestCode();
+            int newRequestCode = Identifiers.next(Identifiers.TYPE_REQUEST_CODE);
             data.setLastRequestCode(componentInfo.getComponentClass(), newRequestCode);
             TimedComponent.RepeatingMode repeatingMode = component.getRepeatingMode();
             Calendar calendar = Calendar.getInstance();
