@@ -6,7 +6,7 @@ import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 import eu.codetopic.utils.log.Log;
 
-public class TimCompInfoData implements Serializable {
+public final class TimCompInfoData implements Serializable {
 
     private static final String LOG_TAG = "TimCompInfoData";
 
@@ -23,9 +23,8 @@ public class TimCompInfoData implements Serializable {
         this.componentClass = componentClass;
 
         TimedComponent info = componentClass.getAnnotation(TimedComponent.class);
-        if (info == null)
-            throw new NoAnnotationPresentException("TimedComponent annotation is not present in "
-                    + componentClass.getName());
+        if (info == null) throw new NoAnnotationPresentException(
+                "TimedComponent annotation is not present in " + componentClass.getName());
 
         repeatTime = info.repeatTime();
         usableDays = info.usableDays();
@@ -117,5 +116,20 @@ public class TimCompInfoData implements Serializable {
 
     public TimCompInfoModifier[] getModifiers() {
         return modifiers;
+    }
+
+    @Override
+    public String toString() {
+        return "TimCompInfoData{" +
+                "componentClass=" + componentClass +
+                ", modifiers=" + java.util.Arrays.toString(modifiers) +
+                ", repeatTime=" + repeatTime +
+                ", usableDays=" + java.util.Arrays.toString(usableDays) +
+                ", startHour=" + startHour +
+                ", stopHour=" + stopHour +
+                ", resetOnBoot=" + resetOnBoot +
+                ", requiresInternetAccess=" + requiresInternetAccess +
+                ", repeatingMode=" + repeatingMode +
+                '}';
     }
 }
