@@ -7,7 +7,7 @@ import java.io.Serializable;
 
 import eu.codetopic.utils.Utils;
 
-public class TimCompInfo implements Serializable {
+public final class TimCompInfo implements Serializable {
 
     private final Class<?> mComponent;
     private final TimCompInfoData mComponentInfo;
@@ -32,7 +32,15 @@ public class TimCompInfo implements Serializable {
         return Utils.isComponentEnabled(context, mComponent);
     }
 
-    public TimCompInfoData getComponentInfo() {
+    public TimCompInfoData getComponentProperties() {
         return mComponentInfo;
+    }
+
+    @Override
+    public String toString() {
+        return "TimCompInfo{" +
+                "mComponent=" + mComponent +
+                ", mComponentInfo=" + mComponentInfo +
+                '}';
     }
 }
