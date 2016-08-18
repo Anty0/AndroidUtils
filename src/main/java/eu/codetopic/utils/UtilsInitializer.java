@@ -18,7 +18,7 @@ public class UtilsInitializer extends Application {
      * Methods that should be called in your Application onCreate:
      * - {@code eu.codetopic.utils.thread.job.SingletonJobManager.initialize() }
      * - {@code eu.codetopic.utils.data.database.singleton.SingletonDatabase.initialize() }
-     * - {@code eu.codetopic.utils.locale.LocaleManager.initialize() }
+     * - {@code LocaleManager.initialize() }
      * - {@code eu.codetopic.utils.log.DebugModeManager.initDebugModeDetector() } using {@code Logger.getDebugModeManager() }
      * - {@code eu.codetopic.utils.log.DebugModeManager.setDebugModeEnabled() } using {@code Logger.getDebugModeManager() }
      * - {@code eu.codetopic.utils.log.ErrorLogsHandler.addOnErrorLoggedListener() } using {@code Logger.getErrorLogsHandler }

@@ -10,7 +10,7 @@ import com.birbit.android.jobqueue.Params;
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.data.getter.JobManagerGetter;
 import eu.codetopic.utils.thread.job.LoadingJob;
-import eu.codetopic.utils.view.holder.loading.LoadingVH;
+import eu.codetopic.utils.ui.view.holder.loading.LoadingVH;
 
 public class NetworkJob extends LoadingJob {
 

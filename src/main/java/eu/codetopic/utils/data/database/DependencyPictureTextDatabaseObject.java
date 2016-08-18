@@ -14,13 +14,13 @@ import java.sql.SQLException;
 
 import eu.codetopic.utils.callback.ActionCallback;
 import eu.codetopic.utils.callback.CallbackUtils;
-import eu.codetopic.utils.container.items.multiline.MultilineLoadableImageItem;
 import eu.codetopic.utils.data.database.holder.BitmapDatabaseObject;
 import eu.codetopic.utils.data.database.holder.BitmapHolder;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.job.database.DatabaseWork;
 import eu.codetopic.utils.thread.job.database.DbJob;
+import eu.codetopic.utils.ui.container.items.multiline.MultilineLoadableImageItem;
 
 public abstract class DependencyPictureTextDatabaseObject<BDO extends BitmapDatabaseObject,
         BH extends BitmapHolder<BDO>> extends DependencyTextDatabaseObject implements MultilineLoadableImageItem {

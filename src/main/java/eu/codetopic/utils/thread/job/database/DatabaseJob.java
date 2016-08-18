@@ -11,7 +11,7 @@ import eu.codetopic.utils.R;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.LoadingJob;
-import eu.codetopic.utils.view.holder.loading.LoadingVH;
+import eu.codetopic.utils.ui.view.holder.loading.LoadingVH;
 
 public class DatabaseJob<T, ID> extends LoadingJob {
 

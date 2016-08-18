@@ -3,6 +3,8 @@ package eu.codetopic.utils.context;
 import java.util.ArrayList;
 import java.util.List;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public class DestroyReporterHelper implements ActivityDestroyReporter {
 
     private static final String LOG_TAG = "DestroyReporterHelper";

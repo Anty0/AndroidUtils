@@ -7,6 +7,8 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public class ActivityHolder<D> {
 
     private final Context mApplicationContext;

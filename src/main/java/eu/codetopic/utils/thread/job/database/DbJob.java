@@ -10,7 +10,7 @@ import com.j256.ormlite.stmt.SelectArg;
 import java.util.List;
 
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
-import eu.codetopic.utils.view.holder.loading.LoadingVH;
+import eu.codetopic.utils.ui.view.holder.loading.LoadingVH;
 
 public final class DbJob<T, ID> {
 

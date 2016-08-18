@@ -1,7 +1,9 @@
 package eu.codetopic.utils.context;
 
-import eu.codetopic.utils.activity.modular.SimpleActivityCallBackModule;
+import eu.codetopic.utils.ui.activity.modular.SimpleActivityCallBackModule;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public class ActivityDestroyReporterModule extends SimpleActivityCallBackModule implements ActivityDestroyReporter {
 
     private static final String LOG_TAG = "ActivityDestroyReporterModule";

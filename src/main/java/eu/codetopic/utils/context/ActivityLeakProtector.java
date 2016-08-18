@@ -5,8 +5,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import eu.codetopic.utils.activity.modular.ModularActivity;
+import eu.codetopic.utils.ui.activity.modular.ModularActivity;
 
+@Deprecated
+@SuppressWarnings("deprecation")
 public final class ActivityLeakProtector {
 
     private static final String LOG_TAG = "ActivityLeakProtector";
