@@ -83,8 +83,7 @@ public class TimedComponentsManager {
 
         INSTANCE = new TimedComponentsManager(context, requiredNetwork, timedComponents);
 
-        if (TimingData.getter.get().isFirstLoad())
-            INSTANCE.reloadAll();// TODO: 30.5.16 maybe do it every time (every application start)
+        if (TimingData.getter.get().isFirstLoad()) INSTANCE.reloadAll();
     }
 
     public static TimedComponentsManager getInstance() {
@@ -101,7 +100,7 @@ public class TimedComponentsManager {
                 TimingData data = TimingData.getter.get();
                 synchronized (mComponentsInfoMap) {
                     for (TimCompInfo componentInfo : mComponentsInfoMap.values())
-                        if (componentInfo.getComponentInfo().isResetRepeatingOnBoot())
+                        if (componentInfo.getComponentProperties().isResetRepeatingOnBoot())
                             data.clear(componentInfo.getComponentClass());
 
                     reloadAll();
@@ -135,16 +134,22 @@ public class TimedComponentsManager {
     }
 
     public void setComponentEnabled(TimCompInfo componentInfo, boolean enabled) {
-        PackageManager pm = mContext.getPackageManager();
-        if (pm.getComponentEnabledSetting(componentInfo.getComponentName(mContext))
-                != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
-                && enabled == componentInfo.isEnabled(mContext)) return;
+        synchronized (mComponentsInfoMap) {
+            if (!mComponentsInfoMap.containsValue(componentInfo))
+                throw new IllegalArgumentException("Can't reload componentInfo that is not initialized in "
+                        + LOG_TAG + ".initialize(). componentInfo=" + componentInfo);
 
-        pm.setComponentEnabledSetting(componentInfo.getComponentName(mContext),
-                enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                        : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                PackageManager.DONT_KILL_APP);
-        tryReload(componentInfo);
+            PackageManager pm = mContext.getPackageManager();
+            if (pm.getComponentEnabledSetting(componentInfo.getComponentName(mContext))
+                    != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+                    && enabled == componentInfo.isEnabled(mContext)) return;
+
+            pm.setComponentEnabledSetting(componentInfo.getComponentName(mContext),
+                    enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                            : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                    PackageManager.DONT_KILL_APP);
+            tryReload(componentInfo);
+        }
     }
 
     public Intent getReloadIntent(Class<?> componentClass) {
@@ -155,15 +160,21 @@ public class TimedComponentsManager {
     }
 
     public Intent getReloadIntent(TimCompInfo componentInfo) {
-        return new Intent(mContext, BootConnectivityReceiver.class)
-                .setAction(ACTION_RELOAD_COMPONENT)
-                .putExtra(EXTRA_TIMED_COMPONENT_INFO, componentInfo);
+        synchronized (mComponentsInfoMap) {
+            if (!mComponentsInfoMap.containsValue(componentInfo))
+                throw new IllegalArgumentException("Can't reload componentInfo that is not initialized in "
+                        + LOG_TAG + ".initialize(). componentInfo=" + componentInfo);
+
+            return new Intent(mContext, BootConnectivityReceiver.class)
+                    .setAction(ACTION_RELOAD_COMPONENT)
+                    .putExtra(EXTRA_TIMED_COMPONENT_INFO, componentInfo);
+        }
     }
 
     public void reloadAllNetwork() {
         synchronized (mComponentsInfoMap) {
             for (TimCompInfo componentInfo : mComponentsInfoMap.values())
-                if (componentInfo.getComponentInfo().isRequiresInternetAccess())
+                if (componentInfo.getComponentProperties().isRequiresInternetAccess())
                     tryReload(componentInfo);
         }
     }
@@ -204,13 +215,17 @@ public class TimedComponentsManager {
 
     public void reload(TimCompInfo componentInfo) {
         synchronized (mComponentsInfoMap) {
+            if (!mComponentsInfoMap.containsValue(componentInfo))
+                throw new IllegalArgumentException("Can't reload componentInfo that is not initialized in "
+                        + LOG_TAG + ".initialize(). componentInfo=" + componentInfo);
+
             AlarmManager alarms = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
             Intent componentIntent = TimedComponentExecutor.generateIntent(mContext,
                     ACTION_TIMED_EXECUTE, componentInfo, null);
             Intent reloadIntent = getReloadIntent(componentInfo);
 
             TimingData data = TimingData.getter.get();
-            TimCompInfoData component = componentInfo.getComponentInfo();
+            TimCompInfoData component = componentInfo.getComponentProperties();
             int lastRequestCode = data.getLastRequestCode(componentInfo.getComponentClass());
             if (lastRequestCode != -1) {
                 alarms.cancel(PendingIntent.getBroadcast(mContext, lastRequestCode, componentIntent, 0));
@@ -287,7 +302,6 @@ public class TimedComponentsManager {
         }
     }
 
-    @Nullable
     public TimCompInfo getComponentInfo(Class<?> componentClass) {
         synchronized (mComponentsInfoMap) {
             return mComponentsInfoMap.get(componentClass);
