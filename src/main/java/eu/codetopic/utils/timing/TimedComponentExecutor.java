@@ -11,7 +11,7 @@ import android.support.annotation.Nullable;
 import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 
-public class TimedComponentExecutor extends BroadcastReceiver {
+public final class TimedComponentExecutor extends BroadcastReceiver {
 
     private static final String LOG_TAG = "TimedComponentExecutor";
 
