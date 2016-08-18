@@ -16,7 +16,7 @@ public enum Modification {
                 return new DatabaseWork<T, ID>() {
                     @Override
                     public void run(Dao<T, ID> dao) throws Throwable {
-                        for (T object : toModify) dao.create(object);
+                        dao.create(Arrays.asList(toModify));
                     }
                 };
             case UPDATE:
@@ -49,7 +49,7 @@ public enum Modification {
                     }
                 };
             default:
-                throw new EnumConstantNotPresentException(Modification.class, this.name());
+                throw new EnumConstantNotPresentException(Modification.class, name());
         }
     }
 }

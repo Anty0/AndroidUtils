@@ -3,8 +3,10 @@ package eu.codetopic.utils.data.preferences;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.google.gson.Gson;
@@ -18,7 +20,7 @@ public abstract class SharedPreferencesData {
     protected static final Gson GSON = new Gson();
     private static final String LOG_TAG = "SharedPreferencesData";
     private final Context mContext;
-    private final String mFileName;
+    @Nullable private final String mFileName;
     private final int mSaveVersion;
     private final int mPrefOperatingMode;
     private final SharedPreferences.OnSharedPreferenceChangeListener mPreferenceChangeListener =
@@ -33,11 +35,11 @@ public abstract class SharedPreferencesData {
     private boolean mDestroyed = false;
 
 
-    public SharedPreferencesData(Context context, String fileName, int saveVersion) {
+    public SharedPreferencesData(Context context, @Nullable String fileName, int saveVersion) {
         this(context, fileName, Context.MODE_PRIVATE, saveVersion);
     }
 
-    public SharedPreferencesData(Context context, String fileName, int prefOperatingMode, int saveVersion) {
+    public SharedPreferencesData(Context context, @Nullable String fileName, int prefOperatingMode, int saveVersion) {
         mContext = context.getApplicationContext();
         mFileName = fileName;
         mPrefOperatingMode = prefOperatingMode;
@@ -80,6 +82,7 @@ public abstract class SharedPreferencesData {
     }
 
     protected synchronized SharedPreferences createSharedPreferences() {
+        if (mFileName == null) return PreferenceManager.getDefaultSharedPreferences(mContext);
         return mContext.getSharedPreferences(mFileName, mPrefOperatingMode);
     }
 
@@ -97,6 +100,7 @@ public abstract class SharedPreferencesData {
         return mContext;
     }
 
+    @Nullable
     public String getFileName() {
         return mFileName;
     }
