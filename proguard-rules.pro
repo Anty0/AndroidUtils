@@ -19,7 +19,7 @@
 # Preserve annotations, line numbers, and source file names
 -keepattributes *Annotation*,SourceFile,LineNumberTable
 
-# Serializables
+# keep Serializables
 -keepnames class * implements java.io.Serializable
 -keepclassmembers class * implements java.io.Serializable {
     static final long serialVersionUID;
@@ -29,6 +29,14 @@
     private void readObject(java.io.ObjectInputStream);
     java.lang.Object writeReplace();
     java.lang.Object readResolve();
+}
+
+# remove Logs
+-assumenosideeffects class eu.codetopic.utils.log.Log {
+    public static *** v(...);
+    public static *** d(...);
+    public static *** i(...);
+    public static *** w(...);
 }
 
 -keep class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier
