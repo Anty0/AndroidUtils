@@ -30,15 +30,14 @@ public final class ErrorLogsHandler {
         try {
             final Context appContext = Logger.getAppContext();
             if (appContext == null || !Log.isInDebugMode()) return;
-            final StringBuilder sb = new StringBuilder("Error logged:\n")
-                    .append("Tag: ").append(tag)
-                    .append("Msg: ").append(msg).append('\n')
-                    .append("Tr: ").append(tr);
+            final StringBuilder sb = new StringBuilder()
+                    .append(tag).append(": ").append(msg).append('\n')
+                    .append(android.util.Log.getStackTraceString(tr));
 
             JobUtils.runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(appContext, sb.toString(), Toast.LENGTH_LONG).show();// TODO: 12.8.16 use DialogActivity to show error
+                    ErrorInfoActivity.start(appContext, sb.toString());
                 }
             });
         } finally {

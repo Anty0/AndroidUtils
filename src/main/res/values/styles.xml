@@ -1,5 +1,10 @@
 <resources>
 
+    <style name="Theme.AppCompat.Dialog.Alert.NoActionBar" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <!--<style name="DefaultTheme" parent="DefaultTheme.Base">
 
     </style>
