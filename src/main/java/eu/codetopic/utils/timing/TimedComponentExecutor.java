@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.log.Log;
@@ -15,16 +16,17 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
 
     private static final String LOG_TAG = "TimedComponentExecutor";
 
-    private static final String EXTRA_TIMED_COMPONENT_INFO =
-            "eu.codetopic.utils.timing.TimedComponentExecutor.TIMED_COMPONENT_INFO";
+    private static final String EXTRA_TIMED_COMPONENT_CLASS =
+            "eu.codetopic.utils.timing.TimedComponentExecutor.TIMED_COMPONENT_CLASS";
     private static final String EXTRA_EXECUTE_EXTRAS =
             "eu.codetopic.utils.timing.TimedComponentExecutor.EXECUTE_EXTRAS";
 
-    static Intent generateIntent(Context context, String action, TimCompInfo componentInfo,
+    static Intent generateIntent(Context context, String callTypeAction,
+                                 @NonNull Class<?> componentClass,
                                  @Nullable Bundle executeExtras) {
 
-        return new Intent(context, TimedComponentExecutor.class).setAction(action)
-                .putExtra(EXTRA_TIMED_COMPONENT_INFO, componentInfo)
+        return new Intent(context, TimedComponentExecutor.class).setAction(callTypeAction)
+                .putExtra(EXTRA_TIMED_COMPONENT_CLASS, componentClass)
                 .putExtra(EXTRA_EXECUTE_EXTRAS, executeExtras);
     }
 
@@ -33,8 +35,12 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
         Bundle extras = intent.getBundleExtra(EXTRA_EXECUTE_EXTRAS);
         if (extras == null) extras = new Bundle();
 
-        Class<?> componentClass = ((TimCompInfo) intent
-                .getSerializableExtra(EXTRA_TIMED_COMPONENT_INFO)).getComponentClass();
+        Class<?> componentClass = (Class<?>) intent.getSerializableExtra(EXTRA_TIMED_COMPONENT_CLASS);
+        if (componentClass == null) {
+            Log.e(LOG_TAG, "onReceive", new NullPointerException("Received request" +
+                    " to execute component without component class"));
+            return;
+        }
 
         TimingData.getter.get().setLastExecuteTime(componentClass, System.currentTimeMillis());
 

@@ -1,7 +1,9 @@
 package eu.codetopic.utils.timing;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
+import eu.codetopic.utils.BuildConfig;
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.data.getter.DataGetter;
@@ -25,35 +27,33 @@ public final class TimingData extends SharedPreferencesData {
         mInstance.init();
     }
 
-    public boolean isFirstLoad() {
+    boolean isFirstLoad() {
+        if (BuildConfig.DEBUG) return true;//fixes reinstall of application without increasing version code
+
         int versionCode = Utils.getApplicationVersionCode(getContext());
         int lastVersionCode = getPreferences().getInt(PrefNames.LAST_LOAD_VERSION_CODE, -1);
         edit().putInt(PrefNames.LAST_LOAD_VERSION_CODE, versionCode).apply();
         return versionCode != lastVersionCode;
     }
 
-    public void clear() {
-        edit().clear().apply();
-    }
-
-    public void clear(Class clazz) {
+    void clear(@NonNull Class clazz) {
         edit().remove(clazz.getName() + PrefNames.ADD_TIME_LAST_START)
                 .remove(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE).apply();
     }
 
-    public long getLastExecuteTime(Class clazz) {
+    public long getLastExecuteTime(@NonNull Class clazz) {
         return getPreferences().getLong(clazz.getName() + PrefNames.ADD_TIME_LAST_START, -1L);
     }
 
-    void setLastExecuteTime(Class clazz, long lastExecuteTime) {
+    void setLastExecuteTime(@NonNull Class clazz, long lastExecuteTime) {
         edit().putLong(clazz.getName() + PrefNames.ADD_TIME_LAST_START, lastExecuteTime).apply();
     }
 
-    public int getLastRequestCode(Class clazz) {
+    public int getLastRequestCode(@NonNull Class clazz) {
         return getPreferences().getInt(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE, -1);
     }
 
-    void setLastRequestCode(Class clazz, int lastRequestCode) {
+    void setLastRequestCode(@NonNull Class clazz, int lastRequestCode) {
         edit().putInt(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE, lastRequestCode).apply();
     }
 

@@ -64,6 +64,16 @@ public final class DbJob<T, ID> {
         }, callback);
     }
 
+    public String startCallback(final DatabaseWork<T, ID> work, final Callback<Void> callback) {
+        return startCallback(new CallbackWork<Void, T, ID>() {
+            @Override
+            public Void run(Dao<T, ID> dao) throws Throwable {
+                work.run(dao);
+                return null;
+            }
+        }, callback);
+    }
+
     public <D> String startCallback(final CallbackWork<D, T, ID> work, final Callback<D> callback) {
         final Handler handler = new Handler(Looper.myLooper());
         return start(new DatabaseWork<T, ID>() {

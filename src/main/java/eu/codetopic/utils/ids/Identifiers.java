@@ -4,6 +4,7 @@ import android.content.Context;
 
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
+import eu.codetopic.utils.log.Log;
 
 public class Identifiers extends SharedPreferencesData {
 
@@ -34,6 +35,8 @@ public class Identifiers extends SharedPreferencesData {
     private int getNext(Type type) {
         int next = type.getNext(getLast(type));
         edit().putInt(type.getSettingsName(), next).apply();
+        Log.d(LOG_TAG, "Returning next identifier of type "
+                + type.getName() + ", returned id is " + next);
         return next;
     }
 

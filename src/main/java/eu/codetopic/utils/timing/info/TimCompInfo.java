@@ -2,12 +2,11 @@ package eu.codetopic.utils.timing.info;
 
 import android.content.ComponentName;
 import android.content.Context;
-
-import java.io.Serializable;
+import android.support.annotation.NonNull;
 
 import eu.codetopic.utils.Utils;
 
-public final class TimCompInfo implements Serializable {
+public final class TimCompInfo {
 
     private final Class<?> mComponent;
     private final TimCompInfoData mComponentInfo;
@@ -15,15 +14,21 @@ public final class TimCompInfo implements Serializable {
     /**
      * @hide
      */
-    public TimCompInfo(Class<?> componentClass) {
+    @NonNull
+    public static TimCompInfo createInfoFor(Context context, Class<?> componentClass) {
+        return new TimCompInfo(context, componentClass);
+    }
+
+    private TimCompInfo(Context context, Class<?> componentClass) {
         mComponent = componentClass;
-        mComponentInfo = new TimCompInfoData(componentClass);
+        mComponentInfo = new TimCompInfoData(context, componentClass);
     }
 
     public Class<?> getComponentClass() {
         return mComponent;
     }
 
+    @NonNull
     public ComponentName getComponentName(Context context) {
         return new ComponentName(context, mComponent);
     }

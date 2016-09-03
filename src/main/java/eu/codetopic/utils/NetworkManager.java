@@ -35,10 +35,10 @@ public final class NetworkManager {
         if (info != null && info.isConnected()) {
             if (type == NetworkType.ANY) {
                 return true;
-            } else if (type == NetworkType.WIFI) {
-                return info.getType() == ConnectivityManager.TYPE_WIFI;
             } else if (type == NetworkType.MOBILE) {
                 return info.getType() == ConnectivityManager.TYPE_MOBILE;
+            } else if (type == NetworkType.WIFI) {
+                return info.getType() == ConnectivityManager.TYPE_WIFI;
             }
         }
         return false;

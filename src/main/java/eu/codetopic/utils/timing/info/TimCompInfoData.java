@@ -1,12 +1,15 @@
 package eu.codetopic.utils.timing.info;
 
+import android.content.Context;
+
 import java.io.Serializable;
 
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 import eu.codetopic.utils.log.Log;
+import eu.codetopic.utils.timing.TimedComponentsManager;
 
-public final class TimCompInfoData implements Serializable {
+public final class TimCompInfoData {
 
     private static final String LOG_TAG = "TimCompInfoData";
 
@@ -19,7 +22,7 @@ public final class TimCompInfoData implements Serializable {
     private boolean resetOnBoot, requiresInternetAccess;
     private TimedComponent.RepeatingMode repeatingMode;
 
-    TimCompInfoData(Class<?> componentClass) {
+    TimCompInfoData(Context context, Class<?> componentClass) {
         this.componentClass = componentClass;
 
         TimedComponent info = componentClass.getAnnotation(TimedComponent.class);
@@ -44,13 +47,13 @@ public final class TimCompInfoData implements Serializable {
             }
         }
         this.modifiers = Arrays.removeNulls(modifiers);
-        reloadModifications();
+        reloadModifications(context);
     }
 
-    public void reloadModifications() {
+    public void reloadModifications(Context context) {
         synchronized (modifiers) {
             for (TimCompInfoModifier modifier : modifiers)
-                modifier.modify(this);
+                modifier.modify(context, this);
         }
     }
 

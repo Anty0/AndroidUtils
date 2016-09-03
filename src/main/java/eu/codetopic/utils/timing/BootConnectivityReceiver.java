@@ -11,6 +11,6 @@ public final class BootConnectivityReceiver extends BroadcastReceiver {
     @SuppressLint("UnsafeProtectedBroadcastReceiver")
     public void onReceive(Context context, Intent intent) {
         if (!TimedComponentsManager.isInitialized()) return;
-        TimedComponentsManager.getInstance().notifyIntentReceived(intent);
+        TimedComponentsManager.getInstance().proceedIntent(intent);
     }
 }
