@@ -16,8 +16,8 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
 
     private static final String LOG_TAG = "TimedComponentExecutor";
 
-    private static final String EXTRA_TIMED_COMPONENT_CLASS =
-            "eu.codetopic.utils.timing.TimedComponentExecutor.TIMED_COMPONENT_CLASS";
+    private static final String EXTRA_TIMED_COMPONENT_CLASS_NAME =
+            "eu.codetopic.utils.timing.TimedComponentExecutor.TIMED_COMPONENT_CLASS_NAME";
     private static final String EXTRA_EXECUTE_EXTRAS =
             "eu.codetopic.utils.timing.TimedComponentExecutor.EXECUTE_EXTRAS";
 
@@ -26,7 +26,7 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
                                  @Nullable Bundle executeExtras) {
 
         return new Intent(context, TimedComponentExecutor.class).setAction(callTypeAction)
-                .putExtra(EXTRA_TIMED_COMPONENT_CLASS, componentClass)
+                .putExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME, componentClass.getName())
                 .putExtra(EXTRA_EXECUTE_EXTRAS, executeExtras);
     }
 
@@ -35,7 +35,13 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
         Bundle extras = intent.getBundleExtra(EXTRA_EXECUTE_EXTRAS);
         if (extras == null) extras = new Bundle();
 
-        Class<?> componentClass = (Class<?>) intent.getSerializableExtra(EXTRA_TIMED_COMPONENT_CLASS);
+        Class<?> componentClass;
+        try {
+            componentClass = Class.forName(intent.getStringExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME));
+        } catch (ClassNotFoundException e) {
+            Log.e(LOG_TAG, "onReceive: can't find requested class to execute", e);
+            return;
+        }
         if (componentClass == null) {
             Log.e(LOG_TAG, "onReceive", new NullPointerException("Received request" +
                     " to execute component without component class"));

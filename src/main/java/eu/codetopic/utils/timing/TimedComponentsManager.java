@@ -29,7 +29,7 @@ public class TimedComponentsManager {
     public static final String ACTION_TIMED_EXECUTE = "eu.codetopic.utils.timing.TimedComponentsManager.ACTION_TIMED_EXECUTE";
     public static final String ACTION_FORCED_EXECUTE = "eu.codetopic.utils.timing.TimedComponentsManager.ACTION_FORCED_EXECUTE";
     private static final String ACTION_RELOAD_COMPONENT = "eu.codetopic.utils.timing.TimedComponentsManager.RELOAD_COMPONENT";
-    private static final String EXTRA_TIMED_COMPONENT_CLASS = "eu.codetopic.utils.timing.TimedComponentsManager.TIMED_COMPONENT_CLASS";
+    private static final String EXTRA_TIMED_COMPONENT_CLASS_NAME = "eu.codetopic.utils.timing.TimedComponentsManager.TIMED_COMPONENT_CLASS_NAME";
 
     private static final String LOG_TAG = "TimedComponentsManager";
     private static TimedComponentsManager INSTANCE = null;
@@ -116,7 +116,14 @@ public class TimedComponentsManager {
                 reloadAllNetwork();
                 break;
             case ACTION_RELOAD_COMPONENT:
-                tryReload((Class<?>) intent.getSerializableExtra(EXTRA_TIMED_COMPONENT_CLASS));
+                Class<?> clazz;
+                try {
+                    clazz = Class.forName(intent.getStringExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME));
+                } catch (ClassNotFoundException e) {
+                    Log.e(LOG_TAG, "proceedIntent: can't find requested class to reload", e);
+                    break;
+                }
+                tryReload(clazz);
                 break;
         }
     }
@@ -177,7 +184,8 @@ public class TimedComponentsManager {
     private Intent getReloadIntentInternal(@NonNull TimCompInfo componentInfo) {
         return new Intent(mContext, BootConnectivityReceiver.class)
                 .setAction(ACTION_RELOAD_COMPONENT)
-                .putExtra(EXTRA_TIMED_COMPONENT_CLASS, componentInfo.getComponentClass());
+                .putExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME,
+                        componentInfo.getComponentClass().getName());
     }
 
     public void reloadAllNetwork() {
