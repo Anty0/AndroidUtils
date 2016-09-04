@@ -1,5 +1,5 @@
-<manifest package="eu.codetopic.utils"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="eu.codetopic.utils">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -12,9 +12,8 @@
         <activity
             android:name=".log.ErrorInfoActivity"
             android:label="@string/activity_label_error_info"
-            android:icon="@android:drawable/stat_sys_warning"
-            android:theme="@style/Theme.AppCompat.Dialog.Alert.NoActionBar"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.AppCompat.Dialog.Alert.NoActionBar" />
 
         <service
             android:name=".thread.service.BackgroundWorksService"
