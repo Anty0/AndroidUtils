@@ -184,7 +184,7 @@ public class TimedComponentsManager {
     private Intent getReloadIntentInternal(@NonNull TimCompInfo componentInfo) {
         return new Intent(mContext, BootConnectivityReceiver.class)
                 .setAction(ACTION_RELOAD_COMPONENT)
-                .putExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME,
+                .putExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME,// fixes api 24 class passing trough PendingIntent
                         componentInfo.getComponentClass().getName());
     }
 

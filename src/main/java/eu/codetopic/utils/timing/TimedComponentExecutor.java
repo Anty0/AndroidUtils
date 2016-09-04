@@ -26,7 +26,7 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
                                  @Nullable Bundle executeExtras) {
 
         return new Intent(context, TimedComponentExecutor.class).setAction(callTypeAction)
-                .putExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME, componentClass.getName())
+                .putExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME, componentClass.getName())// fixes api 24 class passing trough PendingIntent
                 .putExtra(EXTRA_EXECUTE_EXTRAS, executeExtras);
     }
 
