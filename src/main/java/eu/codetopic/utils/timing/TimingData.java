@@ -28,7 +28,8 @@ public final class TimingData extends SharedPreferencesData {
     }
 
     boolean isFirstLoad() {
-        if (BuildConfig.DEBUG) return true;//fixes reinstall of application without increasing version code
+        if (BuildConfig.DEBUG)
+            return true;//fixes reinstall of application without increasing version code
 
         int versionCode = Utils.getApplicationVersionCode(getContext());
         int lastVersionCode = getPreferences().getInt(PrefNames.LAST_LOAD_VERSION_CODE, -1);

@@ -64,7 +64,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
     public void onAttachToContainer(@Nullable Object container) {
         LocalBroadcastManager.getInstance(getContext())
                 .registerReceiver(mDataChangedReceiver, mItemsGetter
-                .getDatabaseItemsChangedIntentFilter(getContext()));
+                        .getDatabaseItemsChangedIntentFilter(getContext()));
         notifyDatabaseDataChanged();
         super.onAttachToContainer(container);
     }
@@ -81,7 +81,7 @@ public class DatabaseAdapter<T, ID> extends CustomItemAdapter<CustomItem> {
         super.assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
         if (EDIT_TAG != editTag)
             throw new UnsupportedOperationException(LOG_TAG + " don't support external editing," +
-                " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
+                    " you can call notifyDatabaseDataChanged() if you want to force refresh " + LOG_TAG + " content");
     }
 
     private synchronized void setItems(@NonNull Collection<? extends CustomItem> items) {

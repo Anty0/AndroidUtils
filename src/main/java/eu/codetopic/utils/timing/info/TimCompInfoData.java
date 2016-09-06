@@ -2,12 +2,9 @@ package eu.codetopic.utils.timing.info;
 
 import android.content.Context;
 
-import java.io.Serializable;
-
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 import eu.codetopic.utils.log.Log;
-import eu.codetopic.utils.timing.TimedComponentsManager;
 
 public final class TimCompInfoData {
 

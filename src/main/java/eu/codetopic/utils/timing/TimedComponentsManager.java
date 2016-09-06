@@ -62,8 +62,8 @@ public class TimedComponentsManager {
     /**
      * This method must be called in onCreate() in Application, otherwise it won't work!
      *
-     * @param context          application context
-     * @param timedComponents  Classes of timed components to use in TimedComponentsManager
+     * @param context         application context
+     * @param timedComponents Classes of timed components to use in TimedComponentsManager
      */
     public static void initialize(Context context, Class<?>... timedComponents) {
         initialize(context, NetworkManager.NetworkType.ANY, timedComponents);
@@ -377,7 +377,7 @@ public class TimedComponentsManager {
     @NonNull
     public TimCompInfo getComponentInfoNonNull(@NonNull Class<?> componentClass) {
         synchronized (mComponentsInfoMap) {
-            TimCompInfo componentInfo =  mComponentsInfoMap.get(componentClass);
+            TimCompInfo componentInfo = mComponentsInfoMap.get(componentClass);
             if (componentInfo == null)
                 throw new NullPointerException(componentClass.getName() + " no found");
             return componentInfo;
