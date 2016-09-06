@@ -13,33 +13,44 @@ import android.widget.TextView;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.log.base.LogLine;
 
 public class ErrorInfoActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "ErrorInfoActivity";
-    private static final String EXTRA_ERROR_INFO = "EXTRA_ERROR_INFO";
+    private static final String EXTRA_LOG_LINE = "EXTRA_LOG_LINE";
 
-    public static void start(Context context, @NonNull String errorInfo) {
+    public static void start(Context context, @NonNull LogLine logLine) {
         context.startActivity(new Intent(context, ErrorInfoActivity.class)
-                .putExtra(EXTRA_ERROR_INFO, errorInfo));
+                .putExtra(EXTRA_LOG_LINE, logLine));
     }
 
     @Override
     @SuppressLint("PrivateResource")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String errorInfo = getIntent().getStringExtra(EXTRA_ERROR_INFO);
-        if (errorInfo == null) {
+        LogLine logLine = (LogLine) getIntent().getSerializableExtra(EXTRA_LOG_LINE);
+        if (logLine == null) {
             finish();
             return;
         }
 
+        setFinishOnTouchOutside(false);
         setContentView(R.layout.abc_alert_dialog_material);
         findViewById(R.id.customPanel).setVisibility(View.GONE);
         findViewById(R.id.buttonPanel).setVisibility(View.GONE);
+        findViewById(R.id.textSpacerNoButtons).setVisibility(View.VISIBLE);
+
+        ImageView icon = (ImageView) findViewById(android.R.id.icon);
+        icon.setImageDrawable(Utils.getActivityIcon(this, getComponentName()));
+        icon.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         ((TextView) findViewById(R.id.alertTitle)).setText(getTitle());
-        ((ImageView) findViewById(android.R.id.icon))
-                .setImageDrawable(Utils.getActivityIcon(this, getComponentName()));
-        ((TextView) findViewById(android.R.id.message)).setText(errorInfo);
+
+        ((TextView) findViewById(android.R.id.message)).setText(logLine.toString());
     }
 }

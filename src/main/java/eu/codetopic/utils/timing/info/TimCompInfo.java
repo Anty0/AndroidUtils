@@ -5,11 +5,18 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.timing.TimedComponentsManager;
+import eu.codetopic.utils.timing.TimingData;
 
 public final class TimCompInfo {
 
     private final Class<?> mComponent;
-    private final TimCompInfoData mComponentInfo;
+    private final TimCompInfoData mComponentProperties;
+
+    private TimCompInfo(Context context, Class<?> componentClass) {
+        mComponent = componentClass;
+        mComponentProperties = new TimCompInfoData(context, componentClass);
+    }
 
     /**
      * @hide
@@ -17,11 +24,6 @@ public final class TimCompInfo {
     @NonNull
     public static TimCompInfo createInfoFor(Context context, Class<?> componentClass) {
         return new TimCompInfo(context, componentClass);
-    }
-
-    private TimCompInfo(Context context, Class<?> componentClass) {
-        mComponent = componentClass;
-        mComponentInfo = new TimCompInfoData(context, componentClass);
     }
 
     public Class<?> getComponentClass() {
@@ -38,14 +40,18 @@ public final class TimCompInfo {
     }
 
     public TimCompInfoData getComponentProperties() {
-        return mComponentInfo;
+        return mComponentProperties;
     }
 
     @Override
     public String toString() {
         return "TimCompInfo{" +
                 "mComponent=" + mComponent +
-                ", mComponentInfo=" + mComponentInfo +
+                ", mComponentEnabled=" + (!TimedComponentsManager.isInitialized() ? "unknown"
+                : isEnabled(TimedComponentsManager.getInstance().getContext())) +
+                ", mLastExecuteTime=" + TimingData.getter.get().getLastExecuteTime(mComponent) +
+                ", mLastRequestCode=" + TimingData.getter.get().getLastRequestCode(mComponent) +
+                ", mComponentProperties=" + mComponentProperties +
                 '}';
     }
 }

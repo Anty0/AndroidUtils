@@ -5,13 +5,17 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import eu.codetopic.utils.log.base.DefaultTarget;
+import eu.codetopic.utils.log.base.LogLine;
 import eu.codetopic.utils.log.base.LogTarget;
-import eu.codetopic.utils.log.base.Priority;
 
 public final class Logger {
 
     private static final String LOG_TAG = "Logger";
+    private static final List<LogLine> LOG_LINES_CACHE = new ArrayList<>();// TODO: 5.9.16 write and read from session files in debug activity
     private static final ErrorLogsHandler ERROR_LOG = new ErrorLogsHandler();
     private static final DebugModeManager DEBUG_MODE = new DebugModeManager();
     private static Context APP_CONTEXT = null;
@@ -52,9 +56,23 @@ public final class Logger {
         TARGET = target;
     }
 
-    static void println(Priority priority, String tag, String msg) {
+    public static String getLogLinesCache() {
+        StringBuilder sb = new StringBuilder();
+        synchronized (LOG_LINES_CACHE) {
+            for (LogLine logLine : LOG_LINES_CACHE) {
+                sb.append(logLine).append('\n');
+            }
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
+    }
+
+    static void println(LogLine logLine) {
         if (!isInDebugMode()) return;
-        TARGET.println(priority, tag, msg);
+        synchronized (LOG_LINES_CACHE) {
+            LOG_LINES_CACHE.add(logLine);
+        }
+        TARGET.println(logLine);
     }
 
 }

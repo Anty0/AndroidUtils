@@ -3,8 +3,9 @@ package eu.codetopic.utils.log.base;
 public class DefaultTarget implements LogTarget {
 
     @Override
-    public void println(Priority priority, String tag, String msg) {
+    public void println(LogLine logLine) {
         //noinspection WrongConstant
-        android.util.Log.println(priority.getSystemId(), tag, msg);
+        android.util.Log.println(logLine.getPriority().getSystemId(),
+                logLine.getTag(), logLine.getMsgWithTr());
     }
 }

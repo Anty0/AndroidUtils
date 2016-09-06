@@ -1,12 +1,11 @@
 package eu.codetopic.utils.log;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.codetopic.utils.log.base.LogLine;
 import eu.codetopic.utils.thread.JobUtils;
 
 public final class ErrorLogsHandler {
@@ -26,29 +25,26 @@ public final class ErrorLogsHandler {
         listeners.remove(listener);
     }
 
-    synchronized void onErrorLogged(String tag, String msg, @Nullable Throwable tr) {
+    synchronized void onErrorLogged(final LogLine logLine) {
         try {
             final Context appContext = Logger.getAppContext();
             if (appContext == null || !Log.isInDebugMode()) return;
-            final StringBuilder sb = new StringBuilder()
-                    .append(tag).append(": ").append(msg).append('\n')
-                    .append(android.util.Log.getStackTraceString(tr));
 
             JobUtils.runOnMainThread(new Runnable() {
                 @Override
                 public void run() {
-                    ErrorInfoActivity.start(appContext, sb.toString());
+                    ErrorInfoActivity.start(appContext, logLine);
                 }
             });
         } finally {
             for (OnErrorLoggedListener listener : listeners)
-                listener.onError(tag, msg, tr);
+                listener.onError(logLine);
         }
     }
 
     public interface OnErrorLoggedListener {
 
-        void onError(String tag, String msg, @Nullable Throwable t);
+        void onError(LogLine logLine);
     }
 
 }

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -112,6 +113,7 @@ public class TimedComponentsManager {
                     reloadAll();
                 }
                 break;
+            case WifiManager.NETWORK_STATE_CHANGED_ACTION:
             case ConnectivityManager.CONNECTIVITY_ACTION:
                 reloadAllNetwork();
                 break;
@@ -411,5 +413,13 @@ public class TimedComponentsManager {
     private void forceExecuteInternal(@NonNull TimCompInfo componentInfo, @Nullable Bundle extras) {
         mContext.sendBroadcast(TimedComponentExecutor.generateIntent(mContext,
                 ACTION_FORCED_EXECUTE, componentInfo.getComponentClass(), extras));
+    }
+
+    @Override
+    public String toString() {
+        return "TimedComponentsManager{" +
+                "mComponentsInfoMap=" + mComponentsInfoMap +
+                ", mRequiredNetwork=" + mRequiredNetwork +
+                '}';
     }
 }

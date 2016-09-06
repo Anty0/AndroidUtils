@@ -29,4 +29,9 @@
     <string name="but_cancel">Cancel</string>
     <string name="but_refresh">Refresh</string>
     <string name="but_close">Close</string>
+
+    <string name="debug_item_connectivity_check_connection_type">Check connection type</string>
+    <string name="debug_item_connectivity_info_result_text">Wi-Fi: %1$s, Mobile: %2$s</string>
+    <string name="debug_item_timed_components_refresh_info">Refresh TimedComponentsManager info</string>
+    <string name="debug_item_logging_refresh_lines">Refresh LastLoggedLines</string>
 </resources>

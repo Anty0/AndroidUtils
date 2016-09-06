@@ -1,5 +1,6 @@
 package eu.codetopic.utils.log;
 
+import eu.codetopic.utils.log.base.LogLine;
 import eu.codetopic.utils.log.base.Priority;
 
 public final class Log {
@@ -14,13 +15,10 @@ public final class Log {
     /**
      * Low-level logging call.
      *
-     * @param priority The priority/type of this log message
-     * @param tag      Used to identify the source of a log message.  It usually identifies
-     *                 the class or activity where the log call occurs.
-     * @param msg      The message you would like logged.
+     * @param logLine LogLine to log into log
      */
-    public static void println(Priority priority, String tag, String msg) {
-        Logger.println(priority, tag, msg);
+    public static void println(LogLine logLine) {
+        Logger.println(logLine);
     }
 
     /**
@@ -31,7 +29,7 @@ public final class Log {
      * @param msg The message you would like logged.
      */
     public static void v(String tag, String msg) {
-        println(Priority.VERBOSE, tag, msg);
+        println(new LogLine(Priority.VERBOSE, tag, msg));
     }
 
     /**
@@ -43,7 +41,7 @@ public final class Log {
      * @param tr  An exception to log
      */
     public static void v(String tag, String msg, Throwable tr) {
-        println(Priority.VERBOSE, tag, msg + '\n' + getStackTraceString(tr));
+        println(new LogLine(Priority.VERBOSE, tag, msg, tr));
     }
 
     /**
@@ -54,7 +52,7 @@ public final class Log {
      * @param msg The message you would like logged.
      */
     public static void d(String tag, String msg) {
-        println(Priority.DEBUG, tag, msg);
+        println(new LogLine(Priority.DEBUG, tag, msg));
     }
 
     /**
@@ -66,7 +64,7 @@ public final class Log {
      * @param tr  An exception to log
      */
     public static void d(String tag, String msg, Throwable tr) {
-        println(Priority.DEBUG, tag, msg + '\n' + getStackTraceString(tr));
+        println(new LogLine(Priority.DEBUG, tag, msg, tr));
     }
 
     /**
@@ -77,7 +75,7 @@ public final class Log {
      * @param msg The message you would like logged.
      */
     public static void i(String tag, String msg) {
-        println(Priority.INFO, tag, msg);
+        println(new LogLine(Priority.INFO, tag, msg));
     }
 
     /**
@@ -89,7 +87,7 @@ public final class Log {
      * @param tr  An exception to log
      */
     public static void i(String tag, String msg, Throwable tr) {
-        println(Priority.INFO, tag, msg + '\n' + getStackTraceString(tr));
+        println(new LogLine(Priority.INFO, tag, msg, tr));
     }
 
     /**
@@ -100,7 +98,7 @@ public final class Log {
      * @param msg The message you would like logged.
      */
     public static void w(String tag, String msg) {
-        println(Priority.WARN, tag, msg);
+        println(new LogLine(Priority.WARN, tag, msg));
     }
 
     /**
@@ -112,7 +110,7 @@ public final class Log {
      * @param tr  An exception to log
      */
     public static void w(String tag, String msg, Throwable tr) {
-        println(Priority.WARN, tag, msg + '\n' + getStackTraceString(tr));
+        println(new LogLine(Priority.WARN, tag, msg, tr));
     }
 
     /**
@@ -123,7 +121,7 @@ public final class Log {
      * @param tr  An exception to log
      */
     public static void w(String tag, Throwable tr) {
-        println(Priority.WARN, tag, getStackTraceString(tr));
+        println(new LogLine(Priority.WARN, tag, null, tr));
     }
 
     /**
@@ -134,10 +132,11 @@ public final class Log {
      * @param msg The message you would like logged.
      */
     public static void e(String tag, String msg) {
+        LogLine logLine = new LogLine(Priority.ERROR, tag, msg);
         try {
-            println(Priority.ERROR, tag, msg);
+            println(logLine);
         } finally {
-            Logger.getErrorLogsHandler().onErrorLogged(tag, msg, null);
+            Logger.getErrorLogsHandler().onErrorLogged(logLine);
         }
     }
 
@@ -150,15 +149,12 @@ public final class Log {
      * @param tr  An exception to log
      */
     public static void e(String tag, String msg, Throwable tr) {
+        LogLine logLine = new LogLine(Priority.ERROR, tag, msg, tr);
         try {
-            println(Priority.ERROR, tag, msg + '\n' + getStackTraceString(tr));
+            println(logLine);
         } finally {
-            Logger.getErrorLogsHandler().onErrorLogged(tag, msg, tr);
+            Logger.getErrorLogsHandler().onErrorLogged(logLine);
         }
-    }
-
-    private static String getStackTraceString(Throwable tr) {
-        return android.util.Log.getStackTraceString(tr);
     }
 
 }

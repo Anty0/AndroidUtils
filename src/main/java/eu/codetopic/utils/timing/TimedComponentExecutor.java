@@ -9,8 +9,9 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Date;
+
 import eu.codetopic.utils.log.Log;
-import eu.codetopic.utils.timing.info.TimCompInfo;
 
 public final class TimedComponentExecutor extends BroadcastReceiver {
 
@@ -63,6 +64,8 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
             } else {
                 throw new ClassCastException("Unknown component class: " + componentClass.getName());
             }
+            Log.d(LOG_TAG, "onReceive: " + componentClass.getName() + " was executed at "
+                    + new Date(TimingData.getter.get().getLastExecuteTime(componentClass)));
         } catch (Exception e) {
             Log.e(LOG_TAG, "Can't execute component: " + componentClass.getName(), e);
         }
