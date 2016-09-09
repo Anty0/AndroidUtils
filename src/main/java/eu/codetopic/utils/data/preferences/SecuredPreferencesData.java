@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import com.securepreferences.SecurePreferences;
 
+import eu.codetopic.utils.log.Log;
+
 public abstract class SecuredPreferencesData extends SharedPreferencesData {
 
     private static final String LOG_TAG = "SecureModuleData";
@@ -23,6 +25,12 @@ public abstract class SecuredPreferencesData extends SharedPreferencesData {
 
     @Override
     protected SharedPreferences createSharedPreferences() {
-        return new SecurePreferences(getContext(), mPassword, getFileName());
+        try {
+            return new SecurePreferences(getContext(), mPassword, getFileName());
+        } catch (Throwable t) {
+            Log.e(LOG_TAG, "createSharedPreferences: data cleared", t);
+            super.createSharedPreferences().edit().clear().apply();
+            return createSharedPreferences();
+        }
     }
 }

@@ -13,7 +13,7 @@ public class PostNotificationCanceler extends BroadcastReceiver {
 
     private static final String EXTRA_NOTIFICATION_ID = "eu.codetopic.utils.notifications.PostNotificationCanceler.NOTIFICATION_ID";
 
-    private static void postNotificationCancel(Context context, int notificationId, long waitTime) {
+    public static void postNotificationCancel(Context context, int notificationId, long waitTime) {
         ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
                 .set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + waitTime,
                         PendingIntent.getBroadcast(context, Identifiers.next(Identifiers.TYPE_REQUEST_CODE),

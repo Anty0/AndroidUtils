@@ -63,7 +63,12 @@ public abstract class SharedPreferencesData {
         if (mCreated) throw new IllegalStateException(LOG_TAG + " is still initialized");
         if (mDestroyed) throw new IllegalStateException(LOG_TAG + " is destroyed");
         mCreated = true;
-        onCreate();
+        try {
+            onCreate();
+        } catch (Throwable t) {
+            destroy();
+            throw t;
+        }
     }
 
     public final synchronized boolean isCreated() {
@@ -116,9 +121,7 @@ public abstract class SharedPreferencesData {
     }
 
     protected synchronized SharedPreferences.Editor edit() {
-        if (!mCreated) throw new IllegalStateException(LOG_TAG + " is not initialized");
-        if (mDestroyed) throw new IllegalStateException(LOG_TAG + " is still destroyed");
-        return mPreferences.edit();
+        return getPreferences().edit();
     }
 
     protected synchronized void onUpgrade(SharedPreferences.Editor editor, int from, int to) {

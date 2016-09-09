@@ -41,6 +41,7 @@ import org.jsoup.Jsoup;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -479,5 +480,19 @@ public final class Utils {
             }
         }
         return canceled;
+    }
+
+    //////////////////////////////////////
+    //////REGION - PROCESSES//////////////
+    //////////////////////////////////////
+
+    @Nullable
+    @CheckResult
+    public static String getCurrentProcessName() {
+        try {
+            return IOUtils.streamToString(new FileInputStream("/proc/self/cmdline")).trim();
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

@@ -1,7 +1,6 @@
 package eu.codetopic.utils;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,10 +17,23 @@ import android.widget.TextView;
 
 import java.text.NumberFormat;
 
+/**
+ * <p>A dialog showing a progress indicator and an optional text message or view.
+ * Only a text message or a view can be used at the same time.</p>
+ * <p>The dialog can be made cancelable on back key press.</p>
+ * <p>The progress range is 0..10000.</p>
+ */
 public class AppCompatProgressDialog extends AlertDialog {
 
+    /**
+     * Creates a ProgressDialog with a circular, spinning progress
+     * bar. This is the default.
+     */
     public static final int STYLE_SPINNER = 0;
 
+    /**
+     * Creates a ProgressDialog with a horizontal progress bar.
+     */
     public static final int STYLE_HORIZONTAL = 1;
 
     private ProgressBar mProgress;
@@ -92,12 +104,10 @@ public class AppCompatProgressDialog extends AlertDialog {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Resources systemResources = Resources.getSystem();
         LayoutInflater inflater = LayoutInflater.from(getContext());
         TypedArray a = getContext().obtainStyledAttributes(null,
-                Utils.getSystemStyleableInts("AlertDialog"), systemResources
-                        .getIdentifier("alertDialogStyle", "attr", "android"), 0);
-
+                R.styleable.AlertDialog,
+                R.attr.alertDialogStyle, 0);
         if (mProgressStyle == STYLE_HORIZONTAL) {
 
             /* Use a separate handler to update the text views as they
@@ -128,19 +138,15 @@ public class AppCompatProgressDialog extends AlertDialog {
                     }
                 }
             };
-            View view = inflater.inflate(a.getResourceId(
-                    Utils.getSystemStyleableInt("AlertDialog_horizontalProgressLayout"),
-                    systemResources.getIdentifier("alert_dialog_progress", "layout", "android")), null);
-            mProgress = (ProgressBar) view.findViewById(systemResources.getIdentifier("progress", "id", "android"));// TODO: 3.8.16 maybe use own resources instead of system resources
-            mProgressNumber = (TextView) view.findViewById(systemResources.getIdentifier("progress_number", "id", "android"));
-            mProgressPercent = (TextView) view.findViewById(systemResources.getIdentifier("progress_percent", "id", "android"));
+            View view = inflater.inflate(R.layout.dialog_alert_progress, null);
+            mProgress = (ProgressBar) view.findViewById(R.id.progress);
+            mProgressNumber = (TextView) view.findViewById(R.id.progress_number);
+            mProgressPercent = (TextView) view.findViewById(R.id.progress_percent);
             setView(view);
         } else {
-            View view = inflater.inflate(a.getResourceId(
-                    Utils.getSystemStyleableInt("AlertDialog_progressLayout"),
-                    systemResources.getIdentifier("progress_dialog", "layout", "android")), null);
-            mProgress = (ProgressBar) view.findViewById(systemResources.getIdentifier("progress", "id", "android"));
-            mMessageView = (TextView) view.findViewById(systemResources.getIdentifier("message", "id", "android"));
+            View view = inflater.inflate(R.layout.dialog_progress, null);
+            mProgress = (ProgressBar) view.findViewById(R.id.progress);
+            mMessageView = (TextView) view.findViewById(R.id.message);
             setView(view);
         }
         a.recycle();

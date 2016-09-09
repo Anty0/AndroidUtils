@@ -15,6 +15,7 @@ import java.util.List;
 import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
+// TODO: 6.9.16 rework
 // TODO: 4.4.16 find way to stop unneeded services (try use timeout and CommandBinder to make it)
 public final class ServiceCommander<B extends CommandService.CommandBinder> {
 

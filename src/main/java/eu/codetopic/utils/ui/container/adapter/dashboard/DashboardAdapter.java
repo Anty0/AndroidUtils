@@ -72,7 +72,6 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         mLoadingShowed = true;
 
         mFilter = filter;
-        DashboardData.initialize(context);
         mItemsGetters = itemsGetters;
     }
 
@@ -115,11 +114,6 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         for (ItemInfo item : getItems()) data.saveItemState(item);
     }
 
-    private void restoreItemsStates(Collection<ItemInfo> items) {
-        DashboardData data = DashboardData.getter.get();
-        for (ItemInfo item : items) data.restoreItemState(item);
-    }
-
     @UiThread
     public void notifyReloadItem(Class<? extends ItemsGetter> itemsGetterClass) {
         if (!LoadableItemsGetter.class.isAssignableFrom(itemsGetterClass))
@@ -159,7 +153,6 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         for (ItemsGetter getter : mItemsGetters)
             itemInfoList.addAll(getter.getItems(getContext()));
 
-        restoreItemsStates(itemInfoList);
         mFilter.filter(itemInfoList);
         Collections.sort(itemInfoList);
 

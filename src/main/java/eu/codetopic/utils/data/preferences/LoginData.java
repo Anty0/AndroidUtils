@@ -2,8 +2,11 @@ package eu.codetopic.utils.data.preferences;
 
 import android.content.Context;
 
-import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.log.Log;
+
+import static eu.codetopic.utils.PrefNames.LOGGED_IN;
+import static eu.codetopic.utils.PrefNames.PASSWORD;
+import static eu.codetopic.utils.PrefNames.USERNAME;
 
 public class LoginData extends SecuredPreferencesData {
 
@@ -15,30 +18,29 @@ public class LoginData extends SecuredPreferencesData {
 
     public synchronized void login(String username, String password) {
         Log.d(LOG_TAG, "login fileName: " + getFileName());
-        edit().putString(PrefNames.LOGIN, username)
-                .putString(PrefNames.PASSWORD, password)
-                .putBoolean(PrefNames.LOGGED_IN, true)
+        edit().putString(USERNAME, username)
+                .putString(PASSWORD, password)
+                .putBoolean(LOGGED_IN, true)
                 .apply();
     }
 
     public synchronized void logout() {
         Log.d(LOG_TAG, "logout fileName: " + getFileName());
-        edit().putBoolean(PrefNames.LOGGED_IN, false)
-                .putString(PrefNames.PASSWORD, "").apply();
+        edit().putBoolean(LOGGED_IN, false).remove(PASSWORD).apply();
     }
 
     public synchronized boolean isLoggedIn() {
         Log.d(LOG_TAG, "isLoggedIn fileName: " + getFileName());
-        return getPreferences().getBoolean(PrefNames.LOGGED_IN, false);
+        return getPreferences().getBoolean(LOGGED_IN, false);
     }
 
     public synchronized String getUsername() {
         Log.d(LOG_TAG, "getUsername fileName: " + getFileName());
-        return getPreferences().getString(PrefNames.LOGIN, "");
+        return getPreferences().getString(USERNAME, "");
     }
 
     public synchronized String getPassword() {
         Log.d(LOG_TAG, "getPassword fileName: " + getFileName());
-        return getPreferences().getString(PrefNames.PASSWORD, "");
+        return getPreferences().getString(PASSWORD, "");
     }
 }

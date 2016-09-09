@@ -11,15 +11,15 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.ui.activity.navigation.NavigationFragment;
 import eu.codetopic.utils.ui.container.recycler.Recycler;
 
-public abstract class DashboardFragment extends NavigationFragment {
+public abstract class DashboardFragmentBase extends NavigationFragment {
 
-    private static final String LOG_TAG = "DashboardFragment";
+    private static final String LOG_TAG = "DashboardFragmentBase";
 
     private final ItemsGetter[] mItemsGetters;
     protected DashboardAdapter mAdapter = null;
     protected Recycler.RecyclerManagerImpl mRecyclerManager;
 
-    public DashboardFragment(ItemsGetter... itemsGetters) {
+    public DashboardFragmentBase(ItemsGetter... itemsGetters) {
         mItemsGetters = itemsGetters;
     }
 

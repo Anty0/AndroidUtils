@@ -21,7 +21,7 @@ public class DashboardData extends SharedPreferencesData {
     }
 
     public static void initialize(Context context) {
-        if (mInstance != null) return;
+        if (mInstance != null) throw new IllegalStateException(LOG_TAG + " is still initialized");
         mInstance = new DashboardData(context);
         mInstance.init();
     }

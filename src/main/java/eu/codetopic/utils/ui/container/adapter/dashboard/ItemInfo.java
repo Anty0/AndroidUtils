@@ -10,6 +10,10 @@ public abstract class ItemInfo implements Comparable<ItemInfo> {
 
     private boolean enabled = getDefaultEnabledState();
 
+    public ItemInfo() {
+        DashboardData.getter.get().restoreItemState(this);
+    }
+
     @Override
     public int compareTo(@NonNull ItemInfo another) {
         return another.getPriority() - getPriority();
