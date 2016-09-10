@@ -1,41 +1,31 @@
 package eu.codetopic.utils.timing;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 
-import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.Objects;
-import eu.codetopic.utils.ids.Identifiers;
 import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.timing.info.TimCompInfo;
-import eu.codetopic.utils.timing.info.TimCompInfoData;
-import eu.codetopic.utils.timing.info.TimedComponent;
 
 public class TimedComponentsManager {
 
-    public static final String ACTION_TIMED_EXECUTE = "eu.codetopic.utils.timing.TimedComponentsManager.ACTION_TIMED_EXECUTE";
-    public static final String ACTION_FORCED_EXECUTE = "eu.codetopic.utils.timing.TimedComponentsManager.ACTION_FORCED_EXECUTE";
-    private static final String ACTION_RELOAD_COMPONENT = "eu.codetopic.utils.timing.TimedComponentsManager.RELOAD_COMPONENT";
-    private static final String EXTRA_TIMED_COMPONENT_CLASS_NAME = "eu.codetopic.utils.timing.TimedComponentsManager.TIMED_COMPONENT_CLASS_NAME";
+    static final String ACTION_TIMED_EXECUTE = "eu.codetopic.utils.timing.TimedComponentsManager.ACTION_TIMED_EXECUTE";
+    static final String ACTION_FORCED_EXECUTE = "eu.codetopic.utils.timing.TimedComponentsManager.ACTION_FORCED_EXECUTE";
 
     private static final String LOG_TAG = "TimedComponentsManager";
     private static TimedComponentsManager INSTANCE = null;
 
     private final Context mContext;
+    private final Object mComponentsInfoMapLock = new Object();
     private final HashMap<Class<?>, TimCompInfo> mComponentsInfoMap;
     private NetworkManager.NetworkType mRequiredNetwork;
 
@@ -47,7 +37,7 @@ public class TimedComponentsManager {
 
         mComponentsInfoMap = new HashMap<>(components.length);
         Log.d(LOG_TAG, "<init> initializing for: " + java.util.Arrays.toString(components));
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             for (Class<?> component : components) {
                 try {
                     mComponentsInfoMap.put(component, TimCompInfo.createInfoFor(mContext, component));
@@ -101,33 +91,8 @@ public class TimedComponentsManager {
         return INSTANCE != null;
     }
 
-    void proceedIntent(Intent intent) {
-        switch (intent.getAction()) {
-            case Intent.ACTION_BOOT_COMPLETED:
-                TimingData data = TimingData.getter.get();
-                synchronized (mComponentsInfoMap) {
-                    for (TimCompInfo componentInfo : mComponentsInfoMap.values())
-                        if (componentInfo.getComponentProperties().isResetRepeatingOnBoot())
-                            data.clear(componentInfo.getComponentClass());
-
-                    reloadAll();
-                }
-                break;
-            case WifiManager.NETWORK_STATE_CHANGED_ACTION:
-            case ConnectivityManager.CONNECTIVITY_ACTION:
-                reloadAllNetwork();
-                break;
-            case ACTION_RELOAD_COMPONENT:
-                Class<?> clazz;
-                try {
-                    clazz = Class.forName(intent.getStringExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME));
-                } catch (ClassNotFoundException e) {
-                    Log.e(LOG_TAG, "proceedIntent: can't find requested class to reload", e);
-                    break;
-                }
-                tryReload(clazz);
-                break;
-        }
+    static Intent getReloadComponentIntentInternal(Context context, @NonNull TimCompInfo componentInfo) {
+        return ReloadComponentReceiver.generateIntent(context, componentInfo);
     }
 
     public Context getContext() {
@@ -147,20 +112,20 @@ public class TimedComponentsManager {
     }
 
     public void setComponentEnabled(@NonNull Class<?> componentClass, boolean enabled) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             setComponentEnabledInternal(getComponentInfoNonNull(componentClass), enabled);
         }
     }
 
     public void setComponentEnabled(@NonNull TimCompInfo componentInfo, boolean enabled) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             validateComponentInfo(componentInfo);
             setComponentEnabledInternal(componentInfo, enabled);
         }
     }
 
-    private void setComponentEnabledInternal(@NonNull TimCompInfo componentInfo, boolean enabled) {
-        synchronized (mComponentsInfoMap) {
+    void setComponentEnabledInternal(@NonNull TimCompInfo componentInfo, boolean enabled) {
+        synchronized (mComponentsInfoMapLock) {
             PackageManager pm = mContext.getPackageManager();
             if (pm.getComponentEnabledSetting(componentInfo.getComponentName(mContext))
                     != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
@@ -174,24 +139,17 @@ public class TimedComponentsManager {
         }
     }
 
-    public Intent getReloadIntent(@NonNull Class<?> componentClass) {
-        return getReloadIntentInternal(getComponentInfoNonNull(componentClass));
+    public Intent getReloadComponentIntent(@NonNull Class<?> componentClass) {
+        return getReloadComponentIntentInternal(mContext, getComponentInfoNonNull(componentClass));
     }
 
-    public Intent getReloadIntent(@NonNull TimCompInfo componentInfo) {
+    public Intent getReloadComponentIntent(@NonNull TimCompInfo componentInfo) {
         validateComponentInfo(componentInfo);
-        return getReloadIntentInternal(componentInfo);
-    }
-
-    private Intent getReloadIntentInternal(@NonNull TimCompInfo componentInfo) {
-        return new Intent(mContext, BootConnectivityReceiver.class)
-                .setAction(ACTION_RELOAD_COMPONENT)
-                .putExtra(EXTRA_TIMED_COMPONENT_CLASS_NAME,// fixes api 24 class passing trough PendingIntent
-                        componentInfo.getComponentClass().getName());
+        return getReloadComponentIntentInternal(mContext, componentInfo);
     }
 
     public void reloadAllNetwork() {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             for (TimCompInfo componentInfo : mComponentsInfoMap.values())
                 if (componentInfo.getComponentProperties().isRequiresInternetAccess())
                     tryReloadInternal(componentInfo);
@@ -199,27 +157,27 @@ public class TimedComponentsManager {
     }
 
     public void reloadAll() {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             for (TimCompInfo componentInfo : mComponentsInfoMap.values())
                 tryReloadInternal(componentInfo);
         }
     }
 
     public void reloadComponentModifications(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             reloadComponentModificationsInternal(getComponentInfoNonNull(componentClass));
         }
     }
 
     public void reloadComponentModifications(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             validateComponentInfo(componentInfo);
             reloadComponentModificationsInternal(componentInfo);
         }
     }
 
-    private void reloadComponentModificationsInternal(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMap) {
+    void reloadComponentModificationsInternal(@NonNull TimCompInfo componentInfo) {
+        synchronized (mComponentsInfoMapLock) {
             componentInfo.getComponentProperties().reloadModifications(mContext);
             tryReloadInternal(componentInfo);
         }
@@ -247,7 +205,7 @@ public class TimedComponentsManager {
         }
     }
 
-    private boolean tryReloadInternal(@NonNull TimCompInfo componentInfo) {
+    boolean tryReloadInternal(@NonNull TimCompInfo componentInfo) {
         try {
             reloadInternal(componentInfo);
             return true;
@@ -259,124 +217,44 @@ public class TimedComponentsManager {
     }
 
     public void reload(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             reloadInternal(getComponentInfoNonNull(componentClass));
         }
     }
 
     public void reload(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             validateComponentInfo(componentInfo);
             reloadInternal(componentInfo);
         }
     }
 
-    private void reloadInternal(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMap) {
-            AlarmManager alarms = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-            Intent componentIntent = TimedComponentExecutor.generateIntent(mContext,
-                    ACTION_TIMED_EXECUTE, componentInfo.getComponentClass(), null);
-            Intent reloadIntent = getReloadIntentInternal(componentInfo);
-
-            TimingData data = TimingData.getter.get();
-            TimCompInfoData component = componentInfo.getComponentProperties();
-            int lastRequestCode = data.getLastRequestCode(componentInfo.getComponentClass());
-            if (lastRequestCode != -1) {
-                PendingIntent oldComponentPendingIntent = PendingIntent.getBroadcast(mContext,
-                        lastRequestCode, componentIntent, PendingIntent.FLAG_NO_CREATE);
-                if (oldComponentPendingIntent != null) alarms.cancel(oldComponentPendingIntent);
-
-                PendingIntent oldReloadPendingIntent = PendingIntent.getBroadcast(mContext,
-                        lastRequestCode, reloadIntent, PendingIntent.FLAG_NO_CREATE);
-                if (oldReloadPendingIntent != null) alarms.cancel(oldReloadPendingIntent);
-            }
-
-            if (!componentInfo.isEnabled(mContext) || (component.isRequiresInternetAccess()
-                    && !NetworkManager.isConnected(mRequiredNetwork))) {
-                data.setLastRequestCode(componentInfo.getComponentClass(), -1);
-                return;
-            }
-
-            int newRequestCode = Identifiers.next(Identifiers.TYPE_REQUEST_CODE);
-            data.setLastRequestCode(componentInfo.getComponentClass(), newRequestCode);
-            TimedComponent.RepeatingMode repeatingMode = component.getRepeatingMode();
-            Calendar calendar = Calendar.getInstance();
-            int[] usableDays = component.getUsableDays();
-            int hour = calendar.get(Calendar.HOUR_OF_DAY);
-            int startHour = component.getStartHour();
-            int stopHour = component.getStopHour();
-            if ((startHour != stopHour && !(startHour < stopHour
-                    ? (hour >= startHour && hour < stopHour)
-                    : (hour >= startHour || hour < stopHour)))
-                    || !Arrays.contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK))) {
-                calendar.set(Calendar.MILLISECOND, 0);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MINUTE, 1);
-
-                while (!Arrays.contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK)))
-                    calendar.add(Calendar.DAY_OF_WEEK, 1);
-
-                while (!(startHour < stopHour ? (hour >= startHour && hour < stopHour)
-                        : (hour >= startHour || hour < stopHour))) {
-                    calendar.add(Calendar.HOUR_OF_DAY, 1);
-                    hour = calendar.get(Calendar.HOUR_OF_DAY);
-                }
-
-                alarms.set(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                        calendar.getTimeInMillis(), PendingIntent.getBroadcast(mContext,
-                                newRequestCode, reloadIntent, PendingIntent.FLAG_CANCEL_CURRENT));
-                return;
-            }
-
-            long lastStart = data.getLastExecuteTime(componentInfo.getComponentClass());
-            long startInterval = component.getRepeatTime();
-            if (lastStart == -1L) lastStart = calendar.getTimeInMillis() - startInterval;
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, newRequestCode,
-                    componentIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-            if (repeatingMode.inexact()) {
-                alarms.setInexactRepeating(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                        lastStart + startInterval, startInterval, pendingIntent);
-            } else {
-                alarms.setRepeating(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                        lastStart + startInterval, startInterval, pendingIntent);
-            }
-
-            if (startHour != stopHour) {
-                calendar.set(Calendar.MILLISECOND, 0);
-                calendar.set(Calendar.SECOND, 0);
-                calendar.set(Calendar.MINUTE, 5);
-
-                hour = calendar.get(Calendar.HOUR_OF_DAY);
-                while ((startHour < stopHour ? (hour >= startHour && hour < stopHour)
-                        : (hour >= startHour || hour < stopHour)) && Arrays
-                        .contains(usableDays, calendar.get(Calendar.DAY_OF_WEEK))) {
-                    calendar.add(Calendar.HOUR_OF_DAY, 1);
-                    hour = calendar.get(Calendar.HOUR_OF_DAY);
-                }
-
-                alarms.set(repeatingMode.wakeUp() ? AlarmManager.RTC_WAKEUP : AlarmManager.RTC,
-                        calendar.getTimeInMillis(), PendingIntent.getBroadcast(mContext,
-                                newRequestCode, reloadIntent, PendingIntent.FLAG_CANCEL_CURRENT));
-            }
+    void reloadInternal(@NonNull TimCompInfo componentInfo) {
+        synchronized (mComponentsInfoMapLock) {
+            new ComponentLoader(mContext, mRequiredNetwork, componentInfo).reload();
         }
     }
 
+    public Object getTimedComponentsLock() {
+        return mComponentsInfoMapLock;
+    }
+
     public Collection<TimCompInfo> getAllTimedComponentInfo() {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             return mComponentsInfoMap.values();
         }
     }
 
     @Nullable
     public TimCompInfo getComponentInfo(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             return mComponentsInfoMap.get(componentClass);
         }
     }
 
     @NonNull
     public TimCompInfo getComponentInfoNonNull(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             TimCompInfo componentInfo = mComponentsInfoMap.get(componentClass);
             if (componentInfo == null)
                 throw new NullPointerException(componentClass.getName() + " no found");
@@ -385,7 +263,7 @@ public class TimedComponentsManager {
     }
 
     public TimCompInfo validateComponentInfo(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMap) {
+        synchronized (mComponentsInfoMapLock) {
             if (!mComponentsInfoMap.containsValue(componentInfo))
                 throw new IllegalArgumentException("Can't reload componentInfo that is not initialized in "
                         + LOG_TAG + ".initialize(). componentInfo=" + componentInfo);
@@ -410,7 +288,7 @@ public class TimedComponentsManager {
         forceExecuteInternal(componentInfo, extras);
     }
 
-    private void forceExecuteInternal(@NonNull TimCompInfo componentInfo, @Nullable Bundle extras) {
+    void forceExecuteInternal(@NonNull TimCompInfo componentInfo, @Nullable Bundle extras) {
         mContext.sendBroadcast(TimedComponentExecutor.generateIntent(mContext,
                 ACTION_FORCED_EXECUTE, componentInfo.getComponentClass(), extras));
     }
