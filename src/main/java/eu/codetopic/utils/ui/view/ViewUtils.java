@@ -3,6 +3,7 @@ package eu.codetopic.utils.ui.view;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -265,6 +266,20 @@ public class ViewUtils {
                 }
             }
         });
+    }
+
+    @Nullable
+    @CheckResult
+    public static Activity getViewActivity(@NonNull View view) {
+        Context context = view.getContext();
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity) context;
+            } else {
+                context = ((ContextWrapper) context).getBaseContext();
+            }
+        }
+        return null;
     }
 
     @CheckResult
