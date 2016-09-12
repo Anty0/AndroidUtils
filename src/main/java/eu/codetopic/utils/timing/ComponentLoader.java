@@ -50,11 +50,17 @@ final class ComponentLoader {
         if (lastRequestCode != -1) {
             PendingIntent oldComponentPendingIntent = PendingIntent.getBroadcast(context,
                     lastRequestCode, componentIntent, PendingIntent.FLAG_NO_CREATE);
-            if (oldComponentPendingIntent != null) alarmManager.cancel(oldComponentPendingIntent);
+            if (oldComponentPendingIntent != null) {
+                alarmManager.cancel(oldComponentPendingIntent);
+                oldComponentPendingIntent.cancel();
+            }
 
             PendingIntent oldReloadPendingIntent = PendingIntent.getBroadcast(context,
                     lastRequestCode, reloadIntent, PendingIntent.FLAG_NO_CREATE);
-            if (oldReloadPendingIntent != null) alarmManager.cancel(oldReloadPendingIntent);
+            if (oldReloadPendingIntent != null) {
+                alarmManager.cancel(oldReloadPendingIntent);
+                oldReloadPendingIntent.cancel();
+            }
         }
     }
 
