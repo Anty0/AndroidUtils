@@ -45,7 +45,7 @@ public final class UtilsBase {
         }
         Log.e(LOG_TAG, "initialize", new IllegalStateException("Can't find ProcessName ("
                 + processName + "), in provided ProcessProfiles, using empty ProcessProfile"));
-        setActiveProfile(app, new ProcessProfile(processName, false, false, null));
+        setActiveProfile(app, new ProcessProfile(processName, false, false));
     }
 
     private static void setActiveProfile(Application app, ProcessProfile activeProfile) {

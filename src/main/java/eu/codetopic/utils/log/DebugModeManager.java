@@ -8,6 +8,7 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.v4.content.LocalBroadcastManager;
 
+import eu.codetopic.utils.BuildConfig;
 import eu.codetopic.utils.data.DebugProviderData;
 import eu.codetopic.utils.data.getter.DataGetter;
 
@@ -16,7 +17,7 @@ public final class DebugModeManager {
     private static final String LOG_TAG = "DebugModeManager";
 
     private boolean DEBUG_MODE_DETECTOR_INITIALIZED = false;
-    private boolean DEBUG_MODE = true;
+    private boolean DEBUG_MODE = BuildConfig.DEBUG;
 
     DebugModeManager() {
     }

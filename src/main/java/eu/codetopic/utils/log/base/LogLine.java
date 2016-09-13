@@ -66,6 +66,10 @@ public final class LogLine implements Serializable {
 
     @Override
     public String toString() {
-        return priority.getDisaplayID() + "/" + tag + ": " + getMsgWithTr();
+        return toString(true);
+    }
+
+    public String toString(boolean showTr) {
+        return priority.getDisaplayID() + "/" + tag + ": " + (showTr ? getMsgWithTr() : getMsg());
     }
 }
