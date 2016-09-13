@@ -34,6 +34,10 @@ public class MultilineItemCustomItemWrapper extends CustomItem {
         return wrappedItems;
     }
 
+    public MultilineItem getItemBase() {
+        return item;
+    }
+
     @Override
     protected void onBindViewHolder(ViewHolder holder, int itemPosition) {
         MultilineItemUtils.apply(item).withoutPadding()

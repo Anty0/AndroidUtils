@@ -6,6 +6,7 @@ import android.support.annotation.UiThread;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -261,6 +262,10 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
                     if (adapterBase != null) adapterBase.notifyItemInserted(index);
                 }
             });
+        }
+
+        public <AT extends T> Editor<T> addAll(final AT[] array) {
+            return addAll(Arrays.asList(array));
         }
 
         public Editor<T> addAll(final Collection<? extends T> collection) {

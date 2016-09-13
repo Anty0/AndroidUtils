@@ -157,4 +157,15 @@ public abstract class SharedPreferencesData {
         super.finalize();
     }
 
+    @Override
+    public String toString() {
+        return "SharedPreferencesData{" +
+                "mFileName='" + mFileName + '\'' +
+                ", mSaveVersion=" + mSaveVersion +
+                ", mPrefOperatingMode=" + mPrefOperatingMode +
+                ", mPreferences=" + mPreferences +
+                ", mCreated=" + mCreated +
+                ", mDestroyed=" + mDestroyed +
+                '}';
+    }
 }

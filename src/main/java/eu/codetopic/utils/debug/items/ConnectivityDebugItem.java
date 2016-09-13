@@ -25,6 +25,7 @@ public class ConnectivityDebugItem extends CustomItem {
                 resultText.setVisibility(View.VISIBLE);
                 resultText.setText(Utils.getFormattedText(resultText.getContext(),
                         R.string.debug_item_connectivity_info_result_text,
+                        Boolean.toString(NetworkManager.isConnected(NetworkManager.NetworkType.ANY)),
                         Boolean.toString(NetworkManager.isConnected(NetworkManager.NetworkType.WIFI)),
                         Boolean.toString(NetworkManager.isConnected(NetworkManager.NetworkType.MOBILE))));
             }
