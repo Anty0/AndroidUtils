@@ -4,7 +4,6 @@ import android.app.Application;
 import android.content.ComponentCallbacks;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
 import com.birbit.android.jobqueue.log.JqLog;
@@ -94,8 +93,7 @@ public final class UtilsBase {
             });
         }
 
-        Runnable additionalCommands = ACTIVE_PROFILE.getAdditionalCommands();
-        if (additionalCommands != null) additionalCommands.run();
+        for (Runnable command : ACTIVE_PROFILE.getAdditionalCommands()) command.run();
     }
 
     public static final class ProcessProfile {
@@ -103,7 +101,7 @@ public final class UtilsBase {
         @NonNull private final String processName;
         private final boolean initializeUtils;
         private final boolean allowUtilsDataAccess;
-        @Nullable private final Runnable additionalCommands;
+        private final Runnable[] additionalCommands;
 
         /**
          * Methods that should be called in additionalCommands:
@@ -117,7 +115,7 @@ public final class UtilsBase {
          * - {@code eu.codetopic.utils.broadcast.BroadcastsConnector.connect() }
          */
         public ProcessProfile(@NonNull String processName, boolean initializeUtils,
-                              boolean allowUtilsDataAccess, @Nullable Runnable additionalCommands) {
+                              boolean allowUtilsDataAccess, Runnable... additionalCommands) {
 
             this.processName = processName;
             this.initializeUtils = initializeUtils;
@@ -138,8 +136,7 @@ public final class UtilsBase {
             return allowUtilsDataAccess;
         }
 
-        @Nullable
-        private Runnable getAdditionalCommands() {
+        private Runnable[] getAdditionalCommands() {
             return additionalCommands;
         }
     }
