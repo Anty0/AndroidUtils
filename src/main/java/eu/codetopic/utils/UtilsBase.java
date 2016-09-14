@@ -9,6 +9,8 @@ import android.support.annotation.UiThread;
 import com.birbit.android.jobqueue.log.JqLog;
 import com.squareup.leakcanary.LeakCanary;
 
+import java.util.Arrays;
+
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
 import eu.codetopic.utils.ids.Identifiers;
 import eu.codetopic.utils.log.Log;
@@ -59,12 +61,12 @@ public final class UtilsBase {
 
     private static void completeInit(Application app) {
         android.util.Log.d(Utils.getApplicationLabel(app).toString(), "INITIALIZING {"
-                + "\n    - PROCESS_NAME=" + ACTIVE_PROFILE.getProcessName()
+                + "\n    - PROCESS_PROFILE=" + ACTIVE_PROFILE
                 + "\n    - DEBUG=" + BuildConfig.DEBUG
                 + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE
                 + "\n    - VERSION_NAME=" + Utils.getApplicationVersionName(app)
                 + "\n    - VERSION_CODE=" + Utils.getApplicationVersionCode(app)
-                + "\n}");//TODO: add here ACTIVE_PROFILE toString() result
+                + "\n}");
 
         InitType initType = ACTIVE_PROFILE.getUtilsInitType();
         if (initType.isUtilsEnabled()) {
@@ -154,6 +156,15 @@ public final class UtilsBase {
 
         private Runnable[] getAdditionalCommands() {
             return additionalCommands;
+        }
+
+        @Override
+        public String toString() {
+            return "ProcessProfile{" +
+                    "processName='" + processName + '\'' +
+                    ", utilsInitType=" + utilsInitType +
+                    ", additionalCommands=" + Arrays.toString(additionalCommands) +
+                    '}';
         }
     }
 

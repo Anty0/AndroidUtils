@@ -7,8 +7,8 @@ import eu.codetopic.utils.BuildConfig;
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
-import eu.codetopic.utils.data.preferences.SharedPreferencesGetterAbs;
 
 public final class TimingData extends SharedPreferencesData {
 
@@ -58,7 +58,7 @@ public final class TimingData extends SharedPreferencesData {
         edit().putInt(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE, lastRequestCode).apply();
     }
 
-    private static class TimingDataGetter extends SharedPreferencesGetterAbs<TimingData> {
+    private static class TimingDataGetter extends PreferencesGetterAbs<TimingData> {
 
         @Override
         public TimingData get() {

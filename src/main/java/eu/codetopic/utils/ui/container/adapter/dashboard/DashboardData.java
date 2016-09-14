@@ -5,8 +5,8 @@ import android.content.SharedPreferences;
 
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
-import eu.codetopic.utils.data.preferences.SharedPreferencesGetterAbs;
 
 public class DashboardData extends SharedPreferencesData {
 
@@ -46,7 +46,7 @@ public class DashboardData extends SharedPreferencesData {
         }
     }
 
-    private static class DashboardDataGetter extends SharedPreferencesGetterAbs<DashboardData> {
+    private static class DashboardDataGetter extends PreferencesGetterAbs<DashboardData> {
 
         @Override
         public DashboardData get() {

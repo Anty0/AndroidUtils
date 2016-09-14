@@ -2,7 +2,7 @@ package eu.codetopic.utils.data.preferences;
 
 import eu.codetopic.utils.data.getter.DataGetter;
 
-public abstract class SharedPreferencesGetterAbs<DT extends SharedPreferencesData>
+public abstract class PreferencesGetterAbs<DT extends PreferencesData>
         implements DataGetter<DT> {
 
     @Override
@@ -12,6 +12,6 @@ public abstract class SharedPreferencesGetterAbs<DT extends SharedPreferencesDat
 
     @Override
     public String getDataChangedBroadcastAction() {
-        return SharedPreferencesData.getBroadcastActionChanged(get());
+        return PreferencesData.getBroadcastActionChanged(get());
     }
 }
