@@ -45,7 +45,7 @@ public final class UtilsBase {
         }
         Log.e(LOG_TAG, "initialize", new IllegalStateException("Can't find ProcessName ("
                 + processName + "), in provided ProcessProfiles, using empty ProcessProfile"));
-        setActiveProfile(app, new ProcessProfile(processName, false, false));
+        setActiveProfile(app, new ProcessProfile(processName, InitType.DISABLE_UTILS));
     }
 
     private static void setActiveProfile(Application app, ProcessProfile activeProfile) {
@@ -64,9 +64,10 @@ public final class UtilsBase {
                 + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE
                 + "\n    - VERSION_NAME=" + Utils.getApplicationVersionName(app)
                 + "\n    - VERSION_CODE=" + Utils.getApplicationVersionCode(app)
-                + "\n}");
+                + "\n}");//TODO: add here ACTIVE_PROFILE toString() result
 
-        if (ACTIVE_PROFILE.initializesUtils()) {
+        InitType initType = ACTIVE_PROFILE.getUtilsInitType();
+        if (initType.isUtilsEnabled()) {
             LeakCanary.install(app);
 
             Logger.initialize(app);
@@ -74,7 +75,7 @@ public final class UtilsBase {
             NetworkManager.init(app);
             JobUtils.initialize(app);
             BroadcastsConnector.initialize(app);
-            if (ACTIVE_PROFILE.allowsUtilsDataAccess()) {
+            if (initType.isMutiProcessModeEnabled) {
                 Identifiers.initialize(app);
             }
 
@@ -95,12 +96,31 @@ public final class UtilsBase {
 
         for (Runnable command : ACTIVE_PROFILE.getAdditionalCommands()) command.run();
     }
+    
+    public enum InitType {
+        INIT_MULTI_PROCESS_MODE(true, true), INIT_NORMAL_MODE(true, false),
+        DISABLE_UTILS(false, false);
+        
+        private final boolean utilsEnabled, multiProcessModeEnabled;
+        
+        public InitType(boolean utilsEnabled, boolean multiProcessModeEnabled) {
+            this.utilsEnabled = utilsEnabled;
+            this.multiProcessModeEnabled = multiProcessModeEnabled;
+        }
+        
+        public boolean isUtilsEnabled() {
+            return utilsEnabled;
+        }
+        
+        public boolean isMultiProcessModeEnabled() {
+            return multiProcessModeEnabled;
+        }
+    }
 
     public static final class ProcessProfile {
 
         @NonNull private final String processName;
-        private final boolean initializeUtils;
-        private final boolean allowUtilsDataAccess;
+        @NonNull private final InitType utilsInitType;
         private final Runnable[] additionalCommands;
 
         /**
@@ -114,12 +134,11 @@ public final class UtilsBase {
          * - {@code eu.codetopic.utils.timing.TimedComponentsManager.initialize() }
          * - {@code eu.codetopic.utils.broadcast.BroadcastsConnector.connect() }
          */
-        public ProcessProfile(@NonNull String processName, boolean initializeUtils,
-                              boolean allowUtilsDataAccess, Runnable... additionalCommands) {
+        public ProcessProfile(@NonNull String processName, @NonNull InitType utilsInitType,
+                              Runnable... additionalCommands) {
 
             this.processName = processName;
-            this.initializeUtils = initializeUtils;
-            this.allowUtilsDataAccess = allowUtilsDataAccess;
+            this.utilsInitType = utilsInitType;
             this.additionalCommands = additionalCommands;
         }
 
@@ -128,12 +147,9 @@ public final class UtilsBase {
             return processName;
         }
 
-        public boolean initializesUtils() {
-            return initializeUtils;
-        }
-
-        public boolean allowsUtilsDataAccess() {
-            return allowUtilsDataAccess;
+        @NonNull
+        public InitType getUtilsInitType() {
+            return utilsInitType;
         }
 
         private Runnable[] getAdditionalCommands() {
