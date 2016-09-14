@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -13,6 +14,7 @@ import java.util.Date;
 
 import eu.codetopic.utils.log.Log;
 
+@MainThread
 public final class TimedComponentExecutor extends BroadcastReceiver {
 
     private static final String LOG_TAG = "TimedComponentExecutor";
@@ -49,6 +51,22 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
             return;
         }
 
+        try {
+            if (!TimedComponentsManager.isInitialized()) {
+                throw new IllegalStateException("can't check if Component is active," +
+                        " TimedComponentsManager is not initialized");
+            } else {
+                if (!TimedComponentsManager.getInstance().getComponentInfoNonNull(componentClass).isActive()) {
+                    Log.w(LOG_TAG, "onReceive", new IllegalStateException("Received ComponentExecute" +
+                            " request in situation, when component is not active. ComponentInfo: " +
+                            TimedComponentsManager.getInstance().getComponentInfo(componentClass)));
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            Log.w(LOG_TAG, "onReceive", e);
+        }
+
         TimingData.getter.get().setLastExecuteTime(componentClass, System.currentTimeMillis());
 
         try {
@@ -60,6 +78,7 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
             } else if (Service.class.isAssignableFrom(componentClass)) {
                 context.startService(targetIntent);
             } else if (Activity.class.isAssignableFrom(componentClass)) {
+                targetIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(targetIntent);
             } else {
                 throw new ClassCastException("Unknown component class: " + componentClass.getName());

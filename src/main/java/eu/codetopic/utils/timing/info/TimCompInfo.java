@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.timing.TimedComponentsManager;
 import eu.codetopic.utils.timing.TimingData;
@@ -37,6 +38,26 @@ public final class TimCompInfo {
 
     public boolean isEnabled(Context context) {
         return Utils.isComponentEnabled(context, mComponent);
+    }
+
+    public boolean isReady() {
+        TimedComponentsManager timCompMan = TimedComponentsManager.getInstance();
+        return isReady(timCompMan.getContext(), timCompMan.getRequiredNetwork());
+    }
+
+    public boolean isReady(Context context, NetworkManager.NetworkType requiredNetwork) {
+        return isEnabled(context)
+                && (!mComponentProperties.isRequiresInternetAccess()
+                || NetworkManager.isConnected(requiredNetwork));
+    }
+
+    public boolean isActive() {
+        TimedComponentsManager timCompMan = TimedComponentsManager.getInstance();
+        return isActive(timCompMan.getContext(), timCompMan.getRequiredNetwork());
+    }
+
+    public boolean isActive(Context context, NetworkManager.NetworkType requiredNetwork) {
+        return isReady(context, requiredNetwork) && mComponentProperties.isCurrentTimeInTimeRange();
     }
 
     public TimCompInfoData getComponentProperties() {

@@ -77,7 +77,7 @@ public final class UtilsBase {
             NetworkManager.init(app);
             JobUtils.initialize(app);
             BroadcastsConnector.initialize(app);
-            if (initType.isMultiProcessModeEnabled()) {
+            if (!initType.isMultiProcessModeEnabled()) {
                 Identifiers.initialize(app);
             }
 

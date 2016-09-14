@@ -132,12 +132,7 @@ public final class Log {
      * @param msg The message you would like logged.
      */
     public static void e(String tag, String msg) {
-        LogLine logLine = new LogLine(Priority.ERROR, tag, msg);
-        try {
-            println(logLine);
-        } finally {
-            Logger.getErrorLogsHandler().onErrorLogged(logLine);
-        }
+        println(new LogLine(Priority.ERROR, tag, msg));
     }
 
     /**
@@ -149,12 +144,7 @@ public final class Log {
      * @param tr  An exception to log
      */
     public static void e(String tag, String msg, Throwable tr) {
-        LogLine logLine = new LogLine(Priority.ERROR, tag, msg, tr);
-        try {
-            println(logLine);
-        } finally {
-            Logger.getErrorLogsHandler().onErrorLogged(logLine);
-        }
+        println(new LogLine(Priority.ERROR, tag, msg, tr));
     }
 
 }

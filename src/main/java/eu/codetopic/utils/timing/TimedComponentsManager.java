@@ -1,10 +1,14 @@
 package eu.codetopic.utils.timing;
 
+import android.app.Activity;
+import android.app.Service;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -16,6 +20,7 @@ import eu.codetopic.utils.Objects;
 import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 
+@MainThread
 public class TimedComponentsManager {
 
     static final String ACTION_TIMED_EXECUTE = "eu.codetopic.utils.timing.TimedComponentsManager.ACTION_TIMED_EXECUTE";
@@ -35,16 +40,25 @@ public class TimedComponentsManager {
         mContext = context;
         mRequiredNetwork = requiredNetwork;
 
+        if (Log.isInDebugMode()) {
+            for (Class<?> component : components) {
+                if (!BroadcastReceiver.class.isAssignableFrom(component)
+                        && !Service.class.isAssignableFrom(component)
+                        && !Activity.class.isAssignableFrom(component)) {
+                    Log.e(LOG_TAG, "<init>", new ClassCastException(
+                            "Unknown component class: " + component.getName()));
+                }
+            }
+        }
+
         mComponentsInfoMap = new HashMap<>(components.length);
         Log.d(LOG_TAG, "<init> initializing for: " + java.util.Arrays.toString(components));
-        synchronized (mComponentsInfoMapLock) {
-            for (Class<?> component : components) {
-                try {
-                    mComponentsInfoMap.put(component, TimCompInfo.createInfoFor(mContext, component));
-                } catch (Throwable t) {
-                    Log.e(LOG_TAG, "<init> - problem detected during initialisation of "
-                            + component.getName(), t);
-                }
+        for (Class<?> component : components) {
+            try {
+                mComponentsInfoMap.put(component, TimCompInfo.createInfoFor(mContext, component));
+            } catch (Throwable t) {
+                Log.e(LOG_TAG, "<init> - problem detected during initialisation of "
+                        + component.getName(), t);
             }
         }
     }
@@ -112,31 +126,25 @@ public class TimedComponentsManager {
     }
 
     public void setComponentEnabled(@NonNull Class<?> componentClass, boolean enabled) {
-        synchronized (mComponentsInfoMapLock) {
-            setComponentEnabledInternal(getComponentInfoNonNull(componentClass), enabled);
-        }
+        setComponentEnabledInternal(getComponentInfoNonNull(componentClass), enabled);
     }
 
     public void setComponentEnabled(@NonNull TimCompInfo componentInfo, boolean enabled) {
-        synchronized (mComponentsInfoMapLock) {
-            validateComponentInfo(componentInfo);
-            setComponentEnabledInternal(componentInfo, enabled);
-        }
+        validateComponentInfo(componentInfo);
+        setComponentEnabledInternal(componentInfo, enabled);
     }
 
     void setComponentEnabledInternal(@NonNull TimCompInfo componentInfo, boolean enabled) {
-        synchronized (mComponentsInfoMapLock) {
-            PackageManager pm = mContext.getPackageManager();
-            if (pm.getComponentEnabledSetting(componentInfo.getComponentName(mContext))
-                    != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
-                    && enabled == componentInfo.isEnabled(mContext)) return;
+        PackageManager pm = mContext.getPackageManager();
+        if (pm.getComponentEnabledSetting(componentInfo.getComponentName(mContext))
+                != PackageManager.COMPONENT_ENABLED_STATE_DEFAULT
+                && enabled == componentInfo.isEnabled(mContext)) return;
 
-            pm.setComponentEnabledSetting(componentInfo.getComponentName(mContext),
-                    enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
-                            : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                    PackageManager.DONT_KILL_APP);
-            tryReloadInternal(componentInfo);
-        }
+        pm.setComponentEnabledSetting(componentInfo.getComponentName(mContext),
+                enabled ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                        : PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                PackageManager.DONT_KILL_APP);
+        tryReloadInternal(componentInfo);
     }
 
     public Intent getReloadComponentIntent(@NonNull Class<?> componentClass) {
@@ -149,38 +157,28 @@ public class TimedComponentsManager {
     }
 
     public void reloadAllNetwork() {
-        synchronized (mComponentsInfoMapLock) {
-            for (TimCompInfo componentInfo : mComponentsInfoMap.values())
-                if (componentInfo.getComponentProperties().isRequiresInternetAccess())
-                    tryReloadInternal(componentInfo);
-        }
+        for (TimCompInfo componentInfo : mComponentsInfoMap.values())
+            if (componentInfo.getComponentProperties().isRequiresInternetAccess())
+                tryReloadInternal(componentInfo);
     }
 
     public void reloadAll() {
-        synchronized (mComponentsInfoMapLock) {
-            for (TimCompInfo componentInfo : mComponentsInfoMap.values())
-                tryReloadInternal(componentInfo);
-        }
+        for (TimCompInfo componentInfo : mComponentsInfoMap.values())
+            tryReloadInternal(componentInfo);
     }
 
     public void reloadComponentModifications(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMapLock) {
-            reloadComponentModificationsInternal(getComponentInfoNonNull(componentClass));
-        }
+        reloadComponentModificationsInternal(getComponentInfoNonNull(componentClass));
     }
 
     public void reloadComponentModifications(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMapLock) {
-            validateComponentInfo(componentInfo);
-            reloadComponentModificationsInternal(componentInfo);
-        }
+        validateComponentInfo(componentInfo);
+        reloadComponentModificationsInternal(componentInfo);
     }
 
     void reloadComponentModificationsInternal(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMapLock) {
-            componentInfo.getComponentProperties().reloadModifications(mContext);
-            tryReloadInternal(componentInfo);
-        }
+        componentInfo.getComponentProperties().reloadModifications(mContext);
+        tryReloadInternal(componentInfo);
     }
 
     public boolean tryReload(@NonNull Class<?> componentClass) {
@@ -217,22 +215,17 @@ public class TimedComponentsManager {
     }
 
     public void reload(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMapLock) {
-            reloadInternal(getComponentInfoNonNull(componentClass));
-        }
+        reloadInternal(getComponentInfoNonNull(componentClass));
     }
 
     public void reload(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMapLock) {
-            validateComponentInfo(componentInfo);
-            reloadInternal(componentInfo);
-        }
+        validateComponentInfo(componentInfo);
+        reloadInternal(componentInfo);
     }
 
     void reloadInternal(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMapLock) {
-            new ComponentLoader(mContext, mRequiredNetwork, componentInfo).reload();
-        }
+        Log.d(LOG_TAG, "reloadInternal: started for componentInfo " + componentInfo);
+        new ComponentLoader(componentInfo).reload();
     }
 
     public Object getTimedComponentsLock() {
@@ -240,35 +233,27 @@ public class TimedComponentsManager {
     }
 
     public Collection<TimCompInfo> getAllTimedComponentInfo() {
-        synchronized (mComponentsInfoMapLock) {
-            return mComponentsInfoMap.values();
-        }
+        return mComponentsInfoMap.values();
     }
 
     @Nullable
     public TimCompInfo getComponentInfo(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMapLock) {
-            return mComponentsInfoMap.get(componentClass);
-        }
+        return mComponentsInfoMap.get(componentClass);
     }
 
     @NonNull
     public TimCompInfo getComponentInfoNonNull(@NonNull Class<?> componentClass) {
-        synchronized (mComponentsInfoMapLock) {
-            TimCompInfo componentInfo = mComponentsInfoMap.get(componentClass);
-            if (componentInfo == null)
-                throw new NullPointerException(componentClass.getName() + " no found");
-            return componentInfo;
-        }
+        TimCompInfo componentInfo = mComponentsInfoMap.get(componentClass);
+        if (componentInfo == null)
+            throw new NullPointerException(componentClass.getName() + " no found");
+        return componentInfo;
     }
 
     public TimCompInfo validateComponentInfo(@NonNull TimCompInfo componentInfo) {
-        synchronized (mComponentsInfoMapLock) {
-            if (!mComponentsInfoMap.containsValue(componentInfo))
-                throw new IllegalArgumentException("Can't reload componentInfo that is not initialized in "
-                        + LOG_TAG + ".initialize(). componentInfo=" + componentInfo);
-            return componentInfo;
-        }
+        if (!mComponentsInfoMap.containsValue(componentInfo))
+            throw new IllegalArgumentException("Can't reload componentInfo that is not initialized in "
+                    + LOG_TAG + ".initialize(). componentInfo=" + componentInfo);
+        return componentInfo;
     }
 
     public void forceExecute(@NonNull Class<?> componentClass) {

@@ -6,9 +6,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiManager;
+import android.support.annotation.MainThread;
 
 import eu.codetopic.utils.timing.info.TimCompInfo;
 
+@MainThread
 public final class BootConnectivityReceiver extends BroadcastReceiver {
 
     @Override

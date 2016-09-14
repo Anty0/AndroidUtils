@@ -41,7 +41,7 @@ public class TimedComponentsManagerTest {
     public void tearDown() throws Exception {
     }
 
-    @TimedComponent(repeatTime = 1000, repeatingMode = TimedComponent.RepeatingMode.REPEATING_WAKE_UP)
+    @TimedComponent(repeatTime = 1000)
     public static class TestTimedBroadcast extends BroadcastReceiver {
 
         @Override

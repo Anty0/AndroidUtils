@@ -1,11 +1,15 @@
 package eu.codetopic.utils.timing.info;
 
 import android.content.Context;
+import android.support.annotation.MainThread;
+
+import java.util.Calendar;
 
 import eu.codetopic.utils.Arrays;
 import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
 import eu.codetopic.utils.log.Log;
 
+@MainThread
 public final class TimCompInfoData {
 
     private static final String LOG_TAG = "TimCompInfoData";
@@ -17,7 +21,7 @@ public final class TimCompInfoData {
     private int[] usableDays;
     private int startHour, stopHour;
     private boolean resetOnBoot, requiresInternetAccess;
-    private TimedComponent.RepeatingMode repeatingMode;
+    private boolean wakeUp;
 
     TimCompInfoData(Context context, Class<?> componentClass) {
         this.componentClass = componentClass;
@@ -32,7 +36,7 @@ public final class TimCompInfoData {
         stopHour = info.stopHour();
         resetOnBoot = info.resetRepeatingOnBoot();
         requiresInternetAccess = info.requiresInternetAccess();
-        repeatingMode = info.repeatingMode();
+        wakeUp = info.wakeUpForExecute();
 
         Class<? extends TimCompInfoModifier>[] modifiersClasses = info.infoModifiers();
         TimCompInfoModifier[] modifiers = new TimCompInfoModifier[modifiersClasses.length];
@@ -74,6 +78,10 @@ public final class TimCompInfoData {
         this.usableDays = usableDays;
     }
 
+    public boolean isInUsableDaysRange(int dayOfWeek) {
+        return Arrays.contains(usableDays, dayOfWeek);
+    }
+
     public int getStartHour() {
         return startHour;
     }
@@ -90,6 +98,31 @@ public final class TimCompInfoData {
         this.stopHour = stopHour;
     }
 
+    public boolean isInHoursRange(int hour) {
+        return !hasTimeRestrictions() || (startHour < stopHour
+                ? (hour >= startHour && hour < stopHour)
+                : (hour >= startHour || hour < stopHour));
+    }
+
+    public boolean isCurrentTimeInTimeRange() {
+        return isInTimeRange(Calendar.getInstance());
+    }
+
+    public boolean isInTimeRange(long timeInMilis) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(timeInMilis);
+        return isInTimeRange(calendar);
+    }
+
+    public boolean isInTimeRange(Calendar calendar) {
+        return isInHoursRange(calendar.get(Calendar.HOUR_OF_DAY)) &&
+                isInUsableDaysRange(calendar.get(Calendar.DAY_OF_WEEK));
+    }
+
+    public boolean hasTimeRestrictions() {
+        return startHour != stopHour;
+    }
+
     public boolean isResetRepeatingOnBoot() {
         return resetOnBoot;
     }
@@ -102,12 +135,12 @@ public final class TimCompInfoData {
         this.requiresInternetAccess = requiresInternetAccess;
     }
 
-    public TimedComponent.RepeatingMode getRepeatingMode() {
-        return repeatingMode;
+    public boolean isWakeUpForExecute() {
+        return wakeUp;
     }
 
-    public void setRepeatingMode(TimedComponent.RepeatingMode repeatingMode) {
-        this.repeatingMode = repeatingMode;
+    public void setWakeUpForExecute(boolean wakeUp) {
+        this.wakeUp = wakeUp;
     }
 
     public Class<?> getComponentClass() {
@@ -129,7 +162,7 @@ public final class TimCompInfoData {
                 ", stopHour=" + stopHour +
                 ", resetOnBoot=" + resetOnBoot +
                 ", requiresInternetAccess=" + requiresInternetAccess +
-                ", repeatingMode=" + repeatingMode +
+                ", wakeUp=" + wakeUp +
                 '}';
     }
 }

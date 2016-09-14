@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.codetopic.utils.log.base.LogLine;
+import eu.codetopic.utils.log.base.Priority;
 import eu.codetopic.utils.thread.JobUtils;
+
+import static eu.codetopic.utils.log.base.Priority.ERROR;
+import static eu.codetopic.utils.log.base.Priority.WARN;
 
 public final class ErrorLogsHandler {
 
@@ -25,20 +29,25 @@ public final class ErrorLogsHandler {
         listeners.remove(listener);
     }
 
-    synchronized void onErrorLogged(final LogLine logLine) {
+    synchronized void onLogged(final LogLine logLine) {
+        Priority priority = logLine.getPriority();
         try {
-            final Context appContext = Logger.getAppContext();
-            if (appContext == null || !Log.isInDebugMode()) return;
+            if (ERROR.equals(priority) || WARN.equals(priority)) {
+                final Context appContext = Logger.getAppContext();
+                if (appContext == null || !Log.isInDebugMode()) return;
 
-            JobUtils.runOnMainThread(new Runnable() {
-                @Override
-                public void run() {
-                    ErrorInfoActivity.start(appContext, logLine);
-                }
-            });
+                JobUtils.runOnMainThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ErrorInfoActivity.start(appContext, logLine);
+                    }
+                });
+            }
         } finally {
-            for (OnErrorLoggedListener listener : listeners)
-                listener.onError(logLine);
+            if (ERROR.equals(priority)) {
+                for (OnErrorLoggedListener listener : listeners)
+                    listener.onError(logLine);
+            }
         }
     }
 

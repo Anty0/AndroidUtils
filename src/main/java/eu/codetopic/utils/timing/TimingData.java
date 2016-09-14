@@ -1,6 +1,7 @@
 package eu.codetopic.utils.timing;
 
 import android.content.Context;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
 import eu.codetopic.utils.BuildConfig;
@@ -10,6 +11,7 @@ import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 
+@MainThread
 public final class TimingData extends SharedPreferencesData {
 
     public static final DataGetter<TimingData> getter = new TimingDataGetter();

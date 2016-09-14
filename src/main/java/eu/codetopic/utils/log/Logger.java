@@ -68,6 +68,8 @@ public final class Logger {
     }
 
     static void println(LogLine logLine) {
+        ERROR_LOG.onLogged(logLine);
+
         if (!isInDebugMode()) return;
         synchronized (LOG_LINES_CACHE) {
             LOG_LINES_CACHE.add(logLine);

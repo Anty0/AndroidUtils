@@ -14,6 +14,7 @@ import android.widget.TextView;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.log.base.LogLine;
+import eu.codetopic.utils.log.base.Priority;
 
 public class ErrorInfoActivity extends AppCompatActivity {
 
@@ -36,6 +37,10 @@ public class ErrorInfoActivity extends AppCompatActivity {
         }
 
         setFinishOnTouchOutside(false);
+        setTitle(Priority.ERROR.equals(logLine.getPriority())
+                ? R.string.activity_label_error_info
+                : R.string.activity_label_warn_info);
+
         setContentView(R.layout.abc_alert_dialog_material);
         findViewById(R.id.customPanel).setVisibility(View.GONE);
         findViewById(R.id.buttonPanel).setVisibility(View.GONE);
