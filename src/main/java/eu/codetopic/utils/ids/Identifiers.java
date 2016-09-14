@@ -2,20 +2,24 @@ package eu.codetopic.utils.ids;
 
 import android.content.Context;
 
-import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 import eu.codetopic.utils.log.Log;
 
+import static eu.codetopic.utils.PrefNames.ADD_LAST_ID;
+import static eu.codetopic.utils.PrefNames.FILE_NAME_IDENTIFIERS;
+import static eu.codetopic.utils.PrefNames.ID_TYPE_NOTIFICATION_ID;
+import static eu.codetopic.utils.PrefNames.ID_TYPE_REQUEST_CODE;
+
 public class Identifiers extends SharedPreferencesData {
 
-    public static final Type TYPE_REQUEST_CODE = new Type(PrefNames.ID_TYPE_REQUEST_CODE);
-    public static final Type TYPE_NOTIFICATION_ID = new Type(PrefNames.ID_TYPE_NOTIFICATION_ID);
+    public static final Type TYPE_REQUEST_CODE = new Type(ID_TYPE_REQUEST_CODE);
+    public static final Type TYPE_NOTIFICATION_ID = new Type(ID_TYPE_NOTIFICATION_ID);
     private static final String LOG_TAG = "Identifiers";
     private static final int SAVE_VERSION = 0;
     private static Identifiers mInstance;
 
     private Identifiers(Context context) {
-        super(context, PrefNames.FILE_NAME_IDENTIFIERS, SAVE_VERSION);
+        super(context, FILE_NAME_IDENTIFIERS, SAVE_VERSION);
     }
 
     public static void initialize(Context context) {
@@ -62,7 +66,7 @@ public class Identifiers extends SharedPreferencesData {
         }
 
         public String getSettingsName() {
-            return PrefNames.ADD_LAST_ID + name;
+            return ADD_LAST_ID + name;
         }
 
         public int getMin() {
