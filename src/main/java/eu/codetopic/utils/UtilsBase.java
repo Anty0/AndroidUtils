@@ -75,7 +75,7 @@ public final class UtilsBase {
             NetworkManager.init(app);
             JobUtils.initialize(app);
             BroadcastsConnector.initialize(app);
-            if (initType.isMutiProcessModeEnabled) {
+            if (initType.isMultiProcessModeEnabled()) {
                 Identifiers.initialize(app);
             }
 
@@ -102,8 +102,8 @@ public final class UtilsBase {
         DISABLE_UTILS(false, false);
         
         private final boolean utilsEnabled, multiProcessModeEnabled;
-        
-        public InitType(boolean utilsEnabled, boolean multiProcessModeEnabled) {
+
+        InitType(boolean utilsEnabled, boolean multiProcessModeEnabled) {
             this.utilsEnabled = utilsEnabled;
             this.multiProcessModeEnabled = multiProcessModeEnabled;
         }
