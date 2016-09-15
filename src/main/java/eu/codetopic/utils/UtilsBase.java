@@ -70,13 +70,16 @@ public final class UtilsBase {
 
         InitType initType = ACTIVE_PROFILE.getUtilsInitType();
         if (initType.isUtilsEnabled()) {
-            LeakCanary.install(app);
+            if (!initType.isMultiProcessModeEnabled()) {
+                LeakCanary.install(app);
+            }
 
             Logger.initialize(app);
             JqLog.setCustomLogger(new JobQueueLogger());
             NetworkManager.init(app);
             JobUtils.initialize(app);
             BroadcastsConnector.initialize(app);
+
             if (!initType.isMultiProcessModeEnabled()) {
                 Identifiers.initialize(app);
             }
