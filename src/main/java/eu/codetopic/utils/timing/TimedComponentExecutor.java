@@ -60,6 +60,7 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
                     Log.w(LOG_TAG, "onReceive", new IllegalStateException("Received ComponentExecute" +
                             " request in situation, when component is not active. ComponentInfo: " +
                             TimedComponentsManager.getInstance().getComponentInfo(componentClass)));
+                    TimedComponentsManager.getInstance().tryReload(componentClass);
                     return;
                 }
             }

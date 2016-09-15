@@ -100,7 +100,8 @@ final class ComponentLoader {
     private void setupRepeating(int freeRequestCode) {
         long lastStart = data.getLastExecuteTime(componentInfo.getComponentClass());
         long startInterval = properties.getRepeatTime();
-        if (lastStart == -1L) lastStart = System.currentTimeMillis() - startInterval;
+        long minimumLastStart = System.currentTimeMillis() - startInterval;
+        if (lastStart < minimumLastStart) lastStart = minimumLastStart;
         alarmManager.setInexactRepeating(properties.isWakeUpForExecute() ? AlarmManager.RTC_WAKEUP
                         : AlarmManager.RTC, lastStart + startInterval, startInterval,
                 PendingIntent.getBroadcast(context, freeRequestCode,
