@@ -157,12 +157,19 @@ public class TimedComponentsManager {
     }
 
     public void reloadAllNetwork() {
+        TimingData timingData = TimingData.getter.get();
+        boolean connected = NetworkManager.isConnected(mRequiredNetwork);
+        if (timingData.getWasLastNetworkReloadConnected() == connected) return;
+        timingData.setWasLastNetworkReloadConnected(connected);
+        
         for (TimCompInfo componentInfo : mComponentsInfoMap.values())
             if (componentInfo.getComponentProperties().isRequiresInternetAccess())
                 tryReloadInternal(componentInfo);
     }
 
     public void reloadAll() {
+        TimingData.getter.get().setWasLastNetworkReloadConnected(
+                NetworkManager.isConnected(mRequiredNetwork));
         for (TimCompInfo componentInfo : mComponentsInfoMap.values())
             tryReloadInternal(componentInfo);
     }

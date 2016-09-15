@@ -5,11 +5,16 @@ import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
 import eu.codetopic.utils.BuildConfig;
-import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
+
+import static eu.codetopic.utils.PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE;
+import static eu.codetopic.utils.PrefNames.ADD_TIME_LAST_START;
+import static eu.codetopic.utils.PrefNames.FILE_NAME_TIMING_DATA;
+import static eu.codetopic.utils.PrefNames.LAST_LOAD_VERSION_CODE;
+import static eu.codetopic.utils.PrefNames.WAS_LAST_NETWORK_RELOAD_CONNECTED;
 
 @MainThread
 public final class TimingData extends SharedPreferencesData {
@@ -20,7 +25,7 @@ public final class TimingData extends SharedPreferencesData {
     private static TimingData mInstance = null;
 
     private TimingData(Context context) {
-        super(context, PrefNames.FILE_NAME_TIMING_DATA, SAVE_VERSION);
+        super(context, FILE_NAME_TIMING_DATA, SAVE_VERSION);
     }
 
     static void initialize(Context context) {
@@ -34,30 +39,38 @@ public final class TimingData extends SharedPreferencesData {
             return true;//fixes reinstall of application without increasing version code
 
         int versionCode = Utils.getApplicationVersionCode(getContext());
-        int lastVersionCode = getPreferences().getInt(PrefNames.LAST_LOAD_VERSION_CODE, -1);
-        edit().putInt(PrefNames.LAST_LOAD_VERSION_CODE, versionCode).apply();
+        int lastVersionCode = getPreferences().getInt(LAST_LOAD_VERSION_CODE, -1);
+        edit().putInt(LAST_LOAD_VERSION_CODE, versionCode).apply();
         return versionCode != lastVersionCode;
     }
 
+    public boolean getWasLastNetworkReloadConnected() {
+        return getPreferences().getBoolean(WAS_LAST_NETWORK_RELOAD_CONNECTED, false);
+    }
+
+    void setWasLastNetworkReloadConnected(boolean wasConnection) {
+        edit().putBoolean(WAS_LAST_NETWORK_RELOAD_CONNECTED, wasConnection).apply();
+    }
+
     void clear(@NonNull Class clazz) {
-        edit().remove(clazz.getName() + PrefNames.ADD_TIME_LAST_START)
-                .remove(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE).apply();
+        edit().remove(clazz.getName() + ADD_TIME_LAST_START)
+                .remove(clazz.getName() + ADD_LAST_BROADCAST_REQUEST_CODE).apply();
     }
 
     public long getLastExecuteTime(@NonNull Class clazz) {
-        return getPreferences().getLong(clazz.getName() + PrefNames.ADD_TIME_LAST_START, -1L);
+        return getPreferences().getLong(clazz.getName() + ADD_TIME_LAST_START, -1L);
     }
 
     void setLastExecuteTime(@NonNull Class clazz, long lastExecuteTime) {
-        edit().putLong(clazz.getName() + PrefNames.ADD_TIME_LAST_START, lastExecuteTime).apply();
+        edit().putLong(clazz.getName() + ADD_TIME_LAST_START, lastExecuteTime).apply();
     }
 
     public int getLastRequestCode(@NonNull Class clazz) {
-        return getPreferences().getInt(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE, -1);
+        return getPreferences().getInt(clazz.getName() + ADD_LAST_BROADCAST_REQUEST_CODE, -1);
     }
 
     void setLastRequestCode(@NonNull Class clazz, int lastRequestCode) {
-        edit().putInt(clazz.getName() + PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE, lastRequestCode).apply();
+        edit().putInt(clazz.getName() + ADD_LAST_BROADCAST_REQUEST_CODE, lastRequestCode).apply();
     }
 
     private static class TimingDataGetter extends PreferencesGetterAbs<TimingData> {

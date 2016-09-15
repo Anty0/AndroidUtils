@@ -1,5 +1,6 @@
 package eu.codetopic.utils.log;
 
+import eu.codetopic.utils.BuildConfig;
 import eu.codetopic.utils.log.base.LogLine;
 import eu.codetopic.utils.log.base.Priority;
 
@@ -9,7 +10,7 @@ public final class Log {
     }
 
     public static boolean isInDebugMode() {
-        return Logger.isInDebugMode();
+        return BuildConfig.DEBUG;
     }
 
     /**

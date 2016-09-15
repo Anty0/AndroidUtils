@@ -15,9 +15,8 @@ import eu.codetopic.utils.log.base.LogTarget;
 public final class Logger {
 
     private static final String LOG_TAG = "Logger";
-    private static final List<LogLine> LOG_LINES_CACHE = new ArrayList<>();// TODO: 5.9.16 write and read from session files in debug activity
+    private static final List<LogLine> LOG_LINES_CACHE = new ArrayList<>();// TODO: 5.9.16 write to and read from session files in debug activity
     private static final ErrorLogsHandler ERROR_LOG = new ErrorLogsHandler();
-    private static final DebugModeManager DEBUG_MODE = new DebugModeManager();
     private static Context APP_CONTEXT = null;
     @NonNull private static LogTarget TARGET = new DefaultTarget();
 
@@ -37,14 +36,6 @@ public final class Logger {
 
     public static ErrorLogsHandler getErrorLogsHandler() {
         return ERROR_LOG;
-    }
-
-    public static DebugModeManager getDebugModeManager() {
-        return DEBUG_MODE;
-    }
-
-    public static boolean isInDebugMode() {
-        return DEBUG_MODE.isInDebugMode();
     }
 
     @NonNull
@@ -70,7 +61,7 @@ public final class Logger {
     static void println(LogLine logLine) {
         ERROR_LOG.onLogged(logLine);
 
-        if (!isInDebugMode()) return;
+        if (!Log.isInDebugMode()) return;
         synchronized (LOG_LINES_CACHE) {
             LOG_LINES_CACHE.add(logLine);
         }

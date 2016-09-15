@@ -56,6 +56,8 @@ public class ErrorInfoActivity extends AppCompatActivity {
         });
         ((TextView) findViewById(R.id.alertTitle)).setText(getTitle());
 
-        ((TextView) findViewById(android.R.id.message)).setText(logLine.toString());
+        TextView message = ((TextView) findViewById(android.R.id.message));
+        message.setHorizontallyScrolling(true);
+        message.setText(logLine.toString());
     }
 }
