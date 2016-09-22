@@ -16,8 +16,12 @@ android {
     }
     buildTypes {
         release {
-            FileCollection proGuardFileCollection = files { file('./proguard/').listFiles() }
-            consumerProguardFiles getDefaultProguardFile('proguard-android.txt'), proGuardFileCollection, 'proguard-rules.pro'
+            List<?> proFiles = new ArrayList<>()//TODO: maybe find better way
+            proFiles.add(getDefaultProguardFile('proguard-android.txt'))
+            proFiles.addAll(file('./proguard').listFiles().collect())
+            proFiles.add('proguard-rules.pro')
+            setConsumerProguardFiles(proFiles)
+
             debuggable false
             jniDebuggable false
             renderscriptDebuggable false
