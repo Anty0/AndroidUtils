@@ -75,8 +75,9 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
         if (fragment != null) {
             if (currentFragment == null
                     || !Objects.equals(fragment.getClass(), currentFragment.getClass())
-                    || !Utils.equalBundles(fragment.getArguments(), currentFragment.getArguments()))
+                    || !Utils.equalBundles(fragment.getArguments(), currentFragment.getArguments())) {
                 ft.replace(CONTAINER_LAYOUT_ID, fragment, CURRENT_FRAGMENT_TAG);
+            }
             return fragment;
         }
 
