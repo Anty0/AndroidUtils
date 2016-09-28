@@ -10,6 +10,7 @@ import com.birbit.android.jobqueue.Params;
 import eu.codetopic.utils.Constants;
 import eu.codetopic.utils.data.getter.JobManagerGetter;
 import eu.codetopic.utils.thread.job.LoadingJob;
+import eu.codetopic.utils.thread.job.SingletonJobManager;
 import eu.codetopic.utils.ui.view.holder.loading.LoadingVH;
 
 public class NetworkJob extends LoadingJob {
@@ -32,6 +33,15 @@ public class NetworkJob extends LoadingJob {
                       @Nullable Class<?> syncCls, @Nullable Work work) {
         super(generateParams(syncCls), loadingViewHolder);
         job = work;
+    }
+
+    public static String start(@NonNull Work work) {
+        return start(null, work);
+    }
+
+    public static String start(@Nullable LoadingVH loadingViewHolder, @NonNull Work work) {
+        return start(SingletonJobManager.getter,
+                new NetworkJob(loadingViewHolder, NetworkJob.class, work));
     }
 
     public static String start(@NonNull JobManagerGetter jobManagerGetter, @NonNull NetworkJob job) {

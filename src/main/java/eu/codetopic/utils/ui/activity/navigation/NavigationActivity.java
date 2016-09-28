@@ -150,7 +150,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity
             return;
         }
 
-        presenter.setUpdateSuspended(true);
+        if (presenter != null) presenter.setUpdateSuspended(true);
 
         Menu menu = navigationView.getMenu();
         menu.clear();
@@ -158,8 +158,10 @@ public abstract class NavigationActivity extends BaseFragmentActivity
         setupMenuItemsClickListeners(menu);
         resetNavigationView(getCurrentFragment());
 
-        presenter.setUpdateSuspended(false);
-        presenter.updateMenuView(false);
+        if (presenter != null) {
+            presenter.setUpdateSuspended(false);
+            presenter.updateMenuView(false);
+        }
     }
 
     private void setupMenuItemsClickListeners(Menu menu) {
