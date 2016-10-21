@@ -11,8 +11,8 @@ import android.widget.RemoteViewsService;
 import java.util.ArrayList;
 import java.util.List;
 
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.ui.container.items.multiline.MultilineItem;
 
 @Deprecated

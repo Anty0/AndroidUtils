@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import eu.codetopic.utils.Objects;
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
 
 public final class BroadcastsConnector extends BroadcastReceiver {
 

@@ -21,10 +21,10 @@ import android.widget.RemoteViews;
 
 import java.util.List;
 
+import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.ids.Identifiers;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.ui.container.items.multiline.MultilineItem;
 
 public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of WidgetMultilineAdapter
@@ -103,11 +103,11 @@ public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of
         hasHeader = true;
         headerIntent = null;
         refreshIntent = null;
-        headerTitle = Utils.getApplicationLabel(mContext);
-        headerBackgroundColor = Utils.getColorFromAttr(mContext, R.attr.colorPrimary,
+        headerTitle = AndroidUtils.getApplicationLabel(mContext);
+        headerBackgroundColor = AndroidUtils.getColorFromAttr(mContext, R.attr.colorPrimary,
                 ContextCompat.getColor(mContext, R.color.primary_material_dark));
 
-        backgroundColor = Utils.makeColorDarker(Utils.getColorFromAttr(mContext, R.attr.colorPrimaryDark,
+        backgroundColor = AndroidUtils.makeColorDarker(AndroidUtils.getColorFromAttr(mContext, R.attr.colorPrimaryDark,
                 ContextCompat.getColor(mContext, R.color.primary_dark_material_dark)), 0.5f);
 
         itemsProvider = null;
@@ -208,7 +208,7 @@ public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of
                 hasHeader ? View.VISIBLE : View.GONE);
 
         baseView.setInt(R.id.content_frame_layout, "setBackgroundColor",
-                Utils.makeColorTransparent(backgroundColor, 30));
+                AndroidUtils.makeColorTransparent(backgroundColor, 30));
 
         baseView.removeAllViews(R.id.content_frame_layout);
 

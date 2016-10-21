@@ -1,6 +1,5 @@
 package eu.codetopic.utils.export;
 
-import android.os.Environment;
 import android.support.annotation.Nullable;
 
 import java.io.File;
@@ -9,8 +8,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 
-import eu.codetopic.utils.Objects;
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.thread.progress.ProgressReporter;
 
 public class ExportManager {
@@ -54,7 +53,7 @@ public class ExportManager {
     }
 
     public void saveFile(@Nullable ProgressReporter reporter) throws IOException {
-        if (!isStorageWritable()) {
+        if (!AndroidUtils.isStorageWritable()) {
             Log.e(LOG_TAG, "saveFile - Storage is not writable");
             throw new IOException("Storage is not writable");
         }
@@ -111,9 +110,5 @@ public class ExportManager {
         }
         builder.deleteCharAt(builder.length() - 1);
         return builder.toString();
-    }
-
-    private boolean isStorageWritable() {
-        return Objects.equals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
     }
 }

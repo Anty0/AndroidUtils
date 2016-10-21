@@ -20,7 +20,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 
 public abstract class ModularActivity extends AppCompatActivity {
 

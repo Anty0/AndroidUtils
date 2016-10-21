@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import eu.codetopic.utils.Objects;
+import eu.codetopic.java.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.callback.ActionCallback;
 import eu.codetopic.utils.ui.view.ViewUtils;

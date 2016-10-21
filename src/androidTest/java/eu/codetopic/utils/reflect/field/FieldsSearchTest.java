@@ -8,7 +8,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.java.utils.reflect.field.FieldsFilter;
+import eu.codetopic.java.utils.reflect.field.FieldsSearch;
+import eu.codetopic.java.utils.reflect.field.SimpleFieldsFilter;
 
 @RunWith(AndroidJUnit4.class)
 public class FieldsSearchTest {

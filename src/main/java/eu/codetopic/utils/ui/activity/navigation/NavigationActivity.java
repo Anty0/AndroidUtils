@@ -24,10 +24,10 @@ import android.widget.TextView;
 
 import java.lang.reflect.Field;
 
-import eu.codetopic.utils.Objects;
+import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity;
 
 public abstract class NavigationActivity extends BaseFragmentActivity
@@ -52,8 +52,8 @@ public abstract class NavigationActivity extends BaseFragmentActivity
 
         //noinspection ConstantConditions
         ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
-                .setImageDrawable(Utils.getActivityIcon(this, getComponentName()));
-        setHeaderBackgroundColor(Utils.makeColorDarker(Utils.getColorFromAttr(this,
+                .setImageDrawable(AndroidUtils.getActivityIcon(this, getComponentName()));
+        setHeaderBackgroundColor(AndroidUtils.makeColorDarker(AndroidUtils.getColorFromAttr(this,
                 R.attr.colorPrimaryDark, Color.rgb(0, 0, 0)), 0.8f));
         textViewAppTitle.setText(getTitle());
         setSupportActionBar(toolbar);

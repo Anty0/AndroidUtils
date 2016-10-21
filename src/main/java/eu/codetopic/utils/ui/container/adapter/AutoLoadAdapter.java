@@ -5,15 +5,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import eu.codetopic.utils.Arrays;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.callback.ActionCallback;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
@@ -46,7 +47,7 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     protected CustomItem generateLoadingItem() {
         CustomItemWrapper[] wrappers = new CustomItemWrapper[0];
         if (getBase() instanceof RecyclerView.Adapter<?>)
-            wrappers = Arrays.add(wrappers, new CardViewWrapper());
+            wrappers = ArrayUtils.add(wrappers, new CardViewWrapper());
 
         return new MultilineItemCustomItemWrapper(new
                 TextMultilineResourceLayoutItem(getContext().getText(R.string.wait_text_loading),

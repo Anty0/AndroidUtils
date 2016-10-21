@@ -7,7 +7,7 @@ import com.j256.ormlite.field.DatabaseField;
 
 import java.sql.SQLException;
 
-import eu.codetopic.utils.Utils;
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.database.DependencyDatabaseObject;
 
@@ -26,11 +26,11 @@ public abstract class BitmapDatabaseObject extends DependencyDatabaseObject {
 
     public Bitmap getBitmap() {
         if (bitmapBytes == null) return null;
-        return Utils.getBitmapFromBytes(bitmapBytes);
+        return AndroidUtils.getBitmapFromBytes(bitmapBytes);
     }
 
     public void setBitmap(Bitmap picture) {
-        bitmapBytes = picture == null ? null : Utils.getBitmapBytes(picture);
+        bitmapBytes = picture == null ? null : AndroidUtils.getBitmapBytes(picture);
     }
 
     protected abstract DatabaseBase getDatabase();

@@ -9,7 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import eu.codetopic.utils.Arrays;
+import org.apache.commons.lang3.ArrayUtils;
+
 import eu.codetopic.utils.ui.container.adapter.UniversalAdapter;
 import eu.codetopic.utils.ui.view.ViewUtils;
 
@@ -47,9 +48,9 @@ public abstract class CustomItem {
 
     final ViewHolder performBindViewHolder(ViewHolder holder, int itemPosition,
                                            @Nullable CustomItem contentItem, CustomItemWrapper[] wrappers) {
-        wrappers = Arrays.concat(getWrappers(holder.context), wrappers);
+        wrappers = ArrayUtils.addAll(getWrappers(holder.context), wrappers);
         if (wrappers.length > 0) holder = wrappers[0].performBindViewHolder(holder,
-                itemPosition, this, Arrays.remove(wrappers, 0));
+                itemPosition, this, ArrayUtils.remove(wrappers, 0));
 
         if (holder.layoutResId != getItemLayoutResId(holder.context))
             throw new IllegalArgumentException("Invalid holder (wrong layout): " + holder);

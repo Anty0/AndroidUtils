@@ -5,7 +5,7 @@ import com.j256.ormlite.field.DatabaseField;
 
 import java.io.Serializable;
 
-import eu.codetopic.utils.Objects;
+import eu.codetopic.java.utils.Objects;
 
 public abstract class DatabaseObject implements Serializable {
 

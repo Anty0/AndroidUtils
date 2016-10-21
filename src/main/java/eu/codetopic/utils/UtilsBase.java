@@ -11,11 +11,12 @@ import com.squareup.leakcanary.LeakCanary;
 
 import java.util.Arrays;
 
+import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
 import eu.codetopic.utils.ids.Identifiers;
-import eu.codetopic.utils.log.Log;
-import eu.codetopic.utils.log.Logger;
-import eu.codetopic.utils.log.base.JobQueueLogger;
+import eu.codetopic.utils.log.AndroidLoggerExtension;
+import eu.codetopic.utils.log.JobQueueLogger;
 import eu.codetopic.utils.service.ServiceCommander;
 import eu.codetopic.utils.thread.JobUtils;
 
@@ -33,7 +34,7 @@ public final class UtilsBase {
         if (ACTIVE_PROFILE != null)
             throw new IllegalStateException(LOG_TAG + " is still initialized");
 
-        String processName = Utils.getCurrentProcessName();
+        String processName = AndroidUtils.getCurrentProcessName();
         if (processName == null) {
             Log.e(LOG_TAG, "initialize", new RuntimeException(
                     "Can't get CurrentProcessName, using default ProcessName"));
@@ -60,12 +61,12 @@ public final class UtilsBase {
     }
 
     private static void completeInit(Application app) {
-        android.util.Log.d(Utils.getApplicationLabel(app).toString(), "INITIALIZING {"
+        android.util.Log.d(AndroidUtils.getApplicationLabel(app).toString(), "INITIALIZING {"
                 + "\n    - PROCESS_PROFILE=" + ACTIVE_PROFILE
                 + "\n    - DEBUG=" + BuildConfig.DEBUG
                 + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE
-                + "\n    - VERSION_NAME=" + Utils.getApplicationVersionName(app)
-                + "\n    - VERSION_CODE=" + Utils.getApplicationVersionCode(app)
+                + "\n    - VERSION_NAME=" + AndroidUtils.getApplicationVersionName(app)
+                + "\n    - VERSION_CODE=" + AndroidUtils.getApplicationVersionCode(app)
                 + "\n}");
 
         InitType initType = ACTIVE_PROFILE.getUtilsInitType();
@@ -74,7 +75,7 @@ public final class UtilsBase {
                 LeakCanary.install(app);
             }
 
-            Logger.initialize(app);
+            AndroidLoggerExtension.install(app);
             JqLog.setCustomLogger(new JobQueueLogger());
             NetworkManager.init(app);
             JobUtils.initialize(app);
@@ -135,7 +136,7 @@ public final class UtilsBase {
          * - {@code LocaleManager.initialize() }
          * - {@code eu.codetopic.utils.log.DebugModeManager.initDebugModeDetector() } using {@code Logger.getDebugModeManager() }
          * - {@code eu.codetopic.utils.log.DebugModeManager.setDebugModeEnabled() } using {@code Logger.getDebugModeManager() }
-         * - {@code eu.codetopic.utils.log.ErrorLogsHandler.addOnErrorLoggedListener() } using {@code Logger.getErrorLogsHandler }
+         * - {@code eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() } using {@code Logger.getErrorLogsHandler }
          * - {@code eu.codetopic.utils.timing.TimedComponentsManager.initialize() }
          * - {@code eu.codetopic.utils.broadcast.BroadcastsConnector.connect() }
          */

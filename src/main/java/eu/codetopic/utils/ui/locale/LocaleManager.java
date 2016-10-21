@@ -13,8 +13,8 @@ import android.widget.RadioGroup;
 
 import java.util.Locale;
 
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.getter.DataGetterNoBroadcastImpl;
 
@@ -102,7 +102,7 @@ public class LocaleManager {
     }
 
     private static void applyLocale(String language) {
-        Utils.setLocale(mContext, new Locale(language));
+        AndroidUtils.setLocale(mContext, new Locale(language));
     }
 
 }

@@ -15,9 +15,9 @@ import android.support.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 
+import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.NetworkManager;
-import eu.codetopic.utils.Objects;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 
 @MainThread

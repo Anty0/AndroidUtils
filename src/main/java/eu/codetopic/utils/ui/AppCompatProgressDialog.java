@@ -1,4 +1,4 @@
-package eu.codetopic.utils;
+package eu.codetopic.utils.ui;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -16,6 +16,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import java.text.NumberFormat;
+
+import eu.codetopic.utils.R;
 
 /**
  * <p>A dialog showing a progress indicator and an optional text message or view.

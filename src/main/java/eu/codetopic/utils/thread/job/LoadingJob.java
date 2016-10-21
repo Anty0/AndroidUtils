@@ -14,8 +14,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.Constants;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.ui.view.holder.loading.LoadingVH;
 
 public abstract class LoadingJob extends Job implements Serializable {

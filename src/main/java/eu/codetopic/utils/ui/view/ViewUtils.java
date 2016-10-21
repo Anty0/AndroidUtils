@@ -28,10 +28,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import eu.codetopic.utils.Objects;
+import eu.codetopic.java.utils.JavaUtils;
+import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
 public class ViewUtils {
@@ -287,7 +287,7 @@ public class ViewUtils {
         StringBuilder sb = new StringBuilder("-->");
 
         //draw visibility
-        sb.append(Utils.fillToLen(visibilityToString(view.getVisibility()), 9)).append(" -> ");
+        sb.append(JavaUtils.fillToLen(visibilityToString(view.getVisibility()), 9)).append(" -> ");
 
         //draw id
         sb.append(viewIdToString(view)).append(" -> ");
@@ -311,7 +311,7 @@ public class ViewUtils {
             StringBuilder csb = new StringBuilder();
             for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++)
                 csb.append("\n").append(drawViewHierarchy(((ViewGroup) view).getChildAt(i)));
-            sb.append(Utils.addBeforeEveryLine(csb.toString(), "\t"));
+            sb.append(JavaUtils.addBeforeEveryLine(csb.toString(), "\t"));
             sb.append("\n}");
         }
         return sb.toString();

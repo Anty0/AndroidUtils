@@ -4,7 +4,7 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.widget.RemoteViewsService;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 
 @Deprecated
 @SuppressWarnings("deprecation")

@@ -1,6 +1,7 @@
 package eu.codetopic.utils.ui.view.holder.loading;
 
-import eu.codetopic.utils.Arrays;
+import org.apache.commons.lang3.ArrayUtils;
+
 import eu.codetopic.utils.ui.activity.modular.ActivityCallBackModule;
 import eu.codetopic.utils.ui.activity.modular.ModularActivity;
 
@@ -23,7 +24,7 @@ public abstract class LoadingModularActivity extends ModularActivity {
 
     private LoadingModularActivity(LoadingModule loadingModule,
                                    ActivityCallBackModule... additionalModules) {
-        super(Arrays.addToStart(additionalModules, loadingModule));
+        super(ArrayUtils.add(additionalModules, 0, loadingModule));
     }
 
     public LoadingVH getHolder() {

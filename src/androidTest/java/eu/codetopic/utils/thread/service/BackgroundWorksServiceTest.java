@@ -17,10 +17,10 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeoutException;
 
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.SingletonJobManager;
 import eu.codetopic.utils.thread.progress.ProgressReporter;

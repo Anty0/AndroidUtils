@@ -1,4 +1,4 @@
-package eu.codetopic.utils.exceptions;
+package eu.codetopic.utils.exception;
 
 public class NonUiThreadUsedException extends RuntimeException {
 

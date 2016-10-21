@@ -11,10 +11,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import eu.codetopic.java.utils.log.base.LogLine;
+import eu.codetopic.java.utils.log.base.Priority;
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
-import eu.codetopic.utils.log.base.LogLine;
-import eu.codetopic.utils.log.base.Priority;
 
 public class ErrorInfoActivity extends AppCompatActivity {
 
@@ -47,7 +47,7 @@ public class ErrorInfoActivity extends AppCompatActivity {
         findViewById(R.id.textSpacerNoButtons).setVisibility(View.VISIBLE);
 
         ImageView icon = (ImageView) findViewById(android.R.id.icon);
-        icon.setImageDrawable(Utils.getActivityIcon(this, getComponentName()));
+        icon.setImageDrawable(AndroidUtils.getActivityIcon(this, getComponentName()));
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

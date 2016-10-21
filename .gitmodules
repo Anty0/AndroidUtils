@@ -1,0 +1,3 @@
+[submodule "javautils"]
+	path = javautils
+	url = https://bitbucket.org/codetopic/javautils.git

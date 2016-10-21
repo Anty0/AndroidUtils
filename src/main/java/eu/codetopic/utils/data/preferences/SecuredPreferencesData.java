@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.securepreferences.SecurePreferences;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 
 public abstract class SecuredPreferencesData extends PreferencesData {
 

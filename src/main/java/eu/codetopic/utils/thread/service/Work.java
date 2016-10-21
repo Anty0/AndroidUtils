@@ -8,7 +8,7 @@ import com.birbit.android.jobqueue.CancelReason;
 import com.birbit.android.jobqueue.Job;
 import com.birbit.android.jobqueue.RetryConstraint;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.progress.ProgressReporter;
 

@@ -3,11 +3,12 @@ package eu.codetopic.utils.timing.info;
 import android.content.Context;
 import android.support.annotation.MainThread;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Calendar;
 
-import eu.codetopic.utils.Arrays;
-import eu.codetopic.utils.exceptions.NoAnnotationPresentException;
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.exception.NoAnnotationPresentException;
+import eu.codetopic.java.utils.log.Log;
 
 @MainThread
 public final class TimCompInfoData {
@@ -47,7 +48,7 @@ public final class TimCompInfoData {
                 Log.e(LOG_TAG, "Wrong modifier provided for " + componentClass.getName(), e);
             }
         }
-        this.modifiers = Arrays.removeNulls(modifiers);
+        this.modifiers = ArrayUtils.removeAllOccurences(modifiers, null);
         reloadModifications(context);
     }
 
@@ -79,7 +80,7 @@ public final class TimCompInfoData {
     }
 
     public boolean isInUsableDaysRange(int dayOfWeek) {
-        return Arrays.contains(usableDays, dayOfWeek);
+        return ArrayUtils.contains(usableDays, dayOfWeek);
     }
 
     public int getStartHour() {

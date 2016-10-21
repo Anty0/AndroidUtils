@@ -6,7 +6,7 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.view.View;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 
 public class JobUtils {
 

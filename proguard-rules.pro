@@ -37,7 +37,7 @@
     public static *** v(...);
     public static *** d(...);
 }
--assumenosideeffects class eu.codetopic.utils.log.Log {
+-assumenosideeffects class eu.codetopic.java.utils.log.Log {
     public static *** v(...);
     public static *** d(...);
     public static *** i(...);

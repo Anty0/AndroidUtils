@@ -4,8 +4,8 @@ import android.content.Context;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.BuildConfig;
-import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
@@ -38,7 +38,7 @@ public final class TimingData extends SharedPreferencesData {
         if (BuildConfig.DEBUG)
             return true;//fixes reinstall of application without increasing version code
 
-        int versionCode = Utils.getApplicationVersionCode(getContext());
+        int versionCode = AndroidUtils.getApplicationVersionCode(getContext());
         int lastVersionCode = getPreferences().getInt(LAST_LOAD_VERSION_CODE, -1);
         edit().putInt(LAST_LOAD_VERSION_CODE, versionCode).apply();
         return versionCode != lastVersionCode;

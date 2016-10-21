@@ -24,9 +24,9 @@ import android.widget.RemoteViews;
 
 import java.util.List;
 
+import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.ui.container.items.multiline.MultilineItem;
 
@@ -104,7 +104,7 @@ public abstract class WidgetProvider extends AppWidgetProvider {
     }
 
     protected CharSequence getTitle(Context context, int[] appWidgetIds) {
-        return Utils.getApplicationLabel(context);
+        return AndroidUtils.getApplicationLabel(context);
     }
 
     @ColorInt

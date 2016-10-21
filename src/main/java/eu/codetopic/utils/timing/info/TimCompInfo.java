@@ -4,8 +4,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.NetworkManager;
-import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.timing.TimedComponentsManager;
 import eu.codetopic.utils.timing.TimingData;
 
@@ -37,7 +37,7 @@ public final class TimCompInfo {
     }
 
     public boolean isEnabled(Context context) {
-        return Utils.isComponentEnabled(context, mComponent);
+        return AndroidUtils.isComponentEnabled(context, mComponent);
     }
 
     public boolean isReady() {

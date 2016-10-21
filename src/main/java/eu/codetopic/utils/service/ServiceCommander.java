@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.thread.JobUtils;
 
 // TODO: 6.9.16 rework

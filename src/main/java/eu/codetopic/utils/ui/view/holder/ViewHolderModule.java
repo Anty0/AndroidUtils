@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.view.ViewGroup;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.ui.activity.modular.SimpleActivityCallBackModule;
 
 public class ViewHolderModule<VH extends ViewHolder> extends SimpleActivityCallBackModule {

@@ -5,8 +5,8 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
+import eu.codetopic.java.utils.log.Logger;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.log.Logger;
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper;

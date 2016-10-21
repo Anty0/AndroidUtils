@@ -8,10 +8,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
-import eu.codetopic.utils.Objects;
+import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
-import eu.codetopic.utils.log.Log;
 
 public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 12.5.16 rework fragment replacing
 
@@ -75,14 +75,14 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
         if (fragment != null) {
             if (currentFragment == null
                     || !Objects.equals(fragment.getClass(), currentFragment.getClass())
-                    || !Utils.equalBundles(fragment.getArguments(), currentFragment.getArguments())) {
+                    || !AndroidUtils.equalBundles(fragment.getArguments(), currentFragment.getArguments())) {
                 ft.replace(CONTAINER_LAYOUT_ID, fragment, CURRENT_FRAGMENT_TAG);
             }
             return fragment;
         }
 
         if (currentFragment != null) ft.remove(currentFragment);
-        setTitle(Utils.getApplicationLabel(this));
+        setTitle(AndroidUtils.getApplicationLabel(this));
         return null;
     }
 

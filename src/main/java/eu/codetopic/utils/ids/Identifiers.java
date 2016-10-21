@@ -2,8 +2,8 @@ package eu.codetopic.utils.ids;
 
 import android.content.Context;
 
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
-import eu.codetopic.utils.log.Log;
 
 import static eu.codetopic.utils.PrefNames.ADD_LAST_ID;
 import static eu.codetopic.utils.PrefNames.FILE_NAME_IDENTIFIERS;

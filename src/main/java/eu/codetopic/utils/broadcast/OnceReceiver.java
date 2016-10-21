@@ -7,8 +7,8 @@ import android.content.IntentFilter;
 import android.support.annotation.UiThread;
 import android.support.v4.content.LocalBroadcastManager;
 
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.broadcast.BroadcastsConnector.BroadcastTargetingType;
-import eu.codetopic.utils.log.Log;
 
 @UiThread
 public abstract class OnceReceiver extends BroadcastReceiver {

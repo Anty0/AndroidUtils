@@ -2,7 +2,7 @@ package eu.codetopic.utils.data.preferences;
 
 import android.content.Context;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 
 import static eu.codetopic.utils.PrefNames.LOGGED_IN;
 import static eu.codetopic.utils.PrefNames.PASSWORD;

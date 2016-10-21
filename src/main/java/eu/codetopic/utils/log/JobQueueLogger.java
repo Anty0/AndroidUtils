@@ -1,10 +1,10 @@
-package eu.codetopic.utils.log.base;
+package eu.codetopic.utils.log;
 
 import com.birbit.android.jobqueue.log.CustomLogger;
 
 import java.util.Locale;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 
 public final class JobQueueLogger implements CustomLogger {
 

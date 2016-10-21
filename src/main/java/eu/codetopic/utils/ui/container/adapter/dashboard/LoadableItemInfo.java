@@ -9,9 +9,9 @@ import android.support.v4.content.LocalBroadcastManager;
 
 import java.lang.ref.WeakReference;
 
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.callback.ActionCallback;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.items.custom.EmptyCustomItem;

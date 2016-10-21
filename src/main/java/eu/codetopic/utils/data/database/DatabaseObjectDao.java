@@ -7,7 +7,7 @@ import com.j256.ormlite.stmt.PreparedUpdate;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import eu.codetopic.utils.log.Log;
+import eu.codetopic.java.utils.log.Log;
 
 public class DatabaseObjectDao<T> extends DaoWrapper<T, Long> {// TODO: 17.8.16 use new DaoObserver replacing this
 

@@ -2,9 +2,9 @@ package eu.codetopic.utils.data.database.singleton;
 
 import android.support.annotation.NonNull;
 
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.data.database.DatabaseBase;
 import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
-import eu.codetopic.utils.log.Log;
 import eu.codetopic.utils.thread.job.SingletonJobManager;
 
 public final class SingletonDatabase {

@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.TextView;
 
+import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.Utils;
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper;
@@ -23,7 +23,7 @@ public class ConnectivityDebugItem extends CustomItem {
             @Override
             public void onClick(View v) {
                 resultText.setVisibility(View.VISIBLE);
-                resultText.setText(Utils.getFormattedText(resultText.getContext(),
+                resultText.setText(AndroidUtils.getFormattedText(resultText.getContext(),
                         R.string.debug_item_connectivity_info_result_text,
                         Boolean.toString(NetworkManager.isConnected(NetworkManager.NetworkType.ANY)),
                         Boolean.toString(NetworkManager.isConnected(NetworkManager.NetworkType.WIFI)),

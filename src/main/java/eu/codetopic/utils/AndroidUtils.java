@@ -20,6 +20,7 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.AnyRes;
 import android.support.annotation.AttrRes;
@@ -33,6 +34,7 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Base64;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -47,56 +49,27 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.data.database.DatabaseObject;
-import eu.codetopic.utils.log.Log;
 
-public final class Utils {
+public final class AndroidUtils {
 
-    private static final String LOG_TAG = "Utils";
+    private static final String LOG_TAG = "AndroidUtils";
 
-    private Utils() {
+    private AndroidUtils() {
     }
 
     //////////////////////////////////////
     //////REGION - TEXTS_AND_STRINGS//////
     //////////////////////////////////////
-
-    @CheckResult
-    public static String substring(@NonNull String base, @Nullable String start,
-                                   @Nullable String end) {
-
-        int startIndex = start != null ? base.indexOf(start) : -1;
-        if (startIndex != -1) startIndex += start.length();
-        int endIndex = end != null ? base.indexOf(end) : -1;
-        return base.substring(startIndex != -1 ? startIndex : 0,
-                endIndex != -1 ? endIndex : base.length());
-    }
-
-    @CheckResult
-    public static String fillToMaxLen(int toFill) {
-        return fillToLen(Integer.toString(toFill),
-                Integer.toString(Integer.MAX_VALUE).length());
-    }
-
-    @CheckResult
-    public static String fillToLen(CharSequence toFill, int len) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = toFill.length(); i < len; i++)
-            builder.append(" ");
-        builder.append(toFill);
-        return builder.toString();
-    }
-
-    @CheckResult
-    public static String addBeforeEveryLine(String toEdit, String toAdd) {
-        return toAdd + toEdit.replace("\n", "\n" + toAdd);
-    }
 
     @CheckResult
     public static Spanned fromHtml(String source) {
@@ -131,14 +104,6 @@ public final class Utils {
     }
 
     @CheckResult
-    public static double parseDouble(String string) {
-        try {
-            return Double.parseDouble(string.replace(",", ".").replaceAll("[^\\d.]", ""));
-        } catch (Exception e) {
-            return 0;
-        }
-    }
-
     public static Uri getResourceUri(@NonNull Context context, @AnyRes int resource) {
         Resources resources = context.getResources();
         return Uri.parse(ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
@@ -489,10 +454,24 @@ public final class Utils {
     @Nullable
     @CheckResult
     public static String getCurrentProcessName() {
+        FileInputStream input = null;
         try {
-            return IOUtils.streamToString(new FileInputStream("/proc/self/cmdline")).trim();
+            input = new FileInputStream("/proc/self/cmdline");
+            return IOUtils.toString(input,
+                    Charset.defaultCharset()).trim();
         } catch (IOException e) {
             return null;
+        } finally {
+            IOUtils.closeQuietly(input);
         }
+    }
+
+    //////////////////////////////////////
+    //////REGION - STORAGE////////////////
+    //////////////////////////////////////
+
+    @CheckResult
+    public static boolean isStorageWritable() {
+        return Objects.equals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
     }
 }

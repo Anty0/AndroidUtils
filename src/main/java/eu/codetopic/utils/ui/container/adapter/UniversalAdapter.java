@@ -16,7 +16,7 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import android.widget.SpinnerAdapter;
 
-import eu.codetopic.utils.Objects;
+import eu.codetopic.java.utils.Objects;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ui.view.ViewUtils;
 

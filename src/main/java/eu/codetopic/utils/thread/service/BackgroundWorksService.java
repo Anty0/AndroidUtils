@@ -8,7 +8,7 @@ import com.birbit.android.jobqueue.JobStatus;
 
 import java.util.ArrayList;
 
-import eu.codetopic.utils.Objects;
+import eu.codetopic.java.utils.Objects;
 import eu.codetopic.utils.data.getter.JobManagerGetter;
 import eu.codetopic.utils.ids.Identifiers;
 import eu.codetopic.utils.service.CommandService;
