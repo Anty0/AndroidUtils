@@ -11,10 +11,12 @@ import android.view.ViewGroup;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.io.Serializable;
+
 import eu.codetopic.utils.ui.container.adapter.UniversalAdapter;
 import eu.codetopic.utils.ui.view.ViewUtils;
 
-public abstract class CustomItem {
+public abstract class CustomItem implements Serializable {
 
     public static final int NO_POSITION = -1;
     private static final String LOG_TAG = "CustomItem";
@@ -38,7 +40,7 @@ public abstract class CustomItem {
 
     public final void bindViewHolder(UniversalAdapter.ViewHolder holder, int itemPosition) {
         if (!(holder instanceof ViewHolder.UniversalHolder))
-            throw new IllegalArgumentException("Invalid holder (unknown): " + holder);
+            throw new IllegalArgumentException("Invalid holder (unknown holder): " + holder);
         bindViewHolder(((ViewHolder.UniversalHolder) holder).getBase(), itemPosition);
     }
 

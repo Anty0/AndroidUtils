@@ -30,6 +30,12 @@ android {
             zipAlignEnabled true
         }
         debug {
+            List<?> proFiles = new ArrayList<>()//TODO: maybe find better way
+            proFiles.add(getDefaultProguardFile('proguard-android.txt'))
+            proFiles.addAll(file('./proguard').listFiles().collect())
+            proFiles.add('proguard-rules.pro')
+            setConsumerProguardFiles(proFiles)
+
             debuggable true
             jniDebuggable false
             renderscriptDebuggable false
@@ -58,6 +64,7 @@ dependencies {
     //androidTestCompile 'com.android.support.test.uiautomator:uiautomator-v18:2.1.2'
 
     compile project(':utils:javautils')
+    compile fileTree(dir: new File(project(':utils:javautils').projectDir, 'libs'), include: ['*.jar'])
 
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:recyclerview-v7:24.2.1'

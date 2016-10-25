@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="eu.codetopic.utils"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="eu.codetopic.utils">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -22,7 +22,7 @@
             android:exported="false"
             android:label="BackgroundWorks"/>
         <service
-            android:name=".ui.widget.WidgetService"
+            android:name=".ui.container.adapter.widget.CustomItemWidgetAdapterService"
             android:enabled="true"
             android:exported="false"
             android:label="WidgetService"

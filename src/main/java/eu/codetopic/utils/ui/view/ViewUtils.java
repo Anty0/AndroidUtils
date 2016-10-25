@@ -17,6 +17,7 @@ import android.support.annotation.Nullable;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.ArrayAdapter;
@@ -232,6 +233,7 @@ public class ViewUtils {
         return views;
     }
 
+    @CheckResult
     public static View getLastViewParent(View view) {
         ViewParent parent = view.getParent();
         while (parent instanceof View) {
@@ -242,13 +244,27 @@ public class ViewUtils {
     }
 
     @CheckResult
-    public static Bitmap drawViewToBitmap(View view, int width, int height) {
-        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        view.measure(width, height);
-        view.layout(0, 0, width, height);
-        view.buildDrawingCache();
+    public static Bitmap drawViewToBitmap(View view) {
+        int spec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
+        view.measure(spec, spec);
+
+        Bitmap bitmap = Bitmap.createBitmap(view.getMeasuredWidth(),
+                view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+
+        view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
         view.draw(new Canvas(bitmap));
-        view.destroyDrawingCache();
+        return bitmap;
+    }
+
+    @CheckResult
+    public static Bitmap drawViewToBitmap(View view, int width, int height) {
+        view.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
+
+        Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        view.layout(0, 0, width, height);
+        view.draw(new Canvas(bitmap));
         return bitmap;
     }
 

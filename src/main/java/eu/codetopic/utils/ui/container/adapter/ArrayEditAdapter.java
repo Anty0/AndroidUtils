@@ -90,13 +90,13 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         };
     }
 
+    public Editor<T> edit() {
+        return new Editor<>(this);
+    }
+
     protected void assertAllowApplyChanges(@Nullable Object editTag,
                                            Collection<Modification<T>> modifications,
                                            @Nullable Collection<T> contentModifiedItems) {
-    }
-
-    public Editor<T> edit() {
-        return new Editor<>(this);
     }
 
     @UiThread
@@ -209,7 +209,7 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         void modify(@Nullable Base adapterBase, List<T> toModify);
     }
 
-    public static class Editor<T> {
+    public static class Editor<T> {// TODO: 24.10.16 maybe rework to use AccessibleList instead of own implementation of editor
 
         private static final String LOG_TAG = ArrayEditAdapter.LOG_TAG + "$Editor";
 

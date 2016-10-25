@@ -19,15 +19,13 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.RemoteViews;
 
-import java.util.List;
-
-import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ids.Identifiers;
-import eu.codetopic.utils.ui.container.items.multiline.MultilineItem;
+import eu.codetopic.utils.ui.container.adapter.widget.CustomItemWidgetAdapter;
+import eu.codetopic.utils.ui.container.adapter.widget.WidgetCustomItemsProvider;
 
-public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of WidgetMultilineAdapter
+public class WidgetBuilder {
 
     private static final String LOG_TAG = "WidgetBuilder";
 
@@ -43,7 +41,7 @@ public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of
     @ColorInt private int backgroundColor;
 
     @Nullable private RemoteViews ownDataContent;
-    @Nullable private WidgetItemsProvider itemsProvider;
+    @Nullable private WidgetCustomItemsProvider itemsProvider;
     @Nullable private CharSequence emptyViewText;
     @DrawableRes private int emptyViewImageSrc;
 
@@ -162,7 +160,7 @@ public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of
         return this;
     }
 
-    public WidgetBuilder setItemsProvider(@Nullable WidgetItemsProvider itemsProvider) {
+    public WidgetBuilder setItemsProvider(@Nullable WidgetCustomItemsProvider itemsProvider) {
         this.itemsProvider = itemsProvider;
         return this;
     }
@@ -229,47 +227,18 @@ public class WidgetBuilder {// TODO: 12.8.16 use new UniversalAdapter instead of
         return baseView;
     }
 
-    @SuppressLint("NewApi")
-    @SuppressWarnings("deprecation")
     private RemoteViews getDataView(@Nullable RemoteViews baseView) {
         if (ownDataContent != null) return ownDataContent;
         RemoteViews dataView;
 
-        if (Build.VERSION.SDK_INT >= 11 && baseView != null) {
+        if (baseView != null) {
             dataView = new RemoteViews(mContext.getPackageName(), R.layout.widget_content_new);
             dataView.setEmptyView(R.id.content_list_view, R.id.empty_view);
 
-            Intent serviceIntent = WidgetMultilineAdapter.getServiceIntent(mContext, itemsProvider);
-            if (Build.VERSION.SDK_INT >= 14)
-                baseView.setRemoteAdapter(R.id.content_list_view, serviceIntent);
-            else {
-                for (int appWidgetId : appWidgetIds) {
-                    baseView.setRemoteAdapter(appWidgetId, R.id.content_list_view, serviceIntent);
-                }
-            }
+            Intent serviceIntent = CustomItemWidgetAdapter.getServiceIntent(mContext, itemsProvider);
+            baseView.setRemoteAdapter(R.id.content_list_view, serviceIntent);
         } else {
-            List<? extends MultilineItem> itemList = null;
-            try {
-                itemList = itemsProvider == null ? null : itemsProvider.getItems();
-            } catch (Throwable t) {
-                Log.e(LOG_TAG, "getDataView", t);
-            }
-            if (itemList == null || itemList.size() == 0) {
-                dataView = new RemoteViews(mContext.getPackageName(), R.layout.empty_view_base);
-            } else {
-                dataView = new RemoteViews(mContext.getPackageName(), R.layout.widget_content_old);
-                dataView.removeAllViews(R.id.content_list_linear_layout);
-
-                int len = itemList.size();
-                len = len > 7 ? 7 : len;
-                for (int i = 0; i < len; i++) {
-                    MultilineItem multilineItem = itemList.get(i);
-                    RemoteViews itemRemoteViews = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_item_multi_line_text);
-                    itemRemoteViews.setTextViewText(R.id.widget_text_view_title, multilineItem.getTitle(mContext, i));
-                    itemRemoteViews.setTextViewText(R.id.widget_text_view_text, multilineItem.getText(mContext, i));
-                    dataView.addView(R.id.content_list_linear_layout, itemRemoteViews);
-                }
-            }
+            dataView = new RemoteViews(mContext.getPackageName(), R.layout.empty_view_base);
         }
 
         if (emptyViewImageSrc != 0)

@@ -16,7 +16,11 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import android.widget.SpinnerAdapter;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 import eu.codetopic.java.utils.Objects;
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ui.view.ViewUtils;
 
@@ -24,6 +28,9 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
 
     public static final int NO_VIEW_TYPE = 0;
     private static final String LOG_TAG = "UniversalAdapter";
+    public static final String VIEW_TAG_WIDGET_ITEM_CLICK_LISTENER = "eu.codetopic.utils.ui.container.adapter."
+            + LOG_TAG + ".VIEW_TAG_WIDGET_ITEM_CLICK_LISTENER";
+
     private Base base = null;
 
     public final void attachBase(@NonNull Base base) {
@@ -53,6 +60,7 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
         return new ListBase<>(this);
     }
 
+    @TargetApi(11)
     public final RemoteViewsService.RemoteViewsFactory forWidget(Context context, int[] appWidgetIds) {
         return new WidgetBase<>(context, this, appWidgetIds);
     }
@@ -384,13 +392,17 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
     public static class WidgetBase<VH extends ViewHolder> extends SimpleReportingBase
             implements RemoteViewsService.RemoteViewsFactory {
 
+        private static final String LOG_TAG = UniversalAdapter.LOG_TAG + "$WidgetBase";
+
         private final Context mContext;
         private final UniversalAdapter<VH> mAdapter;
         private final int[] mAppWidgetIds;
+        private final Cache<Integer, VH> mViewHoldersCache =
+                CacheBuilder.newBuilder().maximumSize(5).build();
 
         private RemoteViews mLoadingView = null;
 
-        public WidgetBase(Context context, UniversalAdapter<VH> adapter, int[] appWidgetIds) {
+        public WidgetBase(Context context, UniversalAdapter<VH> adapter, @Nullable int[] appWidgetIds) {
             mContext = context;
             mAppWidgetIds = appWidgetIds;
             mAdapter = adapter;
@@ -404,6 +416,11 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
 
         @Override
         public void notifyDataSetChanged() {
+            if (mAppWidgetIds == null) {
+                Log.d(LOG_TAG, "notifyDataSetChanged: Can't notify" +
+                        " about data set change without valid AppWidgetIds");
+                return;
+            }
             AppWidgetManager.getInstance(mContext)
                     .notifyAppWidgetViewDataChanged(mAppWidgetIds, R.id.content_list_view);
         }
@@ -429,9 +446,27 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
 
         @Override
         public RemoteViews getViewAt(int i) {
-            return null;
-            /*return ViewUtils.drawViewToBitmap(mAdapter.onCreateViewHolder(null,
-                    mAdapter.getItemViewType(i)).itemView, 0, 0);*/// TODO: 12.8.16 Complete implementation
+            int itemType = mAdapter.getItemViewType(i);
+
+            VH viewHolder = mViewHoldersCache.getIfPresent(itemType);
+            if (viewHolder == null) {
+                viewHolder = mAdapter.onCreateViewHolder(null, itemType);
+                mViewHoldersCache.put(itemType, viewHolder);
+            }
+            mAdapter.onBindViewHolder(viewHolder, i);
+
+            RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_custom_item);
+            remoteViews.setImageViewBitmap(R.id.image_view_content, ViewUtils.drawViewToBitmap(viewHolder.itemView));
+
+            Object viewListenerTag = ViewUtils.getViewTag(viewHolder.itemView, VIEW_TAG_WIDGET_ITEM_CLICK_LISTENER);
+            WidgetItemClickListener widgetItemClickListener = viewListenerTag instanceof WidgetItemClickListener
+                    ? (WidgetItemClickListener) viewListenerTag : null;
+            if (widgetItemClickListener != null) {
+                remoteViews.setOnClickPendingIntent(R.id.content_frame_layout,
+                        widgetItemClickListener.getOnClickIntent(mContext));
+            }
+
+            return remoteViews;
         }
 
         @Override
