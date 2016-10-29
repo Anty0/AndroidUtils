@@ -19,8 +19,7 @@ public final class SingletonJobManager {
     }
 
     public static void initialize(@NonNull Context context) {
-        context = context.getApplicationContext();
-        initialize(new JobManager(new Configuration.Builder(context).id(LOG_TAG).build()));
+        initialize(new JobManager(new Configuration.Builder(context).id(LOG_TAG).build()));// TODO: 14.10.16 add support for per process job manager
     }
 
     public static void initialize(@NonNull JobManager jobManagerInstance) {
