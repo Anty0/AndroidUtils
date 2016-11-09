@@ -244,7 +244,7 @@ public class ViewUtils {
     }
 
     @CheckResult
-    public static Bitmap drawViewToBitmap(View view) {
+    public static Bitmap drawViewToBitmap(View view, boolean useDrawingCache) {
         int spec = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED);
         view.measure(spec, spec);
 
@@ -252,23 +252,26 @@ public class ViewUtils {
                 view.getMeasuredHeight(), Bitmap.Config.ARGB_8888);
 
         view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+        if (useDrawingCache) view.buildDrawingCache();
         view.draw(new Canvas(bitmap));
+        if (useDrawingCache) view.destroyDrawingCache();
         return bitmap;
     }
 
     @CheckResult
-    public static Bitmap drawViewToBitmap(View view, int width, int height) {
-        view.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
-                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
-
+    public static Bitmap drawViewToBitmap(View view, int width, int height, boolean useDrawingCache) {
         Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
+        view.measure(MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY));
         view.layout(0, 0, width, height);
+        if (useDrawingCache) view.buildDrawingCache();
         view.draw(new Canvas(bitmap));
+        if (useDrawingCache) view.destroyDrawingCache();
         return bitmap;
     }
 
-    public static void drawViewToImageView(final Activity activity, final View view, final ImageView imageView) {
+    public static void drawViewToImageView(final Activity activity, final View view, final ImageView imageView, final boolean useDrawingCache) {
         imageView.post(new Runnable() {
             @Override
             public void run() {
@@ -277,7 +280,8 @@ public class ViewUtils {
                         imageView.post(this);
                     } else {
                         imageView.setImageBitmap(ViewUtils.drawViewToBitmap(view,
-                                imageView.getMeasuredWidth(), imageView.getMeasuredHeight()));
+                                imageView.getMeasuredWidth(), imageView.getMeasuredHeight(),
+                                useDrawingCache));
                     }
                 }
             }

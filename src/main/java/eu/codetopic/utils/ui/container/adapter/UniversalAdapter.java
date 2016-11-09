@@ -456,7 +456,7 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
             mAdapter.onBindViewHolder(viewHolder, i);
 
             RemoteViews remoteViews = new RemoteViews(mContext.getPackageName(), R.layout.widget_list_custom_item);
-            remoteViews.setImageViewBitmap(R.id.image_view_content, ViewUtils.drawViewToBitmap(viewHolder.itemView));
+            remoteViews.setImageViewBitmap(R.id.image_view_content, ViewUtils.drawViewToBitmap(viewHolder.itemView, false));
 
             Object viewListenerTag = ViewUtils.getViewTag(viewHolder.itemView, VIEW_TAG_WIDGET_ITEM_CLICK_LISTENER);
             WidgetItemClickListener widgetItemClickListener = viewListenerTag instanceof WidgetItemClickListener

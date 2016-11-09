@@ -2,7 +2,6 @@ package eu.codetopic.utils.debug;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,12 +9,19 @@ import java.util.List;
 import eu.codetopic.utils.debug.items.ConnectivityDebugItem;
 import eu.codetopic.utils.debug.items.LoggingDebugItem;
 import eu.codetopic.utils.debug.items.TimedComponentsManagerDebugItem;
+import eu.codetopic.utils.ui.activity.BackButtonModule;
+import eu.codetopic.utils.ui.activity.ToolbarModule;
+import eu.codetopic.utils.ui.activity.modular.ModularActivity;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.recycler.Recycler;
 
-public abstract class BaseDebugActivity extends AppCompatActivity {
+public abstract class BaseDebugActivity extends ModularActivity {
 
     private static final String LOG_TAG = "BaseDebugActivity";
+
+    public BaseDebugActivity() {
+        super(new ToolbarModule(), new BackButtonModule());
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
