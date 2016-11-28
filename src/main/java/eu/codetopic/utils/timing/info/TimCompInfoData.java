@@ -5,6 +5,7 @@ import android.support.annotation.MainThread;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import eu.codetopic.java.utils.exception.NoAnnotationPresentException;
@@ -40,15 +41,15 @@ public final class TimCompInfoData {
         wakeUp = info.wakeUpForExecute();
 
         Class<? extends TimCompInfoModifier>[] modifiersClasses = info.infoModifiers();
-        TimCompInfoModifier[] modifiers = new TimCompInfoModifier[modifiersClasses.length];
-        for (int i = 0, modifiersLength = modifiers.length; i < modifiersLength; i++) {
+        ArrayList<TimCompInfoModifier> modifiers = new ArrayList<>();
+        for (Class<? extends TimCompInfoModifier> modifiersClass : modifiersClasses) {
             try {
-                modifiers[i] = modifiersClasses[i].newInstance();
+                modifiers.add(modifiersClass.newInstance());
             } catch (Exception e) {
                 Log.e(LOG_TAG, "Wrong modifier provided for " + componentClass.getName(), e);
             }
         }
-        this.modifiers = ArrayUtils.removeAllOccurences(modifiers, null);
+        this.modifiers = modifiers.toArray(new TimCompInfoModifier[modifiers.size()]);
         reloadModifications(context);
     }
 
