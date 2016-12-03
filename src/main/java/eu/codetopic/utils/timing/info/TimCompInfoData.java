@@ -3,11 +3,10 @@ package eu.codetopic.utils.timing.info;
 import android.content.Context;
 import android.support.annotation.MainThread;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import eu.codetopic.java.utils.ArrayTools;
 import eu.codetopic.java.utils.exception.NoAnnotationPresentException;
 import eu.codetopic.java.utils.log.Log;
 
@@ -81,7 +80,7 @@ public final class TimCompInfoData {
     }
 
     public boolean isInUsableDaysRange(int dayOfWeek) {
-        return ArrayUtils.contains(usableDays, dayOfWeek);
+        return ArrayTools.contains(usableDays, dayOfWeek);
     }
 
     public int getStartHour() {
