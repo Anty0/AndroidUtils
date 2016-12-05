@@ -4,7 +4,7 @@ android {
     defaultPublishConfig 'release'
     publishNonDefault true
     compileSdkVersion 24
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         minSdkVersion 14
