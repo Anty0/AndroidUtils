@@ -3,12 +3,12 @@ apply plugin: 'com.android.library'
 android {
     defaultPublishConfig 'release'
     publishNonDefault true
-    compileSdkVersion 24
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         useLibrary 'org.apache.http.legacy'
@@ -66,19 +66,32 @@ dependencies {
     compile project(':utils:javautils')
     compile fileTree(dir: new File(project(':utils:javautils').projectDir, 'libs'), include: ['*.jar'])
 
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
-    compile 'com.android.support:cardview-v7:24.2.1'
-    compile 'com.android.support:design:24.2.1'
-    compile 'com.android.support:support-annotations:24.2.1'
-    //compile 'com.balysv:material-ripple:1.0.2'
+    compile 'com.android.support:appcompat-v7:25.1.0'
+    compile 'com.android.support:recyclerview-v7:25.1.0'
+    compile 'com.android.support:cardview-v7:25.1.0'
+    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:support-annotations:25.1.0'
 
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.4'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4'
-    androidTestCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.4'
+    compile "com.mikepenz:iconics-core:2.8.1@aar"
+    compile 'com.mikepenz:google-material-typeface:2.2.0.3.original@aar'
+    //compile 'com.mikepenz:material-design-iconic-typeface:2.2.0.2@aar'
+    //compile 'com.mikepenz:fontawesome-typeface:4.7.0.0@aar'
+    //compile 'com.mikepenz:octicons-typeface:3.2.0.2@aar'
+    //compile 'com.mikepenz:meteocons-typeface:1.1.0.2@aar'
+    compile 'com.mikepenz:community-material-typeface:1.7.22.1@aar'
+    //compile 'com.mikepenz:weather-icons-typeface:2.0.10.2@aar'
+    //compile 'com.mikepenz:typeicons-typeface:2.0.7.2@aar'
+    //compile 'com.mikepenz:entypo-typeface:1.0.0.2@aar'
+    compile 'com.mikepenz:devicon-typeface:2.0.0.2@aar'
+    //compile 'com.mikepenz:foundation-icons-typeface:3.0.0.2@aar'
+    //compile 'com.mikepenz:ionicons-typeface:2.0.1.2@aar'
+
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+    androidTestCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 
     compile 'com.infstory:proguard-annotations:1.0.2'
     compile 'com.j256.ormlite:ormlite-android:5.0'
-    compile 'com.birbit:android-priority-jobqueue:2.0.0'
+    compile 'com.birbit:android-priority-jobqueue:2.0.1'
     compile 'com.scottyab:secure-preferences-lib:0.1.4'
 }
