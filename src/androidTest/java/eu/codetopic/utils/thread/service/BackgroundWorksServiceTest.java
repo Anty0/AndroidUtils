@@ -19,7 +19,6 @@ import java.util.concurrent.TimeoutException;
 
 import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.NetworkManager;
-import eu.codetopic.utils.R;
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
 import eu.codetopic.utils.thread.JobUtils;
 import eu.codetopic.utils.thread.job.SingletonJobManager;
@@ -95,7 +94,7 @@ public class BackgroundWorksServiceTest {
                 public NotificationCompat.Builder extend(NotificationCompat.Builder builder) {
                     return builder.setContentTitle("Test" + index)
                             .setContentText("Test running")
-                            .setSmallIcon(R.drawable.ic_action_refresh);
+                            .setSmallIcon(android.R.drawable.arrow_down_float);
                 }
             };
         }

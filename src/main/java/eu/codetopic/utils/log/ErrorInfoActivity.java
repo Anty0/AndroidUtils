@@ -3,6 +3,7 @@ package eu.codetopic.utils.log;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -11,9 +12,11 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
+
 import eu.codetopic.java.utils.log.base.LogLine;
 import eu.codetopic.java.utils.log.base.Priority;
-import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
 
 public class ErrorInfoActivity extends AppCompatActivity {
@@ -47,7 +50,9 @@ public class ErrorInfoActivity extends AppCompatActivity {
         findViewById(R.id.textSpacerNoButtons).setVisibility(View.VISIBLE);
 
         ImageView icon = (ImageView) findViewById(android.R.id.icon);
-        icon.setImageDrawable(AndroidUtils.getActivityIcon(this, getComponentName()));
+        icon.setImageDrawable(new IconicsDrawable(this)
+                .icon(GoogleMaterial.Icon.gmd_close)
+                .color(Color.WHITE).actionBar());
         icon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

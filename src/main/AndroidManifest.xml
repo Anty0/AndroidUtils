@@ -12,7 +12,6 @@
 
         <activity
             android:name=".log.ErrorInfoActivity"
-            android:icon="@drawable/ic_action_close"
             android:label="@string/activity_label_error_info"
             android:theme="@style/Theme.AppCompat.Dialog.Alert.NoActionBar"/>
 
@@ -35,7 +34,7 @@
             android:label="TimingBootConnectivityReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" /><!--TODO: maybe use android job scheduler instead of deprecated CONNECTIVITY_CHANGE broadcast-->
                 <action android:name="android.net.wifi.STATE_CHANGE"/>
             </intent-filter>
         </receiver>
