@@ -8,7 +8,6 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -19,9 +18,6 @@ import android.support.annotation.StringRes;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.RemoteViews;
-
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.iconics.IconicsDrawable;
 
 import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
@@ -202,9 +198,6 @@ public class WidgetBuilder {
 
         //base
         RemoteViews baseView = new RemoteViews(mContext.getPackageName(), R.layout.widget_base_layout);
-        baseView.setBitmap(R.id.image_button_refresh, "setImageBitmap",// TODO: add support for white theme (detect required icon color)
-                new IconicsDrawable(mContext, GoogleMaterial.Icon.gmd_refresh)
-                        .color(Color.WHITE).actionBar().toBitmap());
 
         baseView.setTextViewText(R.id.text_view_title, headerTitle);
         baseView.setInt(R.id.relative_layout_widget_main,
