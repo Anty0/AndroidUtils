@@ -2,17 +2,11 @@ package eu.codetopic.utils;
 
 import android.app.Application;
 import android.content.ComponentCallbacks;
-import android.content.Context;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 
 import com.birbit.android.jobqueue.log.JqLog;
-import com.mikepenz.community_material_typeface_library.CommunityMaterial;
-import com.mikepenz.devicon_typeface_library.DevIcon;
-import com.mikepenz.google_material_typeface_library.GoogleMaterial;
-import com.mikepenz.iconics.Iconics;
-import com.mikepenz.iconics.context.IconicsContextWrapper;
 import com.squareup.leakcanary.LeakCanary;
 
 import java.util.Arrays;
@@ -34,13 +28,6 @@ public final class UtilsBase {
     private static ProcessProfile ACTIVE_PROFILE = null;
 
     private UtilsBase() {
-    }
-
-    public static Context wrapAppBaseContext(Context baseContext) {
-        Iconics.registerFont(new GoogleMaterial());
-        Iconics.registerFont(new CommunityMaterial());
-        Iconics.registerFont(new DevIcon());
-        return IconicsContextWrapper.wrap(baseContext);
     }
 
     public static void initialize(Application app, ProcessProfile... profiles) {
