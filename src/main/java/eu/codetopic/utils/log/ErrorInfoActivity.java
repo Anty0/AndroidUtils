@@ -23,7 +23,7 @@ public class ErrorInfoActivity extends AppCompatActivity {
 
     public static void start(Context context, @NonNull LogLine logLine) {
         context.startActivity(new Intent(context, ErrorInfoActivity.class)
-                .putExtra(EXTRA_LOG_LINE, logLine));
+                .putExtra(EXTRA_LOG_LINE, logLine).setFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
     }
 
     @Override
