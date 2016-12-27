@@ -14,6 +14,9 @@ import eu.codetopic.utils.data.getter.DatabaseDaoGetter;
 
 public abstract class BitmapHolder<T extends BitmapDatabaseObject> extends DatabaseObjectHolder<T> {
 
+    //added to keep compatibility with previous version after removing bitmap recycle
+    private static final long serialVersionUID = -8901813292448120091L;
+
     private Bitmap bitmap = null;
 
     /**
