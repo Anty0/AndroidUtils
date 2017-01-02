@@ -54,16 +54,16 @@ public abstract class BitmapHolder<T extends BitmapDatabaseObject> extends Datab
 
     @WorkerThread
     public void setBitmap(Bitmap bitmap) throws SQLException {
-        if (this.bitmap != null) this.bitmap.recycle();
         this.bitmap = bitmap;
         T object = getObject();
         object.setBitmap(bitmap);
         getDaoGetter().get().update(object);
     }
 
+    @proguard.annotation.Keep
     @Override
     protected void finalize() throws Throwable {
         super.finalize();
-        if (bitmap != null) bitmap.recycle();
+        //keep method for serializable compatibility
     }
 }
