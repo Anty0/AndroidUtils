@@ -64,7 +64,7 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
         try {
             return replaceFragment(ft, fragment);
         } finally {
-            ft.commit();
+            ft.commitAllowingStateLoss();
         }
     }
 
