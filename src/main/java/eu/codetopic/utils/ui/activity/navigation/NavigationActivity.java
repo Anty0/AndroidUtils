@@ -145,7 +145,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity
             presenterField.setAccessible(true);
             presenter = (NavigationMenuPresenter) presenterField.get(navigationView);//this is HACK
         } catch (Exception e) {
-            Log.e(LOG_TAG, "invalidateNavigationMenu - " +
+            Log.w(LOG_TAG, "invalidateNavigationMenu - " +
                     "can't get menu presenter: can't get field from class", e);
             return;
         }

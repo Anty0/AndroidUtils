@@ -11,6 +11,7 @@ import com.squareup.leakcanary.LeakCanary;
 
 import java.util.Arrays;
 
+import eu.codetopic.java.utils.ArrayTools;
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.broadcast.BroadcastsConnector;
@@ -33,6 +34,10 @@ public final class UtilsBase {
     public static void initialize(Application app, ProcessProfile... profiles) {
         if (ACTIVE_PROFILE != null)
             throw new IllegalStateException(LOG_TAG + " is still initialized");
+
+        profiles = ArrayTools.add(profiles, new ProcessProfile(
+                app.getPackageName() + ":leakcanary", InitType.DISABLE_UTILS
+        ));  // LeakCanary process
 
         String processName = AndroidUtils.getCurrentProcessName();
         if (processName == null) {
@@ -71,7 +76,7 @@ public final class UtilsBase {
 
         InitType initType = ACTIVE_PROFILE.getUtilsInitType();
         if (initType.isUtilsEnabled()) {
-            if (!initType.isMultiProcessModeEnabled()) {
+            if (!LeakCanary.isInAnalyzerProcess(app)) {
                 LeakCanary.install(app);
             }
 

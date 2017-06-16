@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
@@ -94,9 +95,18 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
     @Override
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
-        if (fragment instanceof TitleProvider &&
-                CURRENT_FRAGMENT_TAG.equals(fragment.getTag()))
-            setTitle(((TitleProvider) fragment).getTitle());
+        if (CURRENT_FRAGMENT_TAG.equals(fragment.getTag())) {
+            if (fragment instanceof TitleProvider) {
+                setTitle(((TitleProvider) fragment).getTitle());
+            }
+            /*if (fragment instanceof ToolbarThemeProvider) {
+                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                if (toolbar != null) {
+                    toolbar.setBackgroundColor();
+                    toolbar.setTitleTextColor();
+                }
+            }*/
+        }
 
         //System.runFinalization();
         //System.gc();
