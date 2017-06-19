@@ -48,9 +48,13 @@
 -assumenosideeffects class eu.codetopic.utils.debug.BaseDebugActivity
 -assumenosideeffects class * extends eu.codetopic.utils.debug.BaseDebugActivity
 
-# keep calsses that implements TimCompInfoModifier (classes will be created using Class.getInstance())
+# keep calsses that implements TimCompInfoModifier (instances of these classes will be created using Class.getInstance())
 -keep class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier
 -keepclassmembers class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier {
     public <init>();
     public void modify(android.content.Context, eu.codetopic.utils.timing.info.TimCompInfoData);
 }
+
+-dontwarn android.content.**
+-dontwarn android.animation.**
+-dontwarn android.widget.**

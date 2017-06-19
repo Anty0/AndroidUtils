@@ -23,6 +23,7 @@
 # http://stackoverflow.com/questions/9120338/proguard-configuration-for-guava-with-obfuscation-and-optimization
 -dontwarn javax.annotation.**
 -dontwarn javax.inject.**
+-dontwarn javax.lang.**
 -dontwarn sun.misc.Unsafe
 
 # Guava 19.0
