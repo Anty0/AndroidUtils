@@ -8,6 +8,7 @@ import android.support.annotation.NonNull;
 
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.BuildConfig;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 
 @MainThread
@@ -38,6 +39,12 @@ public class ReloadComponentReceiver extends BroadcastReceiver {
             Log.e(LOG_TAG, "onReceive: can't find requested class to reload", e);
             return;
         }
+
+        if (BuildConfig.DEBUG) {
+            TimingData.getter.get().addDebugLogLine(String.format(
+                    "Received reload request of component %1$s", clazz.getName()));
+        }
+
         TimedComponentsManager.getInstance().tryReload(clazz);
     }
 }

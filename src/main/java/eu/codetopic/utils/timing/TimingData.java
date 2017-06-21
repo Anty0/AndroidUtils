@@ -3,15 +3,22 @@ package eu.codetopic.utils.timing;
 import android.content.Context;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.BuildConfig;
+import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.getter.DataGetter;
 import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
 import eu.codetopic.utils.data.preferences.SharedPreferencesData;
 
 import static eu.codetopic.utils.PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE;
 import static eu.codetopic.utils.PrefNames.ADD_TIME_LAST_START;
+import static eu.codetopic.utils.PrefNames.DEBUG_LOG_LINES;
 import static eu.codetopic.utils.PrefNames.FILE_NAME_TIMING_DATA;
 import static eu.codetopic.utils.PrefNames.LAST_LOAD_VERSION_CODE;
 import static eu.codetopic.utils.PrefNames.WAS_LAST_NETWORK_RELOAD_CONNECTED;
@@ -71,6 +78,30 @@ public final class TimingData extends SharedPreferencesData {
 
     void setLastRequestCode(@NonNull Class clazz, int lastRequestCode) {
         edit().putInt(clazz.getName() + ADD_LAST_BROADCAST_REQUEST_CODE, lastRequestCode).apply();
+    }
+
+    public String getDebugLogJson() {
+        return getPreferences().getString(DEBUG_LOG_LINES, "");
+    }
+
+    void addDebugLogLine(String text) {
+        addDebugLogLine(System.currentTimeMillis(), text);
+    }
+
+    void addDebugLogLine(long time, String text) {
+        try {
+            JSONArray line = new JSONArray();
+            line.put(time);
+            line.put(text);
+
+            String logLinesJson = getPreferences().getString(DEBUG_LOG_LINES, null);
+            JSONArray logLinesArray = logLinesJson == null ? new JSONArray() : new JSONArray(logLinesJson);
+            logLinesArray.put(line);
+
+            edit().putString(DEBUG_LOG_LINES, logLinesArray.toString());
+        } catch (JSONException e) {
+            Log.w(LOG_TAG, e);
+        }
     }
 
     private static class TimingDataGetter extends PreferencesGetterAbs<TimingData> {

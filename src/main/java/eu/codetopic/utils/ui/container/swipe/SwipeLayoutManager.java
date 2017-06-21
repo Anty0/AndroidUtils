@@ -31,9 +31,8 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
                                  boolean useSwipeRefresh, boolean useFloatingActionButton) {
         mContext = mainView.getContext();
         mMainView = mainView;
-        mFAB = (FloatingActionButton) mainView.findViewById(R.id.floatingActionButton);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) mainView
-                .findViewById(R.id.swipe_refresh_layout);
+        mFAB = mainView.findViewById(R.id.floatingActionButton);
+        mSwipeRefreshLayout = mainView.findViewById(R.id.swipe_refresh_layout);
 
         //Log.d(LOG_TAG, "<init> for " + mContext.getClass().getName());
 
@@ -68,31 +67,16 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setOnRefreshListener(final SwipeRefreshLayout.OnRefreshListener listener) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                getSwipeRefreshLayout().setOnRefreshListener(listener);
-            }
-        });
+        JobUtils.runOnMainThread(() -> getSwipeRefreshLayout().setOnRefreshListener(listener));
         return self();
     }
 
     public synchronized T setOnRefreshListener(final OnSwipeRefreshListener listener) {
-        return setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                listener.onRefresh(getSwipeRefreshLayout());
-            }
-        });
+        return setOnRefreshListener(() -> listener.onRefresh(getSwipeRefreshLayout()));
     }
 
     public synchronized T setRefreshing(final boolean refreshing) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                getSwipeRefreshLayout().setRefreshing(refreshing);
-            }
-        });
+        JobUtils.runOnMainThread(() -> getSwipeRefreshLayout().setRefreshing(refreshing));
         return self();
     }
 
@@ -101,54 +85,29 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setFabClickListener(final View.OnClickListener listener) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                getFloatingActionButton().setOnClickListener(listener);
-            }
-        });
+        JobUtils.runOnMainThread(() -> getFloatingActionButton().setOnClickListener(listener));
         return self();
     }
 
     public synchronized T setEmptyImage(final Drawable image) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageDrawable(image);
-            }
-        });
+        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageDrawable(image));
         return self();
     }
 
     public synchronized T setEmptyImage(final Bitmap image) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageBitmap(image);
-            }
-        });
+        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageBitmap(image));
         return self();
     }
 
     @TargetApi(23)
     public synchronized T setEmptyImage(final Icon image) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageIcon(image);
-            }
-        });
+        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageIcon(image));
         return self();
     }
 
 
     public synchronized T setEmptyImage(@DrawableRes final int imageResId) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageResource(imageResId);
-            }
-        });
+        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageResource(imageResId));
         return self();
     }
 
@@ -157,12 +116,7 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setEmptyText(final CharSequence text) {
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                ((TextView) getBaseView().findViewById(R.id.empty_text)).setText(text);
-            }
-        });
+        JobUtils.runOnMainThread(() -> ((TextView) getBaseView().findViewById(R.id.empty_text)).setText(text));
         return self();
     }
 

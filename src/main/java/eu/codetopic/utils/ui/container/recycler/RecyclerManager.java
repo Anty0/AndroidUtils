@@ -27,7 +27,7 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
     protected RecyclerManager(@NonNull View mainView, @Nullable int[] swipeSchemeColors,
                               boolean useSwipeRefresh, boolean useFloatingActionButton) {
         super(mainView, swipeSchemeColors, useSwipeRefresh, useFloatingActionButton);
-        mRecyclerView = (EmptyRecyclerView) mainView.findViewById(R.id.recyclerView);
+        mRecyclerView = mainView.findViewById(R.id.recyclerView);
         mRecyclerView.setEmptyView(mainView.findViewById(R.id.empty_view));
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     }

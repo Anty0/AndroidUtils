@@ -17,6 +17,7 @@ import java.util.HashMap;
 
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.BuildConfig;
 import eu.codetopic.utils.NetworkManager;
 import eu.codetopic.utils.timing.info.TimCompInfo;
 
@@ -37,7 +38,7 @@ public class TimedComponentsManager {
     private TimedComponentsManager(Context context, @NonNull NetworkManager.NetworkType requiredNetwork,
                                    Class<?>[] components) {
 
-        mContext = context;
+        mContext = context.getApplicationContext();
         mRequiredNetwork = requiredNetwork;
 
         if (Log.isInDebugMode()) {
@@ -86,6 +87,11 @@ public class TimedComponentsManager {
         if (isInitialized()) throw new IllegalStateException(LOG_TAG + " is still initialized");
         context = context.getApplicationContext();
         TimingData.initialize(context);
+        TimingData timingData = TimingData.getter.get();
+
+        if (BuildConfig.DEBUG) {
+            timingData.addDebugLogLine("Initializing " + LOG_TAG);
+        }
 
         context.getPackageManager().setComponentEnabledSetting(
                 new ComponentName(context, BootConnectivityReceiver.class),
@@ -94,7 +100,12 @@ public class TimedComponentsManager {
 
         INSTANCE = new TimedComponentsManager(context, requiredNetwork, timedComponents);
 
-        if (TimingData.getter.get().isFirstLoad()) INSTANCE.reloadAll();
+        if (timingData.isFirstLoad()) {
+            if (BuildConfig.DEBUG) {
+                timingData.addDebugLogLine("FirstLoad: Reloading all components");
+            }
+            INSTANCE.reloadAll();
+        }
     }
 
     public static TimedComponentsManager getInstance() {

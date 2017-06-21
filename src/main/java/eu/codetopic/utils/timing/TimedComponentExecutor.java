@@ -13,6 +13,7 @@ import android.support.annotation.Nullable;
 import java.util.Date;
 
 import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.BuildConfig;
 
 @MainThread
 public final class TimedComponentExecutor extends BroadcastReceiver {
@@ -68,7 +69,14 @@ public final class TimedComponentExecutor extends BroadcastReceiver {
             Log.w(LOG_TAG, "onReceive", e);
         }
 
-        TimingData.getter.get().setLastExecuteTime(componentClass, System.currentTimeMillis());
+        TimingData timingData = TimingData.getter.get();
+        timingData.setLastExecuteTime(componentClass, System.currentTimeMillis());
+
+        if (BuildConfig.DEBUG) {
+            timingData.addDebugLogLine(String.format(
+                    "Received execute request of component %1$s with intent action %2$s",
+                    componentClass.getName(), intent.getAction()));
+        }
 
         try {
             Intent targetIntent = new Intent(context, componentClass)
