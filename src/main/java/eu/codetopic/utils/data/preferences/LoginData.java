@@ -13,7 +13,7 @@ public class LoginData extends SecuredPreferencesData {
     private static final String LOG_TAG = "LoginData";
 
     public LoginData(Context context, String fileName, int saveVersion) {
-        super(context, fileName, saveVersion);
+        super(context, fileName, true, saveVersion);
     }
 
     public synchronized void login(String username, String password) {

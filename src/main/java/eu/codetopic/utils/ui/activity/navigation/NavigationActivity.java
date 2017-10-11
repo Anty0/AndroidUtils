@@ -1,5 +1,6 @@
 package eu.codetopic.utils.ui.activity.navigation;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.design.internal.NavigationMenuPresenter;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -43,18 +45,16 @@ public abstract class NavigationActivity extends BaseFragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.navigation_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        navigationView = (NavigationView) findViewById(R.id.nav_view);
-        //noinspection ConstantConditions
-        textViewAppTitle = (TextView) navigationView.getHeaderView(0)
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        drawer = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        textViewAppTitle = navigationView.getHeaderView(0)
                 .findViewById(R.id.textViewAppTitle);
 
-        //noinspection ConstantConditions
-        ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
-                .setImageDrawable(AndroidUtils.getActivityIcon(this, getComponentName()));
-        setHeaderBackgroundColor(AndroidUtils.makeColorDarker(AndroidUtils.getColorFromAttr(this,
-                R.attr.colorPrimaryDark, Color.rgb(0, 0, 0)), 0.8f));
+        setNavigationViewAppIconDrawable(AndroidUtils.getActivityIcon(this, getComponentName()));
+        setHeaderBackgroundColor(AndroidUtils.getColorFromAttr(this,
+                R.attr.colorPrimaryDark, Color.rgb(0, 0, 0)));
+
         textViewAppTitle.setText(getTitle());
         setSupportActionBar(toolbar);
 
@@ -87,6 +87,21 @@ public abstract class NavigationActivity extends BaseFragmentActivity
             Log.e(LOG_TAG, "onCreateMainFragment - provided wrong MainFragment", e);
             return null;
         }
+    }
+
+    public void setNavigationViewAppIconBitmap(Bitmap bm) {
+        ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
+                .setImageBitmap(bm);
+    }
+
+    public void setNavigationViewAppIconDrawable(@Nullable Drawable drawable) {
+        ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
+                .setImageDrawable(drawable);
+    }
+
+    public void setNavigationViewAppIconResource(@DrawableRes int resId) {
+        ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
+                .setImageResource(resId);
     }
 
     public void setHeaderBackground(Drawable drawable) {

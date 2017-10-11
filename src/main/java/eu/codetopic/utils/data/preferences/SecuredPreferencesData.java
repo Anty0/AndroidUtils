@@ -13,14 +13,16 @@ public abstract class SecuredPreferencesData extends PreferencesData {
     private static final String LOG_TAG = "SecureModuleData";
     private static final String DEFAULT_PASSWORD = "TheBestDefaultPasswordEver";
 
+    private final boolean mClearOnFail;
     private final String mPassword;
 
-    public SecuredPreferencesData(Context context, @NonNull String fileName, int saveVersion) {
-        this(context, fileName, DEFAULT_PASSWORD, saveVersion);
+    public SecuredPreferencesData(Context context, @NonNull String fileName, boolean clearOnFail, int saveVersion) {
+        this(context, fileName, DEFAULT_PASSWORD, clearOnFail, saveVersion);
     }
 
-    public SecuredPreferencesData(Context context, @NonNull String fileName, String password, int saveVersion) {
+    public SecuredPreferencesData(Context context, @NonNull String fileName, String password, boolean clearOnFail, int saveVersion) {
         super(context, fileName, saveVersion);
+        mClearOnFail = clearOnFail;
         mPassword = password;
     }
 
@@ -29,10 +31,17 @@ public abstract class SecuredPreferencesData extends PreferencesData {
         try {
             return new SecurePreferences(getContext(), mPassword, getFileName());
         } catch (Throwable t) {
-            Log.e(LOG_TAG, "createSharedPreferences: data cleared", t);
-            getContext().getSharedPreferences(getFileName(),
-                    Context.MODE_PRIVATE).edit().clear().apply();
-            return createSharedPreferences();
+            if (mClearOnFail) {
+                Log.e(LOG_TAG, "createSharedPreferences: failed to create SecurePreferences, data will be cleared", t);
+                SharedPreferences pref = getContext().getSharedPreferences(getFileName(), Context.MODE_PRIVATE);
+                if (!pref.getAll().isEmpty()) {
+                    pref.edit().clear().apply();
+                    return createSharedPreferences();
+                }
+                throw t;
+            }
+            Log.e(LOG_TAG, "createSharedPreferences: failed to create SecurePreferences", t);
+            throw t;
         }
     }
 }
