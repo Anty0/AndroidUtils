@@ -2,6 +2,8 @@ import com.google.common.collect.Iterables
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'com.jakewharton.butterknife'
 
 android {
@@ -68,7 +70,7 @@ dependencies {
     implementation "com.android.support:support-annotations:$support_libs_version"
 
     implementation "com.jakewharton:butterknife:$butterknife_version"
-    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknife_version"
+    kapt "com.jakewharton:butterknife-compiler:$butterknife_version"
 
     String leakcanary_version = '1.5.3'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
