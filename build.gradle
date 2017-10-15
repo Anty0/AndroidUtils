@@ -1,3 +1,5 @@
+import com.google.common.collect.Iterables
+
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.jakewharton.butterknife'
@@ -16,11 +18,10 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        def proguardFilesList = ['proguard-rules.pro']
+        proguardFilesList.addAll(file('./proguard/').list().collect())
         release {
-            List<?> proFiles = new ArrayList<>()
-            proFiles.addAll(file('./proguard').listFiles().collect())
-            proFiles.add('proguard-rules.pro')
-            setConsumerProguardFiles(proFiles)
+            consumerProguardFiles Iterables.toArray(proguardFilesList, Object.class)
 
             debuggable false
             jniDebuggable false
@@ -29,10 +30,7 @@ android {
             zipAlignEnabled true
         }
         debug {
-            List<?> proFiles = new ArrayList<>()
-            proFiles.addAll(file('./proguard').listFiles().collect())
-            proFiles.add('proguard-rules.pro')
-            setConsumerProguardFiles(proFiles)
+            consumerProguardFiles Iterables.toArray(proguardFilesList, Object.class)
 
             debuggable true
             jniDebuggable false
@@ -68,6 +66,9 @@ dependencies {
     implementation "com.android.support:cardview-v7:$support_libs_version"
     implementation "com.android.support:design:$support_libs_version"
     implementation "com.android.support:support-annotations:$support_libs_version"
+
+    implementation "com.jakewharton:butterknife:$butterknife_version"
+    annotationProcessor "com.jakewharton:butterknife-compiler:$butterknife_version"
 
     String leakcanary_version = '1.5.3'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"

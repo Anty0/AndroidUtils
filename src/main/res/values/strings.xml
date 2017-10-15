@@ -17,6 +17,7 @@
 
     <string name="dialog_title_select_language">Select Language</string>
 
+    <string name="description_drop_down_arrow">Dropdown arrow</string>
     <string name="description_icon">Icon</string>
     <string name="description_list_item_content">List item content</string>
     <string name="description_empty_view_image">Empty list image</string>

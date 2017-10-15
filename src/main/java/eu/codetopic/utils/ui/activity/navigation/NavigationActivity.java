@@ -1,9 +1,11 @@
 package eu.codetopic.utils.ui.activity.navigation;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
@@ -12,16 +14,19 @@ import android.support.design.internal.NavigationMenuPresenter;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.internal.view.SupportMenuItem;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.view.menu.MenuItemImpl;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.lang.reflect.Field;
@@ -32,38 +37,73 @@ import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity;
 
-public abstract class NavigationActivity extends BaseFragmentActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public abstract class NavigationActivity extends BaseFragmentActivity {
 
     private static final String LOG_TAG = "NavigationActivity";
 
-    private DrawerLayout drawer;
-    private NavigationView navigationView;
-    private TextView textViewAppTitle;
+    private static final String KEY_SWITCHING_ACCOUNTS =
+            "eu.codetopic.utils.ui.activity.navigation.NavigationActivity.SWITCHING_ACCOUNTS";
+
+    private boolean mEnableSwitchingAccounts = false;
+    private boolean mSwitchingAccounts = false;
+
+    private DrawerLayout mDrawer;
+    private NavigationView mNavigationView;
+    private LinearLayout mHeaderView;
+
+    private ImageView mAppIconView;
+
+    private FrameLayout mContainerAppTitle;
+    private TextView mTextViewAppTitle;
+
+    private LinearLayout mContainerAccountsSwitch;
+    private TextView mTextViewAccountName;
+    private ImageView mImageViewAccountChangeArrow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            mSwitchingAccounts = savedInstanceState.getBoolean(KEY_SWITCHING_ACCOUNTS, false);
+        }
+
         setContentView(R.layout.navigation_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        drawer = findViewById(R.id.drawer_layout);
-        navigationView = findViewById(R.id.nav_view);
-        textViewAppTitle = navigationView.getHeaderView(0)
-                .findViewById(R.id.textViewAppTitle);
+        mDrawer = findViewById(R.id.drawer_layout);
+        mNavigationView = findViewById(R.id.nav_view);
+        mHeaderView = mNavigationView.getHeaderView(0).findViewById(R.id.navigationHeader);
+
+        mAppIconView = mHeaderView.findViewById(R.id.imageViewAppIcon);
+
+        mContainerAppTitle = mHeaderView.findViewById(R.id.container_app_title);
+        mTextViewAppTitle = mContainerAppTitle.findViewById(R.id.textViewAppTitle);
+
+        mContainerAccountsSwitch = mHeaderView.findViewById(R.id.container_accounts_switch);
+        mContainerAccountsSwitch.setOnClickListener(v -> toggleSwitchingAccounts());
+        mTextViewAccountName = mContainerAccountsSwitch.findViewById(R.id.textViewAccountName);
+        mImageViewAccountChangeArrow = mContainerAccountsSwitch.findViewById(R.id.imageViewAccountChangeArrow);
 
         setNavigationViewAppIconDrawable(AndroidUtils.getActivityIcon(this, getComponentName()));
         setHeaderBackgroundColor(AndroidUtils.getColorFromAttr(this,
                 R.attr.colorPrimaryDark, Color.rgb(0, 0, 0)));
 
-        textViewAppTitle.setText(getTitle());
+        mTextViewAppTitle.setText(AndroidUtils.getAppLabel(this));
         setSupportActionBar(toolbar);
 
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar,
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, mDrawer, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+        mDrawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
+        mNavigationView.setNavigationItemSelectedListener(item -> {
+                    mDrawer.closeDrawer(GravityCompat.START);
+                    if (mEnableSwitchingAccounts && mSwitchingAccounts) {
+                        setSwitchingAccounts(false);
+                        return onAccountNavigationItemSelected(item);
+                    }
+                    return onNavigationItemSelected(item);
+                }
+        );
         invalidateNavigationMenu();
     }
 
@@ -89,55 +129,82 @@ public abstract class NavigationActivity extends BaseFragmentActivity
         }
     }
 
+    public void setEnableSwitchingAccounts(boolean enableSwitchingAccounts) {
+        mEnableSwitchingAccounts = enableSwitchingAccounts;
+        invalidateNavigationMenu();
+    }
+
+    public boolean isEnableSwitchingAccounts() {
+        return mEnableSwitchingAccounts;
+    }
+
+    public boolean isSwitchingAccounts() {
+        return mSwitchingAccounts;
+    }
+
+    public void setSwitchingAccounts(boolean switchingAccounts) {
+        mSwitchingAccounts = switchingAccounts;
+        invalidateNavigationMenu();
+    }
+
+    public boolean toggleSwitchingAccounts() {
+        mSwitchingAccounts = !mSwitchingAccounts;
+        invalidateNavigationMenu();
+        return mSwitchingAccounts;
+    }
+
     public void setNavigationViewAppIconBitmap(Bitmap bm) {
-        ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
-                .setImageBitmap(bm);
+        mAppIconView.setImageBitmap(bm);
     }
 
     public void setNavigationViewAppIconDrawable(@Nullable Drawable drawable) {
-        ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
-                .setImageDrawable(drawable);
+        mAppIconView.setImageDrawable(drawable);
     }
 
     public void setNavigationViewAppIconResource(@DrawableRes int resId) {
-        ((ImageView) navigationView.getHeaderView(0).findViewById(R.id.imageViewAppIcon))
-                .setImageResource(resId);
+        mAppIconView.setImageResource(resId);
     }
 
     public void setHeaderBackground(Drawable drawable) {
-        //noinspection deprecation
-        navigationView.getHeaderView(0).findViewById(R.id.navigationHeader)
-                .setBackgroundDrawable(drawable);
+        ViewCompat.setBackground(mHeaderView, drawable);
     }
 
     public void setHeaderBackgroundColor(@ColorInt int color) {
-        navigationView.getHeaderView(0).findViewById(R.id.navigationHeader)
-                .setBackgroundColor(color);
+        mHeaderView.setBackgroundColor(color);
     }
 
     public void setHeaderBackgroundResource(@DrawableRes int resId) {
-        navigationView.getHeaderView(0).findViewById(R.id.navigationHeader)
-                .setBackgroundResource(resId);
+        mHeaderView.setBackgroundResource(resId);
     }
 
-    @Override
+    public void setNavigationTitle(CharSequence title) {
+        mTextViewAppTitle.setText(title);
+    }
+
+    /*@Override
     public void setTitle(CharSequence title) {
         super.setTitle(title);
-        if (textViewAppTitle != null) textViewAppTitle.setText(title);
+        if (mTextViewAppTitle != null) mTextViewAppTitle.setText(title);
+    }*/
+
+    @Override
+    public void onSaveInstanceState(Bundle outState, PersistableBundle outPersistentState) {
+        super.onSaveInstanceState(outState, outPersistentState);
+        outState.putBoolean(KEY_SWITCHING_ACCOUNTS, mSwitchingAccounts);
     }
 
     @Override
     protected void onDestroy() {
-        drawer = null;
-        navigationView = null;
-        textViewAppTitle = null;
+        mDrawer = null;
+        mNavigationView = null;
+        mTextViewAppTitle = null;
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        if (mDrawer.isDrawerOpen(GravityCompat.START)) {
+            mDrawer.closeDrawer(GravityCompat.START);
             return;
         }
 
@@ -151,26 +218,44 @@ public abstract class NavigationActivity extends BaseFragmentActivity
         super.onBackPressed();
     }
 
+    @SuppressLint("RestrictedApi")
     public void invalidateNavigationMenu() {
-        if (navigationView == null) return;
+        if (mNavigationView == null) return;
 
-        NavigationMenuPresenter presenter;
+        if (mEnableSwitchingAccounts) {
+            mTextViewAccountName.setText(onUpdateActiveAccountName());
+            mImageViewAccountChangeArrow.setImageResource(mSwitchingAccounts
+                    ? R.drawable.ic_arrow_drop_up
+                    : R.drawable.ic_arrow_drop_down);
+            mContainerAppTitle.setVisibility(View.GONE);
+            mContainerAccountsSwitch.setVisibility(View.VISIBLE);
+        } else {
+            mContainerAccountsSwitch.setVisibility(View.GONE);
+            mContainerAppTitle.setVisibility(View.VISIBLE);
+        }
+
+        NavigationMenuPresenter presenter = null;
         try {
             Field presenterField = NavigationView.class.getDeclaredField("mPresenter");
             presenterField.setAccessible(true);
-            presenter = (NavigationMenuPresenter) presenterField.get(navigationView);//this is HACK
+            presenter = (NavigationMenuPresenter) presenterField.get(mNavigationView);//this is HACK
         } catch (Exception e) {
             Log.w(LOG_TAG, "invalidateNavigationMenu - " +
                     "can't get menu presenter: can't get field from class", e);
-            return;
         }
 
         if (presenter != null) presenter.setUpdateSuspended(true);
 
-        Menu menu = navigationView.getMenu();
+        Menu menu = mNavigationView.getMenu();
         menu.clear();
-        onCreateNavigationMenu(menu);
-        setupMenuItemsClickListeners(menu);
+
+        if (mEnableSwitchingAccounts && mSwitchingAccounts) {
+            onCreateAccountNavigationMenu(menu);
+            // setupMenuItemsClickListeners(menu);
+        } else {
+            onCreateNavigationMenu(menu);
+            // setupMenuItemsClickListeners(menu);
+        }
         resetNavigationView(getCurrentFragment());
 
         if (presenter != null) {
@@ -179,7 +264,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity
         }
     }
 
-    private void setupMenuItemsClickListeners(Menu menu) {
+    /*private void setupMenuItemsClickListeners(@NonNull Menu menu) {
         Field listenerField;
         try {
             listenerField = MenuItemImpl.class.getDeclaredField("mClickListener");
@@ -196,12 +281,10 @@ public abstract class NavigationActivity extends BaseFragmentActivity
                 if (item instanceof MenuItemImpl) {
                     final SupportMenuItem.OnMenuItemClickListener listener =
                             (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//this is HACK
-                    listenerField.set(item, new SupportMenuItem.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            drawer.closeDrawer(GravityCompat.START);
-                            return listener != null && listener.onMenuItemClick(item);
-                        }
+                    listenerField.set(item, (SupportMenuItem.OnMenuItemClickListener) item1 -> {
+                        boolean result = listener != null && listener.onMenuItemClick(item1);
+                        mDrawer.closeDrawer(GravityCompat.START);
+                        return result;
                     });
                 } else throw new ClassCastException("Wrong class: " + item.getClass());
             } catch (Throwable e) {
@@ -210,11 +293,24 @@ public abstract class NavigationActivity extends BaseFragmentActivity
             }
             if (item.hasSubMenu()) setupMenuItemsClickListeners(item.getSubMenu());
         }
+    }*/
+
+    private void resetNavigationView(@Nullable Fragment currentFragment) {
+        if (mNavigationView == null) return;
+        if (mEnableSwitchingAccounts && mSwitchingAccounts) {
+            onUpdateSelectedAccountNavigationMenuItem(currentFragment, mNavigationView.getMenu());
+            mTextViewAccountName.setText(onUpdateActiveAccountName());
+        } else {
+            onUpdateSelectedNavigationMenuItem(currentFragment, mNavigationView.getMenu());
+        }
     }
 
-    private void resetNavigationView(Fragment currentFragment) {
-        if (navigationView == null) return;
-        onUpdateSelectedNavigationMenuItem(currentFragment, navigationView.getMenu());
+    protected boolean onCreateNavigationMenu(@NonNull Menu menu) {
+        return false;
+    }
+
+    protected boolean onCreateAccountNavigationMenu(@NonNull Menu menu) {
+        return false;
     }
 
     /**
@@ -224,7 +320,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity
      * @param menu            navigation menu
      * @return true if checked state of any item was changed
      */
-    protected boolean onUpdateSelectedNavigationMenuItem(@Nullable Fragment currentFragment, Menu menu) {
+    protected boolean onUpdateSelectedNavigationMenuItem(@Nullable Fragment currentFragment, @NonNull Menu menu) {
         if (currentFragment != null) {
             Log.e(LOG_TAG, "onUpdateSelectedNavigationMenuItem can't detect selected item for " + currentFragment.getClass() +
                     ", override method onUpdateSelectedNavigationMenuItem() and implement your own selected item detecting.");
@@ -238,12 +334,23 @@ public abstract class NavigationActivity extends BaseFragmentActivity
         return true;
     }
 
-    protected boolean onCreateNavigationMenu(Menu menu) {
+    protected boolean onUpdateSelectedAccountNavigationMenuItem(@Nullable Fragment currentFragment, @NonNull Menu menu) {
+        Log.e(LOG_TAG, "onUpdateSelectedAccountNavigationMenuItem can't update selected account item" +
+                ", override method onUpdateSelectedAccountNavigationMenuItem() and implement selected item detecting.");
         return false;
     }
 
-    @Override
+    protected CharSequence onUpdateActiveAccountName() {
+        Log.e(LOG_TAG, "onUpdateActiveAccountName can't get active account name" +
+                ", override method onUpdateActiveAccountName() and implement active account name detecting.");
+        return "";
+    }
+
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
+    public boolean onAccountNavigationItemSelected(@NonNull MenuItem item) {
         return false;
     }
 

@@ -18,11 +18,42 @@
         android:layout_height="wrap_content"
         android:contentDescription="@string/description_icon"/>
 
-    <TextView
-        android:id="@+id/textViewAppTitle"
+    <FrameLayout
+        android:id="@+id/container_app_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:textAppearance="?attr/titleTextAppearance"/>
+        android:visibility="visible">
+
+        <TextView
+            android:id="@+id/textViewAppTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/titleTextAppearance"/>
+    </FrameLayout>
+
+    <LinearLayout
+        android:id="@+id/container_accounts_switch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/nav_header_vertical_spacing"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/textViewAccountName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/titleTextAppearance"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/imageViewAccountChangeArrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_arrow_drop_down"
+            android:contentDescription="@string/description_drop_down_arrow" />
+    </LinearLayout>
 
 </LinearLayout>

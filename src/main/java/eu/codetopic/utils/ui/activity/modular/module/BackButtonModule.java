@@ -1,4 +1,4 @@
-package eu.codetopic.utils.ui.activity;
+package eu.codetopic.utils.ui.activity.modular.module;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

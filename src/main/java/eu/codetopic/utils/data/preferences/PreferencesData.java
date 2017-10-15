@@ -22,12 +22,7 @@ public abstract class PreferencesData {
     private final Context mContext;
     @Nullable private final String mFileName;
     private final int mSaveVersion;
-    private final OnSharedPreferenceChangeListener mPreferenceChangeListener = new OnSharedPreferenceChangeListener() {
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            onChanged(key);
-        }
-    };
+    private final OnSharedPreferenceChangeListener mPreferenceChangeListener = (sharedPreferences, key) -> onChanged(key);
     private SharedPreferences mPreferences;
     private boolean mCreated = false;
     private boolean mDestroyed = false;

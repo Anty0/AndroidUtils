@@ -33,6 +33,7 @@ import android.support.annotation.WorkerThread;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Base64;
+import android.widget.Toast;
 
 import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
@@ -283,6 +284,11 @@ public final class AndroidUtils {
     }
 
     @CheckResult
+    public static CharSequence getAppLabel(Context context) {
+        return context.getPackageManager().getApplicationLabel(context.getApplicationInfo());
+    }
+
+    @CheckResult
     public static Drawable getActivityIcon(Context context, ComponentName component) {
         PackageManager pm = context.getPackageManager();
         return pm.resolveActivity(new Intent().setComponent(component), 0).loadIcon(pm);
@@ -402,6 +408,23 @@ public final class AndroidUtils {
         }
 
         return true;
+    }
+
+    //////////////////////////////////////
+    //////REGION - INTENTS////////////////
+    //////////////////////////////////////
+
+    public static void openUri(@NonNull Context context, @NonNull String uri, @StringRes int failMessage) {
+        openUri(context, uri, context.getText(failMessage));
+    }
+
+    public static void openUri(@NonNull Context context, @NonNull String uri, @NonNull CharSequence failMessage) {
+        try {
+            context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+        } catch (Exception e) {
+            Log.w(LOG_TAG, e);
+            Toast.makeText(context, failMessage, Toast.LENGTH_SHORT).show();
+        }
     }
 
     //////////////////////////////////////
