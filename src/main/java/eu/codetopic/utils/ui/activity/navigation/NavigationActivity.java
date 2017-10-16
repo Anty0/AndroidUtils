@@ -25,6 +25,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -58,6 +59,7 @@ public abstract class NavigationActivity extends BaseFragmentActivity {
 
     private LinearLayout mContainerAccountsSwitch;
     private TextView mTextViewAccountName;
+    private ImageButton mImageButtonEditAccount;
     private ImageView mImageViewAccountChangeArrow;
 
     @Override
@@ -81,6 +83,8 @@ public abstract class NavigationActivity extends BaseFragmentActivity {
         mContainerAccountsSwitch = mHeaderView.findViewById(R.id.container_accounts_switch);
         mContainerAccountsSwitch.setOnClickListener(v -> toggleSwitchingAccounts());
         mTextViewAccountName = mContainerAccountsSwitch.findViewById(R.id.textViewAccountName);
+        mImageButtonEditAccount = mContainerAccountsSwitch.findViewById(R.id.imageButtonEditAccount);
+        mImageButtonEditAccount.setOnClickListener(this::onEditAccountButtonClick);
         mImageViewAccountChangeArrow = mContainerAccountsSwitch.findViewById(R.id.imageViewAccountChangeArrow);
 
         setNavigationViewAppIconDrawable(AndroidUtils.getActivityIcon(this, getComponentName()));
@@ -127,6 +131,14 @@ public abstract class NavigationActivity extends BaseFragmentActivity {
             Log.e(LOG_TAG, "onCreateMainFragment - provided wrong MainFragment", e);
             return null;
         }
+    }
+
+    public void setActiveAccountEditButtonEnabled(boolean enabled) {
+        mImageButtonEditAccount.setVisibility(enabled ? View.VISIBLE : View.GONE);
+    }
+
+    public boolean isActiveAccountEditButtonEnabled() {
+        return mImageButtonEditAccount.getVisibility() == View.VISIBLE;
     }
 
     public void setEnableSwitchingAccounts(boolean enableSwitchingAccounts) {
@@ -340,17 +352,21 @@ public abstract class NavigationActivity extends BaseFragmentActivity {
         return false;
     }
 
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
+    public boolean onAccountNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
+
     protected CharSequence onUpdateActiveAccountName() {
         Log.e(LOG_TAG, "onUpdateActiveAccountName can't get active account name" +
                 ", override method onUpdateActiveAccountName() and implement active account name detecting.");
         return "";
     }
 
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        return false;
-    }
-
-    public boolean onAccountNavigationItemSelected(@NonNull MenuItem item) {
+    protected boolean onEditAccountButtonClick(View v) {
         return false;
     }
 

@@ -48,12 +48,20 @@
             android:textAppearance="?attr/titleTextAppearance"
             android:layout_weight="1"/>
 
+        <ImageButton
+            android:id="@+id/imageButtonEditAccount"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:src="@drawable/ic_edit"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/description_edit_button"
+            android:visibility="gone" />
+
         <ImageView
             android:id="@+id/imageViewAccountChangeArrow"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="32dp"
             android:src="@drawable/ic_arrow_drop_down"
             android:contentDescription="@string/description_drop_down_arrow" />
     </LinearLayout>
-
 </LinearLayout>
