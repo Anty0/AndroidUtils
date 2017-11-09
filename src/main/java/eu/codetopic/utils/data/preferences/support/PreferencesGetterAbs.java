@@ -1,6 +1,7 @@
-package eu.codetopic.utils.data.preferences;
+package eu.codetopic.utils.data.preferences.support;
 
 import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.data.preferences.PreferencesData;
 
 public abstract class PreferencesGetterAbs<DT extends PreferencesData>
         implements DataGetter<DT> {
@@ -12,6 +13,6 @@ public abstract class PreferencesGetterAbs<DT extends PreferencesData>
 
     @Override
     public String getDataChangedBroadcastAction() {
-        return PreferencesData.getBroadcastActionChanged(get());
+        return get().getBroadcastActionChanged();
     }
 }

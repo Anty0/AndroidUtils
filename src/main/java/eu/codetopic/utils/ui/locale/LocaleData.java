@@ -4,14 +4,16 @@ import android.content.Context;
 import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.PrefNames;
-import eu.codetopic.utils.data.preferences.SharedPreferencesData;
+import eu.codetopic.utils.data.preferences.PreferencesData;
+import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider;
 
-public final class LocaleData extends SharedPreferencesData {
+public final class LocaleData extends PreferencesData {
 
     private static final int SAVE_VERSION = 0;
 
     public LocaleData(Context context) {
-        super(context, PrefNames.FILE_NAME_LOCALE_DATA, SAVE_VERSION);
+        super(context, new BasicSharedPreferencesProvider(context,
+                PrefNames.FILE_NAME_LOCALE_DATA, Context.MODE_PRIVATE), SAVE_VERSION);
     }
 
     public String getActualLanguage() {

@@ -2,25 +2,27 @@ package eu.codetopic.utils.data.preferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.data.preferences.provider.SharedPreferencesProvider;
 
 import static eu.codetopic.utils.PrefNames.LOGGED_IN;
 import static eu.codetopic.utils.PrefNames.PASSWORD;
 import static eu.codetopic.utils.PrefNames.USERNAME;
 
-public class LoginData extends SecuredPreferencesData {
+public class LoginData<SP extends SharedPreferences> extends PreferencesData<SP> {
 
     private static final String LOG_TAG = "LoginData";
 
     public static final String DEFAULT_ID = "default";
 
-    public LoginData(Context context, String fileName, int saveVersion) {
-        super(context, fileName, true, saveVersion);
+    public LoginData(Context context, @NonNull SharedPreferencesProvider<SP> preferencesProvider, int saveVersion) {
+        super(context, preferencesProvider, saveVersion);
     }
 
     private void log(String methodName, String id) {
-        Log.d(LOG_TAG, String.format("%s: { fileName: %s, id: %s}", methodName, getFileName(), id));
+        Log.d(LOG_TAG, String.format("%s: { name: %s, id: %s }", methodName, getName(), id));
     }
 
     protected String formatKey(String id, String key) {

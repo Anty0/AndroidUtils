@@ -5,10 +5,11 @@ import android.content.SharedPreferences;
 
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.getter.DataGetter;
-import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
-import eu.codetopic.utils.data.preferences.SharedPreferencesData;
+import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider;
+import eu.codetopic.utils.data.preferences.support.PreferencesGetterAbs;
+import eu.codetopic.utils.data.preferences.PreferencesData;
 
-public class DashboardData extends SharedPreferencesData {
+public class DashboardData extends PreferencesData {
 
     public static final DataGetter<DashboardData> getter = new DashboardDataGetter();
 
@@ -17,7 +18,8 @@ public class DashboardData extends SharedPreferencesData {
     private static DashboardData mInstance = null;
 
     private DashboardData(Context context) {
-        super(context, PrefNames.FILE_NAME_DASHBOARD_DATA, SAVE_VERSION);
+        super(context, new BasicSharedPreferencesProvider(context,
+                PrefNames.FILE_NAME_DASHBOARD_DATA, Context.MODE_PRIVATE), SAVE_VERSION);
     }
 
     public static void initialize(Context context) {

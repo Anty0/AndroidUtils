@@ -3,7 +3,6 @@ package eu.codetopic.utils.timing;
 import android.content.Context;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -11,10 +10,10 @@ import org.json.JSONException;
 import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.BuildConfig;
-import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.getter.DataGetter;
-import eu.codetopic.utils.data.preferences.PreferencesGetterAbs;
-import eu.codetopic.utils.data.preferences.SharedPreferencesData;
+import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider;
+import eu.codetopic.utils.data.preferences.support.PreferencesGetterAbs;
+import eu.codetopic.utils.data.preferences.PreferencesData;
 
 import static eu.codetopic.utils.PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE;
 import static eu.codetopic.utils.PrefNames.ADD_TIME_LAST_START;
@@ -24,7 +23,7 @@ import static eu.codetopic.utils.PrefNames.LAST_LOAD_VERSION_CODE;
 import static eu.codetopic.utils.PrefNames.WAS_LAST_NETWORK_RELOAD_CONNECTED;
 
 @MainThread
-public final class TimingData extends SharedPreferencesData {
+public final class TimingData extends PreferencesData {
 
     public static final DataGetter<TimingData> getter = new TimingDataGetter();
     private static final String LOG_TAG = "TimingData";
@@ -32,7 +31,8 @@ public final class TimingData extends SharedPreferencesData {
     private static TimingData mInstance = null;
 
     private TimingData(Context context) {
-        super(context, FILE_NAME_TIMING_DATA, SAVE_VERSION);
+        super(context, new BasicSharedPreferencesProvider(context,
+                FILE_NAME_TIMING_DATA, Context.MODE_PRIVATE), SAVE_VERSION);
     }
 
     static void initialize(Context context) {

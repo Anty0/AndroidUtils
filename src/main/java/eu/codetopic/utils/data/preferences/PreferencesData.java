@@ -4,47 +4,75 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 
-import com.google.gson.Gson;
-
 import eu.codetopic.utils.PrefNames;
-import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.data.preferences.provider.SharedPreferencesProvider;
+import eu.codetopic.utils.data.preferences.support.NoApplyPreferencesEditor;
 
-public abstract class PreferencesData {
+public abstract class PreferencesData<SP extends SharedPreferences> {
 
-    public static final String EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY";
-    protected static final Gson GSON = new Gson();
     private static final String LOG_TAG = "PreferencesData";
-    private final Context mContext;
-    @Nullable private final String mFileName;
-    private final int mSaveVersion;
+
+    private static final String ACTION_DATA_CHANGED_BASE =
+            "eu.codetopic.utils.data.preferences.PreferencesData.PREFERENCES_CHANGED.$1%s";
+    public static final String EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY";
+
     private final OnSharedPreferenceChangeListener mPreferenceChangeListener = (sharedPreferences, key) -> onChanged(key);
-    private SharedPreferences mPreferences;
+
+    private final Context mContext;
+    private final SharedPreferencesProvider<SP> mPreferencesProvider;
+    private final int mSaveVersion;
+
     private boolean mCreated = false;
     private boolean mDestroyed = false;
 
-    public PreferencesData(Context context, @Nullable String fileName, int saveVersion) {
+    public PreferencesData(Context context, @NonNull SharedPreferencesProvider<SP> preferencesProvider, int saveVersion) {
         mContext = context.getApplicationContext();
-        mFileName = fileName;
+        mPreferencesProvider = preferencesProvider;
         mSaveVersion = saveVersion;
     }
 
-    public static String getBroadcastActionChanged(@NonNull DataGetter<? extends PreferencesData> dataGetter) {
-        return getBroadcastActionChanged(dataGetter.get());
+    private static String getBroadcastActionChanged(@NonNull PreferencesData data) {
+        String name = data.getName();
+        return String.format(ACTION_DATA_CHANGED_BASE, (name == null ? "default" : name));
     }
 
-    public static String getBroadcastActionChanged(@NonNull PreferencesData data) {
-        String fileName = data.getFileName();
-        return SharedPreferencesData.class.getName() + ".PREFERENCES_CHANGED" + (fileName == null ? "" : "." + fileName);
+    public final String getBroadcastActionChanged() {
+        return getBroadcastActionChanged(this);
     }
 
     private Intent generateIntentActionChanged(String changedKey) {
-        return new Intent(getBroadcastActionChanged(this))
-                .putExtra(EXTRA_CHANGED_DATA_KEY, changedKey);
+        return new Intent(this.getBroadcastActionChanged())
+                .putExtra(EXTRA_CHANGED_DATA_KEY, changedKey)
+                .putExtras(getAdditionalDataChangedExtras(changedKey));
+    }
+
+    protected Bundle getAdditionalDataChangedExtras(String changedKey) {
+        return new Bundle();
+    }
+
+    public Context getContext() {
+        return mContext;
+    }
+
+    @Nullable
+    public String getName() {
+        return mPreferencesProvider.getName();
+    }
+
+    protected synchronized SharedPreferences getPreferences() {
+        if (!mCreated) throw new IllegalStateException(LOG_TAG + " is not initialized");
+        if (mDestroyed) throw new IllegalStateException(LOG_TAG + " is still destroyed");
+        return mPreferencesProvider.getSharedPreferences();
+    }
+
+    protected synchronized SharedPreferences.Editor edit() {
+        return getPreferences().edit();
     }
 
     public final synchronized void init() {
@@ -69,47 +97,32 @@ public abstract class PreferencesData {
 
     @CallSuper
     protected synchronized void onCreate() {
-        mPreferences = createSharedPreferences();
-        mPreferences.registerOnSharedPreferenceChangeListener(mPreferenceChangeListener);
+        getPreferences().registerOnSharedPreferenceChangeListener(mPreferenceChangeListener);
         checkUpgrade(mSaveVersion);
     }
-
-    protected abstract SharedPreferences createSharedPreferences();
 
     private synchronized void checkUpgrade(int saveVersion) {
         int actualVersion = getPreferences().getInt(PrefNames.DATA_SAVE_VERSION, -1);
         if (actualVersion != saveVersion) {
             SharedPreferences.Editor editor = edit();
-            if (saveVersion > actualVersion) onUpgrade(editor, actualVersion, saveVersion);
-            else onDowngrade(editor, actualVersion, saveVersion);
+
+            NoApplyPreferencesEditor noApplyEditor = new  NoApplyPreferencesEditor(editor,
+                    "Don't call methods editor.apply() or editor.commit() " +
+                            "during onUpgrade() or onDowngrade(). Changes will be saved later automatically.");
+            if (saveVersion > actualVersion) onUpgrade(noApplyEditor, actualVersion, saveVersion);
+            else onDowngrade(noApplyEditor, actualVersion, saveVersion);
+
             editor.putInt(PrefNames.DATA_SAVE_VERSION, saveVersion).apply();
         }
     }
 
-    public Context getContext() {
-        return mContext;
-    }
-
-    @Nullable
-    public String getFileName() {
-        return mFileName;
-    }
-
-    protected synchronized SharedPreferences getPreferences() {
-        if (!mCreated) throw new IllegalStateException(LOG_TAG + " is not initialized");
-        if (mDestroyed) throw new IllegalStateException(LOG_TAG + " is still destroyed");
-        return mPreferences;
-    }
-
-    protected synchronized SharedPreferences.Editor edit() {
-        return getPreferences().edit();
-    }
-
     protected synchronized void onUpgrade(SharedPreferences.Editor editor, int from, int to) {
+        // Default implementation will just throw all data away.
         editor.clear();
     }
 
     protected synchronized void onDowngrade(SharedPreferences.Editor editor, int from, int to) {
+        // Default implementation should not support downgrading, so we will just throw exception.
         throw new UnsupportedOperationException("Version code cannot be downgraded");
     }
 
@@ -120,8 +133,7 @@ public abstract class PreferencesData {
 
     @CallSuper
     protected synchronized void onDestroy() {
-        mPreferences.unregisterOnSharedPreferenceChangeListener(mPreferenceChangeListener);
-        mPreferences = null;
+        getPreferences().unregisterOnSharedPreferenceChangeListener(mPreferenceChangeListener);
     }
 
     public final synchronized void destroy() {
@@ -140,10 +152,9 @@ public abstract class PreferencesData {
 
     @Override
     public String toString() {
-        return "SharedPreferencesData{" +
-                "mFileName='" + mFileName + '\'' +
+        return "PreferencesData{" +
                 ", mSaveVersion=" + mSaveVersion +
-                ", mPreferences=" + mPreferences +
+                ", mPreferencesProvider=" + mPreferencesProvider +
                 ", mCreated=" + mCreated +
                 ", mDestroyed=" + mDestroyed +
                 '}';
