@@ -16,15 +16,11 @@ class BasicSharedPreferencesProvider(context: Context, private val fileName: Str
         else context.getSharedPreferences(fileName, preferencesOperatingMode)
     }
 
-    override fun getName(): String? {
-        return "BasicSharedPreferences.$1%s".format(fileName ?: "default")
-    }
+    override fun getName(): String? = "BasicSharedPreferences.$1%s".format(fileName ?: "default")
 
-    override fun getSharedPreferences(): SharedPreferences {
-        return preferences
-    }
+    override fun getSharedPreferences(): SharedPreferences = preferences
 
-    override fun toString(): String {
-        return "BasicSharedPreferencesProvider(fileName=$fileName, preferences=$preferences, preferencesOperatingMode=$preferencesOperatingMode)"
-    }
+    override fun toString(): String =
+            "BasicSharedPreferencesProvider(fileName=$fileName, preferences=$preferences," +
+                    " preferencesOperatingMode=$preferencesOperatingMode)"
 }

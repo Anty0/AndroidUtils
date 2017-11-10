@@ -21,7 +21,7 @@ android {
     }
     buildTypes {
         def proguardFilesList = ['proguard-rules.pro']
-        proguardFilesList.addAll(file('./proguard/').list().collect())
+        proguardFilesList.addAll(file('./proguard/').listFiles().collect())
         release {
             consumerProguardFiles Iterables.toArray(proguardFilesList, Object.class)
 

@@ -35,15 +35,10 @@ class SecureSharedPreferencesProvider(context: Context, private val fileName: St
         }
     }
 
-    override fun getName(): String? {
-        return "SecureSharedPreferences.$1%s".format(fileName)
-    }
+    override fun getName(): String? = "SecureSharedPreferences.$1%s".format(fileName)
 
-    override fun getSharedPreferences(): SecurePreferences {
-        return preferences
-    }
+    override fun getSharedPreferences(): SecurePreferences = preferences
 
-    override fun toString(): String {
-        return "SecureSharedPreferencesProvider(fileName='$fileName', preferences=$preferences)"
-    }
+    override fun toString(): String =
+            "SecureSharedPreferencesProvider(fileName='$fileName', preferences=$preferences)"
 }

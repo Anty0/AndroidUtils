@@ -31,7 +31,7 @@ public abstract class PreferencesData<SP extends SharedPreferences> {
     private boolean mCreated = false;
     private boolean mDestroyed = false;
 
-    public PreferencesData(Context context, @NonNull SharedPreferencesProvider<SP> preferencesProvider, int saveVersion) {
+    public PreferencesData(@NonNull Context context, @NonNull SharedPreferencesProvider<SP> preferencesProvider, int saveVersion) {
         mContext = context.getApplicationContext();
         mPreferencesProvider = preferencesProvider;
         mSaveVersion = saveVersion;
