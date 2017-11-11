@@ -3,8 +3,8 @@ package eu.codetopic.utils.data.preferences.provider
 import android.content.Context
 import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
 
-class ContentProviderPreferencesProvider(context: Context, private val authority: String)
-    : SharedPreferencesProvider<ContentProviderSharedPreferences> {
+class ContentProviderPreferencesProvider(context: Context, private val authority: String) :
+        ISharedPreferencesProvider<ContentProviderSharedPreferences> {
 
     private val preferences = createPreferences(context.applicationContext)
 

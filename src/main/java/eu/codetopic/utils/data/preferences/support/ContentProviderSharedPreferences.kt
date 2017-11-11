@@ -15,8 +15,8 @@ import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Co
 import java.util.*
 
 class ContentProviderSharedPreferences private constructor(
-        private val context: Context, private val authority: String)
-    : SharedPreferences {
+        private val context: Context, private val authority: String) :
+        SharedPreferences {
 
     companion object {
 

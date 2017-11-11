@@ -16,19 +16,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.data.preferences.support
+package eu.codetopic.utils.data.preferences.provider
 
 import android.content.SharedPreferences
 
-class NoApplyPreferencesEditor(private val editor : SharedPreferences.Editor,
-                               private val throwableMessage: String = "Changes in this editor cannot be saved from this context!")
-    : SharedPreferences.Editor by editor {
+/**
+ * Created by anty on 11/8/17.
+ * @author anty
+ */
+interface ISharedPreferencesProvider<out SP : SharedPreferences> {
 
-    override fun commit(): Boolean {
-        throw UnsupportedOperationException(throwableMessage)
-    }
+    fun getName(): String?
 
-    override fun apply() {
-        throw UnsupportedOperationException(throwableMessage)
-    }
+    fun getSharedPreferences(): SP
 }

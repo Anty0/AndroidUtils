@@ -1,9 +1,9 @@
 package eu.codetopic.utils.data.preferences.support;
 
 import eu.codetopic.utils.data.getter.DataGetter;
-import eu.codetopic.utils.data.preferences.PreferencesData;
+import eu.codetopic.utils.data.preferences.IPreferencesData;
 
-public abstract class PreferencesGetterAbs<DT extends PreferencesData>
+public abstract class PreferencesGetterAbs<DT extends IPreferencesData>
         implements DataGetter<DT> {
 
     @Override

@@ -1,13 +1,15 @@
 package eu.codetopic.utils.ui.locale;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
 
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.preferences.PreferencesData;
+import eu.codetopic.utils.data.preferences.VersionedPreferencesData;
 import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider;
 
-public final class LocaleData extends PreferencesData {
+public final class LocaleData extends VersionedPreferencesData<SharedPreferences> {
 
     private static final int SAVE_VERSION = 0;
 

@@ -1,9 +1,11 @@
 package eu.codetopic.utils.ids;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 
 import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.data.preferences.PreferencesData;
+import eu.codetopic.utils.data.preferences.VersionedPreferencesData;
 import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider;
 
 import static eu.codetopic.utils.PrefNames.ADD_LAST_ID;
@@ -11,7 +13,7 @@ import static eu.codetopic.utils.PrefNames.FILE_NAME_IDENTIFIERS;
 import static eu.codetopic.utils.PrefNames.ID_TYPE_NOTIFICATION_ID;
 import static eu.codetopic.utils.PrefNames.ID_TYPE_REQUEST_CODE;
 
-public class Identifiers extends PreferencesData {
+public final class Identifiers extends VersionedPreferencesData<SharedPreferences> {
 
     public static final Type TYPE_REQUEST_CODE = new Type(ID_TYPE_REQUEST_CODE);
     public static final Type TYPE_NOTIFICATION_ID = new Type(ID_TYPE_NOTIFICATION_ID);

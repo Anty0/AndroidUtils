@@ -4,8 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 
-class BasicSharedPreferencesProvider(context: Context, private val fileName: String? = null, preferencesOperatingMode: Int = Context.MODE_PRIVATE)
-    : SharedPreferencesProvider<SharedPreferences> {
+class BasicSharedPreferencesProvider(context: Context, private val fileName: String? = null,
+                                     preferencesOperatingMode: Int = Context.MODE_PRIVATE) :
+        ISharedPreferencesProvider<SharedPreferences> {
 
     private val preferences = createPreferences(context.applicationContext, preferencesOperatingMode)
 

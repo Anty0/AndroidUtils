@@ -1,6 +1,7 @@
 package eu.codetopic.utils.timing;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 
@@ -11,9 +12,9 @@ import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.BuildConfig;
 import eu.codetopic.utils.data.getter.DataGetter;
+import eu.codetopic.utils.data.preferences.VersionedPreferencesData;
 import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider;
 import eu.codetopic.utils.data.preferences.support.PreferencesGetterAbs;
-import eu.codetopic.utils.data.preferences.PreferencesData;
 
 import static eu.codetopic.utils.PrefNames.ADD_LAST_BROADCAST_REQUEST_CODE;
 import static eu.codetopic.utils.PrefNames.ADD_TIME_LAST_START;
@@ -23,11 +24,13 @@ import static eu.codetopic.utils.PrefNames.LAST_LOAD_VERSION_CODE;
 import static eu.codetopic.utils.PrefNames.WAS_LAST_NETWORK_RELOAD_CONNECTED;
 
 @MainThread
-public final class TimingData extends PreferencesData {
+public final class TimingData extends VersionedPreferencesData<SharedPreferences> {
 
     public static final DataGetter<TimingData> getter = new TimingDataGetter();
+
     private static final String LOG_TAG = "TimingData";
     private static final int SAVE_VERSION = 0;
+
     private static TimingData mInstance = null;
 
     private TimingData(Context context) {
@@ -43,7 +46,7 @@ public final class TimingData extends PreferencesData {
 
     boolean isFirstLoad() {
         if (BuildConfig.DEBUG)
-            return true;//fixes reinstall of application without increasing version code
+            return true; // fixes reinstall of application without increasing version code
 
         int versionCode = AndroidUtils.getApplicationVersionCode(getContext());
         int lastVersionCode = getPreferences().getInt(LAST_LOAD_VERSION_CODE, -1);

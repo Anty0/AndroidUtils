@@ -1,22 +1,25 @@
 package eu.codetopic.utils.data.preferences.support
 
 import android.content.ContentProvider
-import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.SharedPreferences
 import android.database.Cursor
 import android.net.Uri
-import eu.codetopic.utils.data.preferences.provider.SharedPreferencesProvider
+import android.support.annotation.CallSuper
+import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import eu.codetopic.utils.simple.SimpleMultiColumnCursor
 
-abstract class ContentProviderPreferences<out SP : SharedPreferences>(private val authority: String) : ContentProvider() {
+abstract class ContentProviderPreferences<out SP : SharedPreferences>(
+        private val authority: String) : ContentProvider() {
 
-    private lateinit var preferencesProvider: SharedPreferencesProvider<SP>
+    private lateinit var preferencesProvider: ISharedPreferencesProvider<SP>
 
-    protected val sharedPreferences get() = preferencesProvider.getSharedPreferences()
+    protected val name: String? get() = preferencesProvider.getName()
+
+    protected val preferences: SP get() = preferencesProvider.getSharedPreferences()
 
     protected fun edit(block: SharedPreferences.Editor.() -> Unit) =
-            sharedPreferences.edit().apply { block() }.apply()
+            preferences.edit().apply { block() }.apply()
 
     companion object {
 
@@ -70,12 +73,13 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(private va
         }
     }
 
+    @CallSuper
     override fun onCreate(): Boolean {
         preferencesProvider = onPreparePreferencesProvider()
         return true
     }
 
-    abstract fun onPreparePreferencesProvider(): SharedPreferencesProvider<SP>
+    abstract fun onPreparePreferencesProvider(): ISharedPreferencesProvider<SP>
 
     override fun getType(uri: Uri): String? {
         return null
@@ -116,22 +120,22 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(private va
             }
             Segment.DATA -> {
                 if (uri.getBooleanQueryParameter(Query.ALL_KEYS, false)) {
-                    return cursorOf(sharedPreferences.all)
+                    return cursorOf(preferences.all)
                 }
 
                 return cursorOf(uri.getQueryParameters(Query.KEY).map {
-                    it to sharedPreferences.getString(it, null)
+                    it to preferences.getString(it, null)
                 }.toMap())
             }
             Segment.CONTAINS -> {
                 if (uri.getBooleanQueryParameter(Query.ALL_KEYS, false)) {
-                    return cursorOf(sharedPreferences.all.keys.map {
+                    return cursorOf(preferences.all.keys.map {
                         it to true
                     }.toMap())
                 }
 
                 return cursorOf(uri.getQueryParameters(Query.KEY).map {
-                    it to sharedPreferences.contains(it)
+                    it to preferences.contains(it)
                 }.toMap())
             }
         }

@@ -4,7 +4,7 @@ public final class PrefNames {
 
     // SharedPreferencesData
     public static final String DATA_SAVE_VERSION = "DATA_SAVE_VERSION";
-    // LoginData
+    // LoginDataExtension
     public static final String USERNAME = "LOGIN";
     public static final String PASSWORD = "PASSWORD";
     public static final String LOGGED_IN = "LOGGED_IN";

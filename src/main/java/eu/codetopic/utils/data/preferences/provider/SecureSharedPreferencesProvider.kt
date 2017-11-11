@@ -5,8 +5,9 @@ import com.securepreferences.SecurePreferences
 import eu.codetopic.java.utils.log.Log
 
 class SecureSharedPreferencesProvider(context: Context, private val fileName: String,
-                                      password: String = DEFAULT_PASSWORD, clearOnFail: Boolean = false)
-    : SharedPreferencesProvider<SecurePreferences> {
+                                      password: String = DEFAULT_PASSWORD,
+                                      clearOnFail: Boolean = false) :
+        ISharedPreferencesProvider<SecurePreferences> {
 
     companion object {
         private const val LOG_TAG = "SecureSharedPreferencesProvider"
