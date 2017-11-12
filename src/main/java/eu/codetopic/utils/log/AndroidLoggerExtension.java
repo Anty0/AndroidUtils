@@ -57,12 +57,7 @@ public final class AndroidLoggerExtension {
             public void onLogged(final LogLine logLine) {
                 if (!Log.isInDebugMode()) return;
 
-                JobUtils.runOnMainThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        ErrorInfoActivity.start(appContext, logLine);
-                    }
-                });
+                JobUtils.runOnMainThread(() -> ErrorInfoActivity.start(appContext, logLine));
             }
         });
     }

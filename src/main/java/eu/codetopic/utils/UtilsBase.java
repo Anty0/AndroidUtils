@@ -54,13 +54,13 @@ public final class UtilsBase {
             throw new IllegalStateException(LOG_TAG + " is still initialized");
 
         profiles = ArrayTools.add(profiles, new ProcessProfile(
-                app.getPackageName() + ":leakcanary", InitType.DISABLE_UTILS
-        ));  // LeakCanary process
+                app.getPackageName() + ":leakcanary", InitType.NONE
+        ));  // add LeakCanary process profile
 
         String processName = AndroidUtils.getCurrentProcessName();
         if (processName == null) {
             Log.e(LOG_TAG, "initialize", new RuntimeException(
-                    "Can't get CurrentProcessName, using default ProcessName"));
+                    "Can't get CurrentProcessName, using main process name"));
             processName = app.getPackageName();
         }
 
@@ -70,8 +70,8 @@ public final class UtilsBase {
             return;
         }
         Log.e(LOG_TAG, "initialize", new IllegalStateException("Can't find ProcessName ("
-                + processName + "), in provided ProcessProfiles, using empty ProcessProfile"));
-        setActiveProfile(app, new ProcessProfile(processName, InitType.DISABLE_UTILS));
+                + processName + "), in provided ProcessProfiles, using empty ProcessProfile (utils will be disabled)"));
+        setActiveProfile(app, new ProcessProfile(processName, InitType.NONE));
     }
 
     private static void setActiveProfile(Application app, ProcessProfile activeProfile) {
@@ -84,16 +84,15 @@ public final class UtilsBase {
     }
 
     private static void completeInit(Application app) {
-        android.util.Log.d(AndroidUtils.getApplicationLabel(app).toString(), "INITIALIZING {"
+        android.util.Log.d(AndroidUtils.getApplicationLabel(app).toString(), "INITIALIZING:"
                 + "\n    - PROCESS_PROFILE=" + ACTIVE_PROFILE
                 + "\n    - DEBUG=" + BuildConfig.DEBUG
                 + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE
                 + "\n    - VERSION_NAME=" + AndroidUtils.getApplicationVersionName(app)
-                + "\n    - VERSION_CODE=" + AndroidUtils.getApplicationVersionCode(app)
-                + "\n}");
+                + "\n    - VERSION_CODE=" + AndroidUtils.getApplicationVersionCode(app));
 
         InitType initType = ACTIVE_PROFILE.getUtilsInitType();
-        if (initType.isUtilsEnabled()) {
+        if (initType.isEnabled()) {
             if (!LeakCanary.isInAnalyzerProcess(app)) {
                 LeakCanary.install(app);
             }
@@ -104,7 +103,7 @@ public final class UtilsBase {
             JobUtils.initialize(app);
             BroadcastsConnector.initialize(app);
 
-            if (!initType.isMultiProcessModeEnabled()) {
+            if (!initType.isStorageUsed()) {
                 Identifiers.initialize(app);
             }
 
@@ -127,22 +126,32 @@ public final class UtilsBase {
     }
     
     public enum InitType {
-        INIT_MULTI_PROCESS_MODE(true, true), INIT_NORMAL_MODE(true, false),
-        DISABLE_UTILS(false, false);
+        PRIMARY_PROCESS(true, true), // Enable everything
+        ANOTHER_PROCESS(true, false), // Enable, but leave Identifiers storage disabled
+        NORMAL(true, true), // Enable everything (alias for PRIMARY_PROCESS)
+        NONE(false, false); // Disable everything
         
-        private final boolean utilsEnabled, multiProcessModeEnabled;
+        private final boolean enable, storeData;
 
-        InitType(boolean utilsEnabled, boolean multiProcessModeEnabled) {
-            this.utilsEnabled = utilsEnabled;
-            this.multiProcessModeEnabled = multiProcessModeEnabled;
+        InitType(boolean enable, boolean storeData) {
+            this.enable = enable;
+            this.storeData = storeData;
         }
         
-        public boolean isUtilsEnabled() {
-            return utilsEnabled;
+        public boolean isEnabled() {
+            return enable;
         }
         
-        public boolean isMultiProcessModeEnabled() {
-            return multiProcessModeEnabled;
+        public boolean isStorageUsed() {
+            return storeData;
+        }
+
+        @Override
+        public String toString() {
+            return "InitType{" +
+                    "enable=" + enable +
+                    ", storeData=" + storeData +
+                    '}';
         }
     }
 

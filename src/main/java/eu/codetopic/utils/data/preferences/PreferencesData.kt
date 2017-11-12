@@ -33,6 +33,18 @@ abstract class PreferencesData<out SP : SharedPreferences> (
         context: Context, private val preferencesProvider: ISharedPreferencesProvider<SP>) :
         IPreferencesData {
 
+    companion object {
+
+        private const val LOG_TAG = "PreferencesData"
+
+        private const val ACTION_DATA_CHANGED_BASE = "eu.codetopic.utils.data.preferences.PreferencesData.PREFERENCES_CHANGED.$1%s"
+        const val EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY"
+
+        private fun getBroadcastActionChanged(data: PreferencesData<*>): String {
+            return String.format(ACTION_DATA_CHANGED_BASE, data.name ?: "default")
+        }
+    }
+
     private val preferenceChangeListener = { _: SharedPreferences, key: String -> onChanged(key) }
 
     protected val context: Context = context.applicationContext
@@ -59,18 +71,6 @@ abstract class PreferencesData<out SP : SharedPreferences> (
             return preferencesProvider.getSharedPreferences()
         }
 
-    companion object {
-
-        private const val LOG_TAG = "PreferencesData"
-
-        private const val ACTION_DATA_CHANGED_BASE = "eu.codetopic.utils.data.preferences.PreferencesData.PREFERENCES_CHANGED.$1%s"
-        const val EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY"
-
-        private fun getBroadcastActionChanged(data: PreferencesData<*>): String {
-            return String.format(ACTION_DATA_CHANGED_BASE, data.name ?: "default")
-        }
-    }
-
     private fun generateIntentActionChanged(changedKey: String): Intent {
         return Intent(this.broadcastActionChanged)
                 .putExtra(EXTRA_CHANGED_DATA_KEY, changedKey)
@@ -81,7 +81,8 @@ abstract class PreferencesData<out SP : SharedPreferences> (
         return Bundle()
     }
 
-    @Deprecated("Use new edit(block)")
+    @Suppress("DeprecatedCallableAddReplaceWith")
+    @Deprecated("Migrate to Kotlin and use new edit(block) instead.")
     @SuppressLint("CommitPrefEdits")
     protected fun edit(): SharedPreferences.Editor = preferences.edit()
 

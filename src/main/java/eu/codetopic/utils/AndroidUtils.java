@@ -432,16 +432,18 @@ public final class AndroidUtils {
     //////REGION - INTENTS////////////////
     //////////////////////////////////////
 
-    public static void openUri(@NonNull Context context, @NonNull String uri, @StringRes int failMessage) {
-        openUri(context, uri, context.getText(failMessage));
+    public static boolean openUri(@NonNull Context context, @NonNull String uri, @StringRes int failMessage) {
+        return openUri(context, uri, context.getText(failMessage));
     }
 
-    public static void openUri(@NonNull Context context, @NonNull String uri, @NonNull CharSequence failMessage) {
+    public static boolean openUri(@NonNull Context context, @NonNull String uri, @NonNull CharSequence failMessage) {
         try {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
+            return true;
         } catch (Exception e) {
             Log.w(LOG_TAG, e);
             Toast.makeText(context, failMessage, Toast.LENGTH_SHORT).show();
+            return false;
         }
     }
 
