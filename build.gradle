@@ -95,6 +95,8 @@ dependencies {
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary_version"
     androidTestImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary_version"
 
+    debugImplementation 'im.dino:dbinspector:3.4.1@aar'
+
     implementation 'com.infstory:proguard-annotations:1.0.2'
     implementation 'com.j256.ormlite:ormlite-android:5.0'
     implementation 'com.birbit:android-priority-jobqueue:2.0.1'

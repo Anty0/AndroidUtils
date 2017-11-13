@@ -194,7 +194,7 @@ public final class BroadcastsConnector extends BroadcastReceiver {
         GLOBAL, LOCAL
     }
 
-    public static class Connection {
+    public static class Connection { // TODO: Add option to pass filter lambda function
 
         private final BroadcastTargetingType targetingType;
         @NonNull private final Intent intent;
