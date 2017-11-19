@@ -102,4 +102,10 @@ dependencies {
     implementation 'com.j256.ormlite:ormlite-android:5.0'
     implementation 'com.birbit:android-priority-jobqueue:2.0.1'
     implementation 'com.scottyab:secure-preferences-lib:0.1.4'
+
+    implementation 'org.jsoup:jsoup:1.10.3'
+    implementation 'com.google.guava:guava:23.0-android'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2' // fixes bug with dependencies (guava depends on old version of this library)
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'commons-io:commons-io:2.5'
 }

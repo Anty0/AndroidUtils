@@ -19,7 +19,7 @@
 package eu.codetopic.utils.thread.service;
 
 import android.content.Context;
-import android.support.v7.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat;
 
 import com.birbit.android.jobqueue.JobManager;
 
