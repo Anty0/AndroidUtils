@@ -16,54 +16,50 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.data.preferences.support
+package eu.codetopic.utils.data.preferences.preference
 
-import com.google.gson.Gson
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import eu.codetopic.utils.edit
-import java.lang.reflect.Type
 import kotlin.reflect.KProperty
 
 /**
  * @author anty
  */
-class GsonPreference<T>(val key: String, private val gson: Gson, private val typeOfT: Type,
-                        private val preferencesAccessor: ISharedPreferencesProvider<*>,
-                        private val defaultValue: () -> T) {
+abstract class PreferenceAbs<T> {
 
     companion object {
 
-        private val LOG_TAG = "GsonPreference"
+        private const val LOG_TAG = "PreferenceAbs"
 
-        val DEFAULT_ID = "default"
+        const val DEFAULT_ID = "default"
     }
 
-    private fun formatKey(id: String?): String {
+    abstract val name: String?
+    abstract val key: String
+    protected abstract val fallBackValue: T
+
+    protected open fun formatKey(id: String?): String {
         return "ID{${id ?: DEFAULT_ID}}-$key"
     }
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    operator open fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return getValue(thisRef, null)
     }
 
-    operator fun getValue(thisRef: Any?, property: KProperty<*>, id: String?): T {
+    operator open fun getValue(thisRef: Any?, property: KProperty<*>, id: String?): T {
         return getValue(thisRef, id)
     }
 
-    fun getValue(syncObj: Any?, id: String? = null): T {
-        synchronized(syncObj ?: this) {
+    open fun getValue(syncObj: Any?, id: String? = null): T {
+        return synchronized(syncObj ?: this) {
             try {
-                return gson.fromJson(
-                        preferencesAccessor.preferences.getString(formatKey(id), null)
-                                ?: return defaultValue(),
-                        typeOfT)
+                getValue(formatKey(id))
             } catch (e: Exception) {
-                Log.e(preferencesAccessor.name, "${formatKey(id)}: Failed to load", e)
-                return defaultValue()
+                Log.e(name ?: LOG_TAG, "${formatKey(id)}: Failed to load", e); fallBackValue
             }
         }
     }
+
+    protected abstract fun getValue(key: String): T
 
     operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
         setValue(thisRef, null, value)
@@ -76,14 +72,24 @@ class GsonPreference<T>(val key: String, private val gson: Gson, private val typ
     fun setValue(syncObj: Any?, id: String?, value: T) {
         synchronized(syncObj ?: this) {
             try {
-                preferencesAccessor.preferences.edit {
-                    putString(formatKey(id), gson.toJson(value))
-                }
+                setValue(formatKey(id), value)
             } catch (e: Exception) {
-                Log.e(preferencesAccessor.name, "${formatKey(id)}: Failed to save", e)
+                Log.e(name ?: LOG_TAG, "${formatKey(id)}: Failed to save", e)
             }
         }
     }
 
-    val isSet: Boolean @Synchronized get() = preferencesAccessor.preferences.contains(key)
+    protected abstract fun setValue(key: String, value: T)
+
+    open fun isSet(syncObj: Any?, id: String? = null): Boolean {
+        return synchronized(syncObj ?: this) {
+            try {
+                isSet(formatKey(id))
+            } catch (e: Exception) {
+                Log.e(name ?: LOG_TAG, "${formatKey(id)}: Failed check if is set", e); false
+            }
+        }
+    }
+
+    protected abstract fun isSet(key: String): Boolean
 }
