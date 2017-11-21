@@ -1,19 +1,17 @@
 /*
- * ApplicationPurkynka
- * Copyright (C)  2017  anty
+ * Copyright 2017 Jiří Kuchyňka (Anty)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package eu.codetopic.utils.data.preferences.support
@@ -25,6 +23,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.support.annotation.CallSuper
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
+import eu.codetopic.utils.edit
 import eu.codetopic.utils.simple.SimpleMultiColumnCursor
 
 abstract class ContentProviderPreferences<out SP : SharedPreferences>(
@@ -32,12 +31,9 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
     private lateinit var preferencesProvider: ISharedPreferencesProvider<SP>
 
-    protected val name: String? get() = preferencesProvider.getName()
+    protected val name: String? get() = preferencesProvider.name
 
-    protected val preferences: SP get() = preferencesProvider.getSharedPreferences()
-
-    protected fun edit(block: SharedPreferences.Editor.() -> Unit) =
-            preferences.edit().apply { block() }.apply()
+    protected val preferences: SP get() = preferencesProvider.preferences
 
     companion object {
 
@@ -123,14 +119,14 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
             Segment.CONTROL -> {
                 if (uri.getBooleanQueryParameter(Query.ALL_KEYS, false)) {
                     return cursorOf(mapOf(
-                            Segment.CONTROL_VALUE_NAME to preferencesProvider.getName()
+                            Segment.CONTROL_VALUE_NAME to name
                     ))
                 }
 
                 return cursorOf(uri.getQueryParameters(Query.KEY).map {
                     when (it) {
                         Segment.CONTROL_VALUE_NAME -> {
-                            Segment.CONTROL_VALUE_NAME to preferencesProvider.getName()
+                            Segment.CONTROL_VALUE_NAME to name
                         }
                         else -> it to null
                     }
@@ -165,10 +161,10 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return null
 
-        when (path[0]) {
-            Segment.CONTROL -> return null // Control values cannot be edited
+        return when (path[0]) {
+            Segment.CONTROL -> null // Control values cannot be edited
             Segment.DATA -> {
-                edit {
+                preferences.edit {
                     if (uri.getBooleanQueryParameter(Query.CLEAR, false)) {
                         clear()
                     }
@@ -179,33 +175,34 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
                 }
 
                 context.contentResolver.notifyChange(uri, null)
-                return prepareQueryOrDeleteUri(authority, Segment.DATA,
+
+                prepareQueryOrDeleteUri(authority, Segment.DATA,
                         *values.keySet().toTypedArray())
             }
-            Segment.CONTAINS -> return null // Contains cannot be used to edit values
+            Segment.CONTAINS -> null // Contains cannot be used to edit values
+            else -> null
         }
-        return null
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return 0
 
-        when (path[0]) {
-            Segment.CONTROL -> return 0 // Control values cannot be edited
+        return when (path[0]) {
+            Segment.CONTROL -> 0 // Control values cannot be edited
             Segment.DATA -> {
                 val keys = uri.getQueryParameters(Query.KEY)
-                edit {
+                preferences.edit {
                     keys.forEach {
                         remove(it)
                     }
                 }
 
                 context.contentResolver.notifyChange(uri, null)
-                return keys.size
+                keys.size
             }
-            Segment.CONTAINS -> return 0 // Contains cannot be used to edit values
+            Segment.CONTAINS -> 0 // Contains cannot be used to edit values
+            else -> 0
         }
-        return 0
     }
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
@@ -213,10 +210,10 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return 0
 
-        when (path[0]) {
-            Segment.CONTROL -> return 0 // Control values cannot be edited
+        return when (path[0]) {
+            Segment.CONTROL -> 0 // Control values cannot be edited
             Segment.DATA -> {
-                edit {
+                preferences.edit {
                     if (uri.getBooleanQueryParameter(Query.CLEAR, false)) {
                         clear()
                     }
@@ -227,10 +224,10 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
                 }
 
                 context.contentResolver.notifyChange(uri, null)
-                return values.size()
+                values.size()
             }
-            Segment.CONTAINS -> return 0 // Contains cannot be used to edit values
+            Segment.CONTAINS -> 0 // Contains cannot be used to edit values
+            else -> 0
         }
-        return 0
     }
 }

@@ -1,63 +1,49 @@
 /*
- * ApplicationPurkynka
- * Copyright (C)  2017  anty
+ * Copyright 2017 Jiří Kuchyňka (Anty)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package eu.codetopic.utils.data.preferences.provider
 
-import android.content.Context
-import com.securepreferences.SecurePreferences
+import android.content.SharedPreferences
 import eu.codetopic.java.utils.log.Log
+import eu.codetopic.utils.data.preferences.support.SecurePreferences
 
-class SecureSharedPreferencesProvider(context: Context, private val fileName: String,
-                                      password: String = DEFAULT_PASSWORD,
-                                      clearOnFail: Boolean = false) :
-        ISharedPreferencesProvider<SecurePreferences> {
+class SecureSharedPreferencesProvider<out SP : SharedPreferences>(
+        private val basePreferencesProvider: ISharedPreferencesProvider<SP>,
+        password: String = DEFAULT_PASSWORD) :
+        ISharedPreferencesProvider<SecurePreferences<SP>> {
 
     companion object {
+
         private const val LOG_TAG = "SecureSharedPreferencesProvider"
-        const val DEFAULT_PASSWORD = "TheBestDefaultPasswordEver"
+        const val DEFAULT_PASSWORD = "Copyright 2017 Jiří Kuchyňka (Anty)"
     }
 
-    private val preferences = createPreferences(context.applicationContext, password, clearOnFail)
-
-
-    private fun createPreferences(context: Context, password: String, clearOnFail: Boolean): SecurePreferences {
+    private fun createPreferences(password: String): SecurePreferences<SP> {
         try {
-            return SecurePreferences(context, password, fileName)
+            return SecurePreferences(basePreferencesProvider, password)
         } catch (t: Throwable) {
-            if (clearOnFail) {
-                Log.e(LOG_TAG, "createPreferences: failed to create SecurePreferences, preferences will be cleared", t)
-                val pref = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
-                if (pref.all.isEmpty()) {
-                    Log.e(LOG_TAG, "createPreferences: failed to clear preferences, preferences are empty", t)
-                    throw t
-                }
-                pref.edit().clear().apply()
-                return createPreferences(context, password, clearOnFail)
-            }
             Log.e(LOG_TAG, "createPreferences: failed to create SecurePreferences", t)
             throw t
         }
     }
 
-    override fun getName(): String? = "SecureSharedPreferences.$1%s".format(fileName)
+    override val name: String? by lazy { "SecureSharedPreferences.${basePreferencesProvider.name}" }
 
-    override fun getSharedPreferences(): SecurePreferences = preferences
+    override val preferences: SecurePreferences<SP> by lazy { createPreferences(password) }
 
     override fun toString(): String =
-            "SecureSharedPreferencesProvider(fileName='$fileName', preferences=$preferences)"
+            "SecureSharedPreferencesProvider(basePreferencesProvider='$basePreferencesProvider', preferences=$preferences)"
 }

@@ -1,19 +1,17 @@
 /*
- * ApplicationPurkynka
- * Copyright (C)  2017  anty
+ * Copyright 2017 Jiří Kuchyňka (Anty)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *        http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
  */
 
 package eu.codetopic.utils.data.preferences.provider
@@ -24,14 +22,12 @@ import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferen
 class ContentProviderPreferencesProvider(context: Context, private val authority: String) :
         ISharedPreferencesProvider<ContentProviderSharedPreferences> {
 
-    private val preferences = createPreferences(context.applicationContext)
-
     private fun createPreferences(context: Context): ContentProviderSharedPreferences =
             ContentProviderSharedPreferences.getInstance(context, authority)
 
-    override fun getName(): String? = "ContentProviderPreferences.$authority.${preferences.name}"
+    override val name: String? by lazy { "ContentProviderPreferences.$authority.${preferences.name}" }
 
-    override fun getSharedPreferences(): ContentProviderSharedPreferences = preferences
+    override val preferences: ContentProviderSharedPreferences by lazy { createPreferences(context.applicationContext) }
 
     override fun toString(): String = "ContentProviderPreferencesProvider(preferences=$preferences)"
 }
