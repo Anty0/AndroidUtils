@@ -263,22 +263,16 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         }
 
         public Editor<T> add(final T object) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    toModify.add(object);
-                    if (adapterBase != null) adapterBase.notifyItemInserted(toModify.size() - 1);
-                }
+            return post((adapterBase, toModify) -> {
+                toModify.add(object);
+                if (adapterBase != null) adapterBase.notifyItemInserted(toModify.size() - 1);
             });
         }
 
         public Editor<T> add(final int index, final T object) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    toModify.add(index, object);
-                    if (adapterBase != null) adapterBase.notifyItemInserted(index);
-                }
+            return post((adapterBase, toModify) -> {
+                toModify.add(index, object);
+                if (adapterBase != null) adapterBase.notifyItemInserted(index);
             });
         }
 
@@ -287,123 +281,99 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
         }
 
         public Editor<T> addAll(final Collection<? extends T> collection) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    toModify.addAll(collection);
-                    if (adapterBase != null) {
-                        int count = collection.size();
-                        adapterBase.notifyItemRangeInserted(toModify.size() - count, count);
-                    }
+            return post((adapterBase, toModify) -> {
+                toModify.addAll(collection);
+                if (adapterBase != null) {
+                    int count = collection.size();
+                    adapterBase.notifyItemRangeInserted(toModify.size() - count, count);
                 }
             });
         }
 
         public Editor<T> addAll(final int index, final Collection<? extends T> collection) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    toModify.addAll(index, collection);
-                    if (adapterBase != null) adapterBase
-                            .notifyItemRangeInserted(index, collection.size());
-                }
+            return post((adapterBase, toModify) -> {
+                toModify.addAll(index, collection);
+                if (adapterBase != null) adapterBase
+                        .notifyItemRangeInserted(index, collection.size());
             });
         }
 
         public Editor<T> clear() {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    if (adapterBase == null) {
-                        toModify.clear();
-                        return;
-                    }
-
-                    int count = toModify.size();
+            return post((adapterBase, toModify) -> {
+                if (adapterBase == null) {
                     toModify.clear();
-                    adapterBase.notifyItemRangeRemoved(0, count);
+                    return;
                 }
+
+                int count = toModify.size();
+                toModify.clear();
+                adapterBase.notifyItemRangeRemoved(0, count);
             });
         }
 
         public Editor<T> remove(final int index) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    toModify.remove(index);
-                    if (adapterBase != null) adapterBase.notifyItemRemoved(index);
-                }
+            return post((adapterBase, toModify) -> {
+                toModify.remove(index);
+                if (adapterBase != null) adapterBase.notifyItemRemoved(index);
             });
         }
 
         public Editor<T> remove(final Object object) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    if (adapterBase == null) {
-                        //noinspection SuspiciousMethodCalls
-                        toModify.remove(object);
-                        return;
-                    }
-
+            return post((adapterBase, toModify) -> {
+                if (adapterBase == null) {
                     //noinspection SuspiciousMethodCalls
-                    int index = toModify.indexOf(object);
-                    if (index == -1) return;
-                    toModify.remove(index);
-                    adapterBase.notifyItemRemoved(index);
+                    toModify.remove(object);
+                    return;
                 }
+
+                //noinspection SuspiciousMethodCalls
+                int index = toModify.indexOf(object);
+                if (index == -1) return;
+                toModify.remove(index);
+                adapterBase.notifyItemRemoved(index);
             });
         }
 
         public Editor<T> set(final int index, final T object) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    toModify.set(index, object);
-                    if (adapterBase != null) adapterBase.notifyItemChanged(index);
-                }
+            return post((adapterBase, toModify) -> {
+                toModify.set(index, object);
+                if (adapterBase != null) adapterBase.notifyItemChanged(index);
             });
         }
 
         public Editor<T> removeAll(final Collection<?> collection) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    if (adapterBase == null) {
-                        //noinspection SuspiciousMethodCalls
-                        toModify.removeAll(collection);
-                        return;
-                    }
-
-                    List<Integer> ids = new ArrayList<>();
-                    for (Object o : collection) {
-                        //noinspection SuspiciousMethodCalls
-                        int index = toModify.indexOf(o);
-                        if (index != -1) ids.add(index);
-                    }
+            return post((adapterBase, toModify) -> {
+                if (adapterBase == null) {
                     //noinspection SuspiciousMethodCalls
                     toModify.removeAll(collection);
-                    for (Integer i : ids)
-                        adapterBase.notifyItemRemoved(i);
+                    return;
                 }
+
+                List<Integer> ids = new ArrayList<>();
+                for (Object o : collection) {
+                    //noinspection SuspiciousMethodCalls
+                    int index = toModify.indexOf(o);
+                    if (index != -1) ids.add(index);
+                }
+                //noinspection SuspiciousMethodCalls
+                toModify.removeAll(collection);
+                for (Integer i : ids)
+                    adapterBase.notifyItemRemoved(i);
             });
         }
 
         public Editor<T> retainAll(final Collection<?> collection) {
-            return post(new Modification<T>() {
-                @Override
-                public void modify(@Nullable Base adapterBase, List<T> toModify) {
-                    if (adapterBase == null) {
-                        toModify.retainAll(collection);
-                        return;
-                    }
+            return post((adapterBase, toModify) -> {
+                if (adapterBase == null) {
+                    toModify.retainAll(collection);
+                    return;
+                }
 
-                    for (Iterator<T> iterator = toModify.iterator(); iterator.hasNext(); ) {
-                        T item = iterator.next();
-                        if (!collection.contains(item)) {
-                            adapterBase.notifyItemRemoved(toModify.indexOf(item));
-                            iterator.remove();
-                        }
+                for (Iterator<T> iterator = toModify.iterator(); iterator.hasNext(); ) {
+                    T item = iterator.next();
+                    if (!collection.contains(item)) {
+                        adapterBase.notifyItemRemoved(toModify.indexOf(item));
+                        iterator.remove();
                     }
                 }
             });

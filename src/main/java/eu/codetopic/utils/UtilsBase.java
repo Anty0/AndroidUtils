@@ -99,6 +99,7 @@ public final class UtilsBase {
 
             AndroidLoggerExtension.install(app);
             JqLog.setCustomLogger(new JobQueueLogger());
+            LocalBroadcast.INSTANCE.initialize(app);
             NetworkManager.init(app);
             JobUtils.initialize(app);
             BroadcastsConnector.initialize(app);

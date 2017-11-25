@@ -26,41 +26,25 @@ import eu.codetopic.utils.PrefNames.LOGGED_IN
 import eu.codetopic.utils.PrefNames.PASSWORD
 import eu.codetopic.utils.PrefNames.USERNAME
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import eu.codetopic.utils.edit
+import eu.codetopic.utils.AndroidExtensions.edit
 
-open class LoginDataExtension<out SP : SharedPreferences>(private val provider: ISharedPreferencesProvider<SP>) {
-
-    open val isLoggedIn: Boolean
-        @Synchronized get() = isLoggedIn(null)
-
-    open val username: String?
-        @Synchronized get() = getUsername(null)
-
-    open val password: String?
-        @Synchronized get() = getPassword(null)
+open class LoginDataExtension<out SP : SharedPreferences>(protected val provider: ISharedPreferencesProvider<SP>) {
 
     companion object {
 
         private const val LOG_TAG = "LoginDataExtension"
-
-        const val DEFAULT_ID = "default"
     }
 
-    private fun log(methodName: String, id: String?) {
-        Log.d(LOG_TAG, "$methodName: { name: '${provider.name}', id: '${id ?: DEFAULT_ID}' }")
+    private fun log(methodName: String, id: String) {
+        Log.d(LOG_TAG, "$methodName: { name: '${provider.name}', id: '$id' }")
     }
 
-    protected open fun formatKey(id: String?, key: String): String {
-        return "ID{${id ?: DEFAULT_ID}}-$key"
-    }
-
-    @Synchronized
-    open fun login(username: String, password: String) {
-        login(null, username, password)
+    protected open fun formatKey(id: String, key: String): String {
+        return "ID{$id}-$key"
     }
 
     @Synchronized
-    open fun login(id: String?, username: String, password: String) {
+    open fun login(id: String, username: String, password: String) {
         log("login", id)
         provider.preferences.edit {
             putString(formatKey(id, USERNAME), username)
@@ -70,12 +54,7 @@ open class LoginDataExtension<out SP : SharedPreferences>(private val provider: 
     }
 
     @Synchronized
-    open fun logout() {
-        logout(null)
-    }
-
-    @Synchronized
-    open fun logout(id: String?) {
+    open fun logout(id: String) {
         log("logout", id)
         provider.preferences.edit {
             putBoolean(formatKey(id, LOGGED_IN), false)
@@ -84,31 +63,25 @@ open class LoginDataExtension<out SP : SharedPreferences>(private val provider: 
     }
 
     @Synchronized
-    open fun isLoggedIn(id: String?): Boolean {
+    open fun isLoggedIn(id: String): Boolean {
         log("isLoggedIn", id)
         return provider.preferences.getBoolean(formatKey(id, LOGGED_IN), false)
     }
 
     @Synchronized
-    open fun getUsername(id: String?): String? {
+    open fun getUsername(id: String): String? {
         log("getUsername", id)
         return provider.preferences.getString(USERNAME, null)
     }
 
     @Synchronized
-    open fun getPassword(id: String?): String? {
+    open fun getPassword(id: String): String? {
         log("getPassword", id)
         return provider.preferences.getString(PASSWORD, null)
     }
 
-
     @Synchronized
-    open fun clearData() {
-        clearData(null)
-    }
-
-    @Synchronized
-    open fun clearData(id: String?) {
+    open fun clearData(id: String) {
         log("clearData", id)
         provider.preferences.edit {
             remove(formatKey(id, USERNAME))
@@ -118,7 +91,7 @@ open class LoginDataExtension<out SP : SharedPreferences>(private val provider: 
     }
 
     @Synchronized
-    open fun changeId(id: String?, newId: String?) {
+    open fun changeId(id: String, newId: String) {
         log("changeId", "$id->$newId")
         if (id == newId) return
 

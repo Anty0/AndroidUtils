@@ -23,7 +23,7 @@ import android.util.Base64
 import com.tozny.crypto.android.AesCbcWithIntegrity
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import eu.codetopic.utils.edit
+import eu.codetopic.utils.AndroidExtensions.edit
 import java.security.MessageDigest
 
 /**

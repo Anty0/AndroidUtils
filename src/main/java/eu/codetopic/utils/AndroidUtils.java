@@ -97,6 +97,10 @@ public final class AndroidUtils {
         return Html.fromHtml(source);
     }
 
+    /**
+     * Use AndroidExtensions.getFormattedText() instead
+     */
+    @Deprecated
     @CheckResult
     public static CharSequence getFormattedText(Context context, @StringRes int stringId,
                                                 Object... args) {
@@ -122,6 +126,10 @@ public final class AndroidUtils {
                         Location.convert(longitude, Location.FORMAT_DEGREES);
     }
 
+    /**
+     * Use AndroidExtensions.getResourceUri() instead
+     */
+    @Deprecated
     @CheckResult
     public static Uri getResourceUri(@NonNull Context context, @AnyRes int resource) {
         Resources resources = context.getResources();

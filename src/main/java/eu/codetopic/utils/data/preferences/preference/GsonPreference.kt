@@ -30,6 +30,9 @@ class GsonPreference<T>(override val key: String, private val gson: Gson, privat
                         provider: ISharedPreferencesProvider<*>, private val defaultValue: () -> T) :
         BasePreference<T, SharedPreferences>(provider) {
 
+    constructor(key: String, gson: Gson, typeOfT: Type, provider: ISharedPreferencesProvider<*>,
+                defaultValue: T) : this(key, gson, typeOfT, provider, { defaultValue })
+
     override val fallBackValue: T get() = defaultValue()
 
     override fun SharedPreferences.getValue(key: String): T {

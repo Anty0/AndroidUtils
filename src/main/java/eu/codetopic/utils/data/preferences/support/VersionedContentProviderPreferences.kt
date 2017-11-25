@@ -20,7 +20,7 @@ package eu.codetopic.utils.data.preferences.support
 
 import android.content.SharedPreferences
 import eu.codetopic.utils.PrefNames
-import eu.codetopic.utils.edit
+import eu.codetopic.utils.AndroidExtensions.edit
 
 abstract class VersionedContentProviderPreferences<out SP : SharedPreferences>(
         authority: String, private val saveVersion: Int) :

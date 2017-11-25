@@ -19,8 +19,8 @@
 package eu.codetopic.utils.data.preferences.preference
 
 import android.content.SharedPreferences
-import eu.codetopic.java.utils.deserialize
-import eu.codetopic.java.utils.serialize
+import eu.codetopic.java.utils.JavaExtensions.deserialize
+import eu.codetopic.java.utils.JavaExtensions.serialize
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import java.io.Serializable
 

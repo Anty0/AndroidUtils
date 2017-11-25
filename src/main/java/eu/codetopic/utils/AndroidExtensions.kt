@@ -18,7 +18,53 @@
 
 package eu.codetopic.utils
 
-import android.content.SharedPreferences
+import android.content.*
+import android.net.Uri
+import android.support.annotation.AnyRes
+import android.support.annotation.StringRes
+import eu.codetopic.utils.data.getter.DataGetter
+import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
 
-fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
-        edit().apply { block() }.apply()
+object AndroidExtensions {
+
+    fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
+            edit().apply { block() }.apply()
+
+    fun <T> ArrayEditAdapter<T, *>.edit(block: ArrayEditAdapter.Editor<T>.() -> Unit) =
+            edit().apply { block() }.apply()
+
+    fun broadcast(block: BroadcastReceiver.(context: Context, intent: Intent) -> Unit): BroadcastReceiver {
+        return object: BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                block(context, intent)
+            }
+        }
+    }
+
+    fun intentFilter(vararg actions: String): IntentFilter {
+        return IntentFilter().apply { actions.forEach { addAction(it) } }
+    }
+
+    fun intentFilter(vararg getters: DataGetter<*>): IntentFilter {
+        return IntentFilter().apply {
+            getters.forEach {
+                if (it.hasDataChangedBroadcastAction()) addAction(it.dataChangedBroadcastAction)
+            }
+        }
+    }
+
+    fun Context.getFormattedText(@StringRes stringId: Int, vararg args: Any): CharSequence {
+        return AndroidUtils.getFormattedText(getString(stringId), *args)
+    }
+
+    fun Context.getResourceUri(@AnyRes resource: Int): Uri {
+        return with (resources) {
+            Uri.parse("""${ContentResolver.SCHEME_ANDROID_RESOURCE}://
+                |${getResourcePackageName(resource)}/
+                |${getResourceTypeName(resource)}/
+                |${getResourceEntryName(resource)}""".trimMargin())
+        }
+    }
+
+    // TODO: move functions from AndroidUtils, that can be implemented as extensions here and implement them as extensions
+}

@@ -25,7 +25,7 @@ import android.database.Cursor
 import android.net.Uri
 import android.support.annotation.CallSuper
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import eu.codetopic.utils.edit
+import eu.codetopic.utils.AndroidExtensions.edit
 import eu.codetopic.utils.simple.SimpleMultiColumnCursor
 
 abstract class ContentProviderPreferences<out SP : SharedPreferences>(

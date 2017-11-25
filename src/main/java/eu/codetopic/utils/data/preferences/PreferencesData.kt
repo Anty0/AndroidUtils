@@ -25,8 +25,10 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.content.LocalBroadcastManager
+import eu.codetopic.utils.LocalBroadcast
 
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
+import eu.codetopic.utils.AndroidExtensions.edit
 
 abstract class PreferencesData<out SP : SharedPreferences> (
         context: Context, private val preferencesProvider: ISharedPreferencesProvider<SP>) :
@@ -44,7 +46,7 @@ abstract class PreferencesData<out SP : SharedPreferences> (
         }
     }
 
-    private val preferenceChangeListener = { _: SharedPreferences, key: String -> onChanged(key) }
+    private val preferenceChangeListener = { _: SharedPreferences, key: String? -> onChanged(key) }
 
     protected val context: Context = context.applicationContext
 
@@ -70,13 +72,13 @@ abstract class PreferencesData<out SP : SharedPreferences> (
             return preferencesProvider.preferences
         }
 
-    private fun generateIntentActionChanged(changedKey: String): Intent {
+    private fun generateIntentActionChanged(changedKey: String?): Intent {
         return Intent(this.broadcastActionChanged)
                 .putExtra(EXTRA_CHANGED_DATA_KEY, changedKey)
                 .putExtras(getAdditionalDataChangedExtras(changedKey))
     }
 
-    protected open fun getAdditionalDataChangedExtras(changedKey: String): Bundle {
+    protected open fun getAdditionalDataChangedExtras(changedKey: String?): Bundle {
         return Bundle()
     }
 
@@ -85,8 +87,7 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     @SuppressLint("CommitPrefEdits")
     protected fun edit(): SharedPreferences.Editor = preferences.edit()
 
-    protected fun edit(block: SharedPreferences.Editor.() -> Unit) =
-            preferences.edit().apply { block() }.apply()
+    protected fun edit(block: SharedPreferences.Editor.() -> Unit) = preferences.edit(block)
 
     @Synchronized
     override final fun init() {
@@ -110,8 +111,8 @@ abstract class PreferencesData<out SP : SharedPreferences> (
 
     @CallSuper
     @Synchronized
-    protected open fun onChanged(key: String) {
-        LocalBroadcastManager.getInstance(context).sendBroadcast(generateIntentActionChanged(key))
+    protected open fun onChanged(key: String?) {
+        LocalBroadcast.sendBroadcast(generateIntentActionChanged(key))
     }
 
     @CallSuper

@@ -54,7 +54,7 @@ class ContentProviderSharedPreferences private constructor(
 
     private val changesObserver = object : ContentObserver(Handler(context.mainLooper)) {
         override fun onChange(selfChange: Boolean) {
-            notifyChanged()
+            notifyChanged(null)
         }
     }.also { context.contentResolver.registerContentObserver(prepareUriBase(authority), true, it) }
 
@@ -78,9 +78,9 @@ class ContentProviderSharedPreferences private constructor(
         return findValueByKey(query(prepareQueryOrDeleteUri(authority, Segment.DATA, key)), key)
     }
 
-    private fun notifyChanged() {
+    private fun notifyChanged(key: String?) {
         synchronized(lock) {
-            changeListeners.forEach { it.key.onSharedPreferenceChanged(this, null) }
+            changeListeners.forEach { it.key.onSharedPreferenceChanged(this, key) }
         }
     }
 
@@ -145,9 +145,7 @@ class ContentProviderSharedPreferences private constructor(
 
         private fun insert(uri: Uri): Boolean {
             return context.contentResolver.insert(uri, changesMap.let {
-                val values = ContentValues(it.size)
-                changesMap.forEach { values.put(it.key, it.value) }
-                return@let values
+                ContentValues(it.size).apply { it.forEach { put(it.key, it.value) } }
             }) != null
         }
 
