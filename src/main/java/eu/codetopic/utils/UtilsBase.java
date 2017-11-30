@@ -104,7 +104,7 @@ public final class UtilsBase {
             JobUtils.initialize(app);
             BroadcastsConnector.initialize(app);
 
-            if (!initType.isStorageUsed()) {
+            if (initType.isStorageUsed()) {
                 Identifiers.initialize(app);
             }
 

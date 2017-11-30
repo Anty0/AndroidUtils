@@ -21,9 +21,11 @@ package eu.codetopic.utils.data.preferences.support
 import android.content.ContentProvider
 import android.content.ContentValues
 import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.database.Cursor
 import android.net.Uri
 import android.support.annotation.CallSuper
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import eu.codetopic.utils.AndroidExtensions.edit
 import eu.codetopic.utils.simple.SimpleMultiColumnCursor
@@ -31,44 +33,44 @@ import eu.codetopic.utils.simple.SimpleMultiColumnCursor
 abstract class ContentProviderPreferences<out SP : SharedPreferences>(
         private val authority: String) : ContentProvider() {
 
-    private lateinit var preferencesProvider: ISharedPreferencesProvider<SP>
-
-    protected val name: String? get() = preferencesProvider.name
-
-    protected val preferences: SP get() = preferencesProvider.preferences
-
     companion object {
 
-        fun prepareUriBase(authority: String): Uri {
+        private const val LOG_TAG: String = "ContentProviderPreferences"
+
+        private fun buildUriBase(authority: String): Uri.Builder {
             return Uri.Builder()
                     .scheme("content")
                     .authority(authority)
+        }
+
+        private fun buildUriSegmentBase(authority: String, segment: String): Uri.Builder {
+            return buildUriBase(authority)
+                    .appendPath(segment)
+        }
+
+        fun prepareUriBase(authority: String): Uri {
+            return buildUriBase(authority).build()
+        }
+
+        fun prepareUriSegmentBase(authority: String, segment: String): Uri {
+            return buildUriSegmentBase(authority, segment)
                     .build()
         }
 
         fun prepareAllKeysQueryUri(authority: String, segment: String): Uri {
-            return Uri.Builder()
-                    .scheme("content")
-                    .authority(authority)
-                    .appendPath(segment)
+            return buildUriSegmentBase(authority, segment)
                     .appendQueryParameter(Query.ALL_KEYS, "true")
                     .build()
         }
 
         fun prepareQueryOrDeleteUri(authority: String, segment: String, vararg keys: String): Uri {
-            return Uri.Builder()
-                    .scheme("content")
-                    .authority(authority)
-                    .appendPath(segment)
+            return buildUriSegmentBase(authority, segment)
                     .apply { keys.forEach { appendQueryParameter(Query.KEY, it) } }
                     .build()
         }
 
         fun prepareInsertOrUpdateUri(authority: String, segment: String, clearData: Boolean): Uri {
-            return Uri.Builder()
-                    .scheme("content")
-                    .authority(authority)
-                    .appendPath(segment)
+            return buildUriSegmentBase(authority, segment)
                     .appendQueryParameter(Query.CLEAR, if (clearData) "true" else "false")
                     .build()
         }
@@ -87,19 +89,44 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
             const val ALL_KEYS = "allKeys"
             const val CLEAR = "clear"
         }
+
+        object Column {
+            const val NAME = "name"
+            const val VALUE = "value"
+        }
+    }
+
+    private lateinit var preferencesProvider: ISharedPreferencesProvider<SP>
+
+    protected val name: String? get() = preferencesProvider.name
+
+    protected val preferences: SP get() = preferencesProvider.preferences
+
+    private val preferencesChangeListener = OnSharedPreferenceChangeListener { _, key ->
+        Log.d(LOG_TAG, "onSharedPreferenceChange(key=$key)")
+        val uri: Uri = buildUriSegmentBase(authority, Segment.DATA)
+                .appendQueryParameter(Query.KEY, key).build()
+        context.contentResolver.notifyChange(uri, null)
     }
 
     @CallSuper
     override fun onCreate(): Boolean {
+        Log.d(LOG_TAG, "onCreate()")
         preferencesProvider = onPreparePreferencesProvider()
+        preferences.registerOnSharedPreferenceChangeListener(preferencesChangeListener)
         return true
+    }
+
+    @CallSuper
+    override fun shutdown() {
+        Log.d(LOG_TAG, "shutdown()")
+        preferences.registerOnSharedPreferenceChangeListener(preferencesChangeListener)
+        super.shutdown()
     }
 
     abstract fun onPreparePreferencesProvider(): ISharedPreferencesProvider<SP>
 
-    override fun getType(uri: Uri): String? {
-        return null
-    }
+    override fun getType(uri: Uri): String? = null
 
     private fun cursorOf(valuesMap: Map<String, Any?>) : Cursor {
         val entries = valuesMap.entries.toList()
@@ -109,12 +136,13 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
                         arrayOf(key, value)
                     }
                 }),
-                arrayOf("name", "value")
+                arrayOf(Column.NAME, Column.VALUE)
         )
     }
 
     override fun query(uri: Uri, projection: Array<out String>?, selection: String?,
                        selectionArgs: Array<out String>?, sortOrder: String?): Cursor? {
+        Log.d(LOG_TAG, "query(uri=$uri)")
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return null
 
         when (path[0]) {
@@ -159,6 +187,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
+        Log.d(LOG_TAG, "insert(uri=$uri)")
         if (values == null) return null
 
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return null
@@ -176,7 +205,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
                     }
                 }
 
-                context.contentResolver.notifyChange(uri, null)
+                //context.contentResolver.notifyChange(uri, null)
 
                 prepareQueryOrDeleteUri(authority, Segment.DATA,
                         *values.keySet().toTypedArray())
@@ -187,6 +216,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
+        Log.d(LOG_TAG, "delete(uri=$uri)")
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return 0
 
         return when (path[0]) {
@@ -199,7 +229,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
                     }
                 }
 
-                context.contentResolver.notifyChange(uri, null)
+                //context.contentResolver.notifyChange(uri, null)
                 keys.size
             }
             Segment.CONTAINS -> 0 // Contains cannot be used to edit values
@@ -207,7 +237,9 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
         }
     }
 
-    override fun update(uri: Uri, values: ContentValues?, selection: String?, selectionArgs: Array<out String>?): Int {
+    override fun update(uri: Uri, values: ContentValues?, selection: String?,
+                        selectionArgs: Array<out String>?): Int {
+        Log.d(LOG_TAG, "delete(uri=$uri)")
         if (values == null) return 0
 
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return 0
@@ -225,7 +257,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
                     }
                 }
 
-                context.contentResolver.notifyChange(uri, null)
+                //context.contentResolver.notifyChange(uri, null)
                 values.size()
             }
             Segment.CONTAINS -> 0 // Contains cannot be used to edit values

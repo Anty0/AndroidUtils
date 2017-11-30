@@ -31,6 +31,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.ContextThemeWrapper;
 import android.view.View;
+import android.view.ViewGroup;
 
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
@@ -48,6 +49,26 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState == null) replaceFragment(onCreateMainFragment());
+    }
+
+    @Override
+    public void onContentChanged() {
+        super.onContentChanged();
+        updateFragmentTheme();
+    }
+
+    public void updateFragmentTheme() {
+        super.onContentChanged();
+        Fragment currentFragment = getCurrentFragment();
+        if (currentFragment != null) applyFragmentTheme(currentFragment);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // Let's fix problem with theme of navigation menu after screen rotation.
+        updateFragmentTheme();
     }
 
     @Nullable
@@ -119,54 +140,62 @@ public abstract class BaseFragmentActivity extends AppCompatActivity {// TODO: 1
     public void onAttachFragment(Fragment fragment) {
         super.onAttachFragment(fragment);
         if (CURRENT_FRAGMENT_TAG.equals(fragment.getTag())) {
-            if (fragment instanceof TitleProvider) {
-                setTitle(((TitleProvider) fragment).getTitle());
-            }
-            if (fragment instanceof ThemeProvider) {
-                int themeId = ((ThemeProvider) fragment).getThemeId();
-                Context themedContext = new ContextThemeWrapper(getLayoutInflater().getContext(), themeId);
-                Toolbar toolbar = findViewById(R.id.toolbar);
-                if (toolbar != null) {
-
-                    int backgroundColor = AndroidUtils.getColorFromAttr(
-                            themedContext, R.attr.colorPrimary, -1);
-                    if (backgroundColor != -1) toolbar.setBackgroundColor(backgroundColor);
-
-                    int titleTextColor = AndroidUtils.getColorFromAttr(
-                            themedContext, R.attr.titleTextColor, -1);
-                    if (titleTextColor != -1) toolbar.setTitleTextColor(titleTextColor);
-
-                    int subtitleTextColor = AndroidUtils.getColorFromAttr(
-                            themedContext, R.attr.subtitleTextColor, -1);
-                    if (subtitleTextColor != -1) toolbar.setSubtitleTextColor(subtitleTextColor);
-
-                    if (Build.VERSION.SDK_INT >= 21) {
-                        int navigationBarColor = AndroidUtils.getColorFromAttr(
-                                themedContext, android.R.attr.navigationBarColor, -1);
-                        if (navigationBarColor != -1)
-                            getWindow().setNavigationBarColor(navigationBarColor);
-
-                        int statusBarColor = AndroidUtils.getColorFromAttr(
-                                themedContext, android.R.attr.statusBarColor, -1);
-                        if (statusBarColor != -1)
-                            getWindow().setStatusBarColor(statusBarColor);
-                    }
-                }
-
-                NavigationView navView = findViewById(R.id.nav_view);
-                if (navView != null) {
-                    View headerView = navView.getHeaderView(0).findViewById(R.id.navigationHeader);
-                    if (headerView != null) {
-                        int headerBackgroundColor = AndroidUtils.getColorFromAttr(
-                                themedContext, R.attr.colorPrimaryDark, -1);
-                        if (headerBackgroundColor != -1)
-                            headerView.setBackgroundColor(headerBackgroundColor);
-                    }
-                }
-            }
+            applyFragmentTitle(fragment);
+            applyFragmentTheme(fragment);
         }
 
         //System.runFinalization();
         //System.gc();
+    }
+
+    private void applyFragmentTitle(Fragment fragment) {
+        if (fragment instanceof TitleProvider) {
+            setTitle(((TitleProvider) fragment).getTitle());
+        }
+    }
+
+    private void applyFragmentTheme(Fragment fragment) {
+        if (fragment instanceof ThemeProvider) {
+            int themeId = ((ThemeProvider) fragment).getThemeId();
+            Context themedContext = new ContextThemeWrapper(getLayoutInflater().getContext(), themeId);
+            Toolbar toolbar = findViewById(R.id.toolbar);
+            if (toolbar != null) {
+
+                int backgroundColor = AndroidUtils.getColorFromAttr(
+                        themedContext, R.attr.colorPrimary, -1);
+                if (backgroundColor != -1) toolbar.setBackgroundColor(backgroundColor);
+
+                int titleTextColor = AndroidUtils.getColorFromAttr(
+                        themedContext, R.attr.titleTextColor, -1);
+                if (titleTextColor != -1) toolbar.setTitleTextColor(titleTextColor);
+
+                int subtitleTextColor = AndroidUtils.getColorFromAttr(
+                        themedContext, R.attr.subtitleTextColor, -1);
+                if (subtitleTextColor != -1) toolbar.setSubtitleTextColor(subtitleTextColor);
+
+                if (Build.VERSION.SDK_INT >= 21) {
+                    int navigationBarColor = AndroidUtils.getColorFromAttr(
+                            themedContext, android.R.attr.navigationBarColor, -1);
+                    if (navigationBarColor != -1)
+                        getWindow().setNavigationBarColor(navigationBarColor);
+
+                    int statusBarColor = AndroidUtils.getColorFromAttr(
+                            themedContext, android.R.attr.statusBarColor, -1);
+                    if (statusBarColor != -1)
+                        getWindow().setStatusBarColor(statusBarColor);
+                }
+            }
+
+            NavigationView navView = findViewById(R.id.nav_view);
+            if (navView != null) {
+                View headerView = navView.getHeaderView(0).findViewById(R.id.navigationHeader);
+                if (headerView != null) {
+                    int headerBackgroundColor = AndroidUtils.getColorFromAttr(
+                            themedContext, R.attr.colorPrimaryDark, -1);
+                    if (headerBackgroundColor != -1)
+                        headerView.setBackgroundColor(headerBackgroundColor);
+                }
+            }
+        }
     }
 }

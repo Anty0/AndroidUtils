@@ -25,11 +25,15 @@ import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import android.os.Handler
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareQueryOrDeleteUri
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareInsertOrUpdateUri
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Segment
+import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Query
+import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Column
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareAllKeysQueryUri
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareUriBase
+import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareUriSegmentBase
 import java.util.*
 
 class ContentProviderSharedPreferences private constructor(
@@ -56,19 +60,32 @@ class ContentProviderSharedPreferences private constructor(
         override fun onChange(selfChange: Boolean) {
             notifyChanged(null)
         }
-    }.also { context.contentResolver.registerContentObserver(prepareUriBase(authority), true, it) }
 
-    val name get() = findValueByKey(query(prepareQueryOrDeleteUri(authority, Segment.CONTROL, Segment.CONTROL_VALUE_NAME)), Segment.CONTROL_VALUE_NAME) ?: "unknown"
+        override fun onChange(selfChange: Boolean, uri: Uri?) {
+            val key = uri?.getQueryParameter(Query.KEY)
+            notifyChanged(key)
+        }
+    }
+
+    val name get() = findValueByKey(query(prepareQueryOrDeleteUri(authority, Segment.CONTROL,
+            Segment.CONTROL_VALUE_NAME)), Segment.CONTROL_VALUE_NAME) ?: "unknown"
+
+    init {
+        context.contentResolver.registerContentObserver(prepareUriSegmentBase(authority, Segment.DATA),
+                false, changesObserver)
+    }
 
     private fun query(uri: Uri): Cursor {
         return context.contentResolver.query(uri, null, null, null, null)
     }
 
     private fun findValueByKey(cursor: Cursor, key: String): String? {
-        cursor.moveToFirst()
+        if (!cursor.moveToFirst()) return null
+        val columnName = cursor.getColumnIndex(Column.NAME)
+        val columnValue = cursor.getColumnIndex(Column.VALUE)
         while (!cursor.isAfterLast) {
-            if (cursor.getString(0) == key)
-                return cursor.getString(1)
+            if (cursor.getString(columnName) == key)
+                return cursor.getString(columnValue)
             cursor.moveToNext()
         }
         return null

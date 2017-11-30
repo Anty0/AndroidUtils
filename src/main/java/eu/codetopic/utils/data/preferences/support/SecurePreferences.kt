@@ -103,20 +103,20 @@ class SecurePreferences<out SP : SharedPreferences>(
     }
 
     private fun formatKey(key: String): String {
-        return "\"Encrypted{$id}\"-${hashKey(key)}"
+        return "Encrypted{$id}-${hashKey(key)}"
     }
 
     private fun isMyEncryptedKey(key: String): Boolean {
-        return key.startsWith("\"Encrypted{$id}\"-")
+        return key.startsWith("Encrypted{$id}-")
     }
 
-    private fun encrypt(cleartext: String?): String? {
+    private fun encrypt(clearText: String?): String? {
         return try {
-            AesCbcWithIntegrity.encrypt(
-                    cleartext.takeUnless { it.isNullOrEmpty() } ?: return cleartext, keys
-            ).toString()
+            AesCbcWithIntegrity.encrypt(clearText
+                    .takeUnless { it.isNullOrEmpty() }
+                    ?: return clearText, keys).toString()
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "encrypt($cleartext)", e); null
+            Log.e(LOG_TAG, "encrypt(clearText=$clearText)", e); null
         }
     }
 
@@ -127,13 +127,13 @@ class SecurePreferences<out SP : SharedPreferences>(
     private fun decrypt(cipherText: String?): String? {
         return try {
             AesCbcWithIntegrity.decryptString(
-                    AesCbcWithIntegrity.CipherTextIvMac(
-                            cipherText.takeUnless { it.isNullOrEmpty() }
-                                    ?: return cipherText),
+                    AesCbcWithIntegrity.CipherTextIvMac(cipherText
+                            .takeUnless { it.isNullOrEmpty() }
+                            ?: return cipherText),
                     keys
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "decrypt($cipherText)", e); null
+            Log.e(LOG_TAG, "decrypt(cipherText=$cipherText)", e); null
         }
     }
 
@@ -153,46 +153,45 @@ class SecurePreferences<out SP : SharedPreferences>(
         }.toMap()
     }
 
-    @Synchronized
-    override fun getString(key: String, defaultValue: String?): String? {
-        return preferences.getString(formatKey(key), null)
-                ?.run { decrypt(this) } ?: defaultValue
+    private fun getVal(key: String): String? {
+        val formattedKey = formatKey(key)
+        val encryptedValue = preferences.getString(formattedKey, null)
+        val value = decrypt(encryptedValue)
+
+        Log.d(LOG_TAG, "getVal(key=$key, formattedKey=$formattedKey, " +
+                "encryptedValue=(isNull=${encryptedValue == null}, isEmpty=${encryptedValue.isNullOrEmpty()}), " +
+                "value=(isNull=${value == null}, isEmpty=${value.isNullOrEmpty()}))")
+
+        return value
     }
+
+    @Synchronized
+    override fun getString(key: String, defaultValue: String?): String? = getVal(key) ?: defaultValue
 
     @Synchronized
     override fun getStringSet(key: String, defaultValues: Set<String>?): Set<String>? {
-        return preferences.getStringSet(formatKey(key), null)
-                ?.map { decrypt(it) ?: it }?.toSet() ?: defaultValues
+        val formattedKey = formatKey(key)
+        val encryptedValues = preferences.getStringSet(formattedKey, null)
+
+        Log.d(LOG_TAG, "getStringSet(key=$key, formattedKey=$formattedKey)")
+
+        return encryptedValues?.map { decrypt(it) ?: it }?.toSet() ?: defaultValues
     }
 
     @Synchronized
-    override fun getInt(key: String, defaultValue: Int): Int {
-        return preferences.getString(formatKey(key), null)
-                ?.run { decrypt(this)?.toIntOrNull() } ?: defaultValue
-    }
+    override fun getInt(key: String, defaultValue: Int): Int = getVal(key)?.toIntOrNull() ?: defaultValue
 
     @Synchronized
-    override fun getLong(key: String, defaultValue: Long): Long {
-        return preferences.getString(formatKey(key), null)
-                ?.run { decrypt(this)?.toLongOrNull() } ?: defaultValue
-    }
+    override fun getLong(key: String, defaultValue: Long): Long = getVal(key)?.toLongOrNull() ?: defaultValue
 
     @Synchronized
-    override fun getFloat(key: String, defaultValue: Float): Float {
-        return preferences.getString(formatKey(key), null)
-                ?.run { decrypt(this)?.toFloatOrNull() } ?: defaultValue
-    }
+    override fun getFloat(key: String, defaultValue: Float): Float = getVal(key)?.toFloatOrNull() ?: defaultValue
 
     @Synchronized
-    override fun getBoolean(key: String, defaultValue: Boolean): Boolean {
-        return preferences.getString(formatKey(key), null)
-                ?.run { decrypt(this)?.toBoolean() } ?: defaultValue
-    }
+    override fun getBoolean(key: String, defaultValue: Boolean): Boolean = getVal(key)?.toBoolean() ?: defaultValue
 
     @Synchronized
-    override fun contains(key: String): Boolean {
-        return preferences.contains(formatKey(key))
-    }
+    override fun contains(key: String) = preferences.contains(formatKey(key))
 
 
     /**
@@ -218,9 +217,7 @@ class SecurePreferences<out SP : SharedPreferences>(
         }
     }
 
-    override fun edit(): SharedPreferences.Editor {
-        return Editor()
-    }
+    override fun edit(): SharedPreferences.Editor = Editor()
 
     @Synchronized
     private fun <R> sync(block: () -> R): R = block()
@@ -238,36 +235,38 @@ class SecurePreferences<out SP : SharedPreferences>(
 
         private val editor = preferences.edit()
 
-        override fun putString(key: String, value: String?): SharedPreferences.Editor {
-            editor.putString(formatKey(key), encrypt(value))
+        private fun put(key: String, value: String?): SharedPreferences.Editor {
+            val formattedKey = formatKey(key)
+            val encryptedValue = encrypt(value)
+
+            Log.d(LOG_TAG, "put(key=$key, formattedKey=$formattedKey, " +
+                    "value=(isNull=${value == null}, isEmpty=${value.isNullOrEmpty()}), " +
+                    "encryptedValue=(isNull=${encryptedValue == null}, isEmpty=${encryptedValue.isNullOrEmpty()}))")
+
+            editor.putString(formattedKey, encryptedValue)
             return this
+        }
+
+        override fun putString(key: String, value: String?): SharedPreferences.Editor {
+            return put(key, value)
         }
 
         override fun putStringSet(key: String, values: Set<String>?): SharedPreferences.Editor {
-            editor.putStringSet(formatKey(key), values
-                    ?.map { encrypt(it) }?.toSet())
+            val formattedKey = formatKey(key)
+
+            Log.d(LOG_TAG, "putStringSet(key=$key, formattedKey=$formattedKey)")
+
+            editor.putStringSet(formattedKey, values?.map { encrypt(it) }?.toSet())
             return this
         }
 
-        override fun putInt(key: String, value: Int): SharedPreferences.Editor {
-            editor.putString(formatKey(key), encrypt(value.toString()))
-            return this
-        }
+        override fun putInt(key: String, value: Int) = put(key, value.toString())
 
-        override fun putLong(key: String, value: Long): SharedPreferences.Editor {
-            editor.putString(formatKey(key), encrypt(value.toString()))
-            return this
-        }
+        override fun putLong(key: String, value: Long) = put(key, value.toString())
 
-        override fun putFloat(key: String, value: Float): SharedPreferences.Editor {
-            editor.putString(formatKey(key), encrypt(value.toString()))
-            return this
-        }
+        override fun putFloat(key: String, value: Float) = put(key, value.toString())
 
-        override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor {
-            editor.putString(formatKey(key), encrypt(value.toString()))
-            return this
-        }
+        override fun putBoolean(key: String, value: Boolean) = put(key, value.toString())
 
         override fun remove(key: String): SharedPreferences.Editor {
             editor.remove(formatKey(key))

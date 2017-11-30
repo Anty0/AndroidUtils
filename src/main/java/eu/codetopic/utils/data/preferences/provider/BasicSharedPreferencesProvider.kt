@@ -33,11 +33,13 @@ class BasicSharedPreferencesProvider(context: Context, private val fileName: Str
         else context.getSharedPreferences(fileName, preferencesOperatingMode)
     }
 
-    override val name: String? by lazy { "BasicSharedPreferences.${fileName ?: "default"}" }
+    override val name: String? by lazy { "BasicSharedPreferences.{${fileName ?: "default"}}" }
 
     override val preferences: SharedPreferences by lazy { createPreferences(context.applicationContext, preferencesOperatingMode) }
 
     override fun toString(): String =
-            "BasicSharedPreferencesProvider(fileName=$fileName, preferences=$preferences," +
-                    " preferencesOperatingMode=$preferencesOperatingMode)"
+            "BasicSharedPreferencesProvider(" +
+                    "fileName=$fileName, " +
+                    "preferences=$preferences, " +
+                    "preferencesOperatingMode=$preferencesOperatingMode)"
 }

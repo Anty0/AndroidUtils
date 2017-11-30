@@ -42,10 +42,13 @@ class SecureSharedPreferencesProvider<out SP : SharedPreferences>(
         }
     }
 
-    override val name: String? by lazy { "SecureSharedPreferences.${basePreferencesProvider.name}" }
+    override val name: String? by lazy { "SecureSharedPreferences.{${basePreferencesProvider.name}}" }
 
     override val preferences: SecurePreferences<SP> by lazy { createPreferences(password) }
 
     override fun toString(): String =
-            "SecureSharedPreferencesProvider(basePreferencesProvider='$basePreferencesProvider', preferences=$preferences)"
+            "SecureSharedPreferencesProvider(" +
+                    "name=$name, " +
+                    "basePreferencesProvider='$basePreferencesProvider', " +
+                    "preferences=$preferences)"
 }

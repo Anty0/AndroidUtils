@@ -27,9 +27,13 @@ class ContentProviderPreferencesProvider(context: Context, private val authority
     private fun createPreferences(context: Context): ContentProviderSharedPreferences =
             ContentProviderSharedPreferences.getInstance(context, authority)
 
-    override val name: String? by lazy { "ContentProviderPreferences.$authority.${preferences.name}" }
+    override val name: String? by lazy { "ContentProviderPreferences.{$authority==${preferences.name}}" }
 
     override val preferences: ContentProviderSharedPreferences by lazy { createPreferences(context.applicationContext) }
 
-    override fun toString(): String = "ContentProviderPreferencesProvider(preferences=$preferences)"
+    override fun toString(): String =
+            "ContentProviderPreferencesProvider(" +
+                    "name=$name, " +
+                    "authority=$authority, " +
+                    "preferences=$preferences)"
 }

@@ -41,6 +41,6 @@ class GsonPreference<T>(override val key: String, private val gson: Gson, privat
     }
 
     override fun SharedPreferences.Editor.putValue(key: String, value: T) {
-        putString(key, gson.toJson(value))
+        putString(key, gson.toJson(value, typeOfT))
     }
 }

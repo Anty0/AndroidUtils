@@ -71,13 +71,13 @@ open class LoginDataExtension<out SP : SharedPreferences>(protected val provider
     @Synchronized
     open fun getUsername(id: String): String? {
         log("getUsername", id)
-        return provider.preferences.getString(USERNAME, null)
+        return provider.preferences.getString(formatKey(id, USERNAME), null)
     }
 
     @Synchronized
     open fun getPassword(id: String): String? {
         log("getPassword", id)
-        return provider.preferences.getString(PASSWORD, null)
+        return provider.preferences.getString(formatKey(id, PASSWORD), null)
     }
 
     @Synchronized

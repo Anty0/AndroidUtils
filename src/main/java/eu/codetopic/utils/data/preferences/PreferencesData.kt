@@ -22,9 +22,11 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.content.LocalBroadcastManager
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.LocalBroadcast
 
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
@@ -46,7 +48,7 @@ abstract class PreferencesData<out SP : SharedPreferences> (
         }
     }
 
-    private val preferenceChangeListener = { _: SharedPreferences, key: String? -> onChanged(key) }
+    private val preferenceChangeListener = OnSharedPreferenceChangeListener { _, key -> onChanged(key) }
 
     protected val context: Context = context.applicationContext
 
@@ -87,7 +89,7 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     @SuppressLint("CommitPrefEdits")
     protected fun edit(): SharedPreferences.Editor = preferences.edit()
 
-    protected fun edit(block: SharedPreferences.Editor.() -> Unit) = preferences.edit(block)
+    protected inline fun edit(block: SharedPreferences.Editor.() -> Unit) = preferences.edit(block)
 
     @Synchronized
     override final fun init() {
@@ -106,18 +108,21 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     @CallSuper
     @Synchronized
     protected open fun onCreate() {
+        Log.d(LOG_TAG, "onCreate(name=$name)")
         preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     @CallSuper
     @Synchronized
     protected open fun onChanged(key: String?) {
+        Log.d(LOG_TAG, "onChanged(name=$name, key=$key)")
         LocalBroadcast.sendBroadcast(generateIntentActionChanged(key))
     }
 
     @CallSuper
     @Synchronized
     protected open fun onDestroy() {
+        Log.d(LOG_TAG, "onDestroy(name=$name)")
         preferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
@@ -135,7 +140,8 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     }
 
     override fun toString(): String {
-        return "PreferencesData(preferencesProvider=$preferencesProvider, isCreated=$isCreated, isDestroyed=$isDestroyed)"
+        return "PreferencesData(preferencesProvider=$preferencesProvider, " +
+                "isCreated=$isCreated, isDestroyed=$isDestroyed)"
     }
 
     protected inner class PreferencesProvider : ISharedPreferencesProvider<SP> {

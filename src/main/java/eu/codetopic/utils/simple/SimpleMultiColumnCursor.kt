@@ -89,7 +89,15 @@ class SimpleMultiColumnCursor(private val data: Array<Array<Any?>>, private val 
         }
     }
 
-    override fun getString(column: Int): String {
+    override fun getString(column: Int): String? {
+        val value = this[column]
+        return when (value) {
+            is String? -> value
+            else -> value as String?
+        }
+    }
+
+    fun getNonNullString(column: Int): String {
         val value = this[column]
         return when (value) {
             is String -> value

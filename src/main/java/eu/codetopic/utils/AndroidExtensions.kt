@@ -27,17 +27,15 @@ import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
 
 object AndroidExtensions {
 
-    fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
+    inline fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
             edit().apply { block() }.apply()
 
-    fun <T> ArrayEditAdapter<T, *>.edit(block: ArrayEditAdapter.Editor<T>.() -> Unit) =
+    inline fun <T> ArrayEditAdapter<T, *>.edit(block: ArrayEditAdapter.Editor<T>.() -> Unit) =
             edit().apply { block() }.apply()
 
-    fun broadcast(block: BroadcastReceiver.(context: Context, intent: Intent) -> Unit): BroadcastReceiver {
+    inline fun broadcast(crossinline block: BroadcastReceiver.(context: Context, intent: Intent?) -> Unit): BroadcastReceiver {
         return object: BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                block(context, intent)
-            }
+            override fun onReceive(context: Context, intent: Intent?) = block(context, intent)
         }
     }
 
