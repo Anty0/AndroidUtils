@@ -49,12 +49,9 @@ public abstract class LoadingVH extends ViewHolder {
     public final void showLoading() {
         synchronized (getViewLock()) {
             if (loadingDepth == 0) {
-                JobUtils.postOnContextThread(getViewContext(), new Runnable() {
-                    @Override
-                    public void run() {
-                        synchronized (getViewLock()) {
-                            doShowLoading();
-                        }
+                JobUtils.postOnContextThread(getViewContext(), () -> {
+                    synchronized (getViewLock()) {
+                        doShowLoading();
                     }
                 });
             }
@@ -69,12 +66,9 @@ public abstract class LoadingVH extends ViewHolder {
         synchronized (getViewLock()) {
             loadingDepth--;
             if (loadingDepth == 0) {
-                JobUtils.postOnContextThread(getViewContext(), new Runnable() {
-                    @Override
-                    public void run() {
-                        synchronized (getViewLock()) {
-                            doHideLoading();
-                        }
+                JobUtils.postOnContextThread(getViewContext(), () -> {
+                    synchronized (getViewLock()) {
+                        doHideLoading();
                     }
                 });
             }

@@ -77,7 +77,7 @@ public abstract class CustomItem implements Serializable {
         ViewHolder contentHolder = null;
         if (this instanceof CustomItemWrapper) {
             @IdRes int contentId = ((CustomItemWrapper) this).getContentViewId(holder.context);
-            ViewGroup content = (ViewGroup) holder.itemView.findViewById(contentId);
+            ViewGroup content = holder.itemView.findViewById(contentId);
             contentHolder = (ViewHolder) ViewUtils.getViewTag(content, VIEW_TAG_KEY_CONTENT_VIEW_HOLDER);
 
             if (contentItem == null || (contentHolder != null && contentHolder.layoutResId
