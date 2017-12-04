@@ -27,7 +27,7 @@ import java.io.Serializable
 /**
  * @author anty
  */
-class SerializedPreference<T : Serializable>(override val key: String,
+open class SerializedPreference<T : Serializable>(override val key: String,
                                              provider: ISharedPreferencesProvider<*>,
                                              private val defaultValue: () -> T) :
         BasePreference<T, SharedPreferences>(provider) {

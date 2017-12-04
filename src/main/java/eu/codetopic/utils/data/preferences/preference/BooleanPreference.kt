@@ -24,7 +24,7 @@ import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 /**
  * @author anty
  */
-class BooleanPreference(override val key: String,
+open class BooleanPreference(override val key: String,
                         provider: ISharedPreferencesProvider<*>,
                         private val defaultValue: Boolean) :
         BasePreference<Boolean, SharedPreferences>(provider) {

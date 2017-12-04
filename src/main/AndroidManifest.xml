@@ -67,13 +67,17 @@
             android:enabled="true"
             android:exported="false"
             android:label="TimedBroadcastsExecutor"/>
-
         <receiver
             android:name=".notifications.PostNotificationCanceler"
             android:enabled="true"
             android:exported="false"
             android:label="PostNotificationCanceler"/>
 
+        <provider
+            android:name=".ids.IdentifiersProvider"
+            android:authorities="eu.codetopic.utils.ids.data"
+            android:exported="false"
+            android:process=":providers" />
     </application>
 
 </manifest>

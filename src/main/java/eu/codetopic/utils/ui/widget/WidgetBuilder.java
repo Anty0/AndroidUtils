@@ -273,7 +273,7 @@ public class WidgetBuilder {
         BROADCAST, SERVICE, ACTIVITY;
 
         public PendingIntent toPendingIntent(Context context, Intent intent) {
-            int requestCode = Identifiers.next(Identifiers.TYPE_REQUEST_CODE);
+            int requestCode = Identifiers.Companion.next(Identifiers.Companion.getTYPE_REQUEST_CODE());
             switch (this) {
                 case BROADCAST:
                     return PendingIntent.getBroadcast(context, requestCode,

@@ -46,8 +46,8 @@ public final class BackgroundWorksService extends CommandService<BackgroundWorks
         synchronized (works) {
             if (isStopped()) throw new IllegalStateException(LOG_TAG + " is stopped (what?)");
 
-            WorkInfo info = new WorkInfo(this, jobManager, Identifiers
-                    .next(Identifiers.TYPE_NOTIFICATION_ID), work) {
+            WorkInfo info = new WorkInfo(this, jobManager, Identifiers.Companion
+                    .next(Identifiers.Companion.getTYPE_NOTIFICATION_ID()), work) {
                 @Override
                 public void onBeforeNotificationRemoved() {
                     synchronized (works) {

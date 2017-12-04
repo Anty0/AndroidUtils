@@ -26,21 +26,30 @@ import java.lang.reflect.Type
 /**
  * @author anty
  */
-open class GsonPreference<T>(override val key: String, protected val gson: Gson, protected val typeOfT: Type,
-                        provider: ISharedPreferencesProvider<*>, private val defaultValue: () -> T) :
-        BasePreference<T, SharedPreferences>(provider) {
+open class CachedGsonPreference<T>(key: String, gson: Gson, typeOfT: Type,
+                              provider: ISharedPreferencesProvider<*>, defaultValue: () -> T) :
+        GsonPreference<T>(key, gson, typeOfT, provider, defaultValue) { // FIXME: find way to clone value stored in cache, so cache will stay immutable.
 
     constructor(key: String, gson: Gson, typeOfT: Type, provider: ISharedPreferencesProvider<*>,
                 defaultValue: T) : this(key, gson, typeOfT, provider, { defaultValue })
 
-    override val fallBackValue: T get() = defaultValue()
+    protected var cachedValue: T? = null
 
-    override fun SharedPreferences.getValue(key: String): T {
+    protected fun SharedPreferences.getFreshValue(key: String): T {
         return gson.fromJson(getString(key, null)
                 ?: return fallBackValue, typeOfT)
     }
 
+    override fun SharedPreferences.getValue(key: String): T {
+        return cachedValue ?: {
+            val value = getFreshValue(key)
+            cachedValue = value
+            value
+        }()
+    }
+
     override fun SharedPreferences.Editor.putValue(key: String, value: T) {
+        cachedValue = value
         putString(key, gson.toJson(value, typeOfT))
     }
 }

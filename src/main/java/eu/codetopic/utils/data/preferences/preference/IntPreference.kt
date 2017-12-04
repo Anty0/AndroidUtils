@@ -24,7 +24,7 @@ import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 /**
  * @author anty
  */
-class IntPreference(override val key: String,
+open class IntPreference(override val key: String,
                     provider: ISharedPreferencesProvider<*>,
                     private val defaultValue: Int) :
         BasePreference<Int, SharedPreferences>(provider) {

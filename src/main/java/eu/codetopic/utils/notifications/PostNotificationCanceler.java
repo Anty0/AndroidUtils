@@ -34,7 +34,7 @@ public class PostNotificationCanceler extends BroadcastReceiver {
     public static void postNotificationCancel(Context context, int notificationId, long waitTime) {
         ((AlarmManager) context.getSystemService(Context.ALARM_SERVICE))
                 .set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + waitTime,
-                        PendingIntent.getBroadcast(context, Identifiers.next(Identifiers.TYPE_REQUEST_CODE),
+                        PendingIntent.getBroadcast(context, Identifiers.Companion.next(Identifiers.Companion.getTYPE_REQUEST_CODE()),
                                 new Intent(context, PostNotificationCanceler.class)
                                         .putExtra(EXTRA_NOTIFICATION_ID, notificationId),
                                 PendingIntent.FLAG_CANCEL_CURRENT));

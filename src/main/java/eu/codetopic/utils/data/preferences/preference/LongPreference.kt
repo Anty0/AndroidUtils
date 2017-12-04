@@ -24,7 +24,7 @@ import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 /**
  * @author anty
  */
-class LongPreference(override val key: String,
+open class LongPreference(override val key: String,
                      provider: ISharedPreferencesProvider<*>,
                      private val defaultValue: Long) :
         BasePreference<Long, SharedPreferences>(provider) {

@@ -150,7 +150,7 @@ final class ComponentLoader {
 
         if (checkIsReady()) return;
 
-        int newRequestCode = Identifiers.next(Identifiers.TYPE_REQUEST_CODE);
+        int newRequestCode = Identifiers.Companion.next(Identifiers.Companion.getTYPE_REQUEST_CODE());
         data.setLastRequestCode(componentInfo.getComponentClass(), newRequestCode);
 
         if (checkTimeRestrictions(newRequestCode)) return;

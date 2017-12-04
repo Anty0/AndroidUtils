@@ -24,7 +24,7 @@ import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 /**
  * @author anty
  */
-class FloatPreference(override val key: String,
+open class FloatPreference(override val key: String,
                       provider: ISharedPreferencesProvider<*>,
                       private val defaultValue: Float) :
         BasePreference<Float, SharedPreferences>(provider) {
