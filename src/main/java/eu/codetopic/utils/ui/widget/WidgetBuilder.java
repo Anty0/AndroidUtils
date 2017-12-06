@@ -119,7 +119,7 @@ public class WidgetBuilder {
         hasHeader = true;
         headerIntent = null;
         refreshIntent = null;
-        headerTitle = AndroidUtils.getApplicationLabel(mContext);
+        headerTitle = AndroidUtils.getAppLabel(mContext);
         headerBackgroundColor = AndroidUtils.getColorFromAttr(mContext, R.attr.colorPrimary,
                 ContextCompat.getColor(mContext, R.color.primary_material_dark));
 

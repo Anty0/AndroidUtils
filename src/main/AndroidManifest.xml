@@ -20,10 +20,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="eu.codetopic.utils">
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+
     <uses-permission android:name="android.permission.VIBRATE"/>
 
     <application>
@@ -35,38 +35,12 @@
             android:theme="@style/Theme.AppCompat.Dialog.Alert.NoActionBar"/>
 
         <service
-            android:name=".thread.service.BackgroundWorksService"
-            android:enabled="true"
-            android:exported="false"
-            android:label="BackgroundWorks"/>
-        <service
             android:name=".ui.container.adapter.widget.CustomItemWidgetAdapterService"
             android:enabled="true"
             android:exported="false"
             android:label="WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS"/>
 
-        <receiver
-            android:name=".timing.BootConnectivityReceiver"
-            android:enabled="false"
-            android:exported="false"
-            android:label="TimingBootAndConnectivityReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
-                <action android:name="android.net.wifi.STATE_CHANGE"/>
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".timing.ReloadComponentReceiver"
-            android:enabled="true"
-            android:exported="false"
-            android:label="ReloadComponentReceiver"/>
-        <receiver
-            android:name=".timing.TimedComponentExecutor"
-            android:enabled="true"
-            android:exported="false"
-            android:label="TimedBroadcastsExecutor"/>
         <receiver
             android:name=".notifications.PostNotificationCanceler"
             android:enabled="true"

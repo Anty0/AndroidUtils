@@ -19,24 +19,19 @@
 package eu.codetopic.utils
 
 import android.app.Application
-import android.content.ComponentCallbacks
-import android.content.res.Configuration
 import android.support.annotation.UiThread
 
-import com.birbit.android.jobqueue.log.JqLog
 import com.squareup.leakcanary.LeakCanary
 
 import java.util.Arrays
 
-import eu.codetopic.java.utils.ArrayTools
-import eu.codetopic.java.utils.Objects
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.broadcast.BroadcastsConnector
+import eu.codetopic.utils.broadcast.LocalBroadcast
+import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.log.AndroidLoggerExtension
-import eu.codetopic.utils.log.JobQueueLogger
-import eu.codetopic.utils.service.ServiceCommander
-import eu.codetopic.utils.thread.JobUtils
+import eu.codetopic.utils.thread.LooperUtils
 
 @UiThread
 object UtilsBase {
@@ -73,7 +68,7 @@ object UtilsBase {
     }
 
     private fun completeInit(app: Application) {
-        android.util.Log.d(AndroidUtils.getApplicationLabel(app).toString(), "INITIALIZING:"
+        android.util.Log.d(AndroidUtils.getAppLabel(app).toString(), "INITIALIZING:"
                 + "\n    - PROCESS_PROFILE=" + ACTIVE_PROFILE
                 + "\n    - DEBUG=" + BuildConfig.DEBUG
                 + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE
@@ -87,28 +82,25 @@ object UtilsBase {
 
             // Initialize logger
             AndroidLoggerExtension.install(app)
-            // Setup JobQueueLogger to log into custom logger
-            JqLog.setCustomLogger(JobQueueLogger())
 
             // Initialize some util classes
             LocalBroadcast.initialize(app)
             NetworkManager.init(app)
-            JobUtils.initialize(app)
+            LooperUtils.initialize(app)
             BroadcastsConnector.initialize(app)
             Identifiers.initialize(app)
 
             // Add callback listening onLowMemory event
-            app.registerComponentCallbacks(object : ComponentCallbacks {
+            /*app.registerComponentCallbacks(object : ComponentCallbacks {
                 override fun onConfigurationChanged(newConfig: Configuration) {
 
                 }
 
                 override fun onLowMemory() {
-                    ServiceCommander.disconnectAndKillUnneeded()
                     System.runFinalization()
                     System.gc()
                 }
-            })
+            })*/
         }
 
         ACTIVE_PROFILE.additionalCommands.forEach { it.run() }
@@ -116,13 +108,9 @@ object UtilsBase {
 
     /**
      * Methods that should be called in additionalCommands:
-     * - `eu.codetopic.utils.thread.job.SingletonJobManager.initialize() `
-     * - `eu.codetopic.utils.data.database.singleton.SingletonDatabase.initialize() `
      * - `LocaleManager.initialize() `
-     * - `eu.codetopic.utils.log.DebugModeManager.initDebugModeDetector() ` using `Logger.getDebugModeManager() `
-     * - `eu.codetopic.utils.log.DebugModeManager.setDebugModeEnabled() ` using `Logger.getDebugModeManager() `
-     * - `eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() ` using `Logger.getErrorLogsHandler `
-     * - `eu.codetopic.utils.timing.TimedComponentsManager.initialize() `
+     * - `eu.codetopic.java.utils.log.Log.setDebugMode() (or in kotlin Log.debugMode = ?) `
+     * - `eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() ` using `Logger.getLogsHandler (or in kotlin Logger.logsHandler) `
      * - `eu.codetopic.utils.broadcast.BroadcastsConnector.connect() `
      */
     class ProcessProfile(val processName: String, val initializeUtils: Boolean, vararg val additionalCommands: Runnable) {

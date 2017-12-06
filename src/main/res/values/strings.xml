@@ -20,20 +20,13 @@
 <resources>
     <string name="activity_label_error_info">Logged Error info</string>
     <string name="activity_label_warn_info">Logged Warning info</string>
-    <string name="menu_item_text_settings">Settings</string>
 
     <string name="text_default_no_list_items">Nothing to show</string>
     <string name="text_no_time">No time</string>
     <string name="text_time_format">%1$d minutes, %2$d seconds</string>
-    <string name="text_settings">%1$s Settings</string>
-    <string name="text_settings_about">About</string>
 
     <string name="location_unknown">Unknown location</string>
     <string name="location_none">No address</string>
-
-    <string name="toast_text_database_exception">An error occurred while working with the database.</string>
-
-    <string name="dialog_title_select_language">Select Language</string>
 
     <string name="description_drop_down_arrow">Dropdown arrow</string>
     <string name="description_edit_button">Edit button</string>
@@ -47,10 +40,7 @@
     <string name="wait_text_loading">Loading…</string>
     <string name="wait_text_please_wait">Please wait…</string>
 
-    <string name="but_ok">OK</string>
-    <string name="but_cancel">Cancel</string>
     <string name="but_refresh">Refresh</string>
-    <string name="but_close">Close</string>
 
     <string name="debug_item_connectivity_check_connection_type">Check connection type</string>
     <string name="debug_item_connectivity_info_result_text">Any: %1$s, Wi-Fi: %2$s, Mobile: %3$s</string>

@@ -20,6 +20,7 @@ package eu.codetopic.utils.ui.container.adapter.dashboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 
 import eu.codetopic.utils.PrefNames;
 import eu.codetopic.utils.data.getter.DataGetter;
@@ -70,11 +71,13 @@ public final class DashboardData extends VersionedPreferencesData<SharedPreferen
 
     private static class DashboardDataGetter extends PreferencesGetterAbs<DashboardData> {
 
+        @NonNull
         @Override
         public DashboardData get() {
             return mInstance;
         }
 
+        @NonNull
         @Override
         public Class<DashboardData> getDataClass() {
             return DashboardData.class;

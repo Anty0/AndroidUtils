@@ -28,7 +28,7 @@ import android.support.annotation.CallSuper
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import eu.codetopic.utils.AndroidExtensions.edit
-import eu.codetopic.utils.simple.SimpleMultiColumnCursor
+import eu.codetopic.utils.cursor.MultiColumnCursor
 
 abstract class ContentProviderPreferences<out SP : SharedPreferences>(
         private val authority: String) : ContentProvider() {
@@ -130,9 +130,9 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
     private fun cursorOf(valuesMap: Map<String, Any?>) : Cursor {
         val entries = valuesMap.entries.toList()
-        return SimpleMultiColumnCursor(
+        return MultiColumnCursor(
                 Array(entries.size, { i ->
-                    with (entries[i]) {
+                    with(entries[i]) {
                         arrayOf(key, value)
                     }
                 }),

@@ -1,0 +1,428 @@
+/*
+ * utils
+ * Copyright (C)   2017  anty
+ *
+ * This program is free  software: you can redistribute it and/or modify
+ * it under the terms  of the GNU General Public License as published by
+ * the Free Software  Foundation, either version 3 of the License, or
+ * (at your option) any  later version.
+ *
+ * This program is distributed in the hope that it  will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied  warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+ * GNU General Public License for more details.
+ *
+ * You  should have received a copy of the GNU General Public License
+ * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package eu.codetopic.utils.ui.activity.navigation
+
+import android.annotation.SuppressLint
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.Drawable
+import android.os.Bundle
+import android.os.PersistableBundle
+import android.support.annotation.ColorInt
+import android.support.annotation.DrawableRes
+import android.support.design.internal.NavigationMenuPresenter
+import android.support.design.widget.NavigationView
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentTransaction
+import android.support.v4.view.GravityCompat
+import android.support.v4.view.ViewCompat
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
+import android.support.v7.widget.Toolbar
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import butterknife.BindView
+import butterknife.ButterKnife
+import butterknife.Unbinder
+
+import eu.codetopic.java.utils.Objects
+import eu.codetopic.java.utils.log.Log
+import eu.codetopic.utils.AndroidUtils
+import eu.codetopic.utils.R
+import eu.codetopic.utils.R2
+import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity
+
+abstract class NavigationActivity : BaseFragmentActivity() {
+
+    companion object {
+
+        private const val LOG_TAG = "NavigationActivity"
+
+        private const val KEY_SWITCHING_ACCOUNTS =
+                "eu.codetopic.utils.ui.activity.navigation.NavigationActivity.SWITCHING_ACCOUNTS"
+    }
+
+    internal inner class BaseViews {
+
+        private var unbinder: Unbinder? = null
+
+        @BindView(R2.id.toolbar)
+        lateinit var toolbar: Toolbar
+
+        @BindView(R2.id.drawer_layout)
+        lateinit var drawer: DrawerLayout
+        @BindView(R2.id.nav_view)
+        lateinit var navigationView: NavigationView
+
+        fun bind() {
+            unbinder = ButterKnife.bind(this, this@NavigationActivity)
+        }
+
+        fun isBound() = unbinder != null
+
+        fun unbind() {
+            unbinder?.let {
+                it.unbind()
+                unbinder = null
+            }
+        }
+    }
+
+    internal inner class HeaderViews {
+
+        private var unbinder: Unbinder? = null
+
+        @BindView(R2.id.navigationHeader)
+        lateinit var boxHeader: LinearLayout
+
+        @BindView(R2.id.imageViewAppIcon)
+        lateinit var imgAppIcon: ImageView
+        @BindView(R2.id.container_app_title)
+        lateinit var boxAppName: FrameLayout
+        @BindView(R2.id.textViewAppTitle)
+        lateinit var txtAppName: TextView
+
+        @BindView(R2.id.container_accounts_switch)
+        lateinit var boxAccountsSwitch: LinearLayout
+        @BindView(R2.id.textViewAccountName)
+        lateinit var txtAccountName: TextView
+        @BindView(R2.id.imageButtonEditAccount)
+        lateinit var butAccountEdit: ImageButton
+        @BindView(R2.id.imageButtonAccountChange)
+        lateinit var butAccountChange: ImageButton
+
+        fun bind() {
+            unbinder = ButterKnife.bind(this,
+                    this@NavigationActivity.views.navigationView.getHeaderView(0))
+        }
+
+        fun isBound() = unbinder != null
+
+        fun unbind() {
+            unbinder?.let {
+                it.unbind()
+                unbinder = null
+            }
+        }
+    }
+
+    private val views = BaseViews()
+    private val header = HeaderViews()
+
+    private var drawerToggle: ActionBarDrawerToggle? = null
+
+    var enableSwitchingAccounts = false
+        set(enable) {
+            field = enable
+            invalidateNavigationMenu()
+        }
+    private var switchingAccounts = false
+    var isSwitchingAccounts: Boolean
+        get() = switchingAccounts
+        set(switchingAccounts) {
+            this.switchingAccounts = switchingAccounts
+            invalidateNavigationMenu()
+        }
+
+    protected abstract val mainFragmentClass: Class<out Fragment>?
+    protected open val mainFragment: Fragment?
+        get() = try {
+            mainFragmentClass?.newInstance()
+        } catch (e: Exception) { Log.e(LOG_TAG, "getMainFragment()", e); null }
+
+    var enableActiveAccountEditButton: Boolean
+        get() = header.butAccountEdit.visibility == View.VISIBLE
+        set(enabled) {
+            header.butAccountEdit.visibility =
+                    if (enabled) View.VISIBLE
+                    else View.GONE
+        }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        savedInstanceState?.let {
+            switchingAccounts = it.getBoolean(KEY_SWITCHING_ACCOUNTS, false)
+        }
+
+        setContentView(R.layout.navigation_main)
+
+        views.bind()
+        header.bind()
+
+        header.boxAccountsSwitch.setOnClickListener { isSwitchingAccounts = !isSwitchingAccounts }
+        header.butAccountEdit.setOnClickListener { onEditAccountButtonClick(it) }
+
+        setNavigationViewAppIconDrawable(AndroidUtils.getActivityIcon(this, componentName))
+        setHeaderBackgroundColor(AndroidUtils.getColorFromAttr(this,
+                R.attr.colorPrimaryDark, Color.BLACK))
+
+        header.txtAppName.text = AndroidUtils.getAppLabel(this)
+
+        setSupportActionBar(views.toolbar)
+
+        drawerToggle = ActionBarDrawerToggle(this, views.drawer, views.toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close).also {
+            views.drawer.addDrawerListener(it)
+        }
+
+        views.navigationView.setNavigationItemSelectedListener listener@ {
+            views.drawer.closeDrawer(GravityCompat.START)
+
+            if (enableSwitchingAccounts && switchingAccounts) {
+                isSwitchingAccounts = false
+                return@listener onAccountNavigationItemSelected(it)
+            }
+
+            return@listener onNavigationItemSelected(it)
+        }
+        invalidateNavigationMenu()
+    }
+
+    override fun onCreateMainFragment(): Fragment? = try {
+        mainFragment
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "onCreateMainFragment() -> Failed to create MainFragment", e)
+        null
+    }
+
+    override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
+        super.onPostCreate(savedInstanceState, persistentState)
+        drawerToggle?.syncState()
+    }
+
+    fun setNavigationViewAppIconBitmap(bm: Bitmap) =
+            header.imgAppIcon.setImageBitmap(bm)
+
+    fun setNavigationViewAppIconDrawable(drawable: Drawable?) =
+            header.imgAppIcon.setImageDrawable(drawable)
+
+    fun setNavigationViewAppIconResource(@DrawableRes resId: Int) =
+            header.imgAppIcon.setImageResource(resId)
+
+    fun setHeaderBackground(drawable: Drawable) =
+            ViewCompat.setBackground(header.boxHeader, drawable)
+
+    fun setHeaderBackgroundColor(@ColorInt color: Int) =
+            header.boxHeader.setBackgroundColor(color)
+
+    fun setHeaderBackgroundResource(@DrawableRes resId: Int) =
+            header.boxHeader.setBackgroundResource(resId)
+
+    fun setNavigationTitle(title: CharSequence) {
+        header.txtAppName.text = title
+    }
+
+    override fun onSaveInstanceState(outState: Bundle, outPersistentState: PersistableBundle) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState.putBoolean(KEY_SWITCHING_ACCOUNTS, switchingAccounts)
+    }
+
+    override fun onDestroy() {
+        header.unbind()
+        views.unbind()
+        drawerToggle = null
+        super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        views.drawer.takeIf { it.isDrawerOpen(GravityCompat.START) }?.let {
+            it.closeDrawer(GravityCompat.START)
+            return
+        }
+
+        // If class of current fragment differs from main fragment class,
+        // replace current fragment with main fragment.
+        (currentFragment to mainFragmentClass)
+                .takeIf { it.first?.javaClass != it.second }
+                ?.run {
+                    // If main fragment class is not null, replace current fragment
+                    // with main fragment, if it's null remove current fragment
+                    second?.apply { replaceFragment(this) }
+                            ?: removeCurrentFragment()
+                    return
+                }
+
+        super.onBackPressed()
+    }
+
+    @SuppressLint("RestrictedApi")
+    fun invalidateNavigationMenu() {
+        // Check if we aren't destroyed
+        if (!views.isBound()) return
+
+        if (enableSwitchingAccounts) {
+            header.txtAccountName.text = onUpdateActiveAccountName()
+            header.butAccountChange.setImageResource(
+                    if (switchingAccounts) R.drawable.ic_arrow_drop_up
+                    else R.drawable.ic_arrow_drop_down
+            )
+
+            header.boxAppName.visibility = View.GONE
+            header.boxAccountsSwitch.visibility = View.VISIBLE
+        } else {
+            header.boxAccountsSwitch.visibility = View.GONE
+            header.boxAppName.visibility = View.VISIBLE
+        }
+
+        // Extract menu presenter from navigation view. This allows us to control navigation menu updating.
+        val presenter: NavigationMenuPresenter? = try {
+            NavigationView::class.java.getDeclaredField("mPresenter")?.apply {
+                isAccessible = true
+            }?.let {
+                // Yeah, you are right, next line is really big and dirty HACK.
+                it.get(views.navigationView) as NavigationMenuPresenter?
+            }
+        } catch (e: Exception) {
+            Log.w(LOG_TAG, "invalidateNavigationMenu() -> " +
+                    "Cannot extract menu presenter form navigation view: " +
+                    "Failed to get menu presenter field from navigation view instance -> " +
+                    "Falling back to updating navigation menu after every change", e)
+            null
+        }
+
+        try {
+            presenter?.setUpdateSuspended(true)
+
+            views.navigationView.menu.apply {
+                clear()
+
+                if (enableSwitchingAccounts && switchingAccounts) {
+                    onCreateAccountNavigationMenu(this)
+                    // setupMenuItemsClickListeners(this);
+                } else {
+                    onCreateNavigationMenu(this)
+                    // setupMenuItemsClickListeners(this);
+                }
+            }
+
+            resetNavigationView(currentFragment)
+        } finally {
+            presenter?.run {
+                setUpdateSuspended(false)
+                updateMenuView(false)
+            }
+        }
+    }
+
+    /*private void setupMenuItemsClickListeners(@NonNull Menu menu) {
+        Field listenerField;
+        try {
+            listenerField = MenuItemImpl.class.getDeclaredField("mClickListener");
+            listenerField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +
+                    "can't setup listeners: can't get field from class", e);
+            return;
+        }
+
+        for (int i = 0, size = menu.size(); i < size; i++) {
+            MenuItem item = menu.getItem(i);
+            try {
+                if (item instanceof MenuItemImpl) {
+                    final SupportMenuItem.OnMenuItemClickListener listener =
+                            (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//this is HACK
+                    listenerField.set(item, (SupportMenuItem.OnMenuItemClickListener) item1 -> {
+                        boolean result = listener != null && listener.onMenuItemClick(item1);
+                        drawer.closeDrawer(GravityCompat.START);
+                        return result;
+                    });
+                } else throw new ClassCastException("Wrong class: " + item.getClass());
+            } catch (Throwable e) {
+                Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +
+                        "can't setup listener for " + item, e);
+            }
+            if (item.hasSubMenu()) setupMenuItemsClickListeners(item.getSubMenu());
+        }
+    }*/
+
+    private fun resetNavigationView(currentFragment: Fragment?) {
+        // Check if we aren't destroyed
+        if (!views.isBound()) return
+
+        if (enableSwitchingAccounts && switchingAccounts) {
+            onUpdateSelectedAccountNavigationMenuItem(currentFragment, views.navigationView.menu)
+            header.txtAccountName.text = onUpdateActiveAccountName()
+        } else {
+            onUpdateSelectedNavigationMenuItem(currentFragment, views.navigationView.menu)
+        }
+    }
+
+    protected open fun onCreateNavigationMenu(menu: Menu): Boolean = false
+
+    protected open fun onCreateAccountNavigationMenu(menu: Menu): Boolean = false
+
+    /**
+     * Override this method to enable navigation menu items selecting
+     *
+     * @param currentFragment current fragment
+     * @param menu            navigation menu
+     * @return true if checked state of any item was changed
+     */
+    protected open fun onUpdateSelectedNavigationMenuItem(currentFragment: Fragment?, menu: Menu): Boolean {
+        if (currentFragment != null) {
+            Log.e(LOG_TAG, "onUpdateSelectedNavigationMenuItem(currentFragment=$currentFragment, menu=$currentFragment) -> " +
+                    "Cannot detect selected item for ${currentFragment.javaClass}, override method " +
+                    "onUpdateSelectedNavigationMenuItem() and implement your own selected item detection.")
+            return false
+        }
+
+
+        for (i in 0 until menu.size()) {
+            menu.getItem(i).isChecked = false
+        }
+        return true
+    }
+
+    protected open fun onUpdateSelectedAccountNavigationMenuItem(currentFragment: Fragment?, menu: Menu): Boolean {
+        Log.e(LOG_TAG, "onUpdateSelectedAccountNavigationMenuItem(currentFragment=$currentFragment, menu=$currentFragment) -> " +
+                "Cannot update selected account item, override method onUpdateSelectedAccountNavigationMenuItem() " +
+                "and implement your own selected item detection.")
+        return false
+    }
+
+    open fun onNavigationItemSelected(item: MenuItem): Boolean = false
+
+    open fun onAccountNavigationItemSelected(item: MenuItem): Boolean = false
+
+    protected open fun onUpdateActiveAccountName(): CharSequence {
+        Log.e(LOG_TAG, "onUpdateActiveAccountName() -> Cannot get active account name, " +
+                "override method onUpdateActiveAccountName() and implement active account name detecting.")
+        return ""
+    }
+
+    protected open fun onEditAccountButtonClick(v: View): Boolean = false
+
+    override fun onAttachFragment(fragment: Fragment) {
+        super.onAttachFragment(fragment)
+
+        if (BaseFragmentActivity.FRAGMENT_TAG_CURRENT == fragment.tag)
+            resetNavigationView(fragment)
+    }
+
+    @SuppressLint("PrivateResource")
+    override fun onBeforeReplaceFragment(ft: FragmentTransaction, fragment: Fragment?) {
+        ft.setCustomAnimations(R.anim.abc_fade_in, R.anim.abc_fade_out)
+    }
+}

@@ -25,6 +25,12 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'com.jakewharton.butterknife'
 //apply plugin: 'org.golang.mobile.bind'
 
+kotlin {
+    experimental {
+        coroutines "enable"
+    }
+}
+
 android {
     defaultPublishConfig 'release'
     compileSdkVersion 27
@@ -67,46 +73,35 @@ android {
 }
 
 dependencies {
-    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
 
-     testImplementation 'junit:junit:4.12'
-     androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-         exclude group: 'com.android.support', module: 'support-annotations'
-     })
-
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation project(':utils:javautils')
-    // implementation fileTree(dir: new File(project(':utils:javautils').projectDir, 'libs'), include: ['*.jar'])
 
     implementation "com.android.support:support-v4:$support_libs_version"
-    implementation "com.android.support:support-v13:$support_libs_version"
     implementation "com.android.support:appcompat-v7:$support_libs_version"
     implementation "com.android.support:recyclerview-v7:$support_libs_version"
     implementation "com.android.support:cardview-v7:$support_libs_version"
     implementation "com.android.support:design:$support_libs_version"
     implementation "com.android.support:support-annotations:$support_libs_version"
 
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
+
     implementation "com.jakewharton:butterknife:$butterknife_version"
     kapt "com.jakewharton:butterknife-compiler:$butterknife_version"
+
+    implementation 'com.google.code.gson:gson:2.8.2'
+    implementation 'com.scottyab:aes-crypto:0.0.4'
+    implementation 'com.infstory:proguard-annotations:1.0.2'
 
     String leakcanary_version = '1.5.3'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary_version"
     androidTestImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakcanary_version"
-
-    debugImplementation 'im.dino:dbinspector:3.4.1@aar'
-
-    implementation 'com.infstory:proguard-annotations:1.0.2'
-    implementation 'com.j256.ormlite:ormlite-android:5.0'
-    implementation 'com.birbit:android-priority-jobqueue:2.0.1'
-    implementation 'com.scottyab:aes-crypto:0.0.4'
-
-    implementation 'org.jsoup:jsoup:1.10.3'
-    implementation 'com.google.guava:guava:23.0-android'
-    implementation 'com.google.code.findbugs:jsr305:3.0.2' // fixes bug with dependencies (guava depends on old version of this library)
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation 'com.github.salomonbrys.kotson:kotson:2.5.0'
-    implementation 'commons-io:commons-io:2.5'
 }

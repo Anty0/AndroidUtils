@@ -27,6 +27,7 @@ import android.view.ViewGroup;
 
 import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.ui.activity.modular.SimpleActivityCallBackModule;
+import kotlin.Unit;
 
 public class ViewHolderModule<VH extends ViewHolder> extends SimpleActivityCallBackModule {
 
@@ -50,7 +51,7 @@ public class ViewHolderModule<VH extends ViewHolder> extends SimpleActivityCallB
     }
 
     @Override
-    protected void onSetContentView(@LayoutRes final int layoutResID, SetContentViewCallBack callBack) {
+    public void onSetContentView(@LayoutRes final int layoutResID, SetContentViewCallBack callBack) {
         final ViewHolder.ViewUpdater updater = mHolder.getViewUpdater();
         if (!updater.requiresBaseLayout()) {
             throw new IllegalStateException("Can't create contentView for ViewHolder without base layout");
@@ -59,17 +60,15 @@ public class ViewHolderModule<VH extends ViewHolder> extends SimpleActivityCallB
         }
 
         callBack.set(updater.getBaseLayoutResId());
-        callBack.addViewAttachedCallBack(new Runnable() {
-            @Override
-            public void run() {
-                updater.applyOnBaseLayout(getActivity(),
-                        new ViewHolder.LayoutViewCreator(layoutResID));
-            }
+        callBack.addViewAttachedCallBack(() -> {
+            updater.applyOnBaseLayout(getActivity(),
+                    new ViewHolder.LayoutViewCreator(layoutResID));
+            return Unit.INSTANCE;
         });
     }
 
     @Override
-    protected void onSetContentView(final View view, SetContentViewCallBack callBack) {
+    public void onSetContentView(final View view, SetContentViewCallBack callBack) {
         final ViewHolder.ViewUpdater updater = mHolder.getViewUpdater();
         if (!updater.requiresBaseLayout()) {
             throw new IllegalStateException("Can't create contentView for ViewHolder without base layout");
@@ -78,22 +77,14 @@ public class ViewHolderModule<VH extends ViewHolder> extends SimpleActivityCallB
         }
 
         callBack.set(updater.getBaseLayoutResId());
-        callBack.addViewAttachedCallBack(new Runnable() {
-            @Override
-            public void run() {
-                updater.applyOnBaseLayout(getActivity(), new ViewHolder.ViewCreator() {
-                    @Nullable
-                    @Override
-                    public View createView(Context context, ViewGroup parent) {
-                        return view;
-                    }
-                });
-            }
+        callBack.addViewAttachedCallBack(() -> {
+            updater.applyOnBaseLayout(getActivity(), (context, parent) -> view);
+            return Unit.INSTANCE;
         });
     }
 
     @Override
-    protected void onSetContentView(final View view, final ViewGroup.LayoutParams params,
+    public void onSetContentView(final View view, final ViewGroup.LayoutParams params,
                                     SetContentViewCallBack callBack) {
         throw new UnsupportedOperationException("Not supported");
     }

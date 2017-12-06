@@ -47,28 +47,21 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.annotation.WorkerThread;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Base64;
 import android.widget.Toast;
 
-import org.apache.commons.io.IOUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.jsoup.Connection;
-import org.jsoup.Jsoup;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -77,7 +70,6 @@ import java.util.concurrent.TimeUnit;
 
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
-import eu.codetopic.utils.data.database.DatabaseObject;
 
 public final class AndroidUtils {
 
@@ -166,28 +158,6 @@ public final class AndroidUtils {
         else
             //noinspection SuspiciousNameCombination
             return Bitmap.createBitmap(bitmap, 0, height / 2 - width / 2, width, width);
-    }
-
-    ///////////////////////////////////////
-    //////REGION - DATABASE////////////////
-    ///////////////////////////////////////
-
-    @CheckResult
-    public static <T extends DatabaseObject> int findIndexById(Long id, List<T> databaseObjects) {
-        for (int i = 0, size = databaseObjects.size(); i < size; i++) {
-            if (Objects.equals(id, databaseObjects.get(i).getId()))
-                return i;
-        }
-        return -1;
-    }
-
-    @CheckResult
-    public static <T extends DatabaseObject> int findIndexById(Long id, T[] databaseObjects) {
-        for (int i = 0, size = databaseObjects.length; i < size; i++) {
-            if (Objects.equals(id, databaseObjects[i].getId()))
-                return i;
-        }
-        return -1;
     }
 
     /////////////////////////////////////
@@ -299,19 +269,8 @@ public final class AndroidUtils {
     }
 
     @CheckResult
-    public static CharSequence getApplicationLabel(Context context) {
-        return context.getApplicationInfo().loadLabel(context.getPackageManager());
-    }
-
-    @CheckResult
-    public static CharSequence getApplicationLabel(Context context, String packageName) throws PackageManager.NameNotFoundException {
-        PackageManager pm = context.getPackageManager();
-        return pm.getApplicationInfo(packageName, 0).loadLabel(pm);
-    }
-
-    @CheckResult
     public static CharSequence getAppLabel(Context context) {
-        return context.getPackageManager().getApplicationLabel(context.getApplicationInfo());
+        return context.getApplicationInfo().loadLabel(context.getPackageManager());
     }
 
     @CheckResult
@@ -384,7 +343,7 @@ public final class AndroidUtils {
     //////REGION - LOCATION////////////////
     ///////////////////////////////////////
 
-    @WorkerThread
+    /*@WorkerThread
     @CheckResult
     public static String getLocationName(Context context, double lat, double lon) {
         try {
@@ -407,7 +366,7 @@ public final class AndroidUtils {
             Log.d(LOG_TAG, "getLocationName", e);
         }
         return context.getString(R.string.location_none);
-    }
+    }*/
 
     //////////////////////////////////////
     //////REGION - BUNDLES////////////////
@@ -508,12 +467,25 @@ public final class AndroidUtils {
         FileInputStream input = null;
         try {
             input = new FileInputStream("/proc/self/cmdline");
-            return IOUtils.toString(input,
-                    Charset.defaultCharset()).trim();
+            final InputStreamReader in = new InputStreamReader(input);
+
+            final StringWriter sw = new StringWriter();
+
+            char[] buffer = new char[1024 * 4];
+            int n;
+            while ((n = in.read(buffer)) != -1) {
+                sw.write(buffer, 0, n);
+            }
+
+            return sw.toString().trim();
         } catch (IOException e) {
             return null;
         } finally {
-            IOUtils.closeQuietly(input);
+            try {
+                if (input != null) input.close();
+            } catch (IOException e) {
+                // ignore
+            }
         }
     }
 

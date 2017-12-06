@@ -27,6 +27,7 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
@@ -34,8 +35,8 @@ import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
 import android.widget.SpinnerAdapter;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.util.HashMap;
+import java.util.Map;
 
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
@@ -415,8 +416,7 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
         private final Context mContext;
         private final UniversalAdapter<VH> mAdapter;
         private final int[] mAppWidgetIds;
-        private final Cache<Integer, VH> mViewHoldersCache =
-                CacheBuilder.newBuilder().maximumSize(5).build();
+        private final SparseArray<VH> mViewHoldersCache = new SparseArray<>(); // TODO: limit size of cache
 
         private RemoteViews mLoadingView = null;
 
@@ -466,7 +466,7 @@ public abstract class UniversalAdapter<VH extends UniversalAdapter.ViewHolder> {
         public RemoteViews getViewAt(int i) {
             int itemType = mAdapter.getItemViewType(i);
 
-            VH viewHolder = mViewHoldersCache.getIfPresent(itemType);
+            VH viewHolder = mViewHoldersCache.get(itemType);
             if (viewHolder == null) {
                 viewHolder = mAdapter.onCreateViewHolder(null, itemType);
                 mViewHoldersCache.put(itemType, viewHolder);

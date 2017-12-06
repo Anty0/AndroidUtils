@@ -75,11 +75,12 @@
             android:contentDescription="@string/description_edit_button"
             android:visibility="gone" />
 
-        <ImageView
-            android:id="@+id/imageViewAccountChangeArrow"
+        <ImageButton
+            android:id="@+id/imageButtonAccountChange"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:src="@drawable/ic_arrow_drop_down"
+            android:background="@android:color/transparent"
             android:contentDescription="@string/description_drop_down_arrow" />
     </LinearLayout>
 </LinearLayout>

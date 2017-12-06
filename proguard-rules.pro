@@ -31,12 +31,9 @@
     java.lang.Object readResolve();
 }
 
-# remove Logs
+# remove Logging
 -assumenosideeffects class eu.codetopic.utils.log.ErrorInfoActivity
--assumenosideeffects class com.birbit.android.jobqueue.log.CustomLogger {
-    public static *** v(...);
-    public static *** d(...);
-}
+-assumenosideeffects class eu.codetopic.utils.log.ErrorInfoLogListener
 -assumenosideeffects class eu.codetopic.java.utils.log.Log {
     public static *** v(...);
     public static *** d(...);
@@ -48,13 +45,7 @@
 -assumenosideeffects class eu.codetopic.utils.debug.BaseDebugActivity
 -assumenosideeffects class * extends eu.codetopic.utils.debug.BaseDebugActivity
 
-# keep calsses that implements TimCompInfoModifier (instances of these classes will be created using Class.getInstance())
--keep class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier
--keepclassmembers class * implements eu.codetopic.utils.timing.info.TimCompInfoModifier {
-    public <init>();
-    public void modify(android.content.Context, eu.codetopic.utils.timing.info.TimCompInfoData);
-}
-
+# Fix warnings caused by android packages
 -dontwarn android.content.**
 -dontwarn android.animation.**
 -dontwarn android.widget.**

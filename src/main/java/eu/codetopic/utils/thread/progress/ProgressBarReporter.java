@@ -24,7 +24,8 @@ import android.widget.ProgressBar;
 
 import java.lang.ref.WeakReference;
 
-import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.thread.LooperUtils;
+import kotlin.Unit;
 
 public class ProgressBarReporter extends ProgressReporterImpl {
 
@@ -56,16 +57,14 @@ public class ProgressBarReporter extends ProgressReporterImpl {
 
     @Override
     protected void onChange(final ProgressInfo info) {
-        JobUtils.postOnViewThread(progressBarRef.get(), new Runnable() {
-            @Override
-            public void run() {
-                ProgressBar progressBar = progressBarRef.get();
-                if (progressBar != null) {
-                    progressBar.setMax(info.getMaxProgress());
-                    progressBar.setProgress(info.getProgress());
-                    progressBar.setIndeterminate(info.isIntermediate());
-                }
+        LooperUtils.postOnViewThread(progressBarRef.get(), () -> {
+            ProgressBar progressBar = progressBarRef.get();
+            if (progressBar != null) {
+                progressBar.setMax(info.getMaxProgress());
+                progressBar.setProgress(info.getProgress());
+                progressBar.setIndeterminate(info.isIntermediate());
             }
+            return Unit.INSTANCE;
         });
     }
 }

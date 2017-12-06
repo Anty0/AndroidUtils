@@ -41,7 +41,7 @@ public abstract class ListViewManager<T extends ListViewManager<T>> extends Swip
     protected ListViewManager(@NonNull View mainView, @Nullable int[] swipeSchemeColors,
                               boolean useSwipeRefresh, boolean useFloatingActionButton) {
         super(mainView, swipeSchemeColors, useSwipeRefresh, useFloatingActionButton);
-        mListView = (ListView) mainView.findViewById(R.id.listView);
+        mListView = mainView.findViewById(R.id.listView);
         mListView.setEmptyView(mainView.findViewById(R.id.empty_view));
     }
 

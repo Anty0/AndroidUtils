@@ -18,6 +18,10 @@
 
 package eu.codetopic.utils.thread.progress;
 
+/**
+ * @deprecated use kotlin's interface delegate to create wrapper
+ */
+@Deprecated
 public class ProgressReporterWrapper implements ProgressReporter {
 
     private final ProgressReporter mBase;

@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.ui;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
@@ -122,6 +123,7 @@ public class AppCompatProgressDialog extends AlertDialog {
         mProgressPercentFormat.setMaximumFractionDigits(0);
     }
 
+    @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         LayoutInflater inflater = LayoutInflater.from(getContext());

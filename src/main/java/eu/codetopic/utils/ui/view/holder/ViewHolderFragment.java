@@ -64,22 +64,12 @@ public abstract class ViewHolderFragment extends Fragment {
     @Override
     public final View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                                    @Nullable final Bundle savedInstanceState) {
-        ViewHolder.ViewCreator viewCreator = new ViewHolder.ViewCreator() {
-            @Nullable
-            @Override
-            public View createView(Context context, ViewGroup parent) {
-                return onCreateContentView(LayoutInflater.from(context), parent, savedInstanceState);
-            }
-        };
+        ViewHolder.ViewCreator viewCreator = (context, parent) ->
+                onCreateContentView(LayoutInflater.from(context), parent, savedInstanceState);
         for (final ViewHolder holder : mHolders) {
             final ViewHolder.ViewCreator childViewCreator = viewCreator;
-            viewCreator = new ViewHolder.ViewCreator() {
-                @Nullable
-                @Override
-                public View createView(Context context, ViewGroup parent) {
-                    return holder.updateView(getContext(), parent, childViewCreator, false);
-                }
-            };
+            viewCreator = (context, parent) ->
+                    holder.updateView(getContext(), parent, childViewCreator, false);
         }
         return viewCreator.createView(getContext(), container);
     }

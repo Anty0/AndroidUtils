@@ -19,6 +19,7 @@
 package eu.codetopic.utils.ui.container.adapter;
 
 import android.content.Context;
+import android.support.annotation.MainThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -30,16 +31,15 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import eu.codetopic.java.utils.ArrayTools;
 import eu.codetopic.java.utils.log.Log;
-import eu.codetopic.utils.R;
-import eu.codetopic.utils.callback.ActionCallback;
-import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.thread.LooperUtils;
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper;
-import eu.codetopic.utils.ui.container.items.custom.MultilineItemCustomItemWrapper;
-import eu.codetopic.utils.ui.container.items.multiline.TextMultilineResourceLayoutItem;
+import kotlin.Unit;
 
 public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
+    // TODO: use replace Callback with kotlin's lambda type
+    // TODO: rework, use ASyncTask
 
     private static final String LOG_TAG = "AutoLoadAdapter";
     private static final Object EDIT_TAG = new Object();//LOG_TAG + ".EDIT_TAG";
@@ -66,9 +66,10 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
         if (getBase() instanceof RecyclerView.Adapter<?>)
             wrappers = ArrayTools.add(wrappers, new CardViewWrapper());
 
-        return new MultilineItemCustomItemWrapper(new
+        /*return new MultilineItemCustomItemWrapper(new
                 TextMultilineResourceLayoutItem(getContext().getText(R.string.wait_text_loading),
-                null, R.layout.item_multiline_loading), wrappers);
+                null, R.layout.item_multiline_loading), wrappers);*/
+        return null; // FIXME: create default LoadingItem
     }
 
     protected int getStartingPage() {
@@ -94,35 +95,30 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
             final boolean firstPage = page == getStartingPage();
             final Editor<CustomItem> editor = edit();
             if (firstPage) editor.clear().notifyAllItemsChanged();
-            final ActionCallback<Boolean> callback = new ActionCallback<Boolean>() {
-                @Override
-                public void onActionCompleted(@Nullable Boolean result, @Nullable Throwable caughtThrowable) {
-                    editor.setTag(EDIT_TAG).apply();
-                    AutoLoadAdapter adapter = editor.getAdapter();
-                    if (adapter != null) {
-                        adapter.setShowLoadingItem(result != null && result);
-                        Base base;
-                        if (firstPage && !(base = adapter.getBase()).hasOnlySimpleDataChangedReporting())
-                            base.notifyDataSetChanged(); // first page auto scroll down fix
-                        adapter.mSuspendLock.unlock();
-                    }
+            final Callback<Boolean> callback = (result, caughtThrowable) -> {
+                editor.setTag(EDIT_TAG).apply();
+                AutoLoadAdapter adapter = editor.getAdapter();
+                if (adapter != null) {
+                    adapter.setShowLoadingItem(result != null && result);
+                    Base base;
+                    if (firstPage && !(base = adapter.getBase()).hasOnlySimpleDataChangedReporting())
+                        base.notifyDataSetChanged(); // first page auto scroll down fix
+                    adapter.mSuspendLock.unlock();
                 }
             };
 
             onLoadNextPage(page, editor, callback);
         } else if (force) {
             Log.d(LOG_TAG, "loadNextPage: still loading, trying to wait one loop before next try");
-            JobUtils.postOnContextThread(getContext(), new Runnable() {
-                @Override
-                public void run() {
-                    loadNextPage(true);
-                }
+            LooperUtils.postOnContextThread(getContext(), () -> {
+                loadNextPage(true);
+                return Unit.INSTANCE;
             });
         }
     }
 
     protected abstract void onLoadNextPage(int page, Editor<CustomItem> editor,
-                                           @NonNull ActionCallback<Boolean> callback);
+                                           @NonNull Callback<Boolean> callback);
 
     @Override
     public void onAttachToContainer(@Nullable Object container) {
@@ -207,5 +203,11 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     protected void onDataEdited(Object editorTag) {
         super.onDataEdited(editorTag);
         setShowLoadingItem(mEnabled);
+    }
+
+    public interface Callback<R> {
+
+        @MainThread
+        void onCompleted(@Nullable R result, @Nullable Throwable caughtThrowable);
     }
 }

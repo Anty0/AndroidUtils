@@ -71,9 +71,10 @@ class Identifiers private constructor(context: Context) : PreferencesData<Conten
 
     private class Getter : PreferencesGetterAbs<Identifiers>() {
 
-        override fun get(): Identifiers? = instance
+        override fun get() = instance
 
-        override fun getDataClass(): Class<Identifiers> = Identifiers::class.java
+        override val dataClass: Class<out Identifiers>
+            get() = Identifiers::class.java
     }
 
     class Type(val name: String, val min: Int = 1, val max: Int = Integer.MAX_VALUE): Serializable {

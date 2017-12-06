@@ -25,9 +25,8 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
 import android.support.annotation.CallSuper
-import android.support.v4.content.LocalBroadcastManager
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.LocalBroadcast
+import eu.codetopic.utils.broadcast.LocalBroadcast
 
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import eu.codetopic.utils.AndroidExtensions.edit

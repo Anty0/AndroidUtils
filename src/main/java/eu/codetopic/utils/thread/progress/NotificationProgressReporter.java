@@ -22,7 +22,8 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.support.v4.app.NotificationCompat;
 
-import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.thread.LooperUtils;
+import kotlin.Unit;
 
 public class NotificationProgressReporter extends ProgressReporterImpl {
 
@@ -55,12 +56,10 @@ public class NotificationProgressReporter extends ProgressReporterImpl {
         mNotification.setProgress(info.getMaxProgress(),
                 info.getProgress(), info.isIntermediate());
 
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                ((NotificationManager) mContext.getSystemService(Context
-                        .NOTIFICATION_SERVICE)).notify(mId, mNotification.build());
-            }
+        LooperUtils.runOnMainThread(() -> {
+                ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
+                        .notify(mId, mNotification.build());
+            return Unit.INSTANCE;
         });
     }
 }

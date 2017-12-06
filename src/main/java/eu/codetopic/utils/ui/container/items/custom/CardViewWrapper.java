@@ -24,7 +24,7 @@ import android.view.ViewGroup;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ui.view.ViewUtils;
 
-public class CardViewWrapper extends LayoutItemWrapper {
+public class CardViewWrapper extends LayoutItemWrapper { // TODO: deprecate after rework to kotlin
 
     public static final CustomItemWrapper[] WRAPPER = {new CardViewWrapper()};
     private static final String LOG_TAG = "CardViewWrapper";
@@ -35,7 +35,7 @@ public class CardViewWrapper extends LayoutItemWrapper {
 
     @Override
     protected void onBindViewHolder(ViewHolder holder, int itemPosition) {
-        ViewGroup content = (ViewGroup) holder.itemView.findViewById(getContentViewId(holder.context));
+        ViewGroup content = holder.itemView.findViewById(getContentViewId(holder.context));
         if (content.getChildCount() == 1)
             ViewUtils.copyLayoutParamsToViewParents(content.getChildAt(0), holder.itemView);
     }

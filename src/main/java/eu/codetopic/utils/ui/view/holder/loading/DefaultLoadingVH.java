@@ -28,10 +28,11 @@ import android.widget.ProgressBar;
 import java.lang.ref.WeakReference;
 
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.thread.LooperUtils;
 import eu.codetopic.utils.thread.progress.ProgressInfo;
 import eu.codetopic.utils.thread.progress.ProgressReporter;
 import eu.codetopic.utils.thread.progress.ProgressReporterImpl;
+import kotlin.Unit;
 
 public class DefaultLoadingVH extends ProgressLoadingVH {
 
@@ -76,22 +77,20 @@ public class DefaultLoadingVH extends ProgressLoadingVH {
 
         @Override
         protected void onChange(final ProgressInfo info) {
-            JobUtils.postOnViewThread(loadingViewRef.get(), new Runnable() {
-                @Override
-                public void run() {
-                    View loadingView = loadingViewRef.get();
-                    if (loadingView != null) {
-                        View circleProgress = loadingView.findViewById(CIRCLE_LOADING_VIEW_ID);
-                        ProgressBar horizontalProgress = (ProgressBar) loadingView
-                                .findViewById(HORIZONTAL_LOADING_VIEW_ID);
+            LooperUtils.postOnViewThread(loadingViewRef.get(), () -> {
+                View loadingView = loadingViewRef.get();
+                if (loadingView != null) {
+                    View circleProgress = loadingView.findViewById(CIRCLE_LOADING_VIEW_ID);
+                    ProgressBar horizontalProgress = loadingView
+                            .findViewById(HORIZONTAL_LOADING_VIEW_ID);
 
-                        circleProgress.setVisibility(info.isShowingProgress() ? View.GONE : View.VISIBLE);
-                        horizontalProgress.setVisibility(info.isShowingProgress() ? View.VISIBLE : View.GONE);
-                        horizontalProgress.setMax(info.getMaxProgress());
-                        horizontalProgress.setProgress(info.getProgress());
-                        horizontalProgress.setIndeterminate(info.isIntermediate());
-                    }
+                    circleProgress.setVisibility(info.isShowingProgress() ? View.GONE : View.VISIBLE);
+                    horizontalProgress.setVisibility(info.isShowingProgress() ? View.VISIBLE : View.GONE);
+                    horizontalProgress.setMax(info.getMaxProgress());
+                    horizontalProgress.setProgress(info.getProgress());
+                    horizontalProgress.setIndeterminate(info.isIntermediate());
                 }
+                return Unit.INSTANCE;
             });
         }
     }

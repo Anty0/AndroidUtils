@@ -193,7 +193,7 @@ public abstract class ArrayEditAdapter<T, VH extends UniversalAdapter.ViewHolder
                                 }
                             }
 
-                            if (Log.isInDebugMode() && !Objects.equals(dataBackup, mData))
+                            if (Log.INSTANCE.getDebugMode() && !Objects.equals(dataBackup, mData))
                                 Log.e(LOG_TAG, "apply", new InternalError("Detected problem in " + LOG_TAG
                                         + " while applying changes -> !dataBackup.equals(newData)" +
                                         "\ndataBackup: " + dataBackup + "\nmData: " + mData));

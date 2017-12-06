@@ -23,8 +23,9 @@ import android.support.annotation.UiThread;
 import android.view.View;
 
 import eu.codetopic.java.utils.log.Log;
-import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.thread.LooperUtils;
 import eu.codetopic.utils.ui.view.holder.ViewHolder;
+import kotlin.Unit;
 
 public abstract class LoadingVH extends ViewHolder {
 
@@ -49,10 +50,11 @@ public abstract class LoadingVH extends ViewHolder {
     public final void showLoading() {
         synchronized (getViewLock()) {
             if (loadingDepth == 0) {
-                JobUtils.postOnContextThread(getViewContext(), () -> {
+                LooperUtils.postOnContextThread(getViewContext(), () -> {
                     synchronized (getViewLock()) {
                         doShowLoading();
                     }
+                    return Unit.INSTANCE;
                 });
             }
             loadingDepth++;
@@ -66,10 +68,11 @@ public abstract class LoadingVH extends ViewHolder {
         synchronized (getViewLock()) {
             loadingDepth--;
             if (loadingDepth == 0) {
-                JobUtils.postOnContextThread(getViewContext(), () -> {
+                LooperUtils.postOnContextThread(getViewContext(), () -> {
                     synchronized (getViewLock()) {
                         doHideLoading();
                     }
+                    return Unit.INSTANCE;
                 });
             }
             if (loadingDepth < 0)

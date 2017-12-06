@@ -47,11 +47,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import eu.codetopic.java.utils.JavaUtils;
+import eu.codetopic.java.utils.JavaExtensions;
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.thread.LooperUtils;
+import kotlin.Unit;
+
+import static eu.codetopic.java.utils.JavaExtensions.Anchor.RIGHT;
 
 public class ViewUtils {
 
@@ -325,7 +328,7 @@ public class ViewUtils {
         StringBuilder sb = new StringBuilder("-->");
 
         //draw visibility
-        sb.append(JavaUtils.fillToLen(visibilityToString(view.getVisibility()), 9)).append(" -> ");
+        sb.append(JavaExtensions.fillToLen(visibilityToString(view.getVisibility()), 9, RIGHT)).append(" -> ");
 
         //draw id
         sb.append(viewIdToString(view)).append(" -> ");
@@ -349,7 +352,7 @@ public class ViewUtils {
             StringBuilder csb = new StringBuilder();
             for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++)
                 csb.append("\n").append(drawViewHierarchy(((ViewGroup) view).getChildAt(i)));
-            sb.append(JavaUtils.addBeforeEveryLine(csb.toString(), "\t"));
+            sb.append(JavaExtensions.addBeforeEveryLine(csb.toString(), "\t"));
             sb.append("\n}");
         }
         return sb.toString();
@@ -361,11 +364,9 @@ public class ViewUtils {
                 spinner.getContext(), android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         adapter.addAll(list);
-        JobUtils.runOnMainThread(new Runnable() {
-            @Override
-            public void run() {
-                spinner.setAdapter(adapter);
-            }
+        LooperUtils.runOnMainThread(() -> {
+            spinner.setAdapter(adapter);
+            return Unit.INSTANCE;
         });
     }
 

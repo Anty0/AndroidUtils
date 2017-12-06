@@ -18,20 +18,12 @@
   -->
 
 <resources>
-    <string name="menu_item_text_settings">Nastavení</string>
-
     <string name="text_default_no_list_items">Nic k zobrazení</string>
     <string name="text_no_time">Nulový čas</string>
     <string name="text_time_format">%1$d minut, %2$d sekund</string>
-    <string name="text_settings">%1$s Nastavení</string>
-    <string name="text_settings_about">O Aplikaci</string>
 
     <string name="location_unknown">Neznámá poloha</string>
     <string name="location_none">Žádná adresa</string>
-
-    <string name="toast_text_database_exception">Při práci s databází došlo k chybě.</string>
-
-    <string name="dialog_title_select_language">Vyber jazyk</string>
 
     <string name="description_icon">Ikona</string>
     <string name="description_empty_view_image">Prázdný list</string>
@@ -42,8 +34,7 @@
     <string name="wait_text_loading">Načítání…</string>
     <string name="wait_text_please_wait">Prosím čekejte…</string>
 
-    <string name="but_ok">OK</string>
-    <string name="but_cancel">Storno</string>
     <string name="but_refresh">Obnovit</string>
-    <string name="but_close">Zavřít</string>
+
+    <!-- TODO: complete czech translate -->
 </resources>

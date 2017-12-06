@@ -34,7 +34,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import eu.codetopic.utils.R;
-import eu.codetopic.utils.thread.JobUtils;
+import eu.codetopic.utils.thread.LooperUtils;
+import kotlin.Unit;
 
 public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
 
@@ -85,7 +86,10 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setOnRefreshListener(final SwipeRefreshLayout.OnRefreshListener listener) {
-        JobUtils.runOnMainThread(() -> getSwipeRefreshLayout().setOnRefreshListener(listener));
+        LooperUtils.runOnMainThread(() -> {
+            getSwipeRefreshLayout().setOnRefreshListener(listener);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 
@@ -94,7 +98,10 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setRefreshing(final boolean refreshing) {
-        JobUtils.runOnMainThread(() -> getSwipeRefreshLayout().setRefreshing(refreshing));
+        LooperUtils.runOnMainThread(() -> {
+            getSwipeRefreshLayout().setRefreshing(refreshing);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 
@@ -103,29 +110,44 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setFabClickListener(final View.OnClickListener listener) {
-        JobUtils.runOnMainThread(() -> getFloatingActionButton().setOnClickListener(listener));
+        LooperUtils.runOnMainThread(() -> {
+            getFloatingActionButton().setOnClickListener(listener);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 
     public synchronized T setEmptyImage(final Drawable image) {
-        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageDrawable(image));
+        LooperUtils.runOnMainThread(() -> {
+            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageDrawable(image);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 
     public synchronized T setEmptyImage(final Bitmap image) {
-        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageBitmap(image));
+        LooperUtils.runOnMainThread(() -> {
+            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageBitmap(image);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 
     @TargetApi(23)
     public synchronized T setEmptyImage(final Icon image) {
-        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageIcon(image));
+        LooperUtils.runOnMainThread(() -> {
+            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageIcon(image);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 
 
     public synchronized T setEmptyImage(@DrawableRes final int imageResId) {
-        JobUtils.runOnMainThread(() -> ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageResource(imageResId));
+        LooperUtils.runOnMainThread(() -> {
+            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageResource(imageResId);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 
@@ -134,7 +156,10 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
     }
 
     public synchronized T setEmptyText(final CharSequence text) {
-        JobUtils.runOnMainThread(() -> ((TextView) getBaseView().findViewById(R.id.empty_text)).setText(text));
+        LooperUtils.runOnMainThread(() -> {
+            ((TextView) getBaseView().findViewById(R.id.empty_text)).setText(text);
+            return Unit.INSTANCE;
+        });
         return self();
     }
 

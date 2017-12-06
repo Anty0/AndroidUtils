@@ -1,0 +1,117 @@
+/*
+ * utils
+ * Copyright (C)   2017  anty
+ *
+ * This program is free  software: you can redistribute it and/or modify
+ * it under the terms  of the GNU General Public License as published by
+ * the Free Software  Foundation, either version 3 of the License, or
+ * (at your option) any  later version.
+ *
+ * This program is distributed in the hope that it  will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied  warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+ * GNU General Public License for more details.
+ *
+ * You  should have received a copy of the GNU General Public License
+ * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package eu.codetopic.utils.log
+
+import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.ScrollView
+import android.widget.TextView
+
+import butterknife.BindView
+import butterknife.ButterKnife
+import butterknife.Unbinder
+import eu.codetopic.java.utils.log.base.LogLine
+import eu.codetopic.java.utils.log.base.Priority
+import eu.codetopic.utils.AndroidUtils
+import eu.codetopic.utils.R
+import eu.codetopic.utils.R2
+
+class ErrorInfoActivity : AppCompatActivity() {
+
+    companion object {
+
+        private const val LOG_TAG = "ErrorInfoActivity"
+
+        private const val EXTRA_LOG_LINE = "EXTRA_LOG_LINE"
+
+        fun start(context: Context, logLine: LogLine) {
+            context.startActivity(
+                    Intent(context, ErrorInfoActivity::class.java)
+                            .putExtra(EXTRA_LOG_LINE, logLine)
+                            .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            )
+        }
+    }
+
+    private var unbinder: Unbinder? = null
+
+    @BindView(R2.id.customPanel)
+    lateinit var customPanel: View
+    @BindView(R2.id.buttonPanel)
+    lateinit var buttonPanel: View
+    @BindView(R2.id.textSpacerNoButtons)
+    lateinit var textSpacerNoButtons: View
+
+    @BindView(android.R.id.icon)
+    lateinit var iconView: ImageView
+
+    @BindView(R2.id.alertTitle)
+    lateinit var alertTitle: TextView
+
+    @BindView(android.R.id.message)
+    lateinit var messageView: TextView
+
+    @SuppressLint("PrivateResource")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val logLine = intent.getSerializableExtra(EXTRA_LOG_LINE) as LogLine?
+                ?: return finish()
+
+        val title = getText(
+                if (Priority.ERROR == logLine.priority)
+                    R.string.activity_label_error_info
+                else R.string.activity_label_warn_info
+        )
+
+        setFinishOnTouchOutside(false)
+        setTitle(title)
+
+        setContentView(R.layout.abc_alert_dialog_material)
+
+        unbinder = ButterKnife.bind(this)
+
+        customPanel.visibility = View.GONE
+        buttonPanel.visibility = View.GONE
+        textSpacerNoButtons.visibility = View.VISIBLE
+
+        iconView.setImageDrawable(AndroidUtils.getActivityIcon(this, componentName))
+        iconView.setOnClickListener { finish() }
+
+        alertTitle.text = title
+
+        messageView.setHorizontallyScrolling(true)
+        messageView.isHorizontalScrollBarEnabled = true
+        messageView.text = logLine.toString()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        unbinder?.apply {
+            unbind()
+            unbinder = null
+        }
+    }
+}

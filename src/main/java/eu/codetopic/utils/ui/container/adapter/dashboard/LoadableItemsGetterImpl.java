@@ -30,9 +30,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import eu.codetopic.java.utils.log.Log;
-import eu.codetopic.utils.callback.ActionCallback;
 
-public abstract class LoadableItemsGetterImpl implements LoadableItemsGetter {
+public abstract class LoadableItemsGetterImpl implements LoadableItemsGetter { // TODO: use replace Callback with kotlin's lambda type
 
     private static final String LOG_TAG = "LoadableItemsGetterImpl";
 
@@ -51,12 +50,12 @@ public abstract class LoadableItemsGetterImpl implements LoadableItemsGetter {
 
         loadingStarted = true;
         final WeakReference<Context> contextRef = new WeakReference<>(context);
-        loadItems(context, new ActionCallback<Collection<? extends ItemInfo>>() {
+        loadItems(context, new LoadableItemInfo.Callback<Collection<? extends ItemInfo>>() {
 
             boolean called = false;
 
             @Override
-            public void onActionCompleted(@Nullable Collection<? extends ItemInfo> result,
+            public void onCompleted(@Nullable Collection<? extends ItemInfo> result,
                                           @Nullable Throwable caughtThrowable) {
                 if (caughtThrowable != null)
                     Log.d(LOG_TAG, "getItems -> loadItems", caughtThrowable);
@@ -96,7 +95,7 @@ public abstract class LoadableItemsGetterImpl implements LoadableItemsGetter {
     }
 
     @UiThread
-    protected abstract void loadItems(Context context, ActionCallback<Collection<? extends ItemInfo>> callback);
+    protected abstract void loadItems(Context context, LoadableItemInfo.Callback<Collection<? extends ItemInfo>> callback);
 
     @NonNull
     @UiThread

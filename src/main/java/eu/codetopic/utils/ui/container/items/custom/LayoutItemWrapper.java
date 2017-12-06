@@ -23,7 +23,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 
-public class LayoutItemWrapper extends CustomItemWrapper {
+public class LayoutItemWrapper extends CustomItemWrapper { // TODO: after rework to kotlin remove
 
     private static final String LOG_TAG = "LayoutItemWrapper";
 
