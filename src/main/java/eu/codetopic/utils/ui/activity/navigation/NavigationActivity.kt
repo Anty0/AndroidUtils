@@ -32,27 +32,20 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewCompat
-import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
-import android.support.v7.widget.Toolbar
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageButton
-import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.TextView
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.Unbinder
 
-import eu.codetopic.java.utils.Objects
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
-import eu.codetopic.utils.R2
 import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity
+import kotlinx.android.synthetic.main.navigation_header_base.view.*
+
+import kotlinx.android.synthetic.main.navigation_main.*
+import kotlinx.android.synthetic.main.toolbar_base.*
 
 abstract class NavigationActivity : BaseFragmentActivity() {
 
@@ -64,74 +57,9 @@ abstract class NavigationActivity : BaseFragmentActivity() {
                 "eu.codetopic.utils.ui.activity.navigation.NavigationActivity.SWITCHING_ACCOUNTS"
     }
 
-    internal inner class BaseViews {
+    private lateinit var header: LinearLayout
 
-        private var unbinder: Unbinder? = null
-
-        @BindView(R2.id.toolbar)
-        lateinit var toolbar: Toolbar
-
-        @BindView(R2.id.drawer_layout)
-        lateinit var drawer: DrawerLayout
-        @BindView(R2.id.nav_view)
-        lateinit var navigationView: NavigationView
-
-        fun bind() {
-            unbinder = ButterKnife.bind(this, this@NavigationActivity)
-        }
-
-        fun isBound() = unbinder != null
-
-        fun unbind() {
-            unbinder?.let {
-                it.unbind()
-                unbinder = null
-            }
-        }
-    }
-
-    internal inner class HeaderViews {
-
-        private var unbinder: Unbinder? = null
-
-        @BindView(R2.id.navigationHeader)
-        lateinit var boxHeader: LinearLayout
-
-        @BindView(R2.id.imageViewAppIcon)
-        lateinit var imgAppIcon: ImageView
-        @BindView(R2.id.container_app_title)
-        lateinit var boxAppName: FrameLayout
-        @BindView(R2.id.textViewAppTitle)
-        lateinit var txtAppName: TextView
-
-        @BindView(R2.id.container_accounts_switch)
-        lateinit var boxAccountsSwitch: LinearLayout
-        @BindView(R2.id.textViewAccountName)
-        lateinit var txtAccountName: TextView
-        @BindView(R2.id.imageButtonEditAccount)
-        lateinit var butAccountEdit: ImageButton
-        @BindView(R2.id.imageButtonAccountChange)
-        lateinit var butAccountChange: ImageButton
-
-        fun bind() {
-            unbinder = ButterKnife.bind(this,
-                    this@NavigationActivity.views.navigationView.getHeaderView(0))
-        }
-
-        fun isBound() = unbinder != null
-
-        fun unbind() {
-            unbinder?.let {
-                it.unbind()
-                unbinder = null
-            }
-        }
-    }
-
-    private val views = BaseViews()
-    private val header = HeaderViews()
-
-    private var drawerToggle: ActionBarDrawerToggle? = null
+    private lateinit var drawerToggle: ActionBarDrawerToggle
 
     var enableSwitchingAccounts = false
         set(enable) {
@@ -167,9 +95,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         }
 
         setContentView(R.layout.navigation_main)
-
-        views.bind()
-        header.bind()
+        header = navigationView.getHeaderView(0).boxHeader
 
         header.boxAccountsSwitch.setOnClickListener { isSwitchingAccounts = !isSwitchingAccounts }
         header.butAccountEdit.setOnClickListener { onEditAccountButtonClick(it) }
@@ -180,15 +106,17 @@ abstract class NavigationActivity : BaseFragmentActivity() {
 
         header.txtAppName.text = AndroidUtils.getAppLabel(this)
 
-        setSupportActionBar(views.toolbar)
+        setSupportActionBar(toolbar)
 
-        drawerToggle = ActionBarDrawerToggle(this, views.drawer, views.toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close).also {
-            views.drawer.addDrawerListener(it)
-        }
+        drawerToggle = ActionBarDrawerToggle(this, drawer, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                .also {
+                    drawer.addDrawerListener(it)
+                    it.syncState()
+                }
 
-        views.navigationView.setNavigationItemSelectedListener listener@ {
-            views.drawer.closeDrawer(GravityCompat.START)
+        navigationView.setNavigationItemSelectedListener listener@ {
+            drawer.closeDrawer(GravityCompat.START)
 
             if (enableSwitchingAccounts && switchingAccounts) {
                 isSwitchingAccounts = false
@@ -209,7 +137,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
 
     override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onPostCreate(savedInstanceState, persistentState)
-        drawerToggle?.syncState()
+        drawerToggle.syncState()
     }
 
     fun setNavigationViewAppIconBitmap(bm: Bitmap) =
@@ -239,15 +167,8 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         outState.putBoolean(KEY_SWITCHING_ACCOUNTS, switchingAccounts)
     }
 
-    override fun onDestroy() {
-        header.unbind()
-        views.unbind()
-        drawerToggle = null
-        super.onDestroy()
-    }
-
     override fun onBackPressed() {
-        views.drawer.takeIf { it.isDrawerOpen(GravityCompat.START) }?.let {
+        drawer.takeIf { it.isDrawerOpen(GravityCompat.START) }?.let {
             it.closeDrawer(GravityCompat.START)
             return
         }
@@ -269,9 +190,6 @@ abstract class NavigationActivity : BaseFragmentActivity() {
 
     @SuppressLint("RestrictedApi")
     fun invalidateNavigationMenu() {
-        // Check if we aren't destroyed
-        if (!views.isBound()) return
-
         if (enableSwitchingAccounts) {
             header.txtAccountName.text = onUpdateActiveAccountName()
             header.butAccountChange.setImageResource(
@@ -292,7 +210,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
                 isAccessible = true
             }?.let {
                 // Yeah, you are right, next line is really big and dirty HACK.
-                it.get(views.navigationView) as NavigationMenuPresenter?
+                it.get(navigationView) as NavigationMenuPresenter?
             }
         } catch (e: Exception) {
             Log.w(LOG_TAG, "invalidateNavigationMenu() -> " +
@@ -305,7 +223,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         try {
             presenter?.setUpdateSuspended(true)
 
-            views.navigationView.menu.apply {
+            navigationView.menu.apply {
                 clear()
 
                 if (enableSwitchingAccounts && switchingAccounts) {
@@ -326,46 +244,12 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         }
     }
 
-    /*private void setupMenuItemsClickListeners(@NonNull Menu menu) {
-        Field listenerField;
-        try {
-            listenerField = MenuItemImpl.class.getDeclaredField("mClickListener");
-            listenerField.setAccessible(true);
-        } catch (NoSuchFieldException e) {
-            Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +
-                    "can't setup listeners: can't get field from class", e);
-            return;
-        }
-
-        for (int i = 0, size = menu.size(); i < size; i++) {
-            MenuItem item = menu.getItem(i);
-            try {
-                if (item instanceof MenuItemImpl) {
-                    final SupportMenuItem.OnMenuItemClickListener listener =
-                            (SupportMenuItem.OnMenuItemClickListener) listenerField.get(item);//this is HACK
-                    listenerField.set(item, (SupportMenuItem.OnMenuItemClickListener) item1 -> {
-                        boolean result = listener != null && listener.onMenuItemClick(item1);
-                        drawer.closeDrawer(GravityCompat.START);
-                        return result;
-                    });
-                } else throw new ClassCastException("Wrong class: " + item.getClass());
-            } catch (Throwable e) {
-                Log.e(LOG_TAG, "setupMenuItemsClickListeners - " +
-                        "can't setup listener for " + item, e);
-            }
-            if (item.hasSubMenu()) setupMenuItemsClickListeners(item.getSubMenu());
-        }
-    }*/
-
     private fun resetNavigationView(currentFragment: Fragment?) {
-        // Check if we aren't destroyed
-        if (!views.isBound()) return
-
         if (enableSwitchingAccounts && switchingAccounts) {
-            onUpdateSelectedAccountNavigationMenuItem(currentFragment, views.navigationView.menu)
+            onUpdateSelectedAccountNavigationMenuItem(currentFragment, navigationView.menu)
             header.txtAccountName.text = onUpdateActiveAccountName()
         } else {
-            onUpdateSelectedNavigationMenuItem(currentFragment, views.navigationView.menu)
+            onUpdateSelectedNavigationMenuItem(currentFragment, navigationView.menu)
         }
     }
 
@@ -417,7 +301,8 @@ abstract class NavigationActivity : BaseFragmentActivity() {
     override fun onAttachFragment(fragment: Fragment) {
         super.onAttachFragment(fragment)
 
-        if (BaseFragmentActivity.FRAGMENT_TAG_CURRENT == fragment.tag)
+        // Check if navigation view is available and if fragment is current fragment and if so, reset navigation view.
+        if (navigationView != null && BaseFragmentActivity.FRAGMENT_TAG_CURRENT == fragment.tag)
             resetNavigationView(fragment)
     }
 

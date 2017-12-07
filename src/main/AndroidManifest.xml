@@ -26,7 +26,8 @@
 
     <uses-permission android:name="android.permission.VIBRATE"/>
 
-    <application>
+    <application
+        android:supportsRtl="false">
 
         <activity
             android:name=".log.ErrorInfoActivity"

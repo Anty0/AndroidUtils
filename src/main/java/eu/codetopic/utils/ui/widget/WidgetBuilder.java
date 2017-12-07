@@ -259,8 +259,10 @@ public class WidgetBuilder {
             dataView = new RemoteViews(mContext.getPackageName(), R.layout.empty_view_base);
         }
 
-        if (emptyViewImageSrc != 0)
+        if (emptyViewImageSrc != 0) {
             dataView.setImageViewResource(R.id.empty_image, emptyViewImageSrc);
+            dataView.setViewVisibility(R.id.empty_image, View.VISIBLE);
+        }
         if (emptyViewText != null) dataView.setTextViewText(R.id.empty_text, emptyViewText);
         return dataView;
     }

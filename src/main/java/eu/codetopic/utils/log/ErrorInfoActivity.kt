@@ -18,25 +18,16 @@
 
 package eu.codetopic.utils.log
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.view.View
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.ScrollView
-import android.widget.TextView
 
-import butterknife.BindView
-import butterknife.ButterKnife
-import butterknife.Unbinder
 import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
-import eu.codetopic.utils.R2
+import kotlinx.android.synthetic.main.activity_error_info.*
 
 class ErrorInfoActivity : AppCompatActivity() {
 
@@ -55,25 +46,6 @@ class ErrorInfoActivity : AppCompatActivity() {
         }
     }
 
-    private var unbinder: Unbinder? = null
-
-    @BindView(R2.id.customPanel)
-    lateinit var customPanel: View
-    @BindView(R2.id.buttonPanel)
-    lateinit var buttonPanel: View
-    @BindView(R2.id.textSpacerNoButtons)
-    lateinit var textSpacerNoButtons: View
-
-    @BindView(android.R.id.icon)
-    lateinit var iconView: ImageView
-
-    @BindView(R2.id.alertTitle)
-    lateinit var alertTitle: TextView
-
-    @BindView(android.R.id.message)
-    lateinit var messageView: TextView
-
-    @SuppressLint("PrivateResource")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val logLine = intent.getSerializableExtra(EXTRA_LOG_LINE) as LogLine?
@@ -88,30 +60,15 @@ class ErrorInfoActivity : AppCompatActivity() {
         setFinishOnTouchOutside(false)
         setTitle(title)
 
-        setContentView(R.layout.abc_alert_dialog_material)
+        setContentView(R.layout.activity_error_info)
 
-        unbinder = ButterKnife.bind(this)
+        imgIcon.setImageDrawable(AndroidUtils.getActivityIcon(this, componentName))
+        imgIcon.setOnClickListener { finish() }
 
-        customPanel.visibility = View.GONE
-        buttonPanel.visibility = View.GONE
-        textSpacerNoButtons.visibility = View.VISIBLE
+        txtTitle.text = title
 
-        iconView.setImageDrawable(AndroidUtils.getActivityIcon(this, componentName))
-        iconView.setOnClickListener { finish() }
-
-        alertTitle.text = title
-
-        messageView.setHorizontallyScrolling(true)
-        messageView.isHorizontalScrollBarEnabled = true
-        messageView.text = logLine.toString()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        unbinder?.apply {
-            unbind()
-            unbinder = null
-        }
+        txtMessage.setHorizontallyScrolling(true)
+        txtMessage.isHorizontalScrollBarEnabled = true
+        txtMessage.text = logLine.toString()
     }
 }

@@ -17,28 +17,45 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:layout_centerVertical="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:layout_gravity="center"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:background="?attr/colorPrimaryExtraDark"
+    android:orientation="vertical"
     android:gravity="center">
 
     <ImageView
         android:id="@+id/empty_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp"
+        android:visibility="gone"
         android:contentDescription="@string/description_empty_view_image"/>
 
     <TextView
         android:id="@+id/empty_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/empty_image"
-        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:lines="1"
         android:text="@string/text_default_no_list_items"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
-</RelativeLayout>
+        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+        android:id="@+id/empty_text_small"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:visibility="gone"
+        android:gravity="center_horizontal"
+        android:maxWidth="300dp"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textAppearance="?android:attr/textAppearanceSmall"/>
+</LinearLayout>

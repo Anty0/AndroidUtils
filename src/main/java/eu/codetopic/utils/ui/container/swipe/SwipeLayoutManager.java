@@ -117,26 +117,32 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
         return self();
     }
 
-    public synchronized T setEmptyImage(final Drawable image) {
+    public synchronized T setEmptyImage(@Nullable final Drawable image) {
         LooperUtils.runOnMainThread(() -> {
-            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageDrawable(image);
+            ImageView imageView = getBaseView().findViewById(R.id.empty_image);
+            imageView.setImageDrawable(image);
+            imageView.setVisibility(image != null ? View.VISIBLE : View.GONE);
             return Unit.INSTANCE;
         });
         return self();
     }
 
-    public synchronized T setEmptyImage(final Bitmap image) {
+    public synchronized T setEmptyImage(@NonNull final Bitmap image) {
         LooperUtils.runOnMainThread(() -> {
-            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageBitmap(image);
+            ImageView imageView = getBaseView().findViewById(R.id.empty_image);
+            imageView.setImageBitmap(image);
+            imageView.setVisibility(View.VISIBLE);
             return Unit.INSTANCE;
         });
         return self();
     }
 
     @TargetApi(23)
-    public synchronized T setEmptyImage(final Icon image) {
+    public synchronized T setEmptyImage(@Nullable final Icon image) {
         LooperUtils.runOnMainThread(() -> {
-            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageIcon(image);
+            ImageView imageView = getBaseView().findViewById(R.id.empty_image);
+            imageView.setImageIcon(image);
+            imageView.setVisibility(image != null ? View.VISIBLE : View.GONE);
             return Unit.INSTANCE;
         });
         return self();
@@ -145,7 +151,9 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
 
     public synchronized T setEmptyImage(@DrawableRes final int imageResId) {
         LooperUtils.runOnMainThread(() -> {
-            ((ImageView) getBaseView().findViewById(R.id.empty_image)).setImageResource(imageResId);
+            ImageView imageView = getBaseView().findViewById(R.id.empty_image);
+            imageView.setImageResource(imageResId);
+            imageView.setVisibility(View.VISIBLE);
             return Unit.INSTANCE;
         });
         return self();
@@ -155,9 +163,24 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
         return setEmptyText(getContext().getText(textRes));
     }
 
-    public synchronized T setEmptyText(final CharSequence text) {
+    public synchronized T setEmptyText(@Nullable final CharSequence text) {
         LooperUtils.runOnMainThread(() -> {
-            ((TextView) getBaseView().findViewById(R.id.empty_text)).setText(text);
+            TextView textView = getBaseView().findViewById(R.id.empty_text);
+            textView.setText(text);
+            return Unit.INSTANCE;
+        });
+        return self();
+    }
+
+    public synchronized T setSmallEmptyText(@StringRes int textRes) {
+        return setSmallEmptyText(getContext().getText(textRes));
+    }
+
+    public synchronized T setSmallEmptyText(@Nullable final CharSequence text) {
+        LooperUtils.runOnMainThread(() -> {
+            TextView textView = getBaseView().findViewById(R.id.empty_text_small);
+            textView.setText(text);
+            textView.setVisibility(text != null ? View.VISIBLE : View.GONE);
             return Unit.INSTANCE;
         });
         return self();

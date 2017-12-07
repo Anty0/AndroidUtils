@@ -29,7 +29,6 @@ import android.support.v7.widget.Toolbar
 import android.view.ContextThemeWrapper
 import android.view.View
 
-import eu.codetopic.java.utils.Objects
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
@@ -169,8 +168,8 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
                     .takeIf { it != -1 }?.let { window.statusBarColor = it }
         }
 
-        findViewById<NavigationView>(R.id.nav_view)?.apply {
-            getHeaderView(0).findViewById<View>(R.id.navigationHeader)?.apply {
+        findViewById<NavigationView>(R.id.navigationView)?.apply {
+            getHeaderView(0).findViewById<View>(R.id.boxHeader)?.apply {
                 AndroidUtils.getColorFromAttr(themedContext, R.attr.colorPrimaryDark, -1)
                         .takeIf { it != -1 }?.let { setBackgroundColor(it) }
             }
