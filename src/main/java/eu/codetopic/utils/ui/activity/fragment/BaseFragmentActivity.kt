@@ -47,6 +47,8 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
     val currentFragment: Fragment?
         get() = supportFragmentManager.findFragmentByTag(FRAGMENT_TAG_CURRENT)
 
+    protected abstract val mainFragmentClass: Class<out Fragment>?
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         title = getDefaultTitle()
@@ -120,7 +122,12 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
 
     protected open fun onBeforeReplaceFragment(ft: FragmentTransaction, fragment: Fragment?) {}
 
-    protected abstract fun onCreateMainFragment(): Fragment?
+    protected open fun onCreateMainFragment(): Fragment? = try {
+        mainFragmentClass?.newInstance()
+    } catch (e: Exception) {
+        Log.e(LOG_TAG, "onCreateMainFragment() -> Failed to create main fragment", e)
+        null
+    }
 
     override fun onAttachFragment(fragment: Fragment) {
         super.onAttachFragment(fragment)

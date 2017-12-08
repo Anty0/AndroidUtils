@@ -41,11 +41,11 @@ open class CachedGsonPreference<T>(key: String, gson: Gson, typeOfT: Type,
     }
 
     override fun SharedPreferences.getValue(key: String): T {
-        return cachedValue ?: {
+        return cachedValue ?: run {
             val value = getFreshValue(key)
             cachedValue = value
             value
-        }()
+        }
     }
 
     override fun SharedPreferences.Editor.putValue(key: String, value: T) {

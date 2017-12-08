@@ -58,11 +58,11 @@ object UtilsBase {
         val leakCanaryProfile = ProcessProfile("${app.packageName}:leakcanary", false)
 
         profile = arrayOf(*profiles).plus(arrayOf(providersProfile, leakCanaryProfile))
-                .firstOrNull { processName == it.processName } ?: {
+                .firstOrNull { processName == it.processName } ?: run {
             Log.e(LOG_TAG, "initialize(app=$app, profiles=$profiles)", IllegalStateException("Can't find processName ("
                 + processName + "), in provided ProcessProfiles, using empty ProcessProfile (utils will be disabled)"))
             ProcessProfile(processName, false)
-        }()
+        }
 
         completeInit(app)
     }

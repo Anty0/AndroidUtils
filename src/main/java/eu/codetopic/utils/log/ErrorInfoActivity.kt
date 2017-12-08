@@ -27,8 +27,11 @@ import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
+import kotlinx.android.extensions.CacheImplementation
+import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.synthetic.main.activity_error_info.*
 
+@ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 class ErrorInfoActivity : AppCompatActivity() {
 
     companion object {

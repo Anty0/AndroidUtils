@@ -42,11 +42,15 @@ import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity
+import kotlinx.android.extensions.CacheImplementation
+import kotlinx.android.extensions.ContainerOptions
+import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.navigation_header_base.*
 import kotlinx.android.synthetic.main.navigation_header_base.view.*
-
 import kotlinx.android.synthetic.main.navigation_main.*
 import kotlinx.android.synthetic.main.toolbar_base.*
 
+@ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 abstract class NavigationActivity : BaseFragmentActivity() {
 
     companion object {
@@ -57,7 +61,13 @@ abstract class NavigationActivity : BaseFragmentActivity() {
                 "eu.codetopic.utils.ui.activity.navigation.NavigationActivity.SWITCHING_ACCOUNTS"
     }
 
-    private lateinit var header: LinearLayout
+    @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
+    internal inner class HeaderViews : LayoutContainer {
+        override val containerView: LinearLayout =
+                this@NavigationActivity.navigationView.getHeaderView(0).boxHeader
+    }
+
+    private lateinit var header: HeaderViews
 
     private lateinit var drawerToggle: ActionBarDrawerToggle
 
@@ -74,12 +84,6 @@ abstract class NavigationActivity : BaseFragmentActivity() {
             invalidateNavigationMenu()
         }
 
-    protected abstract val mainFragmentClass: Class<out Fragment>?
-    protected open val mainFragment: Fragment?
-        get() = try {
-            mainFragmentClass?.newInstance()
-        } catch (e: Exception) { Log.e(LOG_TAG, "getMainFragment()", e); null }
-
     var enableActiveAccountEditButton: Boolean
         get() = header.butAccountEdit.visibility == View.VISIBLE
         set(enabled) {
@@ -95,7 +99,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         }
 
         setContentView(R.layout.navigation_main)
-        header = navigationView.getHeaderView(0).boxHeader
+        header = HeaderViews()
 
         header.boxAccountsSwitch.setOnClickListener { isSwitchingAccounts = !isSwitchingAccounts }
         header.butAccountEdit.setOnClickListener { onEditAccountButtonClick(it) }
@@ -126,13 +130,6 @@ abstract class NavigationActivity : BaseFragmentActivity() {
             return@listener onNavigationItemSelected(it)
         }
         invalidateNavigationMenu()
-    }
-
-    override fun onCreateMainFragment(): Fragment? = try {
-        mainFragment
-    } catch (e: Exception) {
-        Log.e(LOG_TAG, "onCreateMainFragment() -> Failed to create MainFragment", e)
-        null
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {

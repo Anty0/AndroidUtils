@@ -30,8 +30,12 @@ kotlin {
     }
 }
 
-kapt {
-    generateStubs = true
+//kapt {
+//    generateStubs = true
+//}
+
+androidExtensions {
+    experimental = true
 }
 
 android {
