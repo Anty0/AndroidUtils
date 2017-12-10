@@ -30,7 +30,7 @@ public class CardViewWrapper extends LayoutItemWrapper { // TODO: deprecate afte
     private static final String LOG_TAG = "CardViewWrapper";
 
     public CardViewWrapper(@NonNull CustomItemWrapper... wrappers) {
-        super(R.layout.card_view_base, R.id.card_view, wrappers);
+        super(R.layout.item_wrapper_card_view, R.id.card_view, wrappers);
     }
 
     @Override

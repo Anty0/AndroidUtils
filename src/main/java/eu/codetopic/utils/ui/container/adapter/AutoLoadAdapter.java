@@ -31,10 +31,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import eu.codetopic.java.utils.ArrayTools;
 import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.LooperUtils;
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper;
+import eu.codetopic.utils.ui.container.items.custom.LoadingItem;
 import kotlin.Unit;
 
 public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
@@ -62,14 +64,14 @@ public abstract class AutoLoadAdapter extends CustomItemAdapter<CustomItem> {
     }
 
     protected CustomItem generateLoadingItem() {
-        CustomItemWrapper[] wrappers = new CustomItemWrapper[0];
-        if (getBase() instanceof RecyclerView.Adapter<?>)
-            wrappers = ArrayTools.add(wrappers, new CardViewWrapper());
-
-        /*return new MultilineItemCustomItemWrapper(new
-                TextMultilineResourceLayoutItem(getContext().getText(R.string.wait_text_loading),
-                null, R.layout.item_multiline_loading), wrappers);*/
-        return null; // FIXME: create default LoadingItem
+        final boolean useCardView = getBase() instanceof RecyclerView.Adapter<?>;
+        return new LoadingItem(getContext(), R.string.wait_text_loading) {
+            @NonNull
+            @Override
+            protected CustomItemWrapper[] getWrappers(Context context) {
+                return useCardView ? CardViewWrapper.WRAPPER : new CustomItemWrapper[0];
+            }
+        };
     }
 
     protected int getStartingPage() {

@@ -44,7 +44,7 @@ class LoggingDebugItem : CustomItem() {
         }
     }
 
-    override fun getItemLayoutResId(context: Context) = R.layout.debug_item_logging
+    override fun getItemLayoutResId(context: Context) = R.layout.item_debug_logging
 
     override fun getWrappers(context: Context): Array<CustomItemWrapper> = CardViewWrapper.WRAPPER
 }

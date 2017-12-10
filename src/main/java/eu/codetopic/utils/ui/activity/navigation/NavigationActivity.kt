@@ -45,10 +45,10 @@ import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.extensions.LayoutContainer
-import kotlinx.android.synthetic.main.navigation_header_base.*
-import kotlinx.android.synthetic.main.navigation_header_base.view.*
-import kotlinx.android.synthetic.main.navigation_main.*
-import kotlinx.android.synthetic.main.toolbar_base.*
+import kotlinx.android.synthetic.main.activity_navigation_header.*
+import kotlinx.android.synthetic.main.activity_navigation_header.view.*
+import kotlinx.android.synthetic.main.activity_navigation_base.*
+import kotlinx.android.synthetic.main.activity_module_toolbar.*
 
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 abstract class NavigationActivity : BaseFragmentActivity() {
@@ -98,7 +98,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
             switchingAccounts = it.getBoolean(KEY_SWITCHING_ACCOUNTS, false)
         }
 
-        setContentView(R.layout.navigation_main)
+        setContentView(R.layout.activity_navigation_base)
         header = HeaderViews()
 
         header.boxAccountsSwitch.setOnClickListener { isSwitchingAccounts = !isSwitchingAccounts }

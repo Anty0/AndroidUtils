@@ -50,7 +50,7 @@ class ConnectivityDebugItem : CustomItem() {
         }
     }
 
-    override fun getItemLayoutResId(context: Context) = R.layout.debug_item_connectivity
+    override fun getItemLayoutResId(context: Context) = R.layout.item_debug_connectivity
 
     override fun getWrappers(context: Context): Array<CustomItemWrapper> = CardViewWrapper.WRAPPER
 }

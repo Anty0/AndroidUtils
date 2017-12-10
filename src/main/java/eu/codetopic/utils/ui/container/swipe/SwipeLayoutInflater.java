@@ -31,7 +31,7 @@ import eu.codetopic.utils.R;
 
 public abstract class SwipeLayoutInflater<T extends SwipeLayoutInflater<T, E>, E extends SwipeLayoutManager> {
 
-    @LayoutRes public static final int DEFAULT_SWIPE_LAYOUT_ID = R.layout.swipe_refresh_base;
+    @LayoutRes public static final int DEFAULT_SWIPE_LAYOUT_ID = R.layout.base_swipe_refresh;
     private static final String LOG_TAG = "SwipeLayoutInflater";
     private static int[] DEFAULT_SWIPE_SCHEME_COLORS = null;
     @LayoutRes private int mBaseLayoutResId = DEFAULT_SWIPE_LAYOUT_ID;

@@ -29,8 +29,12 @@ import android.support.v4.content.LocalBroadcastManager;
 import java.lang.ref.WeakReference;
 
 import eu.codetopic.java.utils.log.Log;
+import eu.codetopic.utils.R;
+import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
+import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper;
 import eu.codetopic.utils.ui.container.items.custom.EmptyCustomItem;
+import eu.codetopic.utils.ui.container.items.custom.LoadingItem;
 
 public abstract class LoadableItemInfo extends ItemInfo { // TODO: use replace Callback with kotlin's lambda type
 
@@ -55,10 +59,13 @@ public abstract class LoadableItemInfo extends ItemInfo { // TODO: use replace C
 
     @NonNull
     protected CustomItem generateLoadingItem(Context context) {
-        /*MultilineItem item = new TextMultilineResourceLayoutItem(getLoadingName(context),
-                context.getText(R.string.wait_text_loading), R.layout.item_multiline_loading);
-        return new MultilineItemCustomItemWrapper(item, new CardViewWrapper());*/
-        return null; // FIXME: create default LoadingItem
+        return new LoadingItem(getLoadingName(context), context.getText(R.string.wait_text_loading)) {
+            @NonNull
+            @Override
+            protected CustomItemWrapper[] getWrappers(Context context) {
+                return CardViewWrapper.WRAPPER;
+            }
+        };
     }
 
     @Nullable

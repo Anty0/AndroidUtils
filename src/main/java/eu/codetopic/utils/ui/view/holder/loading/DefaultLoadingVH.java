@@ -36,7 +36,7 @@ import kotlin.Unit;
 
 public class DefaultLoadingVH extends ProgressLoadingVH {
 
-    @LayoutRes protected static final int LOADING_LAYOUT_ID = R.layout.loading_base;
+    @LayoutRes protected static final int LOADING_LAYOUT_ID = R.layout.view_holder_loading;
     @IdRes protected static final int CONTENT_VIEW_ID = R.id.base_loadable_content;
     @IdRes protected static final int LOADING_VIEW_ID = R.id.base_loading;
     @IdRes protected static final int CIRCLE_LOADING_VIEW_ID = R.id.base_loading_circle;

@@ -32,7 +32,7 @@ import eu.codetopic.utils.ui.container.swipe.SwipeLayoutInflater;
 
 public abstract class RecyclerInflater<T extends RecyclerInflater<T, E>, E extends RecyclerManager<E>> extends SwipeLayoutInflater<T, E> {
 
-    @LayoutRes public static final int DEFAULT_RECYCLER_LAYOUT_ID = R.layout.recycler_base;
+    @LayoutRes public static final int DEFAULT_RECYCLER_LAYOUT_ID = R.layout.base_recycler;
     @IdRes public static final int DEFAULT_CONTENT_VIEW_ID = R.id.container_content;
     private static final String LOG_TAG = "RecyclerInflater";
     @LayoutRes private int mRecyclerLayoutResId = DEFAULT_RECYCLER_LAYOUT_ID;

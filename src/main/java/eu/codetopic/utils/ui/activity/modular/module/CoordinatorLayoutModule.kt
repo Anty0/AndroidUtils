@@ -23,9 +23,6 @@ import android.view.View
 import android.view.ViewGroup
 
 import eu.codetopic.utils.R
-import eu.codetopic.utils.ui.activity.modular.ActivityCallBackModule
-import eu.codetopic.utils.ui.activity.modular.ActivityCallBackModule.SetContentViewCallBack
-import eu.codetopic.utils.ui.activity.modular.ModularActivity
 import eu.codetopic.utils.ui.activity.modular.SimpleActivityCallBackModule
 
 /**
@@ -36,7 +33,7 @@ import eu.codetopic.utils.ui.activity.modular.SimpleActivityCallBackModule
 class CoordinatorLayoutModule : SimpleActivityCallBackModule() {
 
     override fun onSetContentView(@LayoutRes layoutResID: Int, callBack: SetContentViewCallBack) {
-        callBack.set(R.layout.cordinator_layout_base)
+        callBack.set(R.layout.activity_module_coordinator_layout)
         callBack.addViewAttachedCallBack {
             activity.let {
                 it.layoutInflater.inflate(layoutResID, it.findViewById(R.id.base_coordinator_layout_content))
@@ -45,7 +42,7 @@ class CoordinatorLayoutModule : SimpleActivityCallBackModule() {
     }
 
     override fun onSetContentView(view: View, callBack: SetContentViewCallBack) {
-        callBack.set(R.layout.cordinator_layout_base)
+        callBack.set(R.layout.activity_module_coordinator_layout)
         callBack.addViewAttachedCallBack {
             activity.findViewById<ViewGroup>(R.id.base_coordinator_layout_content)
                     .addView(view)
@@ -54,7 +51,7 @@ class CoordinatorLayoutModule : SimpleActivityCallBackModule() {
 
     override fun onSetContentView(view: View, params: ViewGroup.LayoutParams,
                                   callBack: SetContentViewCallBack) {
-        callBack.set(R.layout.cordinator_layout_base)
+        callBack.set(R.layout.activity_module_coordinator_layout)
         callBack.addViewAttachedCallBack {
             activity.findViewById<ViewGroup>(R.id.base_coordinator_layout_content)
                     .addView(view, params)

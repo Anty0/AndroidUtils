@@ -25,7 +25,7 @@ import eu.codetopic.utils.R;
 
 public class SoftKeyboardSupportLoadingVH extends DefaultLoadingVH {
 
-    @LayoutRes protected static final int LOADING_LAYOUT_ID = R.layout.loading_soft_keyboard_support_base;
+    @LayoutRes protected static final int LOADING_LAYOUT_ID = R.layout.view_holder_loading_soft_keyboard_support;
 
     private static final String LOG_TAG = "SoftKeyboardSupportLoadingVH";
 

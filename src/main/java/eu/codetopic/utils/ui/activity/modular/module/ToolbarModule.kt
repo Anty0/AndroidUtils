@@ -19,14 +19,10 @@
 package eu.codetopic.utils.ui.activity.modular.module
 
 import android.support.annotation.LayoutRes
-import android.support.v7.widget.Toolbar
 import android.view.View
 import android.view.ViewGroup
 
 import eu.codetopic.utils.R
-import eu.codetopic.utils.ui.activity.modular.ActivityCallBackModule
-import eu.codetopic.utils.ui.activity.modular.ActivityCallBackModule.SetContentViewCallBack
-import eu.codetopic.utils.ui.activity.modular.ModularActivity
 import eu.codetopic.utils.ui.activity.modular.SimpleActivityCallBackModule
 
 class ToolbarModule : SimpleActivityCallBackModule() {
@@ -37,7 +33,7 @@ class ToolbarModule : SimpleActivityCallBackModule() {
     }
 
     override fun onSetContentView(@LayoutRes layoutResID: Int, callBack: SetContentViewCallBack) {
-        callBack.set(R.layout.toolbar_base)
+        callBack.set(R.layout.activity_module_toolbar)
         callBack.addViewAttachedCallBack {
             activity.let {
                 it.layoutInflater.inflate(layoutResID, it.findViewById(R.id.base_content))
@@ -47,7 +43,7 @@ class ToolbarModule : SimpleActivityCallBackModule() {
     }
 
     override fun onSetContentView(view: View, callBack: SetContentViewCallBack) {
-        callBack.set(R.layout.toolbar_base)
+        callBack.set(R.layout.activity_module_toolbar)
         callBack.addViewAttachedCallBack {
             activity.findViewById<ViewGroup>(R.id.base_content).addView(view)
         }
@@ -55,7 +51,7 @@ class ToolbarModule : SimpleActivityCallBackModule() {
     }
 
     override fun onSetContentView(view: View, params: ViewGroup.LayoutParams, callBack: SetContentViewCallBack) {
-        callBack.set(R.layout.toolbar_base)
+        callBack.set(R.layout.activity_module_toolbar)
         callBack.addViewAttachedCallBack {
             (activity.findViewById<View>(R.id.base_content) as ViewGroup).addView(view, params)
         }

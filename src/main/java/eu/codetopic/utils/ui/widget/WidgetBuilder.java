@@ -256,7 +256,7 @@ public class WidgetBuilder {
             Intent serviceIntent = CustomItemWidgetAdapter.getServiceIntent(mContext, itemsProvider);
             baseView.setRemoteAdapter(R.id.content_list_view, serviceIntent);
         } else {
-            dataView = new RemoteViews(mContext.getPackageName(), R.layout.empty_view_base);
+            dataView = new RemoteViews(mContext.getPackageName(), R.layout.base_empty_view);
         }
 
         if (emptyViewImageSrc != 0) {
