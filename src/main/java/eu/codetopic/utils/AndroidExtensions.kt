@@ -22,6 +22,7 @@ import android.content.*
 import android.net.Uri
 import android.support.annotation.AnyRes
 import android.support.annotation.StringRes
+import android.util.SparseArray
 import eu.codetopic.utils.data.getter.DataGetter
 import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
 
@@ -30,7 +31,7 @@ object AndroidExtensions {
     inline fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
             edit().apply { block() }.apply()
 
-    inline fun <T> ArrayEditAdapter<T, *>.edit(block: ArrayEditAdapter.Editor<T>.() -> Unit) =
+    inline fun <T : Any> ArrayEditAdapter<T, *>.edit(block: ArrayEditAdapter.Editor<T>.() -> Unit) =
             edit().apply { block() }.apply()
 
     inline fun broadcast(crossinline block: BroadcastReceiver.(context: Context, intent: Intent?) -> Unit): BroadcastReceiver {
@@ -63,6 +64,15 @@ object AndroidExtensions {
                 |${getResourceEntryName(resource)}""".trimMargin())
         }
     }
+
+    //////////////////////////////////////
+    //////REGION - SPARSE_ARRAY///////////
+    //////////////////////////////////////
+
+    inline fun <E> SparseArray<E>.getOrPut(key: Int, defaultValue: () -> E): E =
+            get(key) ?: defaultValue().also { put(key, it) }
+
+    // TODO: add more SparseArray extension functions
 
     // TODO: move functions from AndroidUtils, that can be implemented as extensions here and implement them as extensions
 }

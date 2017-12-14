@@ -28,6 +28,8 @@ import android.support.annotation.UiThread;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.ViewGroup;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +40,8 @@ import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter;
 import eu.codetopic.utils.ui.container.adapter.UniversalAdapter;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.view.holder.loading.LoadingVH;
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 
 public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapter.ViewHolder> {
 
@@ -124,7 +128,10 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     public void onDetachFromContainer(@Nullable Object container) {
         super.onDetachFromContainer(container);
         saveItemsStates();
-        edit().clear().setTag(EDIT_TAG).apply();
+        Editor<ItemInfo> editor = edit();
+        editor.clear();
+        editor.setTag(EDIT_TAG);
+        editor.apply();
     }
 
     private void saveItemsStates() {
@@ -174,16 +181,22 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
         mFilter.filter(itemInfoList);
         Collections.sort(itemInfoList);
 
-        edit().clear().addAll(itemInfoList).notifyAllItemsChanged().setTag(EDIT_TAG).apply();
+        Editor<ItemInfo> editor = edit();
+        editor.clear();
+        editor.addAll(itemInfoList);
+        editor.notifyAllItemsChanged();
+        editor.setTag(EDIT_TAG);
+        editor.apply();
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return CustomItem.createViewHolder(getContext(), parent, viewType).forUniversalAdapter();
+        return CustomItem.Companion.createViewHolder(getContext(), parent, viewType).forUniversalAdapter();
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         getItem(position).getItem(getContext()).bindViewHolder(holder, position);
     }
 
@@ -193,8 +206,9 @@ public class DashboardAdapter extends ArrayEditAdapter<ItemInfo, UniversalAdapte
     }
 
     @Override
-    protected void assertAllowApplyChanges(@Nullable Object editTag, Collection<Modification<ItemInfo>> modifications,
-                                           @Nullable Collection<ItemInfo> contentModifiedItems) {
+    protected void assertAllowApplyChanges(@Nullable Object editTag,
+                                           @NotNull Collection<? extends Function2<? super List<ItemInfo>, ? super Base, Unit>> modifications,
+                                           @Nullable Collection<? extends ItemInfo> contentModifiedItems) {
         super.assertAllowApplyChanges(editTag, modifications, contentModifiedItems);
         if (EDIT_TAG != editTag) throw new UnsupportedOperationException(LOG_TAG +
                 " can't be edited anytime, you can call notifyItemsChanged() or send broadcast" +

@@ -63,7 +63,7 @@ public abstract class LoadableItemInfo extends ItemInfo { // TODO: use replace C
             @NonNull
             @Override
             protected CustomItemWrapper[] getWrappers(Context context) {
-                return CardViewWrapper.WRAPPER;
+                return CardViewWrapper.Companion.getWRAPPER();
             }
         };
     }

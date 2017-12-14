@@ -22,19 +22,19 @@ import android.content.Context
 import android.content.SharedPreferences
 
 import eu.codetopic.java.utils.log.Log
+import eu.codetopic.utils.PrefNames.*
 import eu.codetopic.utils.data.preferences.PreferencesData
 import eu.codetopic.utils.data.preferences.VersionedPreferencesData
 import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider
 
-import eu.codetopic.utils.PrefNames.ADD_LAST_ID
-import eu.codetopic.utils.PrefNames.FILE_NAME_IDENTIFIERS
-import eu.codetopic.utils.PrefNames.ID_TYPE_NOTIFICATION_ID
-import eu.codetopic.utils.PrefNames.ID_TYPE_REQUEST_CODE
+import eu.codetopic.utils.data.preferences.preference.IntPreference
+import eu.codetopic.utils.data.preferences.preference.StringPreference
 import eu.codetopic.utils.data.preferences.provider.ContentProviderPreferencesProvider
 import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
 import eu.codetopic.utils.data.preferences.support.PreferencesCompanionObject
 import eu.codetopic.utils.data.preferences.support.PreferencesGetterAbs
 import java.io.Serializable
+import kotlin.coroutines.experimental.buildSequence
 
 class Identifiers private constructor(context: Context) : PreferencesData<ContentProviderSharedPreferences>(context,
         ContentProviderPreferencesProvider(context, IdentifiersProvider.AUTHORITY)) {
@@ -57,16 +57,28 @@ class Identifiers private constructor(context: Context) : PreferencesData<Conten
         }
 
         fun next(type: Type): Int = instance.getNext(type)
+
+        fun sequenceOf(type: Type): Sequence<Int> = buildSequence {
+            while (true) yield(next(type))
+        }
+
+        fun Type.nextId(): Int = next(this)
+
+        fun Type.asIdsSequence(): Sequence<Int> = sequenceOf(this)
     }
 
-    private fun getLast(type: Type) = preferences.getInt(type.settingsName, type.min)
+    private val lastPref = StringPreference(LAST_IDENTIFIER, accessProvider, "")
 
-    private fun getNext(type: Type): Int {
-        val next = type.getNext(getLast(type))
-        edit { putInt(type.settingsName, next) }
-        Log.d(LOG_TAG, "Returning next identifier of type "
-                + type.name + ", returned id is " + next)
-        return next
+    private fun Type.getLastValue() = lastPref.getValue(this, name)
+            .takeIf { it.isNotEmpty() }?.toIntOrNull() ?: min
+
+    private fun Type.setLastValue(value: Int) = lastPref.setValue(this, name, value.toString())
+
+    private fun Type.getNextValue() = getNext(getLastValue()).also { setLastValue(it) }
+
+    @Synchronized
+    private fun getNext(type: Type): Int = type.getNextValue().also {
+        Log.d(LOG_TAG, "getNext(type=$type) -> (nextIdentifier=$it)")
     }
 
     private class Getter : PreferencesGetterAbs<Identifiers>() {
@@ -78,8 +90,6 @@ class Identifiers private constructor(context: Context) : PreferencesData<Conten
     }
 
     class Type(val name: String, val min: Int = 1, val max: Int = Integer.MAX_VALUE): Serializable {
-
-        val settingsName: String get() = ADD_LAST_ID + name
 
         init {
             if (min >= max) throw IllegalArgumentException("Min cannot be same of higher then Max. " + this)

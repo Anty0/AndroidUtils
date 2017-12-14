@@ -28,7 +28,7 @@ public final class PrefNames {
     public static final String LOGGED_IN = "LOGGED_IN";
     // Identifiers
     public static final String FILE_NAME_IDENTIFIERS = "IdentifiersData";
-    public static final String ADD_LAST_ID = "LAST_";
+    public static final String LAST_IDENTIFIER = "LAST_IDENTIFIER";
     public static final String ID_TYPE_REQUEST_CODE = "REQUEST_CODE";
     public static final String ID_TYPE_NOTIFICATION_ID = "NOTIFICATION_ID";
     // DashboardData

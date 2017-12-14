@@ -16,22 +16,19 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.ui.container.items.custom;
+package eu.codetopic.utils.ui.container.items.custom
 
-import android.content.Context;
-import android.view.View;
+import android.content.Context
+import android.support.annotation.LayoutRes
 
-import eu.codetopic.utils.R;
+class LayoutItem(@LayoutRes private val layoutRes: Int) : CustomItem() {
 
-public class EmptyCustomItem extends CustomItem {
+    companion object {
 
-    @Override
-    protected void onBindViewHolder(ViewHolder holder, int itemPosition) {
-        holder.itemView.setVisibility(View.GONE);
+        private const val LOG_TAG = "LayoutItem"
     }
 
-    @Override
-    public int getItemLayoutResId(Context context) {
-        return R.layout.item_empty;
-    }
+    override fun onBindViewHolder(holder: CustomItem.ViewHolder, itemPosition: Int) {}
+
+    override fun getItemLayoutResId(context: Context): Int = layoutRes
 }

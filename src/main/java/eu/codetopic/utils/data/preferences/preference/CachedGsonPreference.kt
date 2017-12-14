@@ -19,14 +19,14 @@
 package eu.codetopic.utils.data.preferences.preference
 
 import android.content.SharedPreferences
-import com.google.gson.Gson
+//import com.google.gson.Gson
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import java.lang.reflect.Type
 
 /**
  * @author anty
  */
-open class CachedGsonPreference<T>(key: String, gson: Gson, typeOfT: Type,
+/*open class CachedGsonPreference<T>(key: String, gson: Gson, typeOfT: Type,
                               provider: ISharedPreferencesProvider<*>, defaultValue: () -> T) :
         GsonPreference<T>(key, gson, typeOfT, provider, defaultValue) { // FIXME: find way to clone value stored in cache, so cache will stay immutable.
 
@@ -52,4 +52,4 @@ open class CachedGsonPreference<T>(key: String, gson: Gson, typeOfT: Type,
         cachedValue = value
         putString(key, gson.toJson(value, typeOfT))
     }
-}
+}*/

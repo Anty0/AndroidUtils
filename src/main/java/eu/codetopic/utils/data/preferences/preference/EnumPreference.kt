@@ -19,28 +19,31 @@
 package eu.codetopic.utils.data.preferences.preference
 
 import android.content.SharedPreferences
-//import com.google.gson.Gson
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import java.lang.reflect.Type
+import kotlinx.serialization.enumFromName
+import kotlin.reflect.KClass
 
 /**
  * @author anty
  */
-/*open class GsonPreference<T>(override val key: String, protected val gson: Gson, protected val typeOfT: Type,
-                        provider: ISharedPreferencesProvider<*>, private val defaultValue: () -> T) :
+class EnumPreference<T : Enum<T>>(override val key: String,
+                              private val enumClass: KClass<T>,
+                              provider: ISharedPreferencesProvider<*>,
+                              private val defaultValue: () -> T) :
         BasePreference<T, SharedPreferences>(provider) {
 
-    constructor(key: String, gson: Gson, typeOfT: Type, provider: ISharedPreferencesProvider<*>,
-                defaultValue: T) : this(key, gson, typeOfT, provider, { defaultValue })
+    constructor(key: String, enumClass: KClass<T>,
+                provider: ISharedPreferencesProvider<*>,
+                defaultValue: T) :
+            this(key, enumClass, provider, { defaultValue })
 
     override val fallBackValue: T get() = defaultValue()
 
     override fun SharedPreferences.getValue(key: String): T {
-        return gson.fromJson(getString(key, null)
-                ?: return fallBackValue, typeOfT)
+        return getString(key, null)?.let { enumFromName(enumClass, it) } ?: defaultValue()
     }
 
     override fun SharedPreferences.Editor.putValue(key: String, value: T) {
-        putString(key, gson.toJson(value, typeOfT))
+        putString(key, value.name)
     }
-}*/
+}

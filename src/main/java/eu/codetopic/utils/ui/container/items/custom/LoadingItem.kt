@@ -46,5 +46,5 @@ open class LoadingItem @JvmOverloads constructor(private val title: CharSequence
         txtText.visibility = if (text != null) VISIBLE else GONE
     }
 
-    override fun getItemLayoutResId(context: Context?): Int = R.layout.item_loading
+    override fun getItemLayoutResId(context: Context): Int = R.layout.item_loading
 }

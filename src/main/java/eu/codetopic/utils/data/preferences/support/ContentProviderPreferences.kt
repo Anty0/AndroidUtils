@@ -120,7 +120,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
     @CallSuper
     override fun shutdown() {
         Log.d(LOG_TAG, "shutdown()")
-        preferences.registerOnSharedPreferenceChangeListener(preferencesChangeListener)
+        preferences.unregisterOnSharedPreferenceChangeListener(preferencesChangeListener)
         super.shutdown()
     }
 

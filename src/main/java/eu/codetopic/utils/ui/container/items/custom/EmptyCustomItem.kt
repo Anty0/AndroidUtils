@@ -16,12 +16,19 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.ui.container.adapter;
+package eu.codetopic.utils.ui.container.items.custom
 
-import android.app.PendingIntent;
-import android.content.Context;
+import android.content.Context
+import android.view.View
 
-public interface WidgetItemClickListener {
+import eu.codetopic.utils.R
 
-    PendingIntent getOnClickIntent(Context context);
+class EmptyCustomItem : CustomItem() {
+
+    override fun onBindViewHolder(holder: CustomItem.ViewHolder, itemPosition: Int) {
+        // Completely hide item, so there will nothing stay in layout
+        holder.itemView.visibility = View.GONE
+    }
+
+    override fun getItemLayoutResId(context: Context): Int = R.layout.item_empty
 }

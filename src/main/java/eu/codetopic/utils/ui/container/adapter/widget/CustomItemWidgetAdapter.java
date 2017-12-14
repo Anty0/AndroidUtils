@@ -61,7 +61,8 @@ public class CustomItemWidgetAdapter extends CustomItemAdapter<CustomItem> {
     }
 
     protected void updateItems() {
-        Editor<CustomItem> editor = edit().clear();
+        Editor<CustomItem> editor = edit();
+        editor.clear();
         try {
             editor.addAll(itemsProvider.getItems(getContext()));
         } catch (Exception e) {
@@ -77,6 +78,8 @@ public class CustomItemWidgetAdapter extends CustomItemAdapter<CustomItem> {
         if (itemsChangedIntentFilter != null) {
             getContext().unregisterReceiver(itemsChangedReceiver);
         }
-        edit().clear().apply();
+        Editor<CustomItem> editor = edit();
+        editor.clear();
+        editor.apply();
     }
 }

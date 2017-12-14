@@ -56,79 +56,11 @@ import kotlin.Unit;
 
 import static eu.codetopic.java.utils.JavaExtensions.Anchor.RIGHT;
 
-public class ViewUtils {
+public class ViewUtils { // TODO: rework to kotlin (and move to ViewExtensions)
 
     private static final String LOG_TAG = "ViewUtils";
-    private static final int VIEW_TAG_KEY_TAGS_HASH_MAP = R.id.view_tag_key_tags_hash_map;
-
-    /////////////////////////
-    //////REGION - TAGS//////
-    /////////////////////////
 
     private ViewUtils() {
-    }
-
-    private static Map<String, Object> getTags(View view) {
-        //noinspection unchecked
-        Map<String, Object> tags = (Map<String, Object>)
-                view.getTag(VIEW_TAG_KEY_TAGS_HASH_MAP);
-        if (tags == null) {
-            tags = new HashMap<>();
-            view.setTag(VIEW_TAG_KEY_TAGS_HASH_MAP, tags);
-        }
-        return tags;
-    }
-
-    public static void setViewTag(View view, String key, Object tag) {
-        getTags(view).put(key, tag);
-    }
-
-    @CheckResult
-    public static Object getViewTag(View view, String key) {
-        return getTags(view).get(key);
-    }
-
-    @CheckResult
-    public static Object getViewTagFromChildren(@NonNull View view, String key) {
-        View result = findViewWithTag(view, key);
-        return result == null ? null : getViewTag(result, key);
-    }
-
-    /**
-     * Look for a child view with the given tag key. If this view has the given
-     * key, return this view.
-     *
-     * @param view   starting view
-     * @param tagKey tag key to search
-     * @return found view or null
-     */
-    @CheckResult
-    public static View findViewWithTag(@NonNull View view, String tagKey) {
-        return findViewWithTag(view, tagKey, null);
-    }
-
-    /**
-     * Look for a child view with the given key with value tag. If this view has the given
-     * key with value tag, return this view.
-     *
-     * @param view   starting view
-     * @param tagKey tag key to search
-     * @param tag    tag to search or null for any tag
-     * @return found view or null
-     */
-    @CheckResult
-    public static View findViewWithTag(@NonNull View view, String tagKey, @Nullable Object tag) {
-        if (tag == null ? getTags(view).containsKey(tagKey)
-                : Objects.equals(getViewTag(view, tagKey), tag))
-            return view;
-
-        if (view instanceof ViewGroup) {
-            for (int i = 0, len = ((ViewGroup) view).getChildCount(); i < len; i++) {
-                View result = findViewWithTag(((ViewGroup) view).getChildAt(i), tagKey, tag);
-                if (result != null) return result;
-            }
-        }
-        return null;
     }
 
     //////////////////////////////////

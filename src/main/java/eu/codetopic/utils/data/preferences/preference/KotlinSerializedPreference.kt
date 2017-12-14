@@ -19,28 +19,34 @@
 package eu.codetopic.utils.data.preferences.preference
 
 import android.content.SharedPreferences
-//import com.google.gson.Gson
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import java.lang.reflect.Type
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.json.JSON
 
 /**
  * @author anty
  */
-/*open class GsonPreference<T>(override val key: String, protected val gson: Gson, protected val typeOfT: Type,
-                        provider: ISharedPreferencesProvider<*>, private val defaultValue: () -> T) :
+open class KotlinSerializedPreference<T : Any>(override val key: String,
+                                               private val serializer: KSerializer<T>,
+                                               provider: ISharedPreferencesProvider<*>,
+                                               private val defaultValue: () -> T) :
         BasePreference<T, SharedPreferences>(provider) {
 
-    constructor(key: String, gson: Gson, typeOfT: Type, provider: ISharedPreferencesProvider<*>,
-                defaultValue: T) : this(key, gson, typeOfT, provider, { defaultValue })
+    constructor(key: String, serializer: KSerializer<T>,
+                provider: ISharedPreferencesProvider<*>,
+                defaultValue: T) :
+            this(key, serializer, provider, { defaultValue })
 
     override val fallBackValue: T get() = defaultValue()
 
     override fun SharedPreferences.getValue(key: String): T {
-        return gson.fromJson(getString(key, null)
-                ?: return fallBackValue, typeOfT)
+        return getString(key, null)?.let {
+            JSON.parse(serializer, it)
+        } ?: defaultValue()
     }
 
     override fun SharedPreferences.Editor.putValue(key: String, value: T) {
-        putString(key, gson.toJson(value, typeOfT))
+        putString(key, JSON.stringify(serializer, value))
     }
-}*/
+}

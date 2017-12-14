@@ -28,6 +28,8 @@ object LooperUtils {
 
     private const val LOG_TAG = "LooperUtils"
 
+    // TODO: maybe use Looper.getMainLooper to obtain main looper instead
+
     private var initialized = false
     lateinit var mainLooperHandler: Handler private set
     lateinit var mainThread: Thread private set
