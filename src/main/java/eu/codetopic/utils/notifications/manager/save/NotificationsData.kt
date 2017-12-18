@@ -32,12 +32,10 @@ import eu.codetopic.utils.data.preferences.support.PreferencesCompanionObject
 import eu.codetopic.utils.data.preferences.support.PreferencesGetterAbs
 import eu.codetopic.utils.notifications.manager.NotificationsChannels
 import eu.codetopic.utils.notifications.manager.NotificationsGroups
-import eu.codetopic.utils.notifications.manager.data.CommonNotificationId
+import eu.codetopic.utils.notifications.manager.data.NotificationId
 import eu.codetopic.utils.notifications.manager.data.NotificationInfo
-import eu.codetopic.utils.notifications.manager.data.SummaryNotificationId
 import eu.codetopic.utils.notifications.manager.util.NotificationChannel
 import eu.codetopic.utils.notifications.manager.util.NotificationGroup
-import kotlinx.serialization.list
 import kotlinx.serialization.map
 
 /**
@@ -64,22 +62,22 @@ class NotificationsData private constructor(context: Context) :
         }
     }
 
-    private var notificationsMap: Map<CommonNotificationId, NotificationInfo>
-            by KotlinSerializedPreference<Map<CommonNotificationId, NotificationInfo>>(
+    private var notificationsMap: Map<NotificationId, NotificationInfo>
+            by KotlinSerializedPreference<Map<NotificationId, NotificationInfo>>(
                     NOTIFICATIONS_MAP,
-                    (kSerializer<CommonNotificationId>() to kSerializer<NotificationInfo>()).map,
+                    (kSerializer<NotificationId>() to kSerializer<NotificationInfo>()).map,
                     accessProvider,
                     { emptyMap() }
             )
 
     @Synchronized
-    internal fun remove(id: CommonNotificationId): Bundle? {
+    internal fun remove(id: NotificationId): Bundle? {
         val map = notificationsMap.toMutableMap()
         return map.remove(id)?.data?.also { notificationsMap = map }
     }
 
     @Synchronized
-    internal fun removeAll(ids: List<CommonNotificationId>): Map<CommonNotificationId, Bundle> {
+    internal fun removeAll(ids: List<NotificationId>): Map<NotificationId, Bundle> {
         if (ids.isEmpty()) return emptyMap()
 
         val map = notificationsMap.toMutableMap()
@@ -92,7 +90,7 @@ class NotificationsData private constructor(context: Context) :
 
     @Synchronized
     internal fun removeAll(groupId: String? = null,
-                           channelId: String? = null): Map<CommonNotificationId, Bundle> {
+                           channelId: String? = null): Map<NotificationId, Bundle> {
         val map = notificationsMap.toMutableMap()
         return map.filter {
             (groupId == null || it.key.groupId == groupId) &&
@@ -105,7 +103,7 @@ class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal fun removeAll(): Map<CommonNotificationId, Bundle> {
+    internal fun removeAll(): Map<NotificationId, Bundle> {
         val map = notificationsMap.toMutableMap()
         return map.map {
             it.key.also { map.remove(it) } to it.value.data
@@ -115,13 +113,13 @@ class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal fun put(groupId: String, channelId: String, data: Bundle): CommonNotificationId =
+    internal fun put(groupId: String, channelId: String, data: Bundle): NotificationId =
             put(NotificationsGroups[groupId], NotificationsChannels[channelId], data)
 
     @Synchronized
     internal fun put(group: NotificationGroup, channel: NotificationChannel,
-                     data: Bundle): CommonNotificationId {
-        val id = CommonNotificationId(
+                     data: Bundle): NotificationId {
+        val id = NotificationId.newCommon(
                 group.id, channel.id,
                 group.nextId(context, channel, data)
         )
@@ -137,12 +135,12 @@ class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal fun putAll(groupId: String, channelId: String, data: Bundle): CommonNotificationId =
+    internal fun putAll(groupId: String, channelId: String, data: Bundle): NotificationId =
             put(NotificationsGroups[groupId], NotificationsChannels[channelId], data)
 
     @Synchronized
     internal fun putAll(groupId: String, channelId: String,
-                        data: List<Bundle>): Map<CommonNotificationId, Bundle> {
+                        data: List<Bundle>): Map<NotificationId, Bundle> {
         val group = NotificationsGroups[groupId]
         val channel = NotificationsChannels[channelId]
 
@@ -150,7 +148,7 @@ class NotificationsData private constructor(context: Context) :
 
         val map = notificationsMap.toMutableMap()
         val result = data.map {
-            CommonNotificationId(
+            NotificationId.newCommon(
                     groupId, channelId,
                     group.nextId(context, channel, it)
             ).also { id ->
@@ -167,15 +165,15 @@ class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal operator fun get(id: CommonNotificationId): Bundle? = notificationsMap[id]?.data
+    internal operator fun get(id: NotificationId): Bundle? = notificationsMap[id]?.data
 
     @Synchronized
-    internal fun getAll(): Map<CommonNotificationId, Bundle> = notificationsMap
+    internal fun getAll(): Map<NotificationId, Bundle> = notificationsMap
             .map { it.key to it.value.data }.toMap()
 
     @Synchronized
     internal fun getAll(groupId: String? = null,
-                        channelId: String? = null): Map<CommonNotificationId, Bundle> {
+                        channelId: String? = null): Map<NotificationId, Bundle> {
         return notificationsMap.filter {
             (groupId == null || it.key.groupId == groupId) &&
                     (channelId == null || it.key.channelId == channelId)
@@ -183,7 +181,7 @@ class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal operator fun contains(id: CommonNotificationId): Boolean = id in notificationsMap
+    internal operator fun contains(id: NotificationId): Boolean = id in notificationsMap
 
     private class Getter : PreferencesGetterAbs<NotificationsData>() {
 

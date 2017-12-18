@@ -48,6 +48,17 @@
             android:exported="false"
             android:label="PostNotificationCanceler"/>
 
+        <receiver
+            android:name=".notifications.manager.receiver.NotificationDeleteReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="NotificationDeleteReceiver" />
+        <receiver
+            android:name=".notifications.manager.receiver.NotificationLaunchReceiver"
+            android:enabled="true"
+            android:exported="false"
+            android:label="NotificationLaunchReceiver" />
+
         <provider
             android:name=".ids.IdentifiersProvider"
             android:authorities="eu.codetopic.utils.ids.data"

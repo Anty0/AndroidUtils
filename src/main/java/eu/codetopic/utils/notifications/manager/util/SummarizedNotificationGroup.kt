@@ -21,6 +21,7 @@ package eu.codetopic.utils.notifications.manager.util
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.NotificationCompat
+import eu.codetopic.utils.notifications.manager.data.NotificationId
 
 /**
  * @author anty
@@ -30,6 +31,8 @@ abstract class SummarizedNotificationGroup(id: String, checkForIdOverrides: Bool
 
     open val summarizeMin = 3
 
-    abstract fun createSummaryNotification(context: Context, channel: NotificationChannel,
+    abstract fun createSummaryNotification(context: Context,
+                                           id: NotificationId,
+                                           channel: NotificationChannel,
                                            data: List<Bundle>): NotificationCompat.Builder
 }

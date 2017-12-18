@@ -32,7 +32,7 @@ object NotificationsGroups {
         if (group.id in groups)
             throw IllegalArgumentException("Existing groupId: '${group.id}'")
 
-        group.initialize(context)
+        refresh(context, group)
         groups.put(group.id, group)
     }
 
@@ -42,4 +42,10 @@ object NotificationsGroups {
     }
 
     internal fun getAll(): List<NotificationGroup> = groups.values.toList()
+
+    internal fun refresh(context: Context, groupId: String) =
+            refresh(context, get(groupId))
+
+    internal fun refresh(context: Context, group: NotificationGroup) =
+            group.initialize(context)
 }

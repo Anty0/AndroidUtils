@@ -32,7 +32,7 @@ object NotificationsChannels {
         if (channel.id in channels)
             throw IllegalArgumentException("Existing channelId: '${channel.id}'")
 
-        channel.initialize(context)
+        refresh(context, channel)
         channels.put(channel.id, channel)
     }
 
@@ -42,4 +42,10 @@ object NotificationsChannels {
     }
 
     internal fun getAll(): List<NotificationChannel> = channels.values.toList()
+
+    internal fun refresh(context: Context, channelId: String) =
+            refresh(context, get(channelId))
+
+    internal fun refresh(context: Context, channel: NotificationChannel) =
+            channel.initialize(context)
 }

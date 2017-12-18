@@ -26,6 +26,7 @@ import android.support.v4.app.NotificationCompat
 
 import eu.codetopic.utils.AndroidExtensions.notificationManager
 import eu.codetopic.java.utils.debug.DebugAsserts.assert
+import eu.codetopic.utils.notifications.manager.data.NotificationId
 
 /**
  * @author anty
@@ -40,10 +41,18 @@ abstract class NotificationGroup(val id: String, val checkForIdOverrides: Boolea
         )
     }
 
-    abstract fun nextId(context: Context, channel: NotificationChannel, data: Bundle): Int
-
     protected abstract fun createGroup(context: Context): NotificationChannelGroup
 
-    abstract fun createNotification(context: Context, channel: NotificationChannel,
+    abstract fun nextId(context: Context, channel: NotificationChannel, data: Bundle): Int
+
+    abstract fun createNotification(context: Context,
+                                    id: NotificationId,
+                                    channel: NotificationChannel,
                                     data: Bundle): NotificationCompat.Builder
+
+    open fun hanldeContentIntent(context: Context, id: NotificationId,
+                                 channel: NotificationChannel, data: Bundle) {}
+
+    open fun handleDeleteIntent(context: Context, id: NotificationId,
+                                channel: NotificationChannel, data: Bundle) {}
 }

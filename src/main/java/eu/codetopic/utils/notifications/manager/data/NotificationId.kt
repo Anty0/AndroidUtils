@@ -18,22 +18,59 @@
 
 package eu.codetopic.utils.notifications.manager.data
 
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 /**
  * @author anty
  */
-interface NotificationId {
+@Serializable
+class NotificationId private constructor(val groupId: String,
+                                               val channelId: String,
+                                               val id: Int,
+                                               val isSummary: Boolean) {
 
-    val groupId: String
+    companion object {
 
-    val channelId: String
+        private const val SUMMARY_NOTIFICATION_ID = 1
 
-    val id: Int
+        internal fun newCommon(groupId: String, channelId: String, id: Int) =
+                NotificationId(groupId, channelId, id, false)
+
+        internal fun newSummary(groupId: String, channelId: String) =
+                NotificationId(groupId, channelId, SUMMARY_NOTIFICATION_ID, true)
+
+        internal fun tagFor(groupId: String, channelId: String, isSummary: Boolean) =
+                "TAG(group=$groupId, channel=$channelId, isSummary=$isSummary)"
+    }
 
     @Transient
     val tag: String
-        get() = "TAG(group=$groupId, channel=$channelId, isSummary=$isSummary)"
+        get() = tagFor(groupId, channelId, isSummary)
 
-    val isSummary: Boolean
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as NotificationId
+
+        if (groupId != other.groupId) return false
+        if (channelId != other.channelId) return false
+        if (id != other.id) return false
+        if (isSummary != other.isSummary) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = groupId.hashCode()
+        result = 31 * result + channelId.hashCode()
+        result = 31 * result + id
+        result = 31 * result + isSummary.hashCode()
+        return result
+    }
+
+    override fun toString(): String =
+            "NotificationId(groupId='$groupId', channelId='$channelId'," +
+                    " id=$id, isSummary=$isSummary)"
 }

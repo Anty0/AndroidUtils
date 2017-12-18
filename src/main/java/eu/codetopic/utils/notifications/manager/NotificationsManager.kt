@@ -21,7 +21,7 @@ package eu.codetopic.utils.notifications.manager
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import eu.codetopic.utils.notifications.manager.data.CommonNotificationId
+import eu.codetopic.utils.notifications.manager.data.NotificationId
 import eu.codetopic.utils.notifications.manager.save.NotificationsData
 import eu.codetopic.utils.notifications.manager.util.NotificationChannel
 import eu.codetopic.utils.notifications.manager.util.NotificationGroup
@@ -31,7 +31,6 @@ import eu.codetopic.utils.notifications.manager.util.NotificationGroup
  */
 @SuppressLint("StaticFieldLeak")
 object NotificationsManager {
-
 
     private lateinit var context: Context
 
@@ -48,33 +47,42 @@ object NotificationsManager {
     fun initChannel(channel: NotificationChannel) =
             NotificationsChannels.add(context, channel)
 
+    fun refreshGroup(groupId: String) =
+            NotificationsGroups.refresh(context, groupId)
+
+    fun refreshChannel(channelId: String) =
+            NotificationsChannels.refresh(context, channelId)
+
     //--------------------------------------------------------------------------
 
     fun refresh() = Notifications.refresh(context)
 
-    fun notify(groupId: String, channelId: String, data: Bundle): CommonNotificationId =
+    fun notify(groupId: String, channelId: String, data: Bundle): NotificationId =
             Notifications.notify(context, groupId, channelId, data)
 
-    fun notifyAll(groupId: String, channelId: String, vararg data: Bundle): List<CommonNotificationId> =
+    fun notifyAll(groupId: String, channelId: String, vararg data: Bundle): List<NotificationId> =
             Notifications.notifyAll(context, groupId, channelId, data.asList())
 
-    fun notifyAll(groupId: String, channelId: String, data: List<Bundle>): List<CommonNotificationId> =
+    fun notifyAll(groupId: String, channelId: String, data: List<Bundle>): List<NotificationId> =
             Notifications.notifyAll(context, groupId, channelId, data)
 
-    fun cancel(id: CommonNotificationId) = Notifications.cancel(context, id)
+    fun cancel(id: NotificationId) = Notifications.cancel(context, id)
 
-    fun cancelAll(vararg ids: CommonNotificationId) =
+    fun cancelAll(vararg ids: NotificationId) =
             Notifications.cancelAll(context, ids.asList())
 
-    fun cancelAll(ids: List<CommonNotificationId>) =
+    fun cancelAll(ids: List<NotificationId>) =
             Notifications.cancelAll(context, ids)
 
     fun cancelAll(groupId: String? = null, channelId: String? = null) =
             Notifications.cancelAll(context, groupId, channelId)
 
-    // TODO: fun get(id)
+    fun get(id: NotificationId): Bundle =
+            NotificationsData.instance[id]
+                    ?: throw IllegalArgumentException("Id doesn't exists: $id")
 
-    // TODO: fun getAll(groupId?, channelId?)
+    fun getAll(groupId: String?, channelId: String?) =
+            NotificationsData.instance.getAll(groupId, channelId)
 
     //--------------------------------------------------------------------------
 
@@ -90,11 +98,11 @@ object NotificationsManager {
         TODO("Not implemented")
     }
 
-    fun requestCancel(id: CommonNotificationId) {
+    fun requestCancel(id: NotificationId) {
         TODO("Not implemented")
     }
 
-    fun requestCancelAll(vararg ids: CommonNotificationId) {
+    fun requestCancelAll(vararg ids: NotificationId) {
         TODO("Not implemented")
     }
 
