@@ -20,6 +20,7 @@ package eu.codetopic.utils.log
 
 import android.content.Context
 import android.support.annotation.MainThread
+import eu.codetopic.java.utils.debug.DebugMode
 
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.log.Logger
@@ -38,7 +39,7 @@ object AndroidLoggerExtension {
         if (INSTALLED) throw IllegalStateException("$LOG_TAG is still installed.")
         INSTALLED = true
 
-        Log.debugMode = BuildConfig.DEBUG
+        DebugMode.isEnabled = BuildConfig.DEBUG // TODO: create AndroidDebugModeExtension and move this line there
         Logger.logTarget = AndroidLogTarget()
 
         Logger.logsHandler.addOnLoggedListener(

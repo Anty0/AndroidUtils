@@ -16,27 +16,27 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log
+package eu.codetopic.utils.notifications.manager.util
 
+import android.app.NotificationChannel
 import android.content.Context
-import eu.codetopic.java.utils.debug.DebugMode
-import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.LogsHandler
-import eu.codetopic.java.utils.log.base.LogLine
-import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.thread.LooperUtils
+import android.os.Build
+
+import eu.codetopic.utils.AndroidExtensions.notificationManager
+import eu.codetopic.java.utils.debug.DebugAsserts.assert
 
 /**
  * @author anty
  */
-class ErrorInfoLogListener(private val appContext: Context) : LogsHandler.OnLoggedListener {
+abstract class NotificationChannel(val id: String) {
 
-    override fun onLogged(logLine: LogLine) {
-        if (!DebugMode.isEnabled) return
+    fun initialize(context: Context) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        LooperUtils.runOnMainThread { ErrorInfoActivity.start(appContext, logLine) }
+        context.notificationManager.createNotificationChannel(
+                createChannel(context).assert { it.id == id }
+        )
     }
 
-    override val filterPriorities: Array<Priority>?
-        get() = arrayOf(Priority.WARN, Priority.ERROR)
+    protected abstract fun createChannel(context: Context): NotificationChannel
 }

@@ -16,27 +16,30 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log
+package eu.codetopic.utils.notifications.manager
 
 import android.content.Context
-import eu.codetopic.java.utils.debug.DebugMode
-import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.LogsHandler
-import eu.codetopic.java.utils.log.base.LogLine
-import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.thread.LooperUtils
+import eu.codetopic.utils.notifications.manager.util.NotificationGroup
 
 /**
  * @author anty
  */
-class ErrorInfoLogListener(private val appContext: Context) : LogsHandler.OnLoggedListener {
+object NotificationsGroups {
 
-    override fun onLogged(logLine: LogLine) {
-        if (!DebugMode.isEnabled) return
+    private val groups: MutableMap<String, NotificationGroup> = mutableMapOf()
 
-        LooperUtils.runOnMainThread { ErrorInfoActivity.start(appContext, logLine) }
+    internal fun add(context: Context, group: NotificationGroup) {
+        if (group.id in groups)
+            throw IllegalArgumentException("Existing groupId: '${group.id}'")
+
+        group.initialize(context)
+        groups.put(group.id, group)
     }
 
-    override val filterPriorities: Array<Priority>?
-        get() = arrayOf(Priority.WARN, Priority.ERROR)
+    internal operator fun get(groupId: String): NotificationGroup {
+        return groups[groupId]
+                ?: throw IllegalArgumentException("Unknown groupId: '$groupId'")
+    }
+
+    internal fun getAll(): List<NotificationGroup> = groups.values.toList()
 }

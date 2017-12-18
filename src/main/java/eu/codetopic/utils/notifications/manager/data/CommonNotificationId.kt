@@ -16,27 +16,23 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log
+package eu.codetopic.utils.notifications.manager.data
 
-import android.content.Context
-import eu.codetopic.java.utils.debug.DebugMode
-import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.LogsHandler
-import eu.codetopic.java.utils.log.base.LogLine
-import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.thread.LooperUtils
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * @author anty
  */
-class ErrorInfoLogListener(private val appContext: Context) : LogsHandler.OnLoggedListener {
+@Serializable
+data class CommonNotificationId internal constructor(override val groupId: String,
+                                                     override val channelId: String,
+                                                     override val id: Int) : NotificationId {
 
-    override fun onLogged(logLine: LogLine) {
-        if (!DebugMode.isEnabled) return
+    @Transient
+    override val isSummary: Boolean = false
 
-        LooperUtils.runOnMainThread { ErrorInfoActivity.start(appContext, logLine) }
-    }
-
-    override val filterPriorities: Array<Priority>?
-        get() = arrayOf(Priority.WARN, Priority.ERROR)
+    override fun toString(): String =
+            "CommonNotificationId(groupId='$groupId', channelId='$channelId', " +
+                    "id=$id, isSummary=$isSummary)"
 }

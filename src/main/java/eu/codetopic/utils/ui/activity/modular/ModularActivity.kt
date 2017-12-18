@@ -30,6 +30,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import eu.codetopic.java.utils.debug.DebugMode
 
 import java.util.ArrayList
 import java.util.Arrays
@@ -47,7 +48,7 @@ abstract class ModularActivity @JvmOverloads constructor(vararg modules: Activit
     private val modulesMap = LinkedHashMap<Class<out ActivityCallBackModule>, ActivityCallBackModule>()
 
     init {
-        if (Log.debugMode) Log.d(LOG_TAG, "<init>(modules=$modules)")
+        if (DebugMode.isEnabled) Log.d(LOG_TAG, "<init>(modules=$modules)")
 
         modules.forEach {
             try {

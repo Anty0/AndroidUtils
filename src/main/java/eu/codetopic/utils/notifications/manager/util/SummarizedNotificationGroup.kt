@@ -16,27 +16,20 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log
+package eu.codetopic.utils.notifications.manager.util
 
 import android.content.Context
-import eu.codetopic.java.utils.debug.DebugMode
-import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.LogsHandler
-import eu.codetopic.java.utils.log.base.LogLine
-import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.thread.LooperUtils
+import android.os.Bundle
+import android.support.v4.app.NotificationCompat
 
 /**
  * @author anty
  */
-class ErrorInfoLogListener(private val appContext: Context) : LogsHandler.OnLoggedListener {
+abstract class SummarizedNotificationGroup(id: String, checkForIdOverrides: Boolean) :
+        NotificationGroup(id, checkForIdOverrides) {
 
-    override fun onLogged(logLine: LogLine) {
-        if (!DebugMode.isEnabled) return
+    open val summarizeMin = 3
 
-        LooperUtils.runOnMainThread { ErrorInfoActivity.start(appContext, logLine) }
-    }
-
-    override val filterPriorities: Array<Priority>?
-        get() = arrayOf(Priority.WARN, Priority.ERROR)
+    abstract fun createSummaryNotification(context: Context, channel: NotificationChannel,
+                                           data: List<Bundle>): NotificationCompat.Builder
 }

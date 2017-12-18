@@ -39,7 +39,8 @@ abstract class PreferencesData<out SP : SharedPreferences> (
 
         private const val LOG_TAG = "PreferencesData"
 
-        private const val ACTION_DATA_CHANGED_BASE = "eu.codetopic.utils.data.preferences.PreferencesData.PREFERENCES_CHANGED.$1%s"
+        private const val ACTION_DATA_CHANGED_BASE =
+                "eu.codetopic.utils.data.preferences.PreferencesData.PREFERENCES_CHANGED.$1%s"
         const val EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY"
 
         private fun getBroadcastActionChanged(data: PreferencesData<*>): String {

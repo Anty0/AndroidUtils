@@ -52,7 +52,7 @@ open class PreferencesCompanionObject<T : IPreferencesData>(private val log_tag:
         synchronized(this) {
             if (_instance != null) throw IllegalStateException("$log_tag is still initialized")
             else {
-                val preferencesInstance = initializer!!(context)
+                val preferencesInstance = initializer!!(context.applicationContext)
                 preferencesInstance.init()
                 _instance = preferencesInstance
                 initializer = null

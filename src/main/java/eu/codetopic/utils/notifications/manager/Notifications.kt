@@ -1,0 +1,256 @@
+/*
+ * utils
+ * Copyright (C)   2017  anty
+ *
+ * This program is free  software: you can redistribute it and/or modify
+ * it under the terms  of the GNU General Public License as published by
+ * the Free Software  Foundation, either version 3 of the License, or
+ * (at your option) any  later version.
+ *
+ * This program is distributed in the hope that it  will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied  warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.   See the
+ * GNU General Public License for more details.
+ *
+ * You  should have received a copy of the GNU General Public License
+ * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package eu.codetopic.utils.notifications.manager
+
+import android.app.Notification
+import android.content.Context
+import android.os.Bundle
+import android.support.v4.app.NotificationCompat
+import android.support.v4.app.NotificationManagerCompat
+import eu.codetopic.java.utils.log.Log
+import eu.codetopic.utils.notifications.manager.save.NotificationsData
+import eu.codetopic.utils.notifications.manager.data.CommonNotificationId
+import eu.codetopic.utils.notifications.manager.data.NotificationId
+import eu.codetopic.utils.notifications.manager.data.SummaryNotificationId
+import eu.codetopic.utils.notifications.manager.util.NotificationChannel
+import eu.codetopic.utils.notifications.manager.util.SummarizedNotificationGroup
+import eu.codetopic.java.utils.debug.DebugAsserts.assert
+import eu.codetopic.utils.notifications.manager.util.NotificationGroup
+
+/**
+ * @author anty
+ */
+object Notifications {
+
+    private const val LOG_TAG = "Notifications"
+
+    private fun prepareNotification(id: NotificationId, notification: NotificationCompat.Builder) {
+        notification
+                .setGroup(id.groupId)
+                .setGroupSummary(id.isSummary)
+        // TODO: set content and delete intent
+    }
+
+    private fun createNotification(context: Context,
+                                   group: NotificationGroup,
+                                   channel: NotificationChannel,
+                                   id: CommonNotificationId,
+                                   data: Bundle): Notification {
+        return group.createNotification(context, channel, data)
+                .also { prepareNotification(id, it) }
+                .build()
+    }
+
+    private fun showNotification(context: Context,
+                                 notifier: NotificationManagerCompat,
+                                 group: NotificationGroup,
+                                 channel: NotificationChannel,
+                                 id: CommonNotificationId,
+                                 data: Bundle) {
+        try {
+            notifier.notify(id.tag, id.id, createNotification(context, group, channel, id, data))
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "showNotification(id=$id) -> Failed to show notification", e)
+        }
+    }
+
+    private fun showNotification(context: Context,
+                                 notifier: NotificationManagerCompat,
+                                 id: CommonNotificationId,
+                                 data: Bundle) {
+        try {
+            showNotification(
+                    context, notifier,
+                    NotificationsGroups[id.groupId],
+                    NotificationsChannels[id.channelId],
+                    id, data
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "showNotification(id=$id) -> Failed to show notification", e)
+        }
+    }
+
+    private fun  cancelNotification(notifier: NotificationManagerCompat,
+                                    id: CommonNotificationId) {
+        try {
+            notifier.cancel(id.tag, id.id)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "cancelNotification(id=$id) -> Failed to cancel notification", e)
+        }
+    }
+
+    private fun createSummaryNotification(context: Context,
+                                          group: SummarizedNotificationGroup,
+                                          channel: NotificationChannel,
+                                          id: SummaryNotificationId,
+                                          data: List<Bundle>): Notification {
+        return group.createSummaryNotification(context, channel, data)
+                .also { prepareNotification(id, it) }
+                .build()
+    }
+
+    private fun showSummaryNotification(context: Context,
+                                        notifier: NotificationManagerCompat,
+                                        group: SummarizedNotificationGroup,
+                                        channel: NotificationChannel,
+                                        id: SummaryNotificationId,
+                                        data: List<Bundle>) {
+        try {
+            notifier.notify(
+                    id.tag, id.id,
+                    createSummaryNotification(context, group, channel, id, data)
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "showSummaryNotification(id=$id)" +
+                    " -> Failed to show notification", e)
+        }
+    }
+
+    private fun cancelSummaryNotification(notifier: NotificationManagerCompat,
+                                          id: SummaryNotificationId) {
+        try {
+            notifier.cancel(id.tag, id.id)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "cancelSummaryNotification(id=$id)" +
+                    " -> Failed to cancel notification", e)
+        }
+    }
+
+    internal fun refresh(context: Context) {
+        val notifier = NotificationManagerCompat.from(context)
+        NotificationsData.instance.getAll().forEach {
+            showNotification(context, notifier, it.key, it.value)
+        }
+
+        refreshSummaries(context)
+    }
+
+    private fun refreshSummary(context: Context,
+                               notifier: NotificationManagerCompat,
+                               group: SummarizedNotificationGroup,
+                               channel: NotificationChannel,
+                               data: List<Bundle>?) {
+        try {
+            val nId = SummaryNotificationId(group.id, channel.id)
+            data?.also { nData ->
+                showSummaryNotification(context, notifier, group, channel, nId, nData)
+            } ?: cancelSummaryNotification(notifier, nId)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "refreshSummary() -> " +
+                    "(groupId=${group.id}, channelId=${channel.id}) -> " +
+                    "Failed to refresh group's channel notification", e)
+        }
+    }
+
+    private fun refreshSummary(context: Context, notifier: NotificationManagerCompat,
+                               group: NotificationGroup, channel: NotificationChannel) {
+        if (group !is SummarizedNotificationGroup) return
+
+        refreshSummary(
+                context, notifier, group, channel,
+                NotificationsData.instance.getAll(group.id, channel.id)
+                        .takeIf { it.size > group.summarizeMin }?.values?.toList()
+        )
+    }
+
+    private fun refreshSummary(context: Context, notifier: NotificationManagerCompat,
+                               groupId: String, channelId: String) {
+        refreshSummary(
+                context, notifier,
+                NotificationsGroups[groupId],
+                NotificationsChannels[channelId]
+        )
+    }
+
+    private fun refreshSummary(context: Context, notifier: NotificationManagerCompat,
+                               id: NotificationId) {
+        refreshSummary(context, notifier, id.groupId, id.channelId)
+    }
+
+    internal fun refreshSummaries(context: Context) {
+        val notifier = NotificationManagerCompat.from(context)
+        val nData = NotificationsData.instance.getAll()
+        NotificationsGroups.getAll().forEach { group ->
+            if (group !is SummarizedNotificationGroup) return@forEach
+            try {
+                group.summarizeMin.assert { it > 0 }
+
+                NotificationsChannels.getAll().forEach { channel ->
+                    refreshSummary(context,  notifier, group, channel, nData
+                            .filter { group.id == it.key.groupId && channel.id == it.key.channelId }
+                            .takeIf { it.size > group.summarizeMin }?.values?.toList())
+                }
+            } catch (e: Exception) {
+                Log.e(LOG_TAG, "refreshSummaries() -> (groupId=${group.id}) -> " +
+                        "Failed to refresh notifications of group's channels", e)
+            }
+        }
+    }
+
+    internal fun notify(context: Context, groupId: String, channelId: String,
+                        data: Bundle): CommonNotificationId {
+        val group = NotificationsGroups[groupId]
+        val channel = NotificationsChannels [channelId]
+
+        val notifier = NotificationManagerCompat.from(context)
+
+        return NotificationsData.instance.put(groupId, channelId, data).also { id ->
+            showNotification(context, notifier, group, channel, id, data)
+            refreshSummary(context, notifier, group, channel)
+        }
+    }
+
+    internal fun notifyAll(context: Context, groupId: String, channelId: String,
+                           data: List<Bundle>): List<CommonNotificationId> {
+        val group = NotificationsGroups[groupId]
+        val channel = NotificationsChannels[channelId]
+
+        val notifier = NotificationManagerCompat.from(context)
+        return NotificationsData.instance.putAll(groupId, channelId, data).onEach {
+            showNotification(context, notifier, group, channel, it.key, it.value)
+        }.also { refreshSummary(context, notifier, group, channel) }.keys.toList()
+    }
+
+    internal fun cancel(context: Context, id: CommonNotificationId) {
+        val notifier = NotificationManagerCompat.from(context)
+
+        NotificationsData.instance.remove(id)?.apply {
+            cancelNotification(notifier, id)
+            refreshSummary(context, notifier, id)
+        } ?: Log.e(LOG_TAG, "cancel(id=$id) -> Notification doesn't exists",
+                IllegalArgumentException("Notification doesn't exists"))
+    }
+
+    internal fun cancelAll(context: Context, ids: List<CommonNotificationId>) {
+        val notifier = NotificationManagerCompat.from(context)
+
+        NotificationsData.instance.removeAll(ids).onEach {
+            cancelNotification(notifier, it.key)
+        }.also { refreshSummaries(context) }
+    }
+
+    internal fun cancelAll(context: Context, groupId: String? = null,
+                           channelId: String? = null) {
+        val notifier = NotificationManagerCompat.from(context)
+
+        NotificationsData.instance.removeAll(groupId, channelId).onEach {
+            cancelNotification(notifier, it.key)
+        }.also { refreshSummaries(context) }
+    }
+}

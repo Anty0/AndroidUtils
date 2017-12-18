@@ -18,13 +18,26 @@
 
 package eu.codetopic.utils
 
+import android.app.NotificationManager
 import android.content.*
 import android.net.Uri
+import android.os.Build
+import android.os.Bundle
 import android.support.annotation.AnyRes
 import android.support.annotation.StringRes
 import android.util.SparseArray
 import eu.codetopic.utils.data.getter.DataGetter
 import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
+import android.os.Parcel
+import android.util.Base64
+import kotlinx.io.ByteArrayInputStream
+import kotlinx.io.ByteArrayOutputStream
+import kotlinx.serialization.internal.readToByteBuffer
+import java.io.BufferedOutputStream
+import java.util.zip.GZIPOutputStream
+import java.nio.file.Files.size
+import java.util.zip.GZIPInputStream
+
 
 object AndroidExtensions {
 
@@ -62,6 +75,68 @@ object AndroidExtensions {
                 |${getResourcePackageName(resource)}/
                 |${getResourceTypeName(resource)}/
                 |${getResourceEntryName(resource)}""".trimMargin())
+        }
+    }
+
+    //////////////////////////////////////
+    //////REGION - CONTEXT////////////////
+    //////////////////////////////////////
+
+    val Context.notificationManager
+        get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    //////////////////////////////////////
+    //////REGION - BUNDLES////////////////
+    //////////////////////////////////////
+
+    fun Bundle.serialize(): String {
+        Parcel.obtain().use { parcel ->
+            parcel.writeBundle(this)
+            ByteArrayOutputStream().use {
+                GZIPOutputStream(BufferedOutputStream(it)).use {
+                    it.write(parcel.marshall())
+                }
+                return Base64.encodeToString(it.toByteArray(), 0)
+            }
+        }
+    }
+
+    fun deserializeBundle(bundleStr: String): Bundle {
+        Parcel.obtain().use { parcel ->
+            GZIPInputStream(ByteArrayInputStream(Base64.decode(bundleStr, 0))).use {
+                it.readBytes().let {
+                    parcel.unmarshall(it, 0, it.size)
+                }
+            }
+            parcel.setDataPosition(0)
+            return parcel.readBundle(UtilsBase.javaClass.classLoader)
+        }
+    }
+
+    //////////////////////////////////////
+    //////REGION - PARCELABLE/////////////
+    //////////////////////////////////////
+
+    inline fun <T : Parcel?, R> T.use(block: (T) -> R): R {
+        var exception: Throwable? = null
+        try {
+            return block(this)
+        } catch (e: Throwable) {
+            exception = e
+            throw e
+        } finally {
+            when {
+                this == null -> {}
+                exception == null -> recycle()
+                else ->
+                    try {
+                        recycle()
+                    } catch (closeException: Throwable) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            exception.addSuppressed(closeException)
+                        }
+                    }
+            }
         }
     }
 

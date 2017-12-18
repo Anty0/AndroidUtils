@@ -31,6 +31,7 @@ import eu.codetopic.utils.broadcast.LocalBroadcast
 import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.log.AndroidLoggerExtension
+import eu.codetopic.utils.notifications.manager.NotificationsManager
 import eu.codetopic.utils.thread.LooperUtils
 
 @UiThread
@@ -90,6 +91,9 @@ object UtilsBase {
             BroadcastsConnector.initialize(app)
             Identifiers.initialize(app)
 
+            // Initialize NotificationsManager
+            NotificationsManager.initialize(app)
+
             // Add callback listening onLowMemory event
             /*app.registerComponentCallbacks(object : ComponentCallbacks {
                 override fun onConfigurationChanged(newConfig: Configuration) {
@@ -109,7 +113,7 @@ object UtilsBase {
     /**
      * Methods that should be called in additionalCommands:
      * - `LocaleManager.initialize() `
-     * - `eu.codetopic.java.utils.log.Log.setDebugMode() (or in kotlin Log.debugMode = ?) `
+     * - `eu.codetopic.java.utils.debug.DebugMode.setEnabled() (or in kotlin DebugBode.isEnabled = ?) `
      * - `eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() ` using `Logger.getLogsHandler (or in kotlin Logger.logsHandler) `
      * - `eu.codetopic.utils.broadcast.BroadcastsConnector.connect() `
      */

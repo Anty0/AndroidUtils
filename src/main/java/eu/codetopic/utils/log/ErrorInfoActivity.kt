@@ -70,8 +70,6 @@ class ErrorInfoActivity : AppCompatActivity() {
 
         txtTitle.text = title
 
-        txtMessage.setHorizontallyScrolling(true)
-        txtMessage.isHorizontalScrollBarEnabled = true
         txtMessage.text = logLine.toString()
     }
 }
