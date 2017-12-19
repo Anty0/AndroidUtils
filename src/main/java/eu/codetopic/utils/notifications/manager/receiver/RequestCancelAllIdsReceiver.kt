@@ -40,24 +40,25 @@ class RequestCancelAllIdsReceiver : BroadcastReceiver() {
         private const val NAME = "eu.codetopic.utils.notifications.manager.receiver.$LOG_TAG"
         private const val EXTRA_IDS_LIST = "$NAME.IDS_LIST"
 
-        internal fun getStartIntent(context: Context, ids: List<NotificationId>): Intent =
-                Intent(context, RequestCancelAllIdsReceiver::class.java)
-                        .putExtra(EXTRA_IDS_LIST,
-                                JSON.stringify(kSerializer<NotificationId>().list, ids))
+        internal fun getStartIntent(context: Context, ids: List<NotificationId>): Intent {
+            if (ids.size == 1) RequestCancelReceiver.getStartIntent(context, ids.first())
+
+            return Intent(context, RequestCancelAllIdsReceiver::class.java)
+                    .putExtra(EXTRA_IDS_LIST, JSON.stringify(kSerializer<NotificationId>().list, ids))
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
             NotificationsManager.assertInitialized()
 
-            val ids = intent.getStringExtra(EXTRA_IDS_LIST)?.let {
-                JSON.parse(kSerializer<NotificationId>().list, it)
-            } ?: throw IllegalArgumentException("No notifications ids list received by intent")
+            val ids = intent.getStringExtra(EXTRA_IDS_LIST)
+                    ?.let { JSON.parse(kSerializer<NotificationId>().list, it) }
+                    ?: throw IllegalArgumentException("No notifications ids list received by intent")
 
             Notifications.cancelAll(context, ids)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
     }
 }

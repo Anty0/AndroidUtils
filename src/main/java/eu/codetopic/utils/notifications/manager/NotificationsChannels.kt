@@ -43,6 +43,8 @@ object NotificationsChannels {
 
     internal fun getAll(): List<NotificationChannel> = channels.values.toList()
 
+    internal operator fun contains(channelId: String) = channelId in channels
+
     internal fun refresh(context: Context, channelId: String) =
             refresh(context, get(channelId))
 

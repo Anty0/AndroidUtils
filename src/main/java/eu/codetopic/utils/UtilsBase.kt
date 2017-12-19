@@ -91,9 +91,6 @@ object UtilsBase {
             BroadcastsConnector.initialize(app)
             Identifiers.initialize(app)
 
-            // Initialize NotificationsManager
-            NotificationsManager.initialize(app)
-
             // Add callback listening onLowMemory event
             /*app.registerComponentCallbacks(object : ComponentCallbacks {
                 override fun onConfigurationChanged(newConfig: Configuration) {

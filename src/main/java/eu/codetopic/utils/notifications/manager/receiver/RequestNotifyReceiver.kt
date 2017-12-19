@@ -61,7 +61,6 @@ class RequestNotifyReceiver : BroadcastReceiver() {
             Notifications.notify(context, groupId, channelId, data)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
     }
 }

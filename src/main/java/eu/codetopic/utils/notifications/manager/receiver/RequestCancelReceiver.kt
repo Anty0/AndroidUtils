@@ -53,7 +53,6 @@ class RequestCancelReceiver : BroadcastReceiver() {
             Notifications.cancel(context, id)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
     }
 }

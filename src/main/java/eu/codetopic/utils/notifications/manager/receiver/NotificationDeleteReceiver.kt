@@ -69,7 +69,6 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
 
     }

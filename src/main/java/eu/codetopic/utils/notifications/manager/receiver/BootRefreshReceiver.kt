@@ -43,7 +43,6 @@ class BootRefreshReceiver : BroadcastReceiver() {
             Notifications.refresh(context)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
     }
 }

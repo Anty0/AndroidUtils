@@ -43,6 +43,8 @@ object NotificationsGroups {
 
     internal fun getAll(): List<NotificationGroup> = groups.values.toList()
 
+    internal operator fun contains(groupId: String) = groupId in groups
+
     internal fun refresh(context: Context, groupId: String) =
             refresh(context, get(groupId))
 

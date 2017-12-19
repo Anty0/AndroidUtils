@@ -21,6 +21,7 @@ package eu.codetopic.utils.notifications.manager.util
 import android.app.NotificationChannel
 import android.content.Context
 import android.os.Build
+import android.support.annotation.RequiresApi
 
 import eu.codetopic.utils.AndroidExtensions.notificationManager
 import eu.codetopic.java.utils.debug.DebugAsserts.assert
@@ -38,5 +39,6 @@ abstract class NotificationChannel(val id: String) {
         )
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     protected abstract fun createChannel(context: Context): NotificationChannel
 }

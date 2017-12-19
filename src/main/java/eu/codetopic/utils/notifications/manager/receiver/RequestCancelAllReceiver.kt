@@ -55,7 +55,6 @@ class RequestCancelAllReceiver : BroadcastReceiver() {
             Notifications.cancelAll(context, groupId, channelId)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
     }
 }

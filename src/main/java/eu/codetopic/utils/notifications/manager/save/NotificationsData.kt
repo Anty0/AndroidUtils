@@ -41,7 +41,7 @@ import kotlinx.serialization.map
 /**
  * @author anty
  */
-class NotificationsData private constructor(context: Context) :
+internal class NotificationsData private constructor(context: Context) :
         VersionedPreferencesData<SharedPreferences>(context,
                 BasicSharedPreferencesProvider(context, FILE_NAME_NOTIFICATIONS_DATA),
                 SAVE_VERSION) {
@@ -68,7 +68,7 @@ class NotificationsData private constructor(context: Context) :
                     (kSerializer<NotificationId>() to kSerializer<NotificationInfo>()).map,
                     accessProvider,
                     { emptyMap() }
-            )
+            ) // TODO: maybe cache notificationsMap and only save changes
 
     @Synchronized
     internal fun remove(id: NotificationId): Bundle? {
@@ -113,12 +113,13 @@ class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal fun put(groupId: String, channelId: String, data: Bundle): NotificationId =
-            put(NotificationsGroups[groupId], NotificationsChannels[channelId], data)
+    internal fun put(context: Context, groupId: String,
+                     channelId: String, data: Bundle): NotificationId =
+            put(context, NotificationsGroups[groupId], NotificationsChannels[channelId], data)
 
     @Synchronized
-    internal fun put(group: NotificationGroup, channel: NotificationChannel,
-                     data: Bundle): NotificationId {
+    internal fun put(context: Context, group: NotificationGroup,
+                     channel: NotificationChannel, data: Bundle): NotificationId {
         val id = NotificationId.newCommon(
                 group.id, channel.id,
                 group.nextId(context, channel, data)
@@ -135,11 +136,7 @@ class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal fun putAll(groupId: String, channelId: String, data: Bundle): NotificationId =
-            put(NotificationsGroups[groupId], NotificationsChannels[channelId], data)
-
-    @Synchronized
-    internal fun putAll(groupId: String, channelId: String,
+    internal fun putAll(context: Context, groupId: String, channelId: String,
                         data: List<Bundle>): Map<NotificationId, Bundle> {
         val group = NotificationsGroups[groupId]
         val channel = NotificationsChannels[channelId]

@@ -18,7 +18,6 @@
 
 package eu.codetopic.utils.notifications.manager
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import eu.codetopic.utils.notifications.manager.data.NotificationId
@@ -30,93 +29,117 @@ import eu.codetopic.utils.notifications.manager.util.NotificationGroup
 /**
  * @author anty
  */
-@SuppressLint("StaticFieldLeak")
 object NotificationsManager {
 
-    private lateinit var context: Context
-
-    val isInitialized: Boolean = ::context.isInitialized
+    val isInitialized: Boolean
+        get() = NotificationsData.isInitialized()
 
     fun assertInitialized() {
         if (!isInitialized) throw IllegalStateException("NotificationsManager is not initialized")
     }
 
-    fun initialize(context: Context) {
+    fun initialize(context: Context, appUpdated: Boolean) {
         NotificationsData.initialize(context)
-        this.context = context.applicationContext
+        if (appUpdated) refresh(context)
     }
 
     //--------------------------------------------------------------------------
 
-    fun initGroup(group: NotificationGroup) =
+    fun initGroup(context: Context, group: NotificationGroup) =
             NotificationsGroups.add(context, group)
 
-    fun initChannel(channel: NotificationChannel) =
+    fun initChannel(context: Context, channel: NotificationChannel) =
             NotificationsChannels.add(context, channel)
 
-    fun refreshGroup(groupId: String) =
+    fun refreshGroup(context: Context, groupId: String) =
             NotificationsGroups.refresh(context, groupId)
 
-    fun refreshChannel(channelId: String) =
+    fun refreshChannel(context: Context, channelId: String) =
             NotificationsChannels.refresh(context, channelId)
+
+    fun initGroups(context: Context, vararg groups: NotificationGroup) =
+            groups.forEach { NotificationsGroups.add(context, it) }
+
+    fun initChannels(context: Context, vararg channels: NotificationChannel) =
+            channels.forEach { NotificationsChannels.add(context, it) }
+
+    fun refreshGroups(context: Context, vararg groupIds: String) =
+            groupIds.forEach { NotificationsGroups.refresh(context, it) }
+
+    fun refreshChannels(context: Context, vararg channelIds: String) =
+            channelIds.forEach { NotificationsChannels.refresh(context, it) }
+
+    fun getGroup(groupId: String): NotificationGroup =
+            NotificationsGroups[groupId]
+
+    fun getChannel(channelId: String): NotificationChannel =
+            NotificationsChannels[channelId]
+
+    fun existsGroup(groupId: String): Boolean = groupId in NotificationsGroups
+
+    fun existsChannel(channelId: String): Boolean = channelId in NotificationsChannels
 
     //--------------------------------------------------------------------------
 
-    fun refresh() = Notifications.refresh(context)
+    fun refresh(context: Context) = Notifications.refresh(context)
 
-    fun notify(groupId: String, channelId: String, data: Bundle): NotificationId =
+    fun notify(context: Context, groupId: String, channelId: String, data: Bundle): NotificationId =
             Notifications.notify(context, groupId, channelId, data)
 
-    fun notifyAll(groupId: String, channelId: String, vararg data: Bundle): List<NotificationId> =
+    fun notifyAll(context: Context, groupId: String,
+                  channelId: String, vararg data: Bundle): List<NotificationId> =
             Notifications.notifyAll(context, groupId, channelId, data.asList())
 
-    fun notifyAll(groupId: String, channelId: String, data: List<Bundle>): List<NotificationId> =
+    fun notifyAll(context: Context, groupId: String,
+                  channelId: String, data: List<Bundle>): List<NotificationId> =
             Notifications.notifyAll(context, groupId, channelId, data)
 
-    fun cancel(id: NotificationId) = Notifications.cancel(context, id)
+    fun cancel(context: Context, id: NotificationId) = Notifications.cancel(context, id)
 
-    fun cancelAll(vararg ids: NotificationId) =
+    fun cancelAll(context: Context, vararg ids: NotificationId) =
             Notifications.cancelAll(context, ids.asList())
 
-    fun cancelAll(ids: List<NotificationId>) =
+    fun cancelAll(context: Context, ids: List<NotificationId>) =
             Notifications.cancelAll(context, ids)
 
-    fun cancelAll(groupId: String? = null, channelId: String? = null) =
+    fun cancelAll(context: Context, groupId: String? = null, channelId: String? = null) =
             Notifications.cancelAll(context, groupId, channelId)
 
     fun get(id: NotificationId): Bundle =
             NotificationsData.instance[id]
                     ?: throw IllegalArgumentException("Id doesn't exists: $id")
 
-    fun getAll(groupId: String?, channelId: String?) =
+    fun getAll(groupId: String?, channelId: String? = null) =
             NotificationsData.instance.getAll(groupId, channelId)
 
     //--------------------------------------------------------------------------
 
-    fun requestRefresh() =
+    fun requestRefresh(context: Context) =
             context.sendBroadcast(RequestRefreshReceiver.getStartIntent(context))
 
-    fun requestNotify(groupId: String, channelId: String, data: Bundle) =
+    fun requestNotify(context: Context, groupId: String, channelId: String, data: Bundle) =
             context.sendBroadcast(RequestNotifyReceiver
                     .getStartIntent(context, groupId, channelId, data))
 
-    fun requestNotifyAll(groupId: String, channelId: String, vararg data: Bundle) =
-            requestNotifyAll(groupId, channelId, data.asList())
+    fun requestNotifyAll(context: Context, groupId: String,
+                         channelId: String, vararg data: Bundle) =
+            requestNotifyAll(context, groupId, channelId, data.asList())
 
-    fun requestNotifyAll(groupId: String, channelId: String, data: List<Bundle>) =
+    fun requestNotifyAll(context: Context, groupId: String,
+                         channelId: String, data: List<Bundle>) =
             context.sendBroadcast(RequestNotifyAllReceiver
                     .getStartIntent(context, groupId, channelId, data))
 
-    fun requestCancel(id: NotificationId) =
+    fun requestCancel(context: Context, id: NotificationId) =
             context.sendBroadcast(RequestCancelReceiver.getStartIntent(context, id))
 
-    fun requestCancelAll(vararg ids: NotificationId) =
-            requestCancelAll(ids.asList())
+    fun requestCancelAll(context: Context, vararg ids: NotificationId) =
+            requestCancelAll(context, ids.asList())
 
-    fun requestCancelAll(ids: List<NotificationId>) =
+    fun requestCancelAll(context: Context, ids: List<NotificationId>) =
             context.sendBroadcast(RequestCancelAllIdsReceiver.getStartIntent(context, ids))
 
-    fun requestCancelAll(groupId: String? = null, channelId: String? = null) =
+    fun requestCancelAll(context: Context, groupId: String? = null, channelId: String? = null) =
             context.sendBroadcast(RequestCancelAllReceiver
                     .getStartIntent(context, groupId, channelId))
 }

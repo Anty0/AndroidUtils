@@ -42,7 +42,7 @@ class RequestNotifyAllReceiver : BroadcastReceiver() {
         private const val NAME = "eu.codetopic.utils.notifications.manager.receiver.$LOG_TAG"
         private const val EXTRA_GROUP_ID = "$NAME.GROUP_ID"
         private const val EXTRA_CHANNEL_ID = "$NAME.CHANNEL_ID"
-        private const val EXTRA_DATA_BUNDLE_LIST = "$NAME.DATA_BUNDLE_LIST"
+        private const val EXTRA_DATA_BUNDLE_ARRAY = "$NAME.DATA_BUNDLE_ARRAY"
 
         internal fun getStartIntent(context: Context, groupId: String, channelId: String,
                                     data: List<Bundle>): Intent {
@@ -52,8 +52,7 @@ class RequestNotifyAllReceiver : BroadcastReceiver() {
             return Intent(context, RequestNotifyAllReceiver::class.java)
                     .putExtra(EXTRA_GROUP_ID, groupId)
                     .putExtra(EXTRA_CHANNEL_ID, channelId)
-                    .putExtra(EXTRA_DATA_BUNDLE_LIST,
-                            JSON.stringify(StringSerializer.list, data.map { it.serialize() }))
+                    .putExtra(EXTRA_DATA_BUNDLE_ARRAY, data.toTypedArray())
         }
     }
 
@@ -65,14 +64,13 @@ class RequestNotifyAllReceiver : BroadcastReceiver() {
                     ?: throw IllegalArgumentException("No group id received by intent")
             val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)
                     ?: throw IllegalArgumentException("No channel id received by intent")
-            val data = intent.getStringExtra(EXTRA_DATA_BUNDLE_LIST)
-                    ?.let { JSON.parse(StringSerializer.list,  it) }?.map { deserializeBundle(it) }
-                    ?: throw IllegalArgumentException("No data bundle list received by intent")
+            @Suppress("UNCHECKED_CAST")
+            val data = intent.getParcelableArrayExtra(EXTRA_DATA_BUNDLE_ARRAY) as? Array<Bundle>
+                    ?: throw IllegalArgumentException("No data bundle array received by intent")
 
-            Notifications.notifyAll(context, groupId, channelId, data)
+            Notifications.notifyAll(context, groupId, channelId, data.asList())
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
     }
 }

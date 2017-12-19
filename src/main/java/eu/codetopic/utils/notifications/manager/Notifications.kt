@@ -38,7 +38,7 @@ import eu.codetopic.utils.notifications.manager.util.NotificationGroup
 /**
  * @author anty
  */
-object Notifications {
+internal object Notifications {
 
     private const val LOG_TAG = "Notifications"
 
@@ -198,7 +198,7 @@ object Notifications {
 
         val notifier = NotificationManagerCompat.from(context)
 
-        return NotificationsData.instance.put(groupId, channelId, data).also { id ->
+        return NotificationsData.instance.put(context, groupId, channelId, data).also { id ->
             showNotification(notifier, id, createNotification(context, group, channel, id, data))
             refreshSummary(context, notifier, group, channel)
         }
@@ -210,35 +210,37 @@ object Notifications {
         val channel = NotificationsChannels[channelId]
 
         val notifier = NotificationManagerCompat.from(context)
-        return NotificationsData.instance.putAll(groupId, channelId, data).onEach {
+        return NotificationsData.instance.putAll(context, groupId, channelId, data).onEach {
             showNotification(notifier, it.key,
                     createNotification(context, group, channel, it.key, it.value))
         }.also { refreshSummary(context, notifier, group, channel) }.keys.toList()
     }
 
-    internal fun cancel(context: Context, id: NotificationId) {
+    internal fun cancel(context: Context, id: NotificationId): Bundle? {
         val notifier = NotificationManagerCompat.from(context)
 
-        NotificationsData.instance.remove(id)?.apply {
+        return NotificationsData.instance.remove(id)?.apply {
             cancelNotification(notifier, id)
             refreshSummaryOf(context, notifier, id)
-        } ?: Log.e(LOG_TAG, "cancel(id=$id) -> Notification doesn't exists",
-                IllegalArgumentException("Notification doesn't exists"))
+        } ?: run {
+            Log.e(LOG_TAG, "cancel(id=$id) -> Notification doesn't exists",
+                    IllegalArgumentException("Notification doesn't exists")); null
+        }
     }
 
-    internal fun cancelAll(context: Context, ids: List<NotificationId>) {
+    internal fun cancelAll(context: Context, ids: List<NotificationId>): Map<NotificationId, Bundle> {
         val notifier = NotificationManagerCompat.from(context)
 
-        NotificationsData.instance.removeAll(ids).onEach {
+        return NotificationsData.instance.removeAll(ids).onEach {
             cancelNotification(notifier, it.key)
         }.also { refreshSummaries(context) }
     }
 
     internal fun cancelAll(context: Context, groupId: String? = null,
-                           channelId: String? = null) {
+                           channelId: String? = null): Map<NotificationId, Bundle> {
         val notifier = NotificationManagerCompat.from(context)
 
-        NotificationsData.instance.removeAll(groupId, channelId).onEach {
+        return NotificationsData.instance.removeAll(groupId, channelId).onEach {
             cancelNotification(notifier, it.key)
         }.also { refreshSummaries(context) }
     }

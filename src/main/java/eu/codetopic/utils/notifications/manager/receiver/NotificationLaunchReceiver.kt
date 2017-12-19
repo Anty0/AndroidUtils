@@ -58,7 +58,7 @@ class NotificationLaunchReceiver : BroadcastReceiver() {
             val data = NotificationsData.instance[id]
                     ?: throw IllegalArgumentException("Id was not found: $id")
 
-            NotificationsGroups[id.groupId].hanldeContentIntent(
+            NotificationsGroups[id.groupId].handleContentIntent(
                     context,
                     id,
                     NotificationsChannels[id.channelId],
@@ -66,7 +66,6 @@ class NotificationLaunchReceiver : BroadcastReceiver() {
             )
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
-            return
         }
 
     }
