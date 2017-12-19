@@ -22,6 +22,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import eu.codetopic.utils.notifications.manager.data.NotificationId
+import eu.codetopic.utils.notifications.manager.receiver.*
 import eu.codetopic.utils.notifications.manager.save.NotificationsData
 import eu.codetopic.utils.notifications.manager.util.NotificationChannel
 import eu.codetopic.utils.notifications.manager.util.NotificationGroup
@@ -33,6 +34,12 @@ import eu.codetopic.utils.notifications.manager.util.NotificationGroup
 object NotificationsManager {
 
     private lateinit var context: Context
+
+    val isInitialized: Boolean = ::context.isInitialized
+
+    fun assertInitialized() {
+        if (!isInitialized) throw IllegalStateException("NotificationsManager is not initialized")
+    }
 
     fun initialize(context: Context) {
         NotificationsData.initialize(context)
@@ -86,27 +93,30 @@ object NotificationsManager {
 
     //--------------------------------------------------------------------------
 
-    fun requestRefresh() {
-        TODO("Not implemented")
-    }
+    fun requestRefresh() =
+            context.sendBroadcast(RequestRefreshReceiver.getStartIntent(context))
 
-    fun requestNotify(groupId: String, channelId: String, data: Bundle) {
-        TODO("Not implemented")
-    }
+    fun requestNotify(groupId: String, channelId: String, data: Bundle) =
+            context.sendBroadcast(RequestNotifyReceiver
+                    .getStartIntent(context, groupId, channelId, data))
 
-    fun requestNotifyAll(groupId: String, channelId: String, vararg data: Bundle) {
-        TODO("Not implemented")
-    }
+    fun requestNotifyAll(groupId: String, channelId: String, vararg data: Bundle) =
+            requestNotifyAll(groupId, channelId, data.asList())
 
-    fun requestCancel(id: NotificationId) {
-        TODO("Not implemented")
-    }
+    fun requestNotifyAll(groupId: String, channelId: String, data: List<Bundle>) =
+            context.sendBroadcast(RequestNotifyAllReceiver
+                    .getStartIntent(context, groupId, channelId, data))
 
-    fun requestCancelAll(vararg ids: NotificationId) {
-        TODO("Not implemented")
-    }
+    fun requestCancel(id: NotificationId) =
+            context.sendBroadcast(RequestCancelReceiver.getStartIntent(context, id))
 
-    fun requestCancelAll(groupId: String? = null, channelId: String? = null) {
-        TODO("Not implemented")
-    }
+    fun requestCancelAll(vararg ids: NotificationId) =
+            requestCancelAll(ids.asList())
+
+    fun requestCancelAll(ids: List<NotificationId>) =
+            context.sendBroadcast(RequestCancelAllIdsReceiver.getStartIntent(context, ids))
+
+    fun requestCancelAll(groupId: String? = null, channelId: String? = null) =
+            context.sendBroadcast(RequestCancelAllReceiver
+                    .getStartIntent(context, groupId, channelId))
 }

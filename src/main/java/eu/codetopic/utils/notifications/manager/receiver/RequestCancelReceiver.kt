@@ -22,30 +22,24 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.Notifications
-import eu.codetopic.utils.notifications.manager.NotificationsChannels
-import eu.codetopic.utils.notifications.manager.NotificationsGroups
 import eu.codetopic.utils.notifications.manager.NotificationsManager
 import eu.codetopic.utils.notifications.manager.data.NotificationId
-import eu.codetopic.utils.notifications.manager.save.NotificationsData
 import kotlinx.serialization.json.JSON
 
 /**
  * @author anty
  */
-class NotificationDeleteReceiver : BroadcastReceiver() {
+class RequestCancelReceiver : BroadcastReceiver() {
 
     companion object {
-        private const val LOG_TAG = "NotificationDeleteReceiver"
+
+        private const val LOG_TAG = "RequestCancelReceiver"
         private const val NAME = "eu.codetopic.utils.notifications.manager.receiver.$LOG_TAG"
-        private const val NAME_REQUEST_CODE_TYPE = "$NAME.LAST_REQUEST_CODE"
         private const val EXTRA_ID = "$NAME.ID"
 
-        internal val REQUEST_CODE_TYPE = Identifiers.Type(NAME_REQUEST_CODE_TYPE)
-
         internal fun getStartIntent(context: Context, id: NotificationId): Intent =
-                Intent(context, NotificationDeleteReceiver::class.java)
+                Intent(context, RequestCancelReceiver::class.java)
                         .putExtra(EXTRA_ID, JSON.stringify(id))
     }
 
@@ -56,21 +50,10 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
             val id = intent.getStringExtra(EXTRA_ID)?.let { JSON.parse<NotificationId>(it) }
                     ?: throw IllegalArgumentException("No notification id received by intent")
 
-            val data = NotificationsData.instance.remove(id)
-                    ?: throw IllegalArgumentException("Id was not found: $id")
-
-            Notifications.refreshSummaryOf(context, id)
-
-            NotificationsGroups[id.groupId].handleDeleteIntent(
-                    context,
-                    id,
-                    NotificationsChannels[id.channelId],
-                    data
-            )
+            Notifications.cancel(context, id)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
             return
         }
-
     }
 }

@@ -47,6 +47,7 @@ object Notifications {
         notification
                 .setGroup(id.groupId)
                 .setGroupSummary(id.isSummary)
+                .setOnlyAlertOnce(true)
                 .setContentIntent(
                         PendingIntent.getBroadcast(
                                 context,

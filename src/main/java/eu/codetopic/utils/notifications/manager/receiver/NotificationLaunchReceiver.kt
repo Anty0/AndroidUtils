@@ -25,6 +25,7 @@ import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.NotificationsChannels
 import eu.codetopic.utils.notifications.manager.NotificationsGroups
+import eu.codetopic.utils.notifications.manager.NotificationsManager
 import eu.codetopic.utils.notifications.manager.data.NotificationId
 import eu.codetopic.utils.notifications.manager.save.NotificationsData
 import kotlinx.serialization.json.JSON
@@ -49,6 +50,8 @@ class NotificationLaunchReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
+            NotificationsManager.assertInitialized()
+
             val id = intent.getStringExtra(EXTRA_ID)?.let { JSON.parse<NotificationId>(it) }
                     ?: throw IllegalArgumentException("No notification id received by intent")
 
