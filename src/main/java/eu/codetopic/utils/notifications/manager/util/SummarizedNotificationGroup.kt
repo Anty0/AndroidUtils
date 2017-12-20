@@ -29,10 +29,14 @@ import eu.codetopic.utils.notifications.manager.data.NotificationId
 abstract class SummarizedNotificationGroup(id: String, checkForIdOverrides: Boolean) :
         NotificationGroup(id, checkForIdOverrides) {
 
-    open val summarizeMin = 3
-
     abstract fun createSummaryNotification(context: Context,
                                            id: NotificationId,
                                            channel: NotificationChannel,
                                            data: List<Bundle>): NotificationCompat.Builder
+
+    open fun handleSummaryContentIntent(context: Context, id: NotificationId,
+                                        channel: NotificationChannel, data: List<Bundle>) {}
+
+    open fun handleSummaryDeleteIntent(context: Context, id: NotificationId,
+                                       channel: NotificationChannel, data: List<Bundle>) {}
 }

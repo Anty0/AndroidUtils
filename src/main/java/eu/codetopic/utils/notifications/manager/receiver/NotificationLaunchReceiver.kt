@@ -28,6 +28,7 @@ import eu.codetopic.utils.notifications.manager.NotificationsGroups
 import eu.codetopic.utils.notifications.manager.NotificationsManager
 import eu.codetopic.utils.notifications.manager.data.NotificationId
 import eu.codetopic.utils.notifications.manager.save.NotificationsData
+import eu.codetopic.utils.notifications.manager.util.SummarizedNotificationGroup
 import kotlinx.serialization.json.JSON
 
 /**
@@ -55,15 +56,22 @@ class NotificationLaunchReceiver : BroadcastReceiver() {
             val id = intent.getStringExtra(EXTRA_ID)?.let { JSON.parse<NotificationId>(it) }
                     ?: throw IllegalArgumentException("No notification id received by intent")
 
-            val data = NotificationsData.instance[id]
-                    ?: throw IllegalArgumentException("Id was not found: $id")
+            val group = NotificationsGroups[id.groupId]
+            val channel = NotificationsChannels[id.channelId]
 
-            NotificationsGroups[id.groupId].handleContentIntent(
-                    context,
-                    id,
-                    NotificationsChannels[id.channelId],
-                    data
-            )
+            if (id.isSummary) {
+                if (group !is SummarizedNotificationGroup) throw IllegalArgumentException(
+                        "Received launch request on summary notification with group without summary implementation.")
+
+                val data = NotificationsData.instance.getAll(id.groupId, id.channelId).values.toList()
+
+                group.handleSummaryContentIntent(context, id, channel, data)
+            } else {
+                val data = NotificationsData.instance[id]
+                        ?: throw IllegalArgumentException("Id was not found: $id")
+
+                group.handleContentIntent(context, id, channel, data)
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }

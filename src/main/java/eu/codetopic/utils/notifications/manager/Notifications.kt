@@ -29,7 +29,6 @@ import eu.codetopic.utils.notifications.manager.save.NotificationsData
 import eu.codetopic.utils.notifications.manager.data.NotificationId
 import eu.codetopic.utils.notifications.manager.util.NotificationChannel
 import eu.codetopic.utils.notifications.manager.util.SummarizedNotificationGroup
-import eu.codetopic.java.utils.debug.DebugAsserts.assert
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId
 import eu.codetopic.utils.notifications.manager.receiver.NotificationDeleteReceiver
 import eu.codetopic.utils.notifications.manager.receiver.NotificationLaunchReceiver
@@ -48,6 +47,10 @@ internal object Notifications {
                 .setGroup(id.groupId)
                 .setGroupSummary(id.isSummary)
                 .setOnlyAlertOnce(true)
+                .setGroupAlertBehavior(
+                        if (id.isSummary) NotificationCompat.GROUP_ALERT_SUMMARY
+                        else NotificationCompat.GROUP_ALERT_ALL
+                )
                 .setContentIntent(
                         PendingIntent.getBroadcast(
                                 context,
@@ -149,7 +152,7 @@ internal object Notifications {
         refreshSummary(
                 context, notifier, group, channel,
                 NotificationsData.instance.getAll(group.id, channel.id)
-                        .takeIf { it.size > group.summarizeMin }?.values?.toList()
+                        .takeIf { it.isNotEmpty() }?.values?.toList()
         )
     }
 
@@ -177,12 +180,10 @@ internal object Notifications {
         NotificationsGroups.getAll().forEach { group ->
             if (group !is SummarizedNotificationGroup) return@forEach
             try {
-                group.summarizeMin.assert { it > 0 }
-
                 NotificationsChannels.getAll().forEach { channel ->
                     refreshSummary(context,  notifier, group, channel, nData
                             .filter { group.id == it.key.groupId && channel.id == it.key.channelId }
-                            .takeIf { it.size > group.summarizeMin }?.values?.toList())
+                            .takeIf { it.isNotEmpty() }?.values?.toList())
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "refreshSummaries() -> (groupId=${group.id}) -> " +

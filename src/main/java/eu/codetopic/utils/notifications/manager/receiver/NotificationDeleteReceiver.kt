@@ -29,6 +29,7 @@ import eu.codetopic.utils.notifications.manager.NotificationsGroups
 import eu.codetopic.utils.notifications.manager.NotificationsManager
 import eu.codetopic.utils.notifications.manager.data.NotificationId
 import eu.codetopic.utils.notifications.manager.save.NotificationsData
+import eu.codetopic.utils.notifications.manager.util.SummarizedNotificationGroup
 import kotlinx.serialization.json.JSON
 
 /**
@@ -56,17 +57,26 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
             val id = intent.getStringExtra(EXTRA_ID)?.let { JSON.parse<NotificationId>(it) }
                     ?: throw IllegalArgumentException("No notification id received by intent")
 
-            val data = NotificationsData.instance.remove(id)
-                    ?: throw IllegalArgumentException("Id was not found: $id")
+            val group = NotificationsGroups[id.groupId]
+            val channel = NotificationsChannels[id.channelId]
 
-            Notifications.refreshSummaryOf(context, id)
+            if (id.isSummary) {
+                if (group !is SummarizedNotificationGroup) throw IllegalArgumentException(
+                        "Received launch request on summary notification with group without summary implementation.")
 
-            NotificationsGroups[id.groupId].handleDeleteIntent(
-                    context,
-                    id,
-                    NotificationsChannels[id.channelId],
-                    data
-            )
+                val data = NotificationsData.instance.getAll(id.groupId, id.channelId).values.toList()
+
+                Notifications.refreshSummaryOf(context, id)
+
+                group.handleSummaryDeleteIntent(context, id, channel, data)
+            } else {
+                val data = NotificationsData.instance.remove(id)
+                        ?: throw IllegalArgumentException("Id was not found: $id")
+
+                Notifications.refreshSummaryOf(context, id)
+
+                group.handleDeleteIntent(context, id, channel, data)
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }

@@ -65,10 +65,10 @@ class RequestNotifyAllReceiver : BroadcastReceiver() {
             val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)
                     ?: throw IllegalArgumentException("No channel id received by intent")
             @Suppress("UNCHECKED_CAST")
-            val data = intent.getParcelableArrayExtra(EXTRA_DATA_BUNDLE_ARRAY) as? Array<Bundle>
+            val data = intent.getParcelableArrayExtra(EXTRA_DATA_BUNDLE_ARRAY)?.map { it as Bundle }
                     ?: throw IllegalArgumentException("No data bundle array received by intent")
 
-            Notifications.notifyAll(context, groupId, channelId, data.asList())
+            Notifications.notifyAll(context, groupId, channelId, data)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }
