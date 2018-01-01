@@ -30,6 +30,7 @@ import eu.codetopic.utils.data.getter.DataGetter
 import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
 import android.os.Parcel
 import android.util.Base64
+import eu.codetopic.java.utils.log.Log
 import kotlinx.io.ByteArrayInputStream
 import kotlinx.io.ByteArrayOutputStream
 import kotlinx.serialization.internal.readToByteBuffer
@@ -40,6 +41,8 @@ import java.util.zip.GZIPInputStream
 
 
 object AndroidExtensions {
+
+    const val LOG_TAG = "AndroidExtensions"
 
     inline fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
             edit().apply { block() }.apply()
@@ -61,6 +64,27 @@ object AndroidExtensions {
         return IntentFilter().apply {
             getters.forEach {
                 if (it.hasDataChangedBroadcastAction()) addAction(it.dataChangedBroadcastAction)
+            }
+        }
+    }
+
+    fun intentFilter(vararg actions: Any): IntentFilter {
+        return IntentFilter().apply {
+            actions.forEach {
+                when (it) {
+                    is DataGetter<*> -> {
+                        if (it.hasDataChangedBroadcastAction()) {
+                            addAction(it.dataChangedBroadcastAction)
+                        } else {
+                            Log.e(LOG_TAG, "intentFilter() -> (action=$it) -> " +
+                                    "Can't add data getter action:" +
+                                    " getter hasn't got data changed broadcast action")
+                        }
+                    }
+                    is String -> addAction(it)
+                    else -> Log.e(LOG_TAG, "intentFilter() -> (action=$it) -> " +
+                            "Can't add action: Unknown action type")
+                }
             }
         }
     }

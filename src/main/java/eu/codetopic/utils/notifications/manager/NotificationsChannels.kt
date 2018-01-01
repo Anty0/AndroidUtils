@@ -36,6 +36,11 @@ object NotificationsChannels {
         channels.put(channel.id, channel)
     }
 
+    internal fun remove(channelId: String): NotificationChannel {
+        return channels.remove(channelId)
+                ?: throw IllegalArgumentException("Unknown channelId: '$channelId'")
+    }
+
     internal operator fun get(channelId: String): NotificationChannel {
         return channels[channelId]
                 ?: throw IllegalArgumentException("Unknown channelId: '$channelId'")

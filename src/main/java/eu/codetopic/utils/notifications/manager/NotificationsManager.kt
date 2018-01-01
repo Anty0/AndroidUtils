@@ -38,9 +38,10 @@ object NotificationsManager {
         if (!isInitialized) throw IllegalStateException("NotificationsManager is not initialized")
     }
 
-    fun initialize(context: Context, appUpdated: Boolean) {
+    fun initialize(context: Context) {
         NotificationsData.initialize(context)
-        if (appUpdated) refresh(context)
+        cleanup(context)
+        refresh(context)
     }
 
     //--------------------------------------------------------------------------
@@ -50,6 +51,16 @@ object NotificationsManager {
 
     fun initChannel(context: Context, channel: NotificationChannel) =
             NotificationsChannels.add(context, channel)
+
+    fun removeGroup(context: Context, groupId: String): NotificationGroup =
+            NotificationsGroups.remove(groupId).also {
+                if (isInitialized) cleanup(context)
+            }
+
+    fun removeChannel(context: Context, channelId: String): NotificationChannel =
+            NotificationsChannels.remove(channelId).also {
+                if (isInitialized) cleanup(context)
+            }
 
     fun refreshGroup(context: Context, groupId: String) =
             NotificationsGroups.refresh(context, groupId)
@@ -111,6 +122,8 @@ object NotificationsManager {
 
     fun getAll(groupId: String?, channelId: String? = null) =
             NotificationsData.instance.getAll(groupId, channelId)
+
+    fun cleanup(context: Context) = Notifications.cleanup(context)
 
     //--------------------------------------------------------------------------
 

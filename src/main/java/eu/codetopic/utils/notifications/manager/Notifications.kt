@@ -108,8 +108,8 @@ internal object Notifications {
         }
     }
 
-    private fun  cancelNotification(notifier: NotificationManagerCompat,
-                                    id: NotificationId) {
+    private fun cancelNotification(notifier: NotificationManagerCompat,
+                                   id: NotificationId) {
         try {
             notifier.cancel(id.tag, id.id)
         } catch (e: Exception) {
@@ -166,7 +166,7 @@ internal object Notifications {
     }
 
     private fun refreshSummaryOf(context: Context, notifier: NotificationManagerCompat,
-                               id: NotificationId) {
+                                 id: NotificationId) {
         refreshSummary(context, notifier, id.groupId, id.channelId)
     }
 
@@ -181,7 +181,7 @@ internal object Notifications {
             if (group !is SummarizedNotificationGroup) return@forEach
             try {
                 NotificationsChannels.getAll().forEach { channel ->
-                    refreshSummary(context,  notifier, group, channel, nData
+                    refreshSummary(context, notifier, group, channel, nData
                             .filter { group.id == it.key.groupId && channel.id == it.key.channelId }
                             .takeIf { it.isNotEmpty() }?.values?.toList())
                 }
@@ -195,7 +195,7 @@ internal object Notifications {
     internal fun notify(context: Context, groupId: String, channelId: String,
                         data: Bundle): NotificationId {
         val group = NotificationsGroups[groupId]
-        val channel = NotificationsChannels [channelId]
+        val channel = NotificationsChannels[channelId]
 
         val notifier = NotificationManagerCompat.from(context)
 
@@ -245,4 +245,14 @@ internal object Notifications {
             cancelNotification(notifier, it.key)
         }.also { refreshSummaries(context) }
     }
+
+    internal fun cleanup(context: Context) = cancelAll(
+            context,
+            NotificationsData.instance.getAll()
+                    .filter {
+                        it.key.groupId !in NotificationsGroups ||
+                                it.key.channelId !in NotificationsChannels
+                    }
+                    .map { it.key }
+    )
 }

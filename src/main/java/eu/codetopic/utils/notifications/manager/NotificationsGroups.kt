@@ -36,6 +36,11 @@ object NotificationsGroups {
         groups.put(group.id, group)
     }
 
+    internal fun remove(groupId: String): NotificationGroup {
+        return groups.remove(groupId)
+                ?: throw IllegalArgumentException("Unknown groupId: '$groupId'")
+    }
+
     internal operator fun get(groupId: String): NotificationGroup {
         return groups[groupId]
                 ?: throw IllegalArgumentException("Unknown groupId: '$groupId'")
