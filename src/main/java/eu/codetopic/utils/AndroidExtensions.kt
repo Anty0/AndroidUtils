@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils
 
+import android.app.Activity
 import android.app.NotificationManager
 import android.content.*
 import android.net.Uri
@@ -108,6 +109,9 @@ object AndroidExtensions {
 
     val Context.notificationManager
         get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    val Context.baseActivity: Activity?
+        get() = this as? Activity ?: (this as? ContextWrapper)?.baseContext?.baseActivity
 
     //////////////////////////////////////
     //////REGION - BUNDLES////////////////
