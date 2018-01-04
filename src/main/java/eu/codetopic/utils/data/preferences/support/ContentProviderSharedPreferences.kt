@@ -67,8 +67,9 @@ class ContentProviderSharedPreferences private constructor(
         }
     }
 
-    val name get() = findValueByKey(query(prepareQueryOrDeleteUri(authority, Segment.CONTROL,
-            Segment.CONTROL_VALUE_NAME)), Segment.CONTROL_VALUE_NAME) ?: "unknown"
+    val name
+        get() = query(prepareQueryOrDeleteUri(authority, Segment.CONTROL, Segment.CONTROL_VALUE_NAME))
+                .use { findValueByKey(it, Segment.CONTROL_VALUE_NAME) ?: "unknown" }
 
     init {
         context.contentResolver.registerContentObserver(prepareUriSegmentBase(authority, Segment.DATA),
@@ -76,7 +77,8 @@ class ContentProviderSharedPreferences private constructor(
     }
 
     private fun query(uri: Uri): Cursor {
-        return context.contentResolver.query(uri, null, null, null, null)
+        return context.contentResolver.query(uri, null,
+                null, null, null)
     }
 
     private fun findValueByKey(cursor: Cursor, key: String): String? {
@@ -92,7 +94,8 @@ class ContentProviderSharedPreferences private constructor(
     }
 
     private fun get(key: String): String? {
-        return findValueByKey(query(prepareQueryOrDeleteUri(authority, Segment.DATA, key)), key)
+        return query(prepareQueryOrDeleteUri(authority, Segment.DATA, key))
+                .use { findValueByKey(it, key) }
     }
 
     private fun notifyChanged(key: String?) {
@@ -116,19 +119,23 @@ class ContentProviderSharedPreferences private constructor(
     }
 
     override fun contains(key: String): Boolean {
-        return findValueByKey(query(prepareQueryOrDeleteUri(authority, Segment.CONTAINS, key)), key)?.toBoolean() ?: false
+        return query(prepareQueryOrDeleteUri(authority, Segment.CONTAINS, key))
+                .use { findValueByKey(it, key)?.toBoolean() ?: false }
     }
 
     override fun getAll(): MutableMap<String, *> {
-        return mutableMapOf(*query(prepareAllKeysQueryUri(authority, Segment.DATA)).let {
-            val pairs = mutableListOf<Pair<String, String?>>()
-            it.moveToFirst()
-            while (!it.isAfterLast) {
-                pairs.add(it.getString(0) to it.getString(1))
-                it.moveToNext()
-            }
-            return@let pairs.toTypedArray()
-        })
+        return mutableMapOf(
+                *query(prepareAllKeysQueryUri(authority, Segment.DATA))
+                        .use {
+                            val pairs = mutableListOf<Pair<String, String?>>()
+                            it.moveToFirst()
+                            while (!it.isAfterLast) {
+                                pairs.add(it.getString(0) to it.getString(1))
+                                it.moveToNext()
+                            }
+                            return@use pairs.toTypedArray()
+                        }
+        )
     }
 
     override fun getBoolean(key: String, defValue: Boolean): Boolean {
