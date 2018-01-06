@@ -43,7 +43,7 @@ import java.util.zip.GZIPInputStream
 
 object AndroidExtensions {
 
-    const val LOG_TAG = "AndroidExtensions"
+    private const val LOG_TAG = "AndroidExtensions"
 
     inline fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
             edit().apply { block() }.apply()
