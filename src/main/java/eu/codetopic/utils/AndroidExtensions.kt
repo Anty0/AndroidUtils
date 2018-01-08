@@ -45,6 +45,30 @@ object AndroidExtensions {
 
     private const val LOG_TAG = "AndroidExtensions"
 
+    fun SharedPreferences.edit(vararg changes: Pair<String, Any>) = edit{ put(*changes) }
+
+    fun SharedPreferences.Editor.put(vararg changes: Pair<String, Any>): SharedPreferences.Editor {
+        changes.forEach {
+            val (key, value) = it
+            when(value) {
+                is String -> putString(key, value)
+                is Int -> putInt(key, value)
+                is Boolean -> putBoolean(key, value)
+                is Float -> putFloat(key, value)
+                is Long -> putLong(key, value)
+                is Set<*> -> {
+                    @Suppress("UNCHECKED_CAST")
+                    putStringSet(key, value as? Set<String>
+                            ?:
+                            throw IllegalArgumentException(
+                                    "Unsupported Set content type: ${value.javaClass}"))
+                }
+                else -> throw IllegalArgumentException("Unsupported value type: ${value.javaClass}")
+            }
+        }
+        return this
+    }
+
     inline fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
             edit().apply { block() }.apply()
 
