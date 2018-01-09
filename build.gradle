@@ -53,10 +53,12 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        def proguardFilesList = ['proguard-rules.pro']
-        proguardFilesList.addAll(file('./proguard/').listFiles().collect())
+        def proguardList = ['proguard-rules.pro']
+        proguardList.addAll(file('./proguard/').listFiles().collect())
+        def proguardArray = Iterables.toArray(proguardList, Object.class)
+
         release {
-            consumerProguardFiles Iterables.toArray(proguardFilesList, Object.class)
+            consumerProguardFiles proguardArray
 
             debuggable false
             jniDebuggable false
@@ -65,7 +67,7 @@ android {
             zipAlignEnabled true
         }
         debug {
-            consumerProguardFiles Iterables.toArray(proguardFilesList, Object.class)
+            consumerProguardFiles proguardArray
 
             debuggable true
             jniDebuggable false
