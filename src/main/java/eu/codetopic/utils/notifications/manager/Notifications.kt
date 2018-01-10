@@ -73,7 +73,7 @@ internal object Notifications {
                                           group: SummarizedNotificationGroup,
                                           channel: NotificationChannel,
                                           id: NotificationId,
-                                          data: List<Bundle>): Notification {
+                                          data: Map<NotificationId, Bundle>): Notification {
         return group.createSummaryNotification(context, id, channel, data)
                 .also { prepareNotification(context, id, it) }
                 .build()
@@ -131,13 +131,13 @@ internal object Notifications {
                                notifier: NotificationManagerCompat,
                                group: SummarizedNotificationGroup,
                                channel: NotificationChannel,
-                               data: List<Bundle>?) {
+                               data: Map<NotificationId, Bundle>?) {
         try {
             val nId = NotificationId.newSummary(group.id, channel.id)
-            data?.also { nData ->
+            if (data != null) {
                 showNotification(notifier, nId,
-                        createSummaryNotification(context, group, channel, nId, nData))
-            } ?: cancelNotification(notifier, nId)
+                        createSummaryNotification(context, group, channel, nId, data))
+            } else cancelNotification(notifier, nId)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "refreshSummary() -> " +
                     "(groupId=${group.id}, channelId=${channel.id}) -> " +
@@ -152,7 +152,7 @@ internal object Notifications {
         refreshSummary(
                 context, notifier, group, channel,
                 NotificationsData.instance.getAll(group.id, channel.id)
-                        .takeIf { it.isNotEmpty() }?.values?.toList()
+                        .takeIf { it.isNotEmpty() }
         )
     }
 
@@ -183,7 +183,7 @@ internal object Notifications {
                 NotificationsChannels.getAll().forEach { channel ->
                     refreshSummary(context, notifier, group, channel, nData
                             .filter { group.id == it.key.groupId && channel.id == it.key.channelId }
-                            .takeIf { it.isNotEmpty() }?.values?.toList())
+                            .takeIf { it.isNotEmpty() })
                 }
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "refreshSummaries() -> (groupId=${group.id}) -> " +

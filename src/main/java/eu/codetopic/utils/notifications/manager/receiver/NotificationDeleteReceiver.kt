@@ -61,17 +61,25 @@ class NotificationDeleteReceiver : BroadcastReceiver() {
             val channel = NotificationsChannels[id.channelId]
 
             if (id.isSummary) {
-                if (group !is SummarizedNotificationGroup) throw IllegalArgumentException(
-                        "Received launch request on summary notification with group without summary implementation.")
+                if (group !is SummarizedNotificationGroup)
+                    throw IllegalArgumentException("Received delete request on summary " +
+                            "notification with group without summary implementation.")
 
-                val data = NotificationsData.instance.getAll(id.groupId, id.channelId).values.toList()
+                val data = NotificationsData.instance
+                        .removeAll(id.groupId, id.channelId)
 
                 Notifications.refreshSummaryOf(context, id)
 
                 group.handleSummaryDeleteIntent(context, id, channel, data)
             } else {
                 val data = NotificationsData.instance.remove(id)
-                        ?: throw IllegalArgumentException("Id was not found: $id")
+                        ?:
+                        run {
+                            // throw IllegalArgumentException("Id not found: $id")
+                            Log.d(LOG_TAG, "onReceive() -> (id=$id) -> " +
+                                    "Id not found, probably was removed by summary notification")
+                            return
+                        }
 
                 Notifications.refreshSummaryOf(context, id)
 

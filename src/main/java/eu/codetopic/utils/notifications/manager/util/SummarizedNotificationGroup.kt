@@ -32,11 +32,13 @@ abstract class SummarizedNotificationGroup(id: String, checkForIdOverrides: Bool
     abstract fun createSummaryNotification(context: Context,
                                            id: NotificationId,
                                            channel: NotificationChannel,
-                                           data: List<Bundle>): NotificationCompat.Builder
+                                           data: Map<NotificationId, Bundle>): NotificationCompat.Builder
 
     open fun handleSummaryContentIntent(context: Context, id: NotificationId,
-                                        channel: NotificationChannel, data: List<Bundle>) {}
+                                        channel: NotificationChannel,
+                                        data: Map<NotificationId, Bundle>) {}
 
     open fun handleSummaryDeleteIntent(context: Context, id: NotificationId,
-                                       channel: NotificationChannel, data: List<Bundle>) {}
+                                       channel: NotificationChannel,
+                                       data: Map<NotificationId, Bundle>) {}
 }

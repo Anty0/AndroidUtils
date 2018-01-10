@@ -63,7 +63,7 @@ class NotificationLaunchReceiver : BroadcastReceiver() {
                 if (group !is SummarizedNotificationGroup) throw IllegalArgumentException(
                         "Received launch request on summary notification with group without summary implementation.")
 
-                val data = NotificationsData.instance.getAll(id.groupId, id.channelId).values.toList()
+                val data = NotificationsData.instance.getAll(id.groupId, id.channelId)
 
                 group.handleSummaryContentIntent(context, id, channel, data)
             } else {
