@@ -22,6 +22,7 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.content.*
 import android.net.Uri
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.AnyRes
@@ -114,6 +115,10 @@ object AndroidExtensions {
         }
     }
 
+    //////////////////////////////////////
+    //////REGION - CONTEXT////////////////
+    //////////////////////////////////////
+
     fun Context.getFormattedText(@StringRes stringId: Int, vararg args: Any): CharSequence {
         return AndroidUtils.getFormattedText(getString(stringId), *args)
     }
@@ -127,12 +132,11 @@ object AndroidExtensions {
         }
     }
 
-    //////////////////////////////////////
-    //////REGION - CONTEXT////////////////
-    //////////////////////////////////////
-
     val Context.notificationManager
         get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+    val Context.wifiManager
+        get() = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
     val Context.baseActivity: Activity?
         get() = this as? Activity ?: (this as? ContextWrapper)?.baseContext?.baseActivity
