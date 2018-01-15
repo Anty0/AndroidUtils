@@ -65,7 +65,6 @@ class ErrorInfoActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_error_info)
 
-        imgIcon.setImageDrawable(AndroidUtils.getActivityIcon(this, componentName))
         imgIcon.setOnClickListener { finish() }
 
         txtTitle.text = title
