@@ -28,6 +28,8 @@ import java.io.Serializable
 
 import eu.codetopic.java.utils.ArrayTools
 import eu.codetopic.utils.ui.container.adapter.UniversalAdapter
+import kotlinx.android.extensions.CacheImplementation
+import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.extensions.LayoutContainer
 
 abstract class CustomItem : Serializable {
@@ -113,6 +115,7 @@ abstract class CustomItem : Serializable {
 
     protected open fun getWrappers(context: Context): Array<CustomItemWrapper> = emptyArray()
 
+    @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
     class ViewHolder internal constructor(val context: Context, val itemView: View,
                                           val parentHolder: ViewHolder?,
                                           @param:LayoutRes @field:LayoutRes val layoutResId: Int) : LayoutContainer {

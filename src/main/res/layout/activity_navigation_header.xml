@@ -68,19 +68,19 @@
 
         <ImageButton
             android:id="@+id/butAccountEdit"
-            android:layout_width="wrap_content"
+            android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/ic_edit"
+            android:padding="8dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/description_edit_button"
-            android:visibility="gone" />
+            android:visibility="gone" /> <!--Icon will be added after inflating-->
 
-        <ImageButton
-            android:id="@+id/butAccountChange"
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/imgAccountsSwitchArrow"
+            android:layout_width="32dp"
             android:layout_height="32dp"
-            android:src="@drawable/ic_arrow_drop_down"
+            android:padding="8dp"
             android:background="@android:color/transparent"
-            android:contentDescription="@string/description_drop_down_arrow" />
+            android:contentDescription="@string/description_drop_down_arrow" /> <!--Icon will be added after inflating-->
     </LinearLayout>
 </LinearLayout>

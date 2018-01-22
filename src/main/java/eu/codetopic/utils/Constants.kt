@@ -1,6 +1,6 @@
 /*
  * utils
- * Copyright (C)   2017  anty
+ * Copyright (C)   2018  anty
  *
  * This program is free  software: you can redistribute it and/or modify
  * it under the terms  of the GNU General Public License as published by
@@ -16,29 +16,15 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log
+package eu.codetopic.utils
 
-import android.content.Context
-import android.support.annotation.MainThread
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
 
-import eu.codetopic.java.utils.log.Logger
-import eu.codetopic.utils.log.issue.IssueLogListener
+/**
+ * @author anty
+ */
+object Constants {
 
-object AndroidLoggerExtension {
-
-    private const val LOG_TAG = "AndroidLoggerExtension"
-
-    private var INSTALLED = false
-
-    @MainThread
-    @Synchronized
-    fun install(context: Context) {
-        if (INSTALLED) throw IllegalStateException("$LOG_TAG is still installed.")
-        INSTALLED = true
-
-        Logger.logTarget = AndroidLogTarget()
-
-        IssueLogListener.initialize(context)
-    }
-
+    val ICON_SETTINGS = GoogleMaterial.Icon.gmd_settings
+    val ICON_DEBUG = GoogleMaterial.Icon.gmd_bug_report
 }

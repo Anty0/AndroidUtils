@@ -1,6 +1,6 @@
 /*
  * utils
- * Copyright (C)   2017  anty
+ * Copyright (C)   2018  anty
  *
  * This program is free  software: you can redistribute it and/or modify
  * it under the terms  of the GNU General Public License as published by
@@ -16,34 +16,39 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log
+package eu.codetopic.utils.log.issue
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import eu.codetopic.java.utils.log.Log
 
 import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
+import eu.codetopic.utils.notifications.manager.NotificationsManager
+import eu.codetopic.utils.notifications.manager.data.NotificationId
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.synthetic.main.activity_error_info.*
+import kotlinx.serialization.json.JSON
 
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
-class ErrorInfoActivity : AppCompatActivity() {
+class IssueInfoActivity : AppCompatActivity() {
 
     companion object {
 
-        private const val LOG_TAG = "ErrorInfoActivity"
+        private const val LOG_TAG = "IssueInfoActivity"
 
-        private const val EXTRA_LOG_LINE = "EXTRA_LOG_LINE"
+        private const val EXTRA_NOTIFY_ID = "EXTRA_NOTIFY_ID"
+        private const val EXTRA_ISSUE = "EXTRA_ISSUE"
 
-        fun start(context: Context, logLine: LogLine) {
+        fun start(context: Context, id: NotificationId?, issue: Issue) {
             context.startActivity(
-                    Intent(context, ErrorInfoActivity::class.java)
-                            .putExtra(EXTRA_LOG_LINE, logLine)
+                    Intent(context, IssueInfoActivity::class.java)
+                            .putExtra(EXTRA_NOTIFY_ID, id?.let { JSON.stringify(it) })
+                            .putExtra(EXTRA_ISSUE, JSON.stringify(issue))
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         }
@@ -51,11 +56,15 @@ class ErrorInfoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val logLine = intent.getSerializableExtra(EXTRA_LOG_LINE) as LogLine?
-                ?: return finish()
+        val notifyId = intent?.getStringExtra(EXTRA_NOTIFY_ID)?.let { JSON.parse<NotificationId>(it) }
+        val issue = intent?.getStringExtra(EXTRA_ISSUE)?.let { JSON.parse<Issue>(it) }
+                ?: run {
+                    Log.w(LOG_TAG, "No Issue received in intent")
+                    return finish()
+                }
 
         val title = getText(
-                if (Priority.ERROR == logLine.priority)
+                if (Priority.ERROR == issue.priority)
                     R.string.activity_label_error_info
                 else R.string.activity_label_warn_info
         )
@@ -65,10 +74,16 @@ class ErrorInfoActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_error_info)
 
-        imgIcon.setOnClickListener { finish() }
+        butExit.setOnClickListener { finish() }
+
+        butDone.isEnabled = notifyId != null
+        butDone.setOnClickListener {
+            notifyId?.let { NotificationsManager.requestCancel(this, it) }
+            finish()
+        }
 
         txtTitle.text = title
 
-        txtMessage.text = logLine.toString()
+        txtMessage.text = issue.toString()
     }
 }

@@ -22,6 +22,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import eu.codetopic.java.utils.JavaExtensions.runIf
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.notifications.manager.Notifications
 import eu.codetopic.utils.notifications.manager.NotificationsManager
@@ -38,13 +39,16 @@ class RequestNotifyReceiver : BroadcastReceiver() {
         private const val EXTRA_GROUP_ID = "$NAME.GROUP_ID"
         private const val EXTRA_CHANNEL_ID = "$NAME.CHANNEL_ID"
         private const val EXTRA_DATA_BUNDLE = "$NAME.DATA_BUNDLE"
+        private const val EXTRA_WHEN_TIME = "$NAME.WHEN_TIME"
 
-        internal fun getStartIntent(context: Context, groupId: String, channelId: String,
-                                    data: Bundle): Intent =
+        internal fun getStartIntent(context: Context, groupId: String,
+                                    channelId: String, data: Bundle,
+                                    whenTime: Long = System.currentTimeMillis()): Intent =
                 Intent(context, RequestNotifyReceiver::class.java)
                         .putExtra(EXTRA_GROUP_ID, groupId)
                         .putExtra(EXTRA_CHANNEL_ID, channelId)
                         .putExtra(EXTRA_DATA_BUNDLE, data)
+                        .putExtra(EXTRA_WHEN_TIME, whenTime)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -57,8 +61,12 @@ class RequestNotifyReceiver : BroadcastReceiver() {
                     ?: throw IllegalArgumentException("No channel id received by intent")
             val data = intent.getBundleExtra(EXTRA_DATA_BUNDLE)
                     ?: throw IllegalArgumentException("No data bundle received by intent")
+            val whenTime = intent.getLongExtra(EXTRA_WHEN_TIME, -1)
+                    .runIf({ it == -1L }) {
+                        throw IllegalArgumentException("No when time received by intent")
+                    }
 
-            Notifications.notify(context, groupId, channelId, data)
+            Notifications.notify(context, groupId, channelId, data, whenTime)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }

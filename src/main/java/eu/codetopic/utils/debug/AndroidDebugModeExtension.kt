@@ -1,6 +1,6 @@
 /*
  * utils
- * Copyright (C)   2017  anty
+ * Copyright (C)   2018  anty
  *
  * This program is free  software: you can redistribute it and/or modify
  * it under the terms  of the GNU General Public License as published by
@@ -16,27 +16,28 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log
+package eu.codetopic.utils.debug
 
 import android.content.Context
+import android.support.annotation.MainThread
 import eu.codetopic.java.utils.debug.DebugMode
-import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.LogsHandler
-import eu.codetopic.java.utils.log.base.LogLine
-import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.thread.LooperUtils
+import eu.codetopic.utils.BuildConfig
 
 /**
  * @author anty
  */
-class ErrorInfoLogListener(private val appContext: Context) : LogsHandler.OnLoggedListener {
+object AndroidDebugModeExtension {
 
-    override fun onLogged(logLine: LogLine) {
-        if (!DebugMode.isEnabled) return
+    private const val LOG_TAG = "AndroidDebugModeExtension"
 
-        LooperUtils.runOnMainThread { ErrorInfoActivity.start(appContext, logLine) }
+    private var INSTALLED = false
+
+    @MainThread
+    @Synchronized
+    fun install(context: Context) {
+        if (INSTALLED) throw IllegalStateException("$LOG_TAG is still installed.")
+        INSTALLED = true
+
+        DebugMode.isEnabled = BuildConfig.DEBUG
     }
-
-    override val filterPriorities: Array<Priority>?
-        get() = arrayOf(Priority.WARN, Priority.ERROR)
 }

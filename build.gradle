@@ -116,6 +116,11 @@ dependencies {
     implementation "org.jetbrains.anko:anko-recyclerview-v7:$anko_version"
     implementation "org.jetbrains.anko:anko-constraint-layout:$anko_version"
 
+    implementation "com.mikepenz:iconics-core:3.0.0@aar"
+    implementation "com.mikepenz:iconics-views:3.0.0@aar"
+    implementation 'com.mikepenz:google-material-typeface:3.0.1.2.original@aar'
+    implementation 'com.mikepenz:community-material-typeface:2.0.46.1@aar'
+
     implementation 'com.scottyab:aes-crypto:0.0.4'
     implementation 'com.infstory:proguard-annotations:1.0.2'
 

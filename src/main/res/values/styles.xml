@@ -18,51 +18,101 @@
 
 <resources>
 
-    <style name="Theme.AppCompat.Dialog.Alert.NoActionBar" parent="Theme.AppCompat.Dialog.Alert">
+    <style name="UtilsTheme.Dialog.NoActionBar" parent="UtilsTheme.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
 
-    <!--<style name="DefaultTheme" parent="DefaultTheme.Base">
+    <style name="UtilsTheme" parent="UtilsTheme.Base">
 
     </style>
 
-    <style name="DefaultTheme.NoActionBar" parent="DefaultTheme.NoActionBar.Base">
+    <style name="UtilsTheme.NoActionBar" parent="UtilsTheme.NoActionBar.Base">
 
     </style>
 
-    <style name="DefaultTheme.Dialog" parent="DefaultTheme.Dialog.Base">
+    <style name="UtilsTheme.Dialog" parent="UtilsTheme.Dialog.Base">
 
     </style>
 
-    <style name="DefaultTheme.Base" parent="Theme.AppCompat.Light">
-        <item name="colorPrimary">@color/defaultColorPrimary</item>
-        <item name="colorPrimaryDark">@color/defaultColorPrimaryDark</item>
-        <item name="colorAccent">@color/defaultColorAccent</item>
-        <item name="cardViewTheme">@style/CardView.Light</item>
-        <item name="appBarOverlay">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-        <item name="popupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="titleTextAppearance">@style/TextAppearance.AppCompat.Large.Inverse</item>
+    <style name="UtilsTheme.Base" parent="Theme.AppCompat">
+        <item name="colorPrimary">@color/utilsColorPrimary</item>
+        <item name="colorPrimaryDark">@color/utilsColorPrimaryDark</item>
+        <item name="colorPrimaryExtraDark">@color/utilsColorPrimaryExtraDark</item>
+        <item name="colorAccent">@color/utilsColorAccent</item>
+
+        <item name="cardViewTheme">@style/CardView.Dark</item>
+        <item name="appBarOverlay">@style/UtilsTheme.AppBarOverlay</item>
+        <item name="popupOverlay">@style/UtilsTheme.PopupOverlay</item>
+        <item name="titleTextAppearance">@style/TextAppearance.UtilsTheme.Title</item>
+        <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Subhead</item>
+        <item name="textAppearanceListItemSmall">@style/TextAppearance.AppCompat.Subhead.Grey</item>
+        <item name="android:progressBarStyle">@style/Widget.AppCompat.ProgressBar.Bigger</item>
+        <item name="android:progressBarStyleHorizontal">
+            @style/Widget.AppCompat.ProgressBar.Horizontal
+        </item>
+
+        <item name="colorDrawable">@color/white</item>
     </style>
 
-    <style name="DefaultTheme.NoActionBar.Base" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="colorPrimary">@color/defaultColorPrimary</item>
-        <item name="colorPrimaryDark">@color/defaultColorPrimaryDark</item>
-        <item name="colorAccent">@color/defaultColorAccent</item>
-        <item name="cardViewTheme">@style/CardView.Light</item>
-        <item name="appBarOverlay">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-        <item name="popupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="titleTextAppearance">@style/TextAppearance.AppCompat.Large.Inverse</item>
+    <style name="UtilsTheme.NoActionBar.Base" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/utilsColorPrimary</item>
+        <item name="colorPrimaryDark">@color/utilsColorPrimaryDark</item>
+        <item name="colorPrimaryExtraDark">@color/utilsColorPrimaryExtraDark</item>
+        <item name="colorAccent">@color/utilsColorAccent</item>
+
+        <item name="cardViewTheme">@style/CardView.Dark</item>
+        <item name="appBarOverlay">@style/UtilsTheme.AppBarOverlay</item>
+        <item name="popupOverlay">@style/UtilsTheme.PopupOverlay</item>
+        <item name="titleTextAppearance">@style/TextAppearance.UtilsTheme.Title</item>
+        <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Subhead</item>
+        <item name="textAppearanceListItemSmall">@style/TextAppearance.AppCompat.Subhead.Grey</item>
+        <item name="android:progressBarStyle">@style/Widget.AppCompat.ProgressBar.Bigger</item>
+        <item name="android:progressBarStyleHorizontal">
+            @style/Widget.AppCompat.ProgressBar.Horizontal
+        </item>
+
+        <item name="colorDrawable">@color/white</item>
     </style>
 
-    <style name="DefaultTheme.Dialog.Base" parent="Theme.AppCompat.Light.Dialog">
-        <item name="colorPrimary">@color/defaultColorPrimary</item>
-        <item name="colorPrimaryDark">@color/defaultColorPrimaryDark</item>
-        <item name="colorAccent">@color/defaultColorAccent</item>
-        <item name="cardViewTheme">@style/CardView.Light</item>
-        <item name="appBarOverlay">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>
-        <item name="popupOverlay">@style/ThemeOverlay.AppCompat.Light</item>
-        <item name="titleTextAppearance">@style/TextAppearance.AppCompat.Large.Inverse</item>
-    </style>-->
+    <style name="UtilsTheme.Dialog.Base" parent="Theme.AppCompat.Dialog">
+        <item name="colorPrimary">@color/utilsColorPrimary</item>
+        <item name="colorPrimaryDark">@color/utilsColorPrimaryDark</item>
+        <item name="colorPrimaryExtraDark">@color/utilsColorPrimaryExtraDark</item>
+        <item name="colorAccent">@color/utilsColorAccent</item>
+
+        <item name="cardViewTheme">@style/CardView.Dark</item>
+        <item name="appBarOverlay">@style/UtilsTheme.AppBarOverlay</item>
+        <item name="popupOverlay">@style/UtilsTheme.PopupOverlay</item>
+        <item name="titleTextAppearance">@style/TextAppearance.UtilsTheme.Title</item>
+        <item name="textAppearanceListItem">@style/TextAppearance.AppCompat.Subhead</item>
+        <item name="textAppearanceListItemSmall">@style/TextAppearance.AppCompat.Subhead.Grey</item>
+        <item name="android:progressBarStyle">@style/Widget.AppCompat.ProgressBar.Bigger</item>
+        <item name="android:progressBarStyleHorizontal">
+            @style/Widget.AppCompat.ProgressBar.Horizontal
+        </item>
+
+        <item name="colorDrawable">@color/white</item>
+    </style>
+
+
+
+    <style name="UtilsTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar"/>
+
+    <style name="UtilsTheme.PopupOverlay" parent="ThemeOverlay.AppCompat"/>
+
+    <style name="TextAppearance.AppCompat.Subhead.Grey" parent="TextAppearance.AppCompat.Subhead">
+        <item name="android:textColor">#C0C0C0</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="TextAppearance.UtilsTheme.Title" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="Widget.AppCompat.ProgressBar.Bigger" parent="Widget.AppCompat.ProgressBar">
+        <item name="android:minHeight">64dp</item>
+        <item name="android:minWidth">64dp</item>
+    </style>
 
 </resources>

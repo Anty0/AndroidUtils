@@ -113,16 +113,19 @@ internal class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal fun put(context: Context, groupId: String,
-                     channelId: String, data: Bundle): NotificationId =
-            put(context, NotificationsGroups[groupId], NotificationsChannels[channelId], data)
+    internal fun put(context: Context, groupId: String, channelId: String, data: Bundle,
+                     whenTime: Long = System.currentTimeMillis()): NotificationId =
+            put(context, NotificationsGroups[groupId], NotificationsChannels[channelId],
+                    data, whenTime)
 
     @Synchronized
     internal fun put(context: Context, group: NotificationGroup,
-                     channel: NotificationChannel, data: Bundle): NotificationId {
+                     channel: NotificationChannel, data: Bundle,
+                     whenTime: Long = System.currentTimeMillis()): NotificationId {
         val id = NotificationId.newCommon(
                 group.id, channel.id,
-                group.nextId(context, channel, data)
+                group.nextId(context, channel, data),
+                whenTime
         )
         val map = notificationsMap.toMutableMap()
         if (DebugMode.isEnabled && group.checkForIdOverrides && id in map) {
@@ -136,8 +139,8 @@ internal class NotificationsData private constructor(context: Context) :
     }
 
     @Synchronized
-    internal fun putAll(context: Context, groupId: String, channelId: String,
-                        data: List<Bundle>): Map<NotificationId, Bundle> {
+    internal fun putAll(context: Context, groupId: String, channelId: String, data: List<Bundle>,
+                        whenTime: Long = System.currentTimeMillis()): Map<NotificationId, Bundle> {
         val group = NotificationsGroups[groupId]
         val channel = NotificationsChannels[channelId]
 
@@ -147,7 +150,8 @@ internal class NotificationsData private constructor(context: Context) :
         val result = data.map {
             NotificationId.newCommon(
                     groupId, channelId,
-                    group.nextId(context, channel, it)
+                    group.nextId(context, channel, it),
+                    whenTime
             ).also { id ->
                 if (DebugMode.isEnabled && group.checkForIdOverrides && id in map) {
                     Log.e(LOG_TAG, "addAll(groupId=$groupId, channelId=$channelId, " +

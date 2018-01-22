@@ -37,8 +37,10 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.LinearLayout
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
 
 import eu.codetopic.java.utils.log.Log
+import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity
@@ -102,7 +104,13 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         header = HeaderViews()
 
         header.boxAccountsSwitch.setOnClickListener { isSwitchingAccounts = !isSwitchingAccounts }
-        header.butAccountEdit.setOnClickListener { onEditAccountButtonClick(it) }
+        header.butAccountEdit.apply {
+            setImageDrawable(
+                    getIconics(GoogleMaterial.Icon.gmd_edit)
+                            .actionBar()
+            )
+            setOnClickListener { onEditAccountButtonClick(it) }
+        }
 
         setNavigationViewAppIconDrawable(AndroidUtils.getActivityIcon(this, componentName))
         setHeaderBackgroundColor(AndroidUtils.getColorFromAttr(this,
@@ -189,9 +197,11 @@ abstract class NavigationActivity : BaseFragmentActivity() {
     fun invalidateNavigationMenu() {
         if (enableSwitchingAccounts) {
             header.txtAccountName.text = onUpdateActiveAccountName()
-            header.butAccountChange.setImageResource(
-                    if (switchingAccounts) R.drawable.ic_arrow_drop_up
-                    else R.drawable.ic_arrow_drop_down
+            header.imgAccountsSwitchArrow.setImageDrawable(
+                    getIconics(
+                            if (switchingAccounts) GoogleMaterial.Icon.gmd_arrow_drop_up
+                            else GoogleMaterial.Icon.gmd_arrow_drop_down
+                    ).actionBar()
             )
 
             header.boxAppName.visibility = View.GONE

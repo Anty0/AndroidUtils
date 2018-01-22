@@ -22,14 +22,10 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import eu.codetopic.java.utils.JavaExtensions.runIf
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.notifications.manager.Notifications
 import eu.codetopic.utils.notifications.manager.NotificationsManager
-import eu.codetopic.utils.AndroidExtensions.serialize
-import eu.codetopic.utils.AndroidExtensions.deserializeBundle
-import kotlinx.serialization.internal.StringSerializer
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.list
 
 /**
  * @author anty
@@ -43,9 +39,11 @@ class RequestNotifyAllReceiver : BroadcastReceiver() {
         private const val EXTRA_GROUP_ID = "$NAME.GROUP_ID"
         private const val EXTRA_CHANNEL_ID = "$NAME.CHANNEL_ID"
         private const val EXTRA_DATA_BUNDLE_ARRAY = "$NAME.DATA_BUNDLE_ARRAY"
+        private const val EXTRA_WHEN_TIME = "$NAME.WHEN_TIME"
 
-        internal fun getStartIntent(context: Context, groupId: String, channelId: String,
-                                    data: List<Bundle>): Intent {
+        internal fun getStartIntent(context: Context, groupId: String,
+                                    channelId: String, data: List<Bundle>,
+                                    whenTime: Long = System.currentTimeMillis()): Intent {
             if (data.size == 1) return RequestNotifyReceiver
                     .getStartIntent(context, groupId, channelId, data.first())
 
@@ -53,6 +51,7 @@ class RequestNotifyAllReceiver : BroadcastReceiver() {
                     .putExtra(EXTRA_GROUP_ID, groupId)
                     .putExtra(EXTRA_CHANNEL_ID, channelId)
                     .putExtra(EXTRA_DATA_BUNDLE_ARRAY, data.toTypedArray())
+                    .putExtra(EXTRA_WHEN_TIME, whenTime)
         }
     }
 
@@ -67,8 +66,12 @@ class RequestNotifyAllReceiver : BroadcastReceiver() {
             @Suppress("UNCHECKED_CAST")
             val data = intent.getParcelableArrayExtra(EXTRA_DATA_BUNDLE_ARRAY)?.map { it as Bundle }
                     ?: throw IllegalArgumentException("No data bundle array received by intent")
+            val whenTime = intent.getLongExtra(EXTRA_WHEN_TIME, -1)
+                    .runIf({ it == -1L }) {
+                        throw IllegalArgumentException("No when time received by intent")
+                    }
 
-            Notifications.notifyAll(context, groupId, channelId, data)
+            Notifications.notifyAll(context, groupId, channelId, data, whenTime)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }

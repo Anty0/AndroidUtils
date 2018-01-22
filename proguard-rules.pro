@@ -31,9 +31,10 @@
     java.lang.Object readResolve();
 }
 
+# remove listening for logged issues
+-assumenosideeffects class eu.codetopic.utils.log.issue.** { *; }
+
 # remove Logging
--assumenosideeffects class eu.codetopic.utils.log.ErrorInfoActivity
--assumenosideeffects class eu.codetopic.utils.log.ErrorInfoLogListener
 -assumenosideeffects class eu.codetopic.java.utils.log.Log {
     public static *** v(...);
     public static *** d(...);

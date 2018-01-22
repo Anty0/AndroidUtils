@@ -37,6 +37,9 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.RemoteViews;
 
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+
+import eu.codetopic.utils.AndroidExtensions;
 import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ids.Identifiers;
@@ -225,6 +228,12 @@ public class WidgetBuilder {
 
         baseView.setInt(R.id.content_frame_layout, "setBackgroundColor",
                 AndroidUtils.makeColorTransparent(backgroundColor, 30));
+
+        baseView.setImageViewBitmap(
+                R.id.image_button_refresh,
+                AndroidExtensions.INSTANCE.getIconics(mContext,
+                        GoogleMaterial.Icon.gmd_refresh).actionBar().toBitmap()
+        );
 
         baseView.removeAllViews(R.id.content_frame_layout);
 

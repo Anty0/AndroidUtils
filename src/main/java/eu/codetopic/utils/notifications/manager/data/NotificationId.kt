@@ -25,20 +25,23 @@ import kotlinx.serialization.Transient
  * @author anty
  */
 @Serializable
-class NotificationId private constructor(val groupId: String,
-                                               val channelId: String,
-                                               val id: Int,
-                                               val isSummary: Boolean) {
+class NotificationId private constructor(val isSummary: Boolean,
+                                         val groupId: String,
+                                         val channelId: String,
+                                         val id: Int,
+                                         val whenTime: Long) {
 
     companion object {
 
         private const val SUMMARY_NOTIFICATION_ID = 1
 
-        internal fun newCommon(groupId: String, channelId: String, id: Int) =
-                NotificationId(groupId, channelId, id, false)
+        internal fun newCommon(groupId: String, channelId: String, id: Int,
+                               whenTime: Long = System.currentTimeMillis()) =
+                NotificationId(false, groupId, channelId, id, whenTime)
 
-        internal fun newSummary(groupId: String, channelId: String) =
-                NotificationId(groupId, channelId, SUMMARY_NOTIFICATION_ID, true)
+        internal fun newSummary(groupId: String, channelId: String,
+                               whenTime: Long = System.currentTimeMillis()) =
+                NotificationId(true, groupId, channelId, SUMMARY_NOTIFICATION_ID, whenTime)
 
         internal fun tagFor(groupId: String, channelId: String, isSummary: Boolean) =
                 "TAG(group=$groupId, channel=$channelId, isSummary=$isSummary)"

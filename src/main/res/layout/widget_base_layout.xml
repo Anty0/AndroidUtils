@@ -58,8 +58,8 @@
             android:layout_centerVertical="true"
             android:background="@android:color/transparent"
             android:clickable="true"
-            android:contentDescription="@string/but_refresh"
-            android:src="@drawable/ic_action_refresh"/>
+            android:focusable="true"
+            android:contentDescription="@string/but_refresh" /> <!--Icon will be added after inflating-->
     </RelativeLayout>
 
     <FrameLayout

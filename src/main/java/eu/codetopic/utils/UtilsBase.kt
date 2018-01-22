@@ -19,6 +19,7 @@
 package eu.codetopic.utils
 
 import android.app.Application
+import android.content.Context
 import android.support.annotation.UiThread
 
 import com.squareup.leakcanary.LeakCanary
@@ -26,8 +27,10 @@ import com.squareup.leakcanary.LeakCanary
 import java.util.Arrays
 
 import eu.codetopic.java.utils.log.Log
+import eu.codetopic.java.utils.JavaExtensions.letIfNull
 import eu.codetopic.utils.broadcast.BroadcastsConnector
 import eu.codetopic.utils.broadcast.LocalBroadcast
+import eu.codetopic.utils.debug.AndroidDebugModeExtension
 import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.log.AndroidLoggerExtension
@@ -37,7 +40,7 @@ import eu.codetopic.utils.thread.LooperUtils
 @UiThread
 object UtilsBase {
 
-    private val LOG_TAG = "UtilsBase"
+    private const val LOG_TAG = "UtilsBase"
 
     private var profile: ProcessProfile? = null
 
@@ -47,23 +50,23 @@ object UtilsBase {
     fun initialize(app: Application, vararg profiles: ProcessProfile) {
         if (profile != null) throw IllegalStateException("$LOG_TAG is still initialized")
 
-        val processName = with(AndroidUtils.getCurrentProcessName()) {
-            if (this == null) {
-                Log.e(LOG_TAG, "initialize", RuntimeException(
-                        "Can't get CurrentProcessName, using main process name"))
-                app.packageName
-            } else this
+        val processName = AndroidUtils.getCurrentProcessName().letIfNull {
+            Log.e(LOG_TAG, "initialize", RuntimeException(
+                    "Can't get CurrentProcessName, using main process name"))
+            return@letIfNull app.packageName
         }
 
         val providersProfile = ProcessProfile("${app.packageName}:providers", true)
         val leakCanaryProfile = ProcessProfile("${app.packageName}:leakcanary", false)
 
-        profile = arrayOf(*profiles).plus(arrayOf(providersProfile, leakCanaryProfile))
-                .firstOrNull { processName == it.processName } ?: run {
-            Log.e(LOG_TAG, "initialize(app=$app, profiles=$profiles)", IllegalStateException("Can't find processName ("
-                + processName + "), in provided ProcessProfiles, using empty ProcessProfile (utils will be disabled)"))
-            ProcessProfile(processName, false)
-        }
+        profile = arrayOf(*profiles)
+                .plus(arrayOf(providersProfile, leakCanaryProfile))
+                .firstOrNull { processName == it.processName }
+                .letIfNull {
+                    Log.e(LOG_TAG, "initialize(app=$app, profiles=$profiles)", IllegalStateException("Can't find processName ("
+                            + processName + "), in provided ProcessProfiles, using empty ProcessProfile (utils will be disabled)"))
+                    ProcessProfile(processName, false)
+                }
 
         completeInit(app)
     }
@@ -76,10 +79,16 @@ object UtilsBase {
                 + "\n    - VERSION_NAME=" + AndroidUtils.getApplicationVersionName(app)
                 + "\n    - VERSION_CODE=" + AndroidUtils.getApplicationVersionCode(app))
 
-        if (ACTIVE_PROFILE.initializeUtils) {
+        val initialize = ACTIVE_PROFILE.initializeUtils
+        val primary = ACTIVE_PROFILE.isPrimaryProcess(app)
+
+        if (initialize) {
             if (!LeakCanary.isInAnalyzerProcess(app)) {
                 LeakCanary.install(app)
             }
+
+            // Initialize JavaUtils -> DebugMode
+            AndroidDebugModeExtension.install(app)
 
             // Initialize logger
             AndroidLoggerExtension.install(app)
@@ -90,21 +99,14 @@ object UtilsBase {
             LooperUtils.initialize(app)
             BroadcastsConnector.initialize(app)
             Identifiers.initialize(app)
-
-            // Add callback listening onLowMemory event
-            /*app.registerComponentCallbacks(object : ComponentCallbacks {
-                override fun onConfigurationChanged(newConfig: Configuration) {
-
-                }
-
-                override fun onLowMemory() {
-                    System.runFinalization()
-                    System.gc()
-                }
-            })*/
         }
 
         ACTIVE_PROFILE.additionalCommands.forEach { it.run() }
+
+        if (initialize && primary) {
+            // Initialize NotificationsManager
+            NotificationsManager.initialize(app)
+        }
     }
 
     /**
@@ -114,7 +116,10 @@ object UtilsBase {
      * - `eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() ` using `Logger.getLogsHandler (or in kotlin Logger.logsHandler) `
      * - `eu.codetopic.utils.broadcast.BroadcastsConnector.connect() `
      */
-    class ProcessProfile(val processName: String, val initializeUtils: Boolean, vararg val additionalCommands: Runnable) {
+    class ProcessProfile(val processName: String, val initializeUtils: Boolean,
+                         vararg val additionalCommands: Runnable) {
+
+        fun isPrimaryProcess(context: Context): Boolean = context.packageName == processName
 
         override fun toString(): String {
             return "ProcessProfile(processName='$processName', " +

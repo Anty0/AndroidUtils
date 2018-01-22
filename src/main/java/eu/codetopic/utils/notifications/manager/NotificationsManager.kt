@@ -94,16 +94,17 @@ object NotificationsManager {
 
     fun refresh(context: Context) = Notifications.refresh(context)
 
-    fun notify(context: Context, groupId: String, channelId: String, data: Bundle): NotificationId =
-            Notifications.notify(context, groupId, channelId, data)
+    fun notify(context: Context, groupId: String, channelId: String, data: Bundle,
+               whenTime: Long = System.currentTimeMillis()): NotificationId =
+            Notifications.notify(context, groupId, channelId, data, whenTime)
 
-    fun notifyAll(context: Context, groupId: String,
-                  channelId: String, vararg data: Bundle): List<NotificationId> =
-            Notifications.notifyAll(context, groupId, channelId, data.asList())
+    fun notifyAll(context: Context, groupId: String, channelId: String, vararg data: Bundle,
+                  whenTime: Long = System.currentTimeMillis()): List<NotificationId> =
+            Notifications.notifyAll(context, groupId, channelId, data.asList(), whenTime)
 
-    fun notifyAll(context: Context, groupId: String,
-                  channelId: String, data: List<Bundle>): List<NotificationId> =
-            Notifications.notifyAll(context, groupId, channelId, data)
+    fun notifyAll(context: Context, groupId: String, channelId: String, data: List<Bundle>,
+                  whenTime: Long = System.currentTimeMillis()): List<NotificationId> =
+            Notifications.notifyAll(context, groupId, channelId, data, whenTime)
 
     fun cancel(context: Context, id: NotificationId) = Notifications.cancel(context, id)
 
@@ -127,32 +128,49 @@ object NotificationsManager {
 
     //--------------------------------------------------------------------------
 
-    fun requestRefresh(context: Context) =
-            context.sendBroadcast(RequestRefreshReceiver.getStartIntent(context))
+    fun requestRefresh(context: Context, optimise: Boolean = true) {
+        if (optimise && isInitialized) refresh(context)
+        else context.sendBroadcast(RequestRefreshReceiver.getStartIntent(context))
+    }
 
-    fun requestNotify(context: Context, groupId: String, channelId: String, data: Bundle) =
-            context.sendBroadcast(RequestNotifyReceiver
-                    .getStartIntent(context, groupId, channelId, data))
+    fun requestNotify(context: Context, groupId: String, channelId: String, data: Bundle,
+                      whenTime: Long = System.currentTimeMillis(), optimise: Boolean = true) {
+        if (optimise && isInitialized) notify(context, groupId, channelId, data, whenTime)
+        else context.sendBroadcast(
+                RequestNotifyReceiver.getStartIntent(context, groupId, channelId, data, whenTime)
+        )
+    }
 
-    fun requestNotifyAll(context: Context, groupId: String,
-                         channelId: String, vararg data: Bundle) =
-            requestNotifyAll(context, groupId, channelId, data.asList())
+    fun requestNotifyAll(context: Context, groupId: String, channelId: String, vararg data: Bundle,
+                         whenTime: Long = System.currentTimeMillis(), optimise: Boolean = true) =
+            requestNotifyAll(context, groupId, channelId, data.asList(), whenTime, optimise)
 
-    fun requestNotifyAll(context: Context, groupId: String,
-                         channelId: String, data: List<Bundle>) =
-            context.sendBroadcast(RequestNotifyAllReceiver
-                    .getStartIntent(context, groupId, channelId, data))
+    fun requestNotifyAll(context: Context, groupId: String, channelId: String, data: List<Bundle>,
+                         whenTime: Long = System.currentTimeMillis(), optimise: Boolean = true) {
+        if (optimise && isInitialized) notifyAll(context, groupId, channelId, data, whenTime)
+        else context.sendBroadcast(
+                RequestNotifyAllReceiver.getStartIntent(context, groupId, channelId, data, whenTime)
+        )
+    }
 
-    fun requestCancel(context: Context, id: NotificationId) =
-            context.sendBroadcast(RequestCancelReceiver.getStartIntent(context, id))
+    fun requestCancel(context: Context, id: NotificationId, optimise: Boolean = true) {
+        if (optimise && isInitialized) cancel(context, id)
+        else context.sendBroadcast(RequestCancelReceiver.getStartIntent(context, id))
+    }
 
-    fun requestCancelAll(context: Context, vararg ids: NotificationId) =
-            requestCancelAll(context, ids.asList())
+    fun requestCancelAll(context: Context, vararg ids: NotificationId, optimise: Boolean = true) =
+            requestCancelAll(context, ids.asList(), optimise)
 
-    fun requestCancelAll(context: Context, ids: List<NotificationId>) =
-            context.sendBroadcast(RequestCancelAllIdsReceiver.getStartIntent(context, ids))
+    fun requestCancelAll(context: Context, ids: List<NotificationId>, optimise: Boolean = true) {
+        if (optimise && isInitialized) cancelAll(context, ids)
+        else context.sendBroadcast(RequestCancelAllIdsReceiver.getStartIntent(context, ids))
+    }
 
-    fun requestCancelAll(context: Context, groupId: String? = null, channelId: String? = null) =
-            context.sendBroadcast(RequestCancelAllReceiver
-                    .getStartIntent(context, groupId, channelId))
+    fun requestCancelAll(context: Context, groupId: String? = null,
+                         channelId: String? = null, optimise: Boolean = true) {
+        if (optimise && isInitialized) cancelAll(context, groupId, channelId)
+        else context.sendBroadcast(
+                RequestCancelAllReceiver.getStartIntent(context, groupId, channelId)
+        )
+    }
 }

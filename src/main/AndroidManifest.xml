@@ -31,11 +31,14 @@
     <application
         android:supportsRtl="false">
 
+        <activity android:name=".log.issue.IssuesActivity"
+            android:label="@string/activity_label_logged_issues"
+            android:theme="@style/UtilsTheme.NoActionBar" />
         <activity
-            android:name=".log.ErrorInfoActivity"
-            android:label="@string/activity_label_error_info"
+            android:name=".log.issue.IssueInfoActivity"
+            android:label="@string/activity_label_issue_info"
             android:excludeFromRecents="true"
-            android:theme="@style/Theme.AppCompat.Dialog.Alert.NoActionBar"/>
+            android:theme="@style/UtilsTheme.Dialog.NoActionBar" />
 
         <service
             android:name=".ui.container.adapter.widget.CustomItemWidgetAdapterService"

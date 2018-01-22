@@ -18,8 +18,10 @@
   -->
 
 <resources>
-    <string name="activity_label_error_info">Logged Error info</string>
-    <string name="activity_label_warn_info">Logged Warning info</string>
+    <string name="activity_label_logged_issues">Logged issues</string>
+    <string name="activity_label_issue_info">Logged issue info</string>
+    <string name="activity_label_error_info">Logged error info</string>
+    <string name="activity_label_warn_info">Logged warning info</string>
 
     <string name="text_default_no_list_items">Nothing to show</string>
     <string name="text_no_time">No time</string>
@@ -28,11 +30,21 @@
     <string name="location_unknown">Unknown location</string>
     <string name="location_none">No address</string>
 
+    <string name="empty_view_text_no_logged_issues">No logged issues</string>
+    <string name="empty_view_text_small_no_logged_issues">All unresolved issues will appear here.</string>
+
+    <string name="notify_logged_error_title">Error logged</string>
+    <string name="notify_logged_warning_title">Warning logged</string>
+    <string name="notify_logged_summary_title">Issues logged</string>
+    <string name="notify_logged_summary_text">By application</string>
+
     <string name="description_drop_down_arrow">Dropdown arrow</string>
     <string name="description_edit_button">Edit button</string>
     <string name="description_icon">Icon</string>
     <string name="description_list_item_content">List item content</string>
     <string name="description_empty_view_image">Empty list image</string>
+    <string name="description_but_exit">Exit button</string>
+    <string name="description_but_done">Done button</string>
 
     <string name="navigation_drawer_open">Open navigation</string>
     <string name="navigation_drawer_close">Close navigation</string>
@@ -40,10 +52,14 @@
     <string name="wait_text_loading">Loading…</string>
     <string name="wait_text_please_wait">Please wait…</string>
 
+    <string name="menu_item_done_all">Done all</string>
+
     <string name="but_refresh">Refresh</string>
 
     <string name="debug_item_connectivity_check_connection_type">Check connection type</string>
     <string name="debug_item_connectivity_info_result_text">Any: %1$s, Wi-Fi: %2$s, Mobile: %3$s</string>
     <string name="debug_item_timed_components_refresh_info">Refresh TimedComponentsManager info</string>
     <string name="debug_item_logging_refresh_lines">Refresh LastLoggedLines</string>
+    <string name="debug_item_issues_log_warning">Log warning</string>
+    <string name="debug_item_issues_log_error">Log error</string>
 </resources>

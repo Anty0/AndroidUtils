@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ utils
-  ~ Copyright (C)   2017  anty
+  ~ Copyright (C)   2018  anty
   ~
   ~ This program is free  software: you can redistribute it and/or modify
   ~ it under the terms  of the GNU General Public License as published by
@@ -17,17 +17,14 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources>
-    <declare-styleable name="CardView">
-        <attr name="cardViewTheme" format="reference"/>
-    </declare-styleable>
-    <declare-styleable name="Theme">
-        <attr name="appBarOverlay" format="reference"/>
-        <attr name="popupOverlay" format="reference"/>
-        <attr name="colorPrimaryExtraDark" format="color"/>
-    </declare-styleable>
-    <declare-styleable name="AndroidIconics">
-        <attr name="colorDrawable" format="color"/>
-    </declare-styleable>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".log.issue.IssuesActivity">
 
-</resources>
+    <item
+        android:id="@+id/item_done_all"
+        android:title="@string/menu_item_done_all"
+        app:showAsAction="ifRoom" /> <!--Icon will be added after inflating-->
+</menu>

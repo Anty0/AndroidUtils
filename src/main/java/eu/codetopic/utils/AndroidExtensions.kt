@@ -21,6 +21,7 @@ package eu.codetopic.utils
 import android.app.Activity
 import android.app.NotificationManager
 import android.content.*
+import android.graphics.Color
 import android.net.Uri
 import android.net.wifi.WifiManager
 import android.os.Build
@@ -32,6 +33,8 @@ import eu.codetopic.utils.data.getter.DataGetter
 import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
 import android.os.Parcel
 import android.util.Base64
+import com.mikepenz.iconics.IconicsDrawable
+import com.mikepenz.iconics.typeface.IIcon
 import eu.codetopic.java.utils.log.Log
 import kotlinx.io.ByteArrayInputStream
 import kotlinx.io.ByteArrayOutputStream
@@ -132,6 +135,9 @@ object AndroidExtensions {
         }
     }
 
+    fun Context.getIconics(icon: IIcon): IconicsDrawable =
+            IconicsDrawable(this, icon).colorDefault(this)
+
     val Context.notificationManager
         get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -204,6 +210,14 @@ object AndroidExtensions {
             get(key) ?: defaultValue().also { put(key, it) }
 
     // TODO: add more SparseArray extension functions
+
+    //////////////////////////////////////
+    //////REGION - ANDROID_ICONICS////////
+    //////////////////////////////////////
+
+    fun IconicsDrawable.colorDefault(context: Context): IconicsDrawable =
+            color(AndroidUtils.getColorFromAttr(context, R.attr.colorDrawable, Color.BLACK))
+
 
     // TODO: move functions from AndroidUtils, that can be implemented as extensions here and implement them as extensions
 }

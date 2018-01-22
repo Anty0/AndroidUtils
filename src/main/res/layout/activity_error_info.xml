@@ -19,37 +19,66 @@
 
 <android.support.v7.widget.AlertDialogLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".log.issue.IssueInfoActivity"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical|start"
-        android:orientation="horizontal"
         android:paddingLeft="?attr/dialogPreferredPadding"
         android:paddingRight="?attr/dialogPreferredPadding"
         android:paddingTop="18dp">
 
-        <ImageView
-            android:id="@+id/imgIcon"
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/butExit"
             android:layout_width="32dip"
             android:layout_height="32dip"
             android:layout_marginEnd="8dip"
             android:layout_marginRight="8dip"
-            android:scaleType="fitCenter"
-            android:src="@drawable/ic_action_close"
-            android:contentDescription="@string/description_icon" />
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="center"
+            android:contentDescription="@string/description_but_exit"
+            app:iiv_icon="gmd-close"
+            app:iiv_color="@color/white"
+            app:iiv_padding="8dp" />
 
         <android.support.v7.widget.DialogTitle
             android:id="@+id/txtTitle"
             style="?android:attr/windowTitleStyle"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/butExit"
+            android:layout_toRightOf="@+id/butExit"
+            android:layout_toStartOf="@+id/butDone"
+            android:layout_toLeftOf="@+id/butDone"
             android:ellipsize="end"
-            android:singleLine="true"/>
-    </LinearLayout>
+            android:singleLine="true" />
+
+        <com.mikepenz.iconics.view.IconicsImageView
+            android:id="@+id/butDone"
+            android:layout_width="32dip"
+            android:layout_height="32dip"
+            android:layout_marginStart="8dip"
+            android:layout_marginLeft="8dip"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:scaleType="center"
+            android:contentDescription="@string/description_but_done"
+            app:iiv_icon="gmd-done"
+            app:iiv_color="@color/white"
+            app:iiv_padding="8dp" />
+    </RelativeLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

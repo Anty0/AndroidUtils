@@ -51,6 +51,7 @@ internal object Notifications {
                         if (id.isSummary) NotificationCompat.GROUP_ALERT_SUMMARY
                         else NotificationCompat.GROUP_ALERT_ALL
                 )
+                .setWhen(id.whenTime)
                 .setContentIntent(
                         PendingIntent.getBroadcast(
                                 context,
@@ -192,29 +193,35 @@ internal object Notifications {
         }
     }
 
-    internal fun notify(context: Context, groupId: String, channelId: String,
-                        data: Bundle): NotificationId {
+    internal fun notify(context: Context, groupId: String, channelId: String, data: Bundle,
+                        whenTime: Long = System.currentTimeMillis()): NotificationId {
         val group = NotificationsGroups[groupId]
         val channel = NotificationsChannels[channelId]
 
         val notifier = NotificationManagerCompat.from(context)
 
-        return NotificationsData.instance.put(context, groupId, channelId, data).also { id ->
-            showNotification(notifier, id, createNotification(context, group, channel, id, data))
-            refreshSummary(context, notifier, group, channel)
-        }
+        return NotificationsData.instance.put(context, groupId, channelId, data, whenTime)
+                .also { id ->
+                    showNotification(notifier, id,
+                            createNotification(context, group, channel, id, data))
+                    refreshSummary(context, notifier, group, channel)
+                }
     }
 
-    internal fun notifyAll(context: Context, groupId: String, channelId: String,
-                           data: List<Bundle>): List<NotificationId> {
+    internal fun notifyAll(context: Context, groupId: String, channelId: String, data: List<Bundle>,
+                           whenTime: Long = System.currentTimeMillis()): List<NotificationId> {
         val group = NotificationsGroups[groupId]
         val channel = NotificationsChannels[channelId]
 
         val notifier = NotificationManagerCompat.from(context)
-        return NotificationsData.instance.putAll(context, groupId, channelId, data).onEach {
-            showNotification(notifier, it.key,
-                    createNotification(context, group, channel, it.key, it.value))
-        }.also { refreshSummary(context, notifier, group, channel) }.keys.toList()
+        return NotificationsData.instance.putAll(context, groupId, channelId, data, whenTime)
+                .onEach {
+                    showNotification(notifier, it.key,
+                            createNotification(context, group, channel, it.key, it.value))
+                }
+                .also {
+                    refreshSummary(context, notifier, group, channel)
+                }.keys.toList()
     }
 
     internal fun cancel(context: Context, id: NotificationId): Bundle? {

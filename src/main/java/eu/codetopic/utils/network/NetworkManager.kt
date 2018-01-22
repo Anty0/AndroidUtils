@@ -26,7 +26,7 @@ import android.os.PowerManager
 
 object NetworkManager {
 
-    private val LOG_TAG = "NetworkManager"
+    private const val LOG_TAG = "NetworkManager"
 
     private lateinit var connManager: ConnectivityManager
     private lateinit var powerManager: PowerManager
