@@ -37,9 +37,10 @@ abstract class NotificationGroup(val id: String, val checkForIdOverrides: Boolea
     fun initialize(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
 
-        context.notificationManager.createNotificationChannelGroup(
+        // From my view has no effect
+        /*context.notificationManager.createNotificationChannelGroup(
                 createGroup(context).assert { it.id == id }
-        )
+        )*/
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -40,6 +40,8 @@ import android.widget.LinearLayout
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 
 import eu.codetopic.java.utils.log.Log
+import eu.codetopic.java.utils.JavaExtensions.runIfTrue
+import eu.codetopic.java.utils.JavaExtensions.IfTrue
 import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
@@ -128,14 +130,14 @@ abstract class NavigationActivity : BaseFragmentActivity() {
                 }
 
         navigationView.setNavigationItemSelectedListener listener@ {
-            drawer.closeDrawer(GravityCompat.START)
-
             if (enableSwitchingAccounts && switchingAccounts) {
                 isSwitchingAccounts = false
-                return@listener onAccountNavigationItemSelected(it)
+                onAccountNavigationItemSelected(it)
+            } else {
+                onNavigationItemSelected(it)
+            } IfTrue {
+                drawer.closeDrawer(GravityCompat.START)
             }
-
-            return@listener onNavigationItemSelected(it)
         }
         invalidateNavigationMenu()
     }

@@ -33,7 +33,7 @@ object NotificationsChannels {
             throw IllegalArgumentException("Existing channelId: '${channel.id}'")
 
         refresh(context, channel)
-        channels.put(channel.id, channel)
+        channels[channel.id] = channel
     }
 
     internal fun remove(channelId: String): NotificationChannel {

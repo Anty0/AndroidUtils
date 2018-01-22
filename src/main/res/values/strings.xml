@@ -17,7 +17,7 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources>
+<resources> <!--TODO: cleanup and remove all string that can be probably used in release-->
     <string name="activity_label_logged_issues">Logged issues</string>
     <string name="activity_label_issue_info">Logged issue info</string>
     <string name="activity_label_error_info">Logged error info</string>

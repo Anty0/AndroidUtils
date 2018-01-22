@@ -43,8 +43,9 @@ internal object Notifications {
 
     private fun prepareNotification(context: Context, id: NotificationId,
                                     notification: NotificationCompat.Builder) {
+        val group = "Group(group=${id.groupId}, channel=${id.channelId})"
         notification
-                .setGroup(id.groupId)
+                .setGroup(group)
                 .setGroupSummary(id.isSummary)
                 .setOnlyAlertOnce(true)
                 .setGroupAlertBehavior(

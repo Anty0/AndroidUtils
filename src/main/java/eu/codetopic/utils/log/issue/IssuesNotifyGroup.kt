@@ -102,9 +102,10 @@ class IssuesNotifyGroup : SummarizedNotificationGroup(ID, true) {
                 setLargeIcon(
                         context.getIconics(GoogleMaterial.Icon.gmd_warning)
                                 .sizeDp(24)
+                                .colorRes(R.color.materialRed)
                                 .toBitmap()
                 )
-                color = ContextCompat.getColor(context, R.color.black)
+                color = ContextCompat.getColor(context, R.color.materialRed)
                 setColorized(true)
 
                 setDefaults(DEFAULT_VIBRATE or DEFAULT_LIGHTS)
@@ -136,6 +137,10 @@ class IssuesNotifyGroup : SummarizedNotificationGroup(ID, true) {
                         else R.string.notify_logged_warning_title
                 ))
                 setContentText(issue.toString(false))
+                setStyle(
+                        NotificationCompat.BigTextStyle()
+                                .bigText(issue.toString(true))
+                )
             }
 
     override fun createSummaryNotification(context: Context,
@@ -152,14 +157,16 @@ class IssuesNotifyGroup : SummarizedNotificationGroup(ID, true) {
             setContentTitle(context.getText(R.string.notify_logged_summary_title))
             setContentText(context.getText(R.string.notify_logged_summary_text))
             setNumber(allIssues.size)
-            setStyle(NotificationCompat.InboxStyle()
-                    .setBigContentTitle(context.getText(R.string.notify_logged_summary_title))
-                    .setSummaryText(context.getText(R.string.notify_logged_summary_text))
-                    .also { n ->
-                        allIssues.forEach {
-                            n.addLine(it.toString(false))
-                        }
-                    })
+            setStyle(
+                    NotificationCompat.InboxStyle()
+                            .setBigContentTitle(context.getText(R.string.notify_logged_summary_title))
+                            .setSummaryText(context.getText(R.string.notify_logged_summary_text))
+                            .also { n ->
+                                allIssues.forEach {
+                                    n.addLine(it.toString(false))
+                                }
+                            }
+            )
         }
     }
 }

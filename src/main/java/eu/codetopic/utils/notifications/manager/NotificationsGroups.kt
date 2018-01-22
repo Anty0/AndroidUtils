@@ -33,7 +33,7 @@ object NotificationsGroups {
             throw IllegalArgumentException("Existing groupId: '${group.id}'")
 
         refresh(context, group)
-        groups.put(group.id, group)
+        groups[group.id] = group
     }
 
     internal fun remove(groupId: String): NotificationGroup {
