@@ -98,7 +98,7 @@ class IssuesNotifyGroup : SummarizedNotificationGroup(ID, true) {
                 //setShowWhen(true)
                 //setStyle()
 
-                setSmallIcon(context.applicationInfo.icon)
+                setSmallIcon(android.R.drawable.stat_sys_warning)
                 setLargeIcon(
                         context.getIconics(GoogleMaterial.Icon.gmd_warning)
                                 .sizeDp(24)

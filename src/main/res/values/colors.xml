@@ -27,4 +27,10 @@
     <color name="black">#000</color>
     <color name="white">#fff</color>
     <color name="red">#f00</color>
+
+    <color name="materialRed">#ff8a80</color>
+    <color name="materialLightRed">#ff9e80</color>
+    <color name="materialOrange">#ffd180</color>
+    <color name="materialYellow">#f4ff81</color>
+    <color name="materialGreen">#ccff90</color>
 </resources>

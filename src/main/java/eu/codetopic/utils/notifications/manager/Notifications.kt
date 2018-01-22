@@ -57,7 +57,7 @@ internal object Notifications {
                                 context,
                                 NotificationLaunchReceiver.REQUEST_CODE_TYPE.nextId(),
                                 NotificationLaunchReceiver.getStartIntent(context, id),
-                                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_ONE_SHOT
+                                PendingIntent.FLAG_UPDATE_CURRENT// or PendingIntent.FLAG_ONE_SHOT
                         )
                 )
                 .setDeleteIntent(
