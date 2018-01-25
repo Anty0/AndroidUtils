@@ -56,6 +56,9 @@
 
     <string name="but_refresh">Refresh</string>
 
+    <string name="issue_item_time_tag_format">%1$s | $2$s</string>
+    <string name="issue_item_time_unknown">Unknown time</string>
+
     <string name="debug_item_connectivity_check_connection_type">Check connection type</string>
     <string name="debug_item_connectivity_info_result_text">Any: %1$s, Wi-Fi: %2$s, Mobile: %3$s</string>
     <string name="debug_item_timed_components_refresh_info">Refresh TimedComponentsManager info</string>

@@ -22,7 +22,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import eu.codetopic.java.utils.JavaExtensions.runIf
+import eu.codetopic.java.utils.JavaExtensions.alsoIf
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.notifications.manager.Notifications
 import eu.codetopic.utils.notifications.manager.NotificationsManager
@@ -62,7 +62,7 @@ class RequestNotifyReceiver : BroadcastReceiver() {
             val data = intent.getBundleExtra(EXTRA_DATA_BUNDLE)
                     ?: throw IllegalArgumentException("No data bundle received by intent")
             val whenTime = intent.getLongExtra(EXTRA_WHEN_TIME, -1)
-                    .runIf({ it == -1L }) {
+                    .alsoIf({ it == -1L }) {
                         throw IllegalArgumentException("No when time received by intent")
                     }
 

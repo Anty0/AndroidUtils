@@ -20,6 +20,7 @@ package eu.codetopic.utils
 
 import android.app.Activity
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.*
 import android.graphics.Color
 import android.net.Uri
@@ -32,13 +33,17 @@ import android.util.SparseArray
 import eu.codetopic.utils.data.getter.DataGetter
 import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
 import android.os.Parcel
+import android.support.annotation.RequiresApi
 import android.util.Base64
 import com.mikepenz.iconics.IconicsDrawable
 import com.mikepenz.iconics.typeface.IIcon
 import eu.codetopic.java.utils.log.Log
 import kotlinx.io.ByteArrayInputStream
 import kotlinx.io.ByteArrayOutputStream
+import kotlinx.serialization.KSerialLoader
+import kotlinx.serialization.KSerialSaver
 import kotlinx.serialization.internal.readToByteBuffer
+import kotlinx.serialization.json.JSON
 import java.io.BufferedOutputStream
 import java.util.zip.GZIPOutputStream
 import java.nio.file.Files.size
@@ -174,6 +179,71 @@ object AndroidExtensions {
             return parcel.readBundle(UtilsBase.javaClass.classLoader)
         }
     }
+
+    inline fun <reified T: Any> Bundle.putKotlinSerializable(name: String, value: T) =
+            putString(name, JSON.stringify(value))
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun <T> Bundle.putKotlinSerializable(name: String, value: T,
+                                                     saver: KSerialSaver<T>) =
+            putString(name, JSON.stringify(saver, value))
+
+    inline fun <reified T: Any> Bundle.getKotlinSerializable(name: String): T? =
+            getString(name)?.let { JSON.parse(it) }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun <T> Bundle.getKotlinSerializable(name: String, loader: KSerialLoader<T>): T? =
+            getString(name)?.let { JSON.parse(loader, it) }
+
+    //////////////////////////////////////
+    //////REGION - Intent/////////////////
+    //////////////////////////////////////
+
+    inline fun <reified T: Any> Intent.putKotlinSerializableExtra(name: String, value: T): Intent =
+            putExtra(name, JSON.stringify(value))
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun <T> Intent.putKotlinSerializableExtra(name: String, value: T,
+                                                     saver: KSerialSaver<T>): Intent =
+            putExtra(name, JSON.stringify(saver, value))
+
+    inline fun <reified T: Any> Intent.getKotlinSerializableExtra(name: String): T? =
+            getStringExtra(name)?.let { JSON.parse(it) }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun <T> Intent.getKotlinSerializableExtra(name: String, loader: KSerialLoader<T>): T? =
+            getStringExtra(name)?.let { JSON.parse(loader, it) }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun Array<Intent>.asPendingActivities(context: Context, requestCode: Int,
+                                                 flags: Int = 0): PendingIntent =
+            PendingIntent.getActivities(context, requestCode, this, flags)
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun Collection<Intent>.asPendingActivities(context: Context, requestCode: Int,
+                                                 flags: Int = 0): PendingIntent =
+            PendingIntent.getActivities(context, requestCode, this.toTypedArray(), flags)
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun Intent.asPendingActivity(context: Context, requestCode: Int,
+                                        flags: Int = 0): PendingIntent =
+            PendingIntent.getActivity(context, requestCode, this, flags)
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun Intent.asPendingBroadcast(context: Context, requestCode: Int,
+                                        flags: Int = 0): PendingIntent =
+            PendingIntent.getBroadcast(context, requestCode, this, flags)
+
+    @Suppress("NOTHING_TO_INLINE")
+    @RequiresApi(Build.VERSION_CODES.O)
+    inline fun Intent.asPendingForegroundService(context: Context, requestCode: Int,
+                                        flags: Int = 0): PendingIntent =
+            PendingIntent.getForegroundService(context, requestCode, this, flags)
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun Intent.asPendingService(context: Context, requestCode: Int,
+                                       flags: Int = 0): PendingIntent =
+            PendingIntent.getService(context, requestCode, this, flags)
 
     //////////////////////////////////////
     //////REGION - PARCELABLE/////////////

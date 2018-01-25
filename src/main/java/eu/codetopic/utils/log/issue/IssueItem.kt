@@ -20,12 +20,16 @@ package eu.codetopic.utils.log.issue
 
 import android.content.Context
 import android.graphics.Color
+import android.support.v4.content.ContextCompat
 import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
+import eu.codetopic.utils.AndroidExtensions.getFormattedText
 import eu.codetopic.utils.R
 import eu.codetopic.utils.notifications.manager.data.NotificationId
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import kotlinx.android.synthetic.main.item_issue.*
+import java.text.SimpleDateFormat
+import java.util.*
 
 /**
  * @author anty
@@ -35,25 +39,31 @@ class IssueItem(val notifyId: NotificationId?, val issue: Issue) : CustomItem() 
     companion object {
 
         private const val LOG_TAG = "IssueItem"
+
+        private val DATE_FORMAT = SimpleDateFormat("yyyy.MM.dd HH:mm:ss", Locale.getDefault())
     }
 
     override fun onBindViewHolder(holder: ViewHolder, itemPosition: Int) {
         holder.txtPriority.apply {
-            setTextColor(
+            setTextColor(ContextCompat.getColor(
+                    holder.context,
                     when (issue.priority) {
-                        Priority.ERROR -> Color.rgb(255, 138, 128)
-                        Priority.WARN -> Color.rgb(255, 209, 128)
-                        else -> Color.rgb(244, 255, 129)
-                    } // TODO: to resources
-            )
+                        Priority.ERROR -> R.color.materialRed
+                        Priority.WARN -> R.color.materialOrange
+                        else -> R.color.materialYellow
+                    }
+            ))
             text = issue.priority.displayID.toString()
         }
 
         holder.txtMessage.text = issue.message ?: issue.throwableName
 
-        holder.txtTag.text = issue.tag
-
-        // TODO: show notifyId.whenTime in item
+        holder.txtTag.text = holder.context.getFormattedText(
+                R.string.issue_item_time_tag_format,
+                notifyId?.whenTime?.let { DATE_FORMAT.format(it) }
+                        ?: holder.context.getString(R.string.issue_item_time_unknown),
+                issue.tag
+        )
 
         if (itemPosition != NO_POSITION) { // detects usage in header
             holder.boxClickTarget.setOnClickListener {

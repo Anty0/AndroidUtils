@@ -29,9 +29,8 @@ import android.support.v4.app.NotificationCompat.DEFAULT_VIBRATE
 import android.support.v4.content.ContextCompat
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.java.utils.JavaExtensions.runIfNull
+import eu.codetopic.java.utils.JavaExtensions.alsoIfNull
 import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ids.Identifiers
@@ -148,7 +147,7 @@ class IssuesNotifyGroup : SummarizedNotificationGroup(ID, true) {
                                            channel: NotificationChannel,
                                            data: Map<NotificationId, Bundle>): NotificationCompat.Builder {
         val allIssues = data.values.mapNotNull {
-            readData(it).runIfNull {
+            readData(it).alsoIfNull {
                 Log.w(LOG_TAG, "Data doesn't contains log line")
             }
         }

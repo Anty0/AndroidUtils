@@ -122,10 +122,16 @@ class IssuesActivity : ModularActivity(ToolbarModule()) {
 
                                 return@mapNotNull IssueItem(id, issue)
                             }
+                            .sortedBy {
+                                it.notifyId?.whenTime
+                                        ?: System.currentTimeMillis()
+                            }
             )
 
             notifyAllItemsChanged()
         }
+
+        recyclerManager?.setRefreshing(false)
     }
 
     override fun onDestroy() {

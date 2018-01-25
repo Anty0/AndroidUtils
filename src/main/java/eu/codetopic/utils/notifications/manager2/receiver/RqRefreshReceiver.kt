@@ -1,6 +1,6 @@
 /*
  * utils
- * Copyright (C)   2017  anty
+ * Copyright (C)   2018  anty
  *
  * This program is free  software: you can redistribute it and/or modify
  * it under the terms  of the GNU General Public License as published by
@@ -16,32 +16,32 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.notifications.manager.receiver
+package eu.codetopic.utils.notifications.manager2.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.notifications.manager.Notifications
-import eu.codetopic.utils.notifications.manager.NotificationsManager
+import eu.codetopic.utils.notifications.manager2.Notifier
+import eu.codetopic.utils.notifications.manager2.NotifyManager
 
 /**
  * @author anty
  */
-class RequestRefreshReceiver : BroadcastReceiver() {
+class RqRefreshReceiver : BroadcastReceiver() {
 
     companion object {
 
-        private const val LOG_TAG = "RequestRefreshReceiver"
+        private const val LOG_TAG = "RqRefreshReceiver"
 
         internal fun getStartIntent(context: Context): Intent =
-                Intent(context, RequestRefreshReceiver::class.java)
+                Intent(context, RqRefreshReceiver::class.java)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotificationsManager.assertInitialized()
-            Notifications.refresh(context)
+            NotifyManager.assertInitialized()
+            Notifier.refresh(context)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }
