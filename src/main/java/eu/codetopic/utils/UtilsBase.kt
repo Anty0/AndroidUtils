@@ -33,7 +33,7 @@ import eu.codetopic.utils.debug.AndroidDebugModeExtension
 import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.log.AndroidLoggerExtension
-import eu.codetopic.utils.notifications.manager2.NotifyManager
+import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.thread.LooperUtils
 import org.jetbrains.anko.bundleOf
 
@@ -142,7 +142,7 @@ object UtilsBase {
      * - `eu.codetopic.java.utils.debug.DebugMode.setEnabled() (or in kotlin DebugBode.isEnabled = ?) `
      * - `eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() ` using `Logger.getLogsHandler (or in kotlin Logger.logsHandler) `
      * - `eu.codetopic.utils.broadcast.BroadcastsConnector.connect() `
-     * - `eu.codetopic.utils.notifications.manager2.NotifyManager.install*() `
+     * - `eu.codetopic.utils.notifications.manager.NotifyManager.install*() `
      */
     fun initialize(app: Application, init: (processName: String, processParams: Bundle) -> Unit) {
         if (isInitialized) throw IllegalStateException("$LOG_TAG is still initialized")

@@ -16,26 +16,29 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue
+package eu.codetopic.utils.notifications.manager.data
 
-import android.app.NotificationChannelGroup
-import android.content.Context
-import android.os.Build
-import android.support.annotation.RequiresApi
-import eu.codetopic.utils.notifications.manager.util.NotifyGroup
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * @author anty
  */
-class IssuesNotifyGroup : NotifyGroup(ID, IssuesNotifyChannel.ID) {
+@Serializable
+internal class CommonNotifyId(override val idGroup: String,
+                              override val idChannel: String,
+                              override val idNotify: Int,
+                              override val timeWhen: Long = System.currentTimeMillis()) : NotifyId() {
 
-    companion object {
+    @Transient
+    override val isSummary: Boolean
+        get() = false
 
-        private const val LOG_TAG = "IssuesNotifyGroup"
-        const val ID = "eu.codetopic.utils.log.issue.$LOG_TAG"
-    }
+    @Transient
+    override val isPersistent: Boolean
+        get() = false
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun createGroup(context: Context): NotificationChannelGroup =
-            NotificationChannelGroup(id, LOG_TAG) // TODO: better name
+    @Transient
+    override val isRefreshable: Boolean
+        get() = false
 }

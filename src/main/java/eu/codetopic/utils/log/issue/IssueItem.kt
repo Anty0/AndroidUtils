@@ -23,7 +23,7 @@ import android.support.v4.content.ContextCompat
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.AndroidExtensions.getFormattedText
 import eu.codetopic.utils.R
-import eu.codetopic.utils.notifications.manager2.data.NotifyId
+import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import kotlinx.android.synthetic.main.item_issue.*
 import java.text.SimpleDateFormat

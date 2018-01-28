@@ -18,9 +18,7 @@
 
 package eu.codetopic.utils.log.issue
 
-import android.content.ComponentName
 import android.content.Context
-import android.content.pm.PackageManager
 import android.support.annotation.MainThread
 import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
@@ -28,11 +26,10 @@ import eu.codetopic.java.utils.log.Logger
 import eu.codetopic.java.utils.log.LogsHandler
 import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.UtilsBase
 import eu.codetopic.utils.log.issue.Issue.Companion.toIssue
-import eu.codetopic.utils.notifications.manager2.NotifyManager
-import eu.codetopic.utils.notifications.manager2.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager2.create.NotificationBuilder.Companion.requestShow
+import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
+import eu.codetopic.utils.notifications.manager.create.NotificationBuilder.Companion.requestShow
 import eu.codetopic.utils.thread.LooperUtils
 
 /**

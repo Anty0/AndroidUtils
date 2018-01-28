@@ -29,7 +29,7 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.AndroidExtensions.edit
 import eu.codetopic.utils.R
-import eu.codetopic.utils.notifications.manager2.NotifyManager
+import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter
 import eu.codetopic.utils.ui.container.recycler.Recycler

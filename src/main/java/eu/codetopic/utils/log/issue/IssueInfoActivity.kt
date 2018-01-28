@@ -26,9 +26,9 @@ import eu.codetopic.java.utils.log.Log
 
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.R
-import eu.codetopic.utils.notifications.manager2.data.NotifyId
-import eu.codetopic.utils.notifications.manager2.data.NotifyId.Companion.stringify
-import eu.codetopic.utils.notifications.manager2.data.NotifyId.Companion.requestCancel
+import eu.codetopic.utils.notifications.manager.data.NotifyId
+import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
+import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.requestCancel
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.synthetic.main.activity_error_info.*

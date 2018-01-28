@@ -16,26 +16,34 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue
+package eu.codetopic.utils.notifications.manager.receiver.internal
 
-import android.app.NotificationChannelGroup
+import android.content.BroadcastReceiver
 import android.content.Context
-import android.os.Build
-import android.support.annotation.RequiresApi
-import eu.codetopic.utils.notifications.manager.util.NotifyGroup
+import android.content.Intent
+import eu.codetopic.java.utils.log.Log
+import eu.codetopic.utils.notifications.manager.Notifier
+import eu.codetopic.utils.notifications.manager.NotifyManager
 
 /**
  * @author anty
  */
-class IssuesNotifyGroup : NotifyGroup(ID, IssuesNotifyChannel.ID) {
+class BootRefreshReceiver : BroadcastReceiver() {
 
     companion object {
 
-        private const val LOG_TAG = "IssuesNotifyGroup"
-        const val ID = "eu.codetopic.utils.log.issue.$LOG_TAG"
+        private const val LOG_TAG = "BootRefreshReceiver"
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override fun createGroup(context: Context): NotificationChannelGroup =
-            NotificationChannelGroup(id, LOG_TAG) // TODO: better name
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
+
+        try {
+            NotifyManager.assertInitialized(context)
+            Notifier.bootCleanup(context)
+            Notifier.refresh(context)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "onReceive()", e)
+        }
+    }
 }
