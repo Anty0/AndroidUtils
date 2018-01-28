@@ -53,48 +53,6 @@
             android:exported="false" />
 
         <receiver
-            android:name=".notifications.manager.receiver.BootRefreshReceiver"
-            android:enabled="true"
-            android:exported="false">
-
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-        <receiver
-            android:name=".notifications.manager.receiver.NotificationDeleteReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".notifications.manager.receiver.NotificationLaunchReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".notifications.manager.receiver.RequestRefreshReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".notifications.manager.receiver.RequestNotifyReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".notifications.manager.receiver.RequestNotifyAllReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".notifications.manager.receiver.RequestCancelReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".notifications.manager.receiver.RequestCancelAllIdsReceiver"
-            android:enabled="true"
-            android:exported="false" />
-        <receiver
-            android:name=".notifications.manager.receiver.RequestCancelAllReceiver"
-            android:enabled="true"
-            android:exported="false" />
-
-        <receiver
             android:name=".notifications.manager2.receiver.internal.BootRefreshReceiver"
             android:enabled="true"
             android:exported="false"
