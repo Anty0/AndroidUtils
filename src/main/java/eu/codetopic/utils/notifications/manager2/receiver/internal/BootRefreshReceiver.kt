@@ -39,8 +39,8 @@ class BootRefreshReceiver : BroadcastReceiver() {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
 
         try {
-            NotifyManager.assertInitialized()
-            Notifier.bootCleanup()
+            NotifyManager.assertInitialized(context)
+            Notifier.bootCleanup(context)
             Notifier.refresh(context)
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)

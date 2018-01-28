@@ -53,7 +53,7 @@ class CommonPersistentNotifyLaunchReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized()
+            NotifyManager.assertInitialized(context)
 
             val notifyId = intent.getKotlinSerializableExtra<CommonPersistentNotifyId>(EXTRA_NOTIFY_ID)
                     ?: throw IllegalArgumentException("No notification id received by intent")

@@ -31,12 +31,16 @@ import eu.codetopic.utils.PrefNames
 import eu.codetopic.utils.PrefNames.FILE_NAME_NOTIFY_DATA
 import eu.codetopic.utils.bundle.SerializableBundleWrapper
 import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.data.preferences.PreferencesData
 import eu.codetopic.utils.data.preferences.VersionedPreferencesData
 import eu.codetopic.utils.data.preferences.preference.KotlinSerializedPreference
 import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider
+import eu.codetopic.utils.data.preferences.provider.ContentProviderPreferencesProvider
+import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
 import eu.codetopic.utils.data.preferences.support.PreferencesCompanionObject
 import eu.codetopic.utils.data.preferences.support.PreferencesGetterAbs
 import eu.codetopic.utils.notifications.manager2.NotifyClassifier
+import eu.codetopic.utils.notifications.manager2.NotifyManager
 import eu.codetopic.utils.notifications.manager2.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager2.data.NotifyId
 import kotlinx.serialization.map
@@ -46,22 +50,22 @@ import kotlinx.serialization.map
  */
 @MainThread
 internal class NotifyData private constructor(context: Context) :
-        VersionedPreferencesData<SharedPreferences>(context,
-                BasicSharedPreferencesProvider(context, FILE_NAME_NOTIFY_DATA),
-                SAVE_VERSION) {
+        PreferencesData<ContentProviderSharedPreferences>(context,
+                ContentProviderPreferencesProvider(context, NotifyProvider.AUTHORITY)) {
 
     companion object : PreferencesCompanionObject<NotifyData>(NotifyData.LOG_TAG,
             ::NotifyData, ::Getter) {
 
         private const val LOG_TAG = "NotifyData"
-        private const val SAVE_VERSION = 0
-    }
+        internal const val SAVE_VERSION = 0
 
-    @Synchronized
-    override fun onUpgrade(editor: SharedPreferences.Editor, from: Int, to: Int) {
-        when (from) {
-            -1 -> {
-                // First start, nothing to do
+        @Suppress("UNUSED_PARAMETER")
+        internal fun onUpgrade(editor: SharedPreferences.Editor, from: Int, to: Int) {
+            // This function will be executed by provider in provider process
+            when (from) {
+                -1 -> {
+                    // First start, nothing to do
+                }
             } // No more versions yet
         }
     }
@@ -74,16 +78,28 @@ internal class NotifyData private constructor(context: Context) :
                     { emptyMap() }
             )
 
-    private val notifyMap by lazy { notifyMapSave.toMutableMap() }
+    private val notifyMapCache by lazy { notifyMapSave.toMutableMap() }
 
-    private fun notifyMapSave() { notifyMapSave = notifyMap }
+    private val notifyMap: MutableMap<CommonPersistentNotifyId, SerializableBundleWrapper>
+        get() =
+            if (NotifyManager.isInitialized) notifyMapCache
+            else notifyMapSave.toMutableMap()
 
-    fun remove(id: NotifyId): Bundle? =
-            id.let { it as? CommonPersistentNotifyId }?.let {
-                notifyMap.remove(it)?.bundle?.also { notifyMapSave() }
-            }
+    private fun notifyMapSave() {
+        NotifyManager.assertInitialized(context)
+        notifyMapSave = notifyMap
+    }
+
+    fun remove(id: NotifyId): Bundle? {
+        NotifyManager.assertInitialized(context)
+        return id.let { it as? CommonPersistentNotifyId }?.let {
+            notifyMap.remove(it)?.bundle?.also { notifyMapSave() }
+        }
+    }
 
     fun removeAll(ids: Collection<NotifyId>): Map<NotifyId, Bundle> {
+        NotifyManager.assertInitialized(context)
+
         if (ids.isEmpty()) return emptyMap()
 
         return ids.mapNotNull { id ->
@@ -94,6 +110,7 @@ internal class NotifyData private constructor(context: Context) :
     }
 
     fun removeAll(groupId: String? = null, channelId: String? = null): Map<NotifyId, Bundle> {
+        NotifyManager.assertInitialized(context)
         return notifyMap
                 .letIf({ groupId != null }) { it.filter { it.key.idGroup == groupId } }
                 .letIf({ channelId != null }) { it.filter { it.key.idChannel == channelId } }
@@ -103,6 +120,7 @@ internal class NotifyData private constructor(context: Context) :
     }
 
     fun removeAll(): Map<NotifyId, Bundle> {
+        NotifyManager.assertInitialized(context)
         return notifyMap.toMap()
                 .onEach { notifyMap.remove(it.key) }
                 .map { it.key to it.value.bundle }.toMap<NotifyId, Bundle>()
@@ -110,6 +128,8 @@ internal class NotifyData private constructor(context: Context) :
     }
 
     fun add(notifyId: NotifyId, data: Bundle) {
+        NotifyManager.assertInitialized(context)
+
         if (notifyId !is CommonPersistentNotifyId) return
         // Ignore add requests of non persistent notifications
 
@@ -125,6 +145,8 @@ internal class NotifyData private constructor(context: Context) :
     }
 
     fun addAll(map: Map<NotifyId, Bundle>) {
+        NotifyManager.assertInitialized(context)
+
         if (map.isEmpty()) return
 
         if (DebugMode.isEnabled) {

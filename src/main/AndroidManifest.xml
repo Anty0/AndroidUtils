@@ -97,7 +97,8 @@
         <receiver
             android:name=".notifications.manager2.receiver.internal.BootRefreshReceiver"
             android:enabled="true"
-            android:exported="false">
+            android:exported="false"
+            android:process=":notify">
 
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -106,11 +107,13 @@
         <receiver
             android:name=".notifications.manager2.receiver.internal.CommonNotifyDeleteReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.internal.CommonPersistentNotifyDeleteReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.internal.SummaryNotifyDeleteReceiver"
             android:enabled="true"
@@ -118,43 +121,57 @@
         <receiver
             android:name=".notifications.manager2.receiver.internal.CommonNotifyLaunchReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.internal.CommonPersistentNotifyLaunchReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.internal.SummaryNotifyLaunchReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.RqRefreshReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.RqNotifyReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.RqNotifyAllReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.RqCancelReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.RqCancelAllIdsReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager2.receiver.RqCancelAllReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
 
         <provider
             android:name=".ids.IdentifiersProvider"
             android:authorities="eu.codetopic.utils.ids.data"
+            android:exported="false"
+            android:process=":providers" />
+        <provider
+            android:name=".notifications.manager2.save.NotifyProvider"
+            android:authorities="eu.codetopic.utils.notifications.manager.data"
             android:exported="false"
             android:process=":providers" />
     </application>

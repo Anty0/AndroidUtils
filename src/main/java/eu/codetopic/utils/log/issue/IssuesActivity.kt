@@ -29,19 +29,22 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.AndroidExtensions.edit
 import eu.codetopic.utils.R
-import eu.codetopic.utils.notifications.manager.NotificationsManager
-import eu.codetopic.utils.ui.activity.modular.ModularActivity
+import eu.codetopic.utils.notifications.manager2.NotifyManager
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter
 import eu.codetopic.utils.ui.container.recycler.Recycler
+import eu.codetopic.utils.ui.view.holder.loading.LoadingModularActivity
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
+import org.jetbrains.anko.coroutines.experimental.asReference
 
 /**
  * @author anty
  */
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
-class IssuesActivity : ModularActivity(ToolbarModule()) {
+class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
 
     companion object {
 
@@ -96,9 +99,21 @@ class IssuesActivity : ModularActivity(ToolbarModule()) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.item_done_all -> {
-                NotificationsManager.cancelAll(this,
-                        IssuesNotifyGroup.ID, IssuesNotifyChannel.ID)
-                update()
+                val thisRef = this.asReference()
+                val holderRef = holder.asReference()
+
+                launch(UI) {
+                    holderRef().showLoading()
+
+                    NotifyManager.requestSuspendCancelAll(
+                        context = thisRef(),
+                        groupId = IssuesNotifyGroup.ID,
+                        channelId = IssuesNotifyChannel.ID
+                    )
+                    thisRef().update()
+
+                    holderRef().hideLoading()
+                }
             }
             else -> return super.onOptionsItemSelected(item)
         }
@@ -110,20 +125,20 @@ class IssuesActivity : ModularActivity(ToolbarModule()) {
             clear()
 
             addAll(
-                    NotificationsManager
-                            .getAll(
-                                    IssuesNotifyGroup.ID,
-                                    IssuesNotifyChannel.ID
+                    NotifyManager
+                            .getAllData(
+                                    groupId = IssuesNotifyGroup.ID,
+                                    channelId = IssuesNotifyChannel.ID
                             )
                             .mapNotNull {
                                 val (id, data) = it
-                                val issue = IssuesNotifyGroup.readData(data)
+                                val issue = IssuesNotifyChannel.readData(data)
                                         ?: return@mapNotNull null
 
                                 return@mapNotNull IssueItem(id, issue)
                             }
                             .sortedBy {
-                                it.notifyId?.whenTime
+                                it.notifyId?.timeWhen
                                         ?: System.currentTimeMillis()
                             }
             )

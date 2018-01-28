@@ -20,6 +20,7 @@ package eu.codetopic.utils.bundle
 
 import android.os.Bundle
 import eu.codetopic.utils.AndroidExtensions
+import eu.codetopic.utils.AndroidExtensions.deserializeBundle
 import eu.codetopic.utils.AndroidExtensions.serialize
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -39,7 +40,8 @@ class SerializableBundleWrapper(private val bundleStr: String) {
     constructor(bundle: Bundle) : this(bundle.serialize())
 
     @Transient
-    private val bundleBase: Bundle by lazy { AndroidExtensions.deserializeBundle(bundleStr) }
+    private val bundleBase: Bundle
+        get() = deserializeBundle(bundleStr)
 
     @Transient
     val bundle: Bundle get() = Bundle(bundleBase)

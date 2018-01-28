@@ -24,6 +24,7 @@ import android.content.Intent
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.notifications.manager2.Notifier
 import eu.codetopic.utils.notifications.manager2.NotifyManager
+import org.jetbrains.anko.bundleOf
 
 /**
  * @author anty
@@ -40,10 +41,21 @@ class RqRefreshReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized()
+            NotifyManager.assertInitialized(context)
+
             Notifier.refresh(context)
+
+            if (isOrderedBroadcast) {
+                setResult(NotifyManager.REQUEST_RESULT_OK, null, null)
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
+
+            if (isOrderedBroadcast) {
+                setResult(NotifyManager.REQUEST_RESULT_FAIL, null, bundleOf(
+                        NotifyManager.REQUEST_EXTRA_THROWABLE to e
+                ))
+            }
         }
     }
 }

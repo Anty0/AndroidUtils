@@ -26,7 +26,9 @@ import eu.codetopic.utils.AndroidExtensions.putKotlinSerializableExtra
 import eu.codetopic.utils.AndroidExtensions.getKotlinSerializableExtra
 import eu.codetopic.utils.notifications.manager2.Notifier
 import eu.codetopic.utils.notifications.manager2.NotifyManager
+import eu.codetopic.utils.notifications.manager2.data.NotifyId.Companion.stringify
 import eu.codetopic.utils.notifications.manager2.create.NotificationBuilder
+import org.jetbrains.anko.bundleOf
 
 /**
  * @author anty
@@ -46,14 +48,26 @@ class RqNotifyReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized()
+            NotifyManager.assertInitialized(context)
 
             val builder = intent.getKotlinSerializableExtra<NotificationBuilder>(EXTRA_BUILDER)
                     ?: throw IllegalArgumentException("No notification builder received by intent")
 
-            Notifier.notify(context, builder)
+            val result = Notifier.notify(context, builder)
+
+            if (isOrderedBroadcast) {
+                setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
+                        NotifyManager.REQUEST_EXTRA_RESULT to result.stringify()
+                ))
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
+
+            if (isOrderedBroadcast) {
+                setResult(NotifyManager.REQUEST_RESULT_FAIL, null, bundleOf(
+                        NotifyManager.REQUEST_EXTRA_THROWABLE to e
+                ))
+            }
         }
     }
 }

@@ -42,17 +42,22 @@ class MultiNotificationBuilder(val groupId: String, val channelId: String) {
 
         private const val LOG_TAG = "MultiNotificationBuilder"
 
-        inline fun notifications(groupId: String, channelId: String,
-                                 init: MultiNotificationBuilder.() -> Unit): MultiNotificationBuilder =
+        inline fun create(groupId: String, channelId: String,
+                          init: MultiNotificationBuilder.() -> Unit): MultiNotificationBuilder =
                 MultiNotificationBuilder(groupId, channelId).apply(init)
 
         @MainThread
         fun MultiNotificationBuilder.showAll(context: Context): Map<NotifyId, Bundle> =
-                Notifier.notifyAll(context, this)
+                NotifyManager.notifyAll(context, this)
 
         @MainThread
         fun MultiNotificationBuilder.requestShowAll(context: Context, optimise: Boolean = true) =
                 NotifyManager.requestNotifyAll(context, this, optimise)
+
+        @MainThread
+        suspend fun MultiNotificationBuilder.requestSuspendShowAll(context: Context,
+                                                                   optimise: Boolean = true): Map<NotifyId, Bundle> =
+                NotifyManager.requestSuspendNotifyAll(context, this, optimise)
 
         internal fun MultiNotificationBuilder.build(context: Context): Map<NotifyId, Bundle> {
             val (groupId, channelId, timeWhen, persistent, refreshable, data) = this

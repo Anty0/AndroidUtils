@@ -45,17 +45,22 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
 
         private const val LOG_TAG = "NotificationBuilder"
 
-        inline fun notification(groupId: String, channelId: String,
-                                init: NotificationBuilder.() -> Unit): NotificationBuilder =
+        inline fun create(groupId: String, channelId: String,
+                          init: NotificationBuilder.() -> Unit): NotificationBuilder =
                 NotificationBuilder(groupId, channelId).apply(init)
 
         @MainThread
         fun NotificationBuilder.show(context: Context): NotifyId =
-                Notifier.notify(context, this)
+                NotifyManager.notify(context, this)
 
         @MainThread
         fun NotificationBuilder.requestShow(context: Context, optimise: Boolean = true) =
                 NotifyManager.requestNotify(context, this, optimise)
+
+        @MainThread
+        suspend fun NotificationBuilder.requestSuspendShow(context: Context,
+                                                           optimise: Boolean = true): NotifyId =
+                NotifyManager.requestSuspendNotify(context, this, optimise)
 
         internal fun NotificationBuilder.build(context: Context): Pair<NotifyId, Bundle> {
             val (groupId, channelId, timeWhen, persistent, refreshable, data) = this
@@ -81,7 +86,7 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
     @Transient
     var data: Bundle
         get() = serializedData?.bundle ?: Bundle.EMPTY
-    set(value) { serializedData = data.asSerializable() }
+    set(value) { serializedData = value.asSerializable() }
 
     operator fun component1() = groupId
     operator fun component2() = channelId

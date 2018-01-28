@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils
 
+import android.accounts.AccountManager
 import android.app.Activity
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -48,6 +49,7 @@ import java.io.BufferedOutputStream
 import java.util.zip.GZIPOutputStream
 import java.nio.file.Files.size
 import java.util.zip.GZIPInputStream
+import kotlin.coroutines.experimental.suspendCoroutine
 
 
 object AndroidExtensions {
@@ -149,14 +151,37 @@ object AndroidExtensions {
     val Context.wifiManager
         get() = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
+    val Context.accountManager
+        get() = AccountManager.get(this)
+
     val Context.baseActivity: Activity?
         get() = this as? Activity ?: (this as? ContextWrapper)?.baseContext?.baseActivity
+
+    suspend fun Context.sendSuspendOrderedBroadcast(intent: Intent,
+                                                    initialResult: OrderedBroadcastResult = OrderedBroadcastResult(),
+                                                    receiverPermission: String? = null) =
+            suspendCoroutine<OrderedBroadcastResult> { cont ->
+                sendOrderedBroadcast(
+                        intent, receiverPermission,
+                        broadcast { _, _ ->
+                            cont.resume(OrderedBroadcastResult(
+                                    code = resultCode,
+                                    data = resultData,
+                                    extras = getResultExtras(false)
+                            ))
+                        }, null,
+                        initialResult.code, initialResult.data, initialResult.extras
+                )
+            }
+
+    data class OrderedBroadcastResult(val code: Int = 0, val data: String? = null,
+                                      val extras: Bundle? = null)
 
     //////////////////////////////////////
     //////REGION - BUNDLES////////////////
     //////////////////////////////////////
 
-    fun Bundle.serialize(): String {
+    fun Bundle.serializeWithGZIP(): String {
         Parcel.obtain().use { parcel ->
             parcel.writeBundle(this)
             ByteArrayOutputStream().use {
@@ -168,7 +193,7 @@ object AndroidExtensions {
         }
     }
 
-    fun deserializeBundle(bundleStr: String): Bundle {
+    fun deserializeBundleWithGZIP(bundleStr: String): Bundle {
         Parcel.obtain().use { parcel ->
             GZIPInputStream(ByteArrayInputStream(Base64.decode(bundleStr, 0))).use {
                 it.readBytes().let {
@@ -177,6 +202,23 @@ object AndroidExtensions {
             }
             parcel.setDataPosition(0)
             return parcel.readBundle(UtilsBase.javaClass.classLoader)
+        }
+    }
+
+    fun Bundle.serialize(): String {
+        Parcel.obtain().use { parcel ->
+            parcel.writeBundle(this)
+            return Base64.encodeToString(parcel.marshall(), 0)
+        }
+    }
+
+    fun deserializeBundle(bundleStr: String): Bundle {
+        Parcel.obtain().use { parcel ->
+            Base64.decode(bundleStr, 0).let {
+                parcel.unmarshall(it, 0, it.size)
+            }
+            parcel.setDataPosition(0)
+            return parcel.readBundle(UtilsBase::class.java.classLoader)
         }
     }
 

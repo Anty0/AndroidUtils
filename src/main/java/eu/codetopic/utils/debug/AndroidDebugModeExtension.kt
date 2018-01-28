@@ -34,6 +34,7 @@ object AndroidDebugModeExtension {
 
     @MainThread
     @Synchronized
+    @Suppress("UNUSED_PARAMETER")
     fun install(context: Context) {
         if (INSTALLED) throw IllegalStateException("$LOG_TAG is still installed.")
         INSTALLED = true

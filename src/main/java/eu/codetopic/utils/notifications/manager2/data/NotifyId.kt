@@ -78,28 +78,17 @@ abstract class NotifyId {
             get() = "TAG(isSummary=$isSummary, combinedId=$idCombined)"
 
         @MainThread
-        fun NotifyId.cancel(context: Context): Bundle? = Notifier.cancel(context, this)
+        fun NotifyId.cancel(context: Context): Bundle? =
+                NotifyManager.cancel(context, this)
 
         @MainThread
         fun NotifyId.requestCancel(context: Context, optimise: Boolean = true) =
                 NotifyManager.requestCancel(context, this, optimise)
 
         @MainThread
-        fun Collection<NotifyId>.cancelAll(context: Context): Map<NotifyId, Bundle> =
-                Notifier.cancelAll(context, this)
-
-        @MainThread
-        fun Collection<NotifyId>.requestCancelAll(context: Context, optimise: Boolean = true) =
-                NotifyManager.requestCancelAll(context, this, optimise)
-
-        @MainThread
-        fun Pair<NotifyGroup, NotifyChannel>.cancelAll(context: Context): Map<NotifyId, Bundle> =
-                Notifier.cancelAll(context, first.id, second.id)
-
-        @MainThread
-        fun Pair<NotifyGroup, NotifyChannel>.requestCancelAll(context: Context,
-                                                              optimise: Boolean = true) =
-                NotifyManager.requestCancelAll(context, first.id, second.id)
+        suspend fun NotifyId.requestSuspendCancel(context: Context,
+                                                  optimise: Boolean = true): Bundle? =
+                NotifyManager.requestSuspendCancel(context, this, optimise)
 
         @get:MainThread
         val NotifyId.data: Bundle

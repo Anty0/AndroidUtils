@@ -24,11 +24,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import eu.codetopic.java.utils.log.Log
 
-import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.R
-import eu.codetopic.utils.notifications.manager.NotificationsManager
-import eu.codetopic.utils.notifications.manager.data.NotificationId
+import eu.codetopic.utils.notifications.manager2.data.NotifyId
+import eu.codetopic.utils.notifications.manager2.data.NotifyId.Companion.stringify
+import eu.codetopic.utils.notifications.manager2.data.NotifyId.Companion.requestCancel
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.synthetic.main.activity_error_info.*
@@ -44,10 +44,10 @@ class IssueInfoActivity : AppCompatActivity() {
         private const val EXTRA_NOTIFY_ID = "EXTRA_NOTIFY_ID"
         private const val EXTRA_ISSUE = "EXTRA_ISSUE"
 
-        fun start(context: Context, id: NotificationId?, issue: Issue) {
+        fun start(context: Context, notifyId: NotifyId?, issue: Issue) {
             context.startActivity(
                     Intent(context, IssueInfoActivity::class.java)
-                            .putExtra(EXTRA_NOTIFY_ID, id?.let { JSON.stringify(it) })
+                            .putExtra(EXTRA_NOTIFY_ID, notifyId?.stringify())
                             .putExtra(EXTRA_ISSUE, JSON.stringify(issue))
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
@@ -56,7 +56,7 @@ class IssueInfoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val notifyId = intent?.getStringExtra(EXTRA_NOTIFY_ID)?.let { JSON.parse<NotificationId>(it) }
+        val notifyId = intent?.getStringExtra(EXTRA_NOTIFY_ID)?.let { NotifyId.parse(it) }
         val issue = intent?.getStringExtra(EXTRA_ISSUE)?.let { JSON.parse<Issue>(it) }
                 ?: run {
                     Log.w(LOG_TAG, "No Issue received in intent")
@@ -78,7 +78,7 @@ class IssueInfoActivity : AppCompatActivity() {
 
         butDone.isEnabled = notifyId != null
         butDone.setOnClickListener {
-            notifyId?.let { NotificationsManager.requestCancel(this, it) }
+            notifyId?.requestCancel(this)
             finish()
         }
 

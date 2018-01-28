@@ -53,13 +53,14 @@ class AndroidLogTarget : LogTarget {
         android.util.Log.println(getPriorityId(logLine.priority), logLine.tag, message)
     }
 
-    private fun getPriorityId(priority: Priority): Int = when (priority) {
-        Priority.ASSERT -> Log.ASSERT
-        Priority.DEBUG -> Log.DEBUG
-        Priority.ERROR -> Log.ERROR
-        Priority.INFO -> Log.INFO
-        Priority.VERBOSE -> Log.VERBOSE
-        Priority.WARN -> Log.WARN
-        else -> Log.ERROR
-    }
+    private fun getPriorityId(priority: Priority): Int =
+            when (priority) {
+                Priority.ASSERT -> Log.ASSERT
+                Priority.DEBUG -> Log.DEBUG
+                Priority.ERROR -> Log.ERROR
+                Priority.INFO -> Log.INFO
+                Priority.VERBOSE -> Log.VERBOSE
+                Priority.WARN -> Log.WARN
+                else -> Log.ERROR
+            }
 }

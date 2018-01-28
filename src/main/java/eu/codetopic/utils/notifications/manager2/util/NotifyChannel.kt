@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.notifications.manager2.util
 
+import android.app.NotificationChannel
 import android.content.Context
 import android.os.Build
 import android.os.Bundle
@@ -35,7 +36,7 @@ abstract class NotifyChannel(val id: String, val checkForIdOverrides: Boolean) {
     companion object {
 
         fun combinedId(groupId: String, channelId: String): String =
-                "CombinedId{groupId=$groupId, channelId=$channelId}"
+                "CombinedId(groupId=$groupId, channelId=$channelId)"
 
         fun combinedIds(channelId: String): List<String> =
                 NotifyClassifier.findAllGroupsFor(channelId)
@@ -48,8 +49,7 @@ abstract class NotifyChannel(val id: String, val checkForIdOverrides: Boolean) {
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    abstract fun createChannel(context: Context, combinedId: String):
-            android.app.NotificationChannel
+    abstract fun createChannel(context: Context, combinedId: String): NotificationChannel
 
     abstract fun nextId(context: Context, group: NotifyGroup, data: Bundle): Int
 

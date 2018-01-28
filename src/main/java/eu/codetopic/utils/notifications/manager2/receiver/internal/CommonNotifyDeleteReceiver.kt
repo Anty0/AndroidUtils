@@ -55,7 +55,7 @@ class CommonNotifyDeleteReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized()
+            NotifyManager.assertInitialized(context)
 
             val notifyId = intent.getKotlinSerializableExtra<CommonNotifyId>(EXTRA_NOTIFY_ID)
                     ?: throw IllegalArgumentException("No notification id received by intent")

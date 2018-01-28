@@ -22,7 +22,6 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.MainThread
 import eu.codetopic.java.utils.debug.DebugAsserts.assert
-import eu.codetopic.java.utils.debug.DebugAsserts.assertNot
 import eu.codetopic.utils.AndroidExtensions.notificationManager
 import eu.codetopic.utils.notifications.manager2.util.NotifyChannel
 import eu.codetopic.utils.notifications.manager2.util.NotifyChannel.Companion.combinedIds
@@ -35,62 +34,96 @@ import eu.codetopic.utils.notifications.manager2.util.NotifyGroup
 @MainThread
 internal object NotifyClassifier {
 
-    private val REGEX_INVALID_ID_CHARACTERS = Regex.fromLiteral("/(,| |{|})/")
+    private val REGEX_INVALID_OUT_OF_BRACKETS_CHARACTERS = Regex("[, ]")
+    private val REGEX_BRACKETS = Regex("[()]")
+    private val REGEX_IN_BRACKETS = Regex("\\(([^()]*?)\\)")
+    private const val BRACKETS_VALID_PAIR = "()"
 
     private val GROUPS: MutableMap<String, NotifyGroup> = mutableMapOf()
     private val CHANNELS: MutableMap<String, NotifyChannel> = mutableMapOf()
 
+    private fun String.isValidId(): Boolean {
+        var brackets = REGEX_BRACKETS.findAll(this)
+                .map { it.value }
+                .joinToString("")
+
+        while (BRACKETS_VALID_PAIR in brackets)
+            brackets = brackets.replace(BRACKETS_VALID_PAIR, "")
+
+        if (brackets.isNotEmpty()) return false
+
+        var inBrackets = REGEX_IN_BRACKETS.replace(this, "")
+        var inBracketsTmp = REGEX_IN_BRACKETS.replace(inBrackets, "")
+
+        while (inBracketsTmp != inBrackets) {
+            inBrackets = inBracketsTmp
+            inBracketsTmp = REGEX_IN_BRACKETS.replace(inBrackets, "")
+        }
+
+        if (REGEX_INVALID_OUT_OF_BRACKETS_CHARACTERS.containsMatchIn(inBrackets)) return false
+
+        return true
+    }
+
     private fun NotifyGroup.install(context: Context) {
-        id.assertNot { it.contains(REGEX_INVALID_ID_CHARACTERS) }
+        id.assert { it.isValidId() }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // installation is required only on Oreo+ devices
 
-        context.notificationManager.createNotificationChannelGroup(
-                createGroup(context).assert { it.id == id }
-        )
+        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+            context.notificationManager.createNotificationChannelGroup(
+                    createGroup(context).assert { it.id == id }
+            )
+        }
     }
 
     private fun NotifyChannel.install(context: Context) {
-        id.assertNot { it.contains(REGEX_INVALID_ID_CHARACTERS) }
+        id.assert { it.isValidId() }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // installation is required only on Oreo+ devices
 
-        context.notificationManager.createNotificationChannels(
-                combinedIds().map { id ->
-                    createChannel(context, id)
-                            .assert { it.id == id }
-                }
-        )
+        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+            context.notificationManager.createNotificationChannels(
+                    combinedIds().map { id ->
+                        createChannel(context, id)
+                                .assert { it.id == id }
+                    }
+            )
+        }
     }
 
     private fun NotifyGroup.uninstall(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // nothing to uninstall on versions bellow Oreo
 
-        context.notificationManager.also { nm ->
-            findAllChannelsOf(this.id).forEach { channel ->
-                nm.deleteNotificationChannel(channel.combinedIdFor(this))
+        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+            context.notificationManager.also { nm ->
+                findAllChannelsOf(this.id).forEach { channel ->
+                    nm.deleteNotificationChannel(channel.combinedIdFor(this))
+                }
+
+                nm.deleteNotificationChannelGroup(id)
             }
 
-            nm.deleteNotificationChannelGroup(id)
+            if (NotifyManager.isInitialized) NotifyManager.cleanup(context)
         }
-
-        if (NotifyManager.isInitialized) NotifyManager.cleanup(context)
     }
 
     private fun NotifyChannel.uninstall(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // nothing to uninstall on versions bellow Oreo
 
-        context.notificationManager.also {
-            combinedIds().forEach { id ->
-                it.deleteNotificationChannel(id)
+        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+            context.notificationManager.also {
+                combinedIds().forEach { id ->
+                    it.deleteNotificationChannel(id)
+                }
             }
-        }
 
-        if (NotifyManager.isInitialized) NotifyManager.cleanup(context)
+            if (NotifyManager.isInitialized) NotifyManager.cleanup(context)
+        }
     }
 
     fun validateGroupId(groupId: String): String =
@@ -113,10 +146,10 @@ internal object NotifyClassifier {
         if (hasGroup(group.id))
             throw IllegalArgumentException("Group with same id exist: '${group.id}'")
 
+        GROUPS[group.id] = group
+
         // Create group
         group.install(context)
-
-        GROUPS[group.id] = group
 
         // reinitialize group channels
         group.channelIds.forEach {
@@ -130,10 +163,10 @@ internal object NotifyClassifier {
         if (hasChannel(channel.id))
             throw IllegalArgumentException("Channel with same id exist: '${channel.id}'")
 
+        CHANNELS[channel.id] = channel
+
         // Create channels for all existing channel groups
         channel.install(context)
-
-        CHANNELS[channel.id] = channel
     }
 
     fun uninstallGroup(context: Context, groupId: String): NotifyGroup =

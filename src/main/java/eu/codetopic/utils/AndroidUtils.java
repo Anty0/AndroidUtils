@@ -19,6 +19,7 @@
 package eu.codetopic.utils;
 
 import android.annotation.TargetApi;
+import android.app.ActivityManager;
 import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.ContentResolver;
@@ -39,6 +40,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Process;
 import android.service.notification.StatusBarNotification;
 import android.support.annotation.AnyRes;
 import android.support.annotation.AttrRes;
@@ -463,7 +465,7 @@ public final class AndroidUtils {
 
     @Nullable
     @CheckResult
-    public static String getCurrentProcessName() {
+    public static String getCurrentProcessName(Context context) {
         FileInputStream input = null;
         try {
             input = new FileInputStream("/proc/self/cmdline");
@@ -479,6 +481,37 @@ public final class AndroidUtils {
 
             return sw.toString().trim();
         } catch (IOException e) {
+            Log.w(LOG_TAG, "getCurrentProcessName()" +
+                    " -> Failed to obtain process name using main method");
+
+            final ActivityManager actManager = (ActivityManager)
+                    context.getSystemService(Context.ACTIVITY_SERVICE);
+            if (actManager == null) {
+                Log.w(LOG_TAG, "getCurrentProcessName()" +
+                        " -> Failed to obtain process name using secondary method" +
+                        " -> ActivityManager is null");
+                return null;
+            }
+
+            final List<ActivityManager.RunningAppProcessInfo> processesInfo =
+                    actManager.getRunningAppProcesses();
+            if (processesInfo == null) {
+                Log.w(LOG_TAG, "getCurrentProcessName()" +
+                        " -> Failed to obtain process name using secondary method" +
+                        " -> List of RunningAppProcessInfo is null");
+                return null;
+            }
+
+            final int pid = Process.myPid();
+            for (ActivityManager.RunningAppProcessInfo processInfo : processesInfo) {
+                if (processInfo.pid != pid) continue;
+                return processInfo.processName;
+            }
+
+
+            Log.w(LOG_TAG, "getCurrentProcessName()" +
+                    " -> Failed to obtain process name using secondary method" +
+                    " -> Current process not found");
             return null;
         } finally {
             try {

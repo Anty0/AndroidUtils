@@ -18,36 +18,159 @@
 
 package eu.codetopic.utils.log.issue
 
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
+import android.os.Bundle
 import android.support.annotation.RequiresApi
+import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
+import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import eu.codetopic.java.utils.JavaExtensions.alsoIfNull
+import eu.codetopic.java.utils.log.Log
+import eu.codetopic.java.utils.log.base.Priority
+import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.R
-import eu.codetopic.utils.notifications.manager.util.NotificationChannel
+import eu.codetopic.utils.ids.Identifiers
+import eu.codetopic.utils.ids.Identifiers.Companion.nextId
+import eu.codetopic.utils.notifications.manager2.data.NotifyId
+import eu.codetopic.utils.notifications.manager2.util.NotifyGroup
+import eu.codetopic.utils.notifications.manager2.util.SummarizedNotifyChannel
+import kotlinx.serialization.json.JSON
 
 /**
  * @author anty
  */
-class IssuesNotifyChannel : NotificationChannel(ID) {
+class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
 
     companion object {
 
         private const val LOG_TAG = "IssuesNotifyChannel"
         const val ID = "eu.codetopic.utils.log.issue.$LOG_TAG"
+
+        private val idType = Identifiers.Type(ID)
+
+        private const val PARAM_ISSUE = "ISSUE"
+
+        fun dataFor(issue: Issue): Bundle = Bundle().apply {
+            putString(PARAM_ISSUE, JSON.stringify(issue))
+        }
+
+        fun readData(data: Bundle): Issue? =
+                data.getString(PARAM_ISSUE)?.let { JSON.parse(it) }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun createChannel(context: Context): android.app.NotificationChannel =
+    override fun createChannel(context: Context, combinedId: String): NotificationChannel =
             android.app.NotificationChannel(
-                    id,
-                    LOG_TAG,
+                    combinedId,
+                    LOG_TAG, // TODO: better name
                     NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 enableLights(true)
                 enableVibration(true)
                 setBypassDnd(false)
                 setShowBadge(true)
-                this.lightColor = ContextCompat.getColor(context, R.color.red)
+                this.lightColor = ContextCompat.getColor(context, R.color.materialRed)
             }
+
+    override fun nextId(context: Context, group: NotifyGroup,
+                        data: Bundle): Int = idType.nextId()
+
+    override fun handleContentIntent(context: Context, group: NotifyGroup,
+                                     notifyId: NotifyId, data: Bundle) {
+        IssueInfoActivity.start(
+                context = context,
+                notifyId = notifyId,
+                issue = readData(data)
+                        ?: throw IllegalArgumentException("Data doesn't contains issue")
+        )
+    }
+
+    override fun handleSummaryContentIntent(context: Context, group: NotifyGroup,
+                                            notifyId: NotifyId, data: Map<NotifyId, Bundle>) {
+        IssuesActivity.start(context)
+    }
+
+    private fun buildNotificationBase(context: Context,
+                                      group: NotifyGroup): NotificationCompat.Builder =
+            NotificationCompat.Builder(context, combinedIdFor(group)).apply {
+                //setContentTitle()
+                //setContentText()
+                //setSubText()
+                //setTicker()
+                //setUsesChronometer()
+                //setNumber()
+                //setShowWhen(true)
+                //setStyle()
+
+                setSmallIcon(android.R.drawable.stat_sys_warning)
+                setLargeIcon(
+                        context.getIconics(GoogleMaterial.Icon.gmd_warning)
+                                .sizeDp(24)
+                                .colorRes(R.color.materialRed)
+                                .toBitmap()
+                )
+                color = ContextCompat.getColor(context, R.color.materialRed)
+                setColorized(true)
+
+                setDefaults(NotificationCompat.DEFAULT_VIBRATE or NotificationCompat.DEFAULT_LIGHTS)
+                priority = NotificationCompat.PRIORITY_HIGH
+
+                setAutoCancel(false) // will be canceled by IssueInfoActivity by user
+                setCategory(NotificationCompat.CATEGORY_ERROR)
+
+                setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
+                //setTimeoutAfter()
+                //setOngoing()
+                //setPublicVersion()
+
+                //addAction()
+                extend(NotificationCompat.WearableExtender()
+                        .setHintContentIntentLaunchesActivity(true))
+            }
+
+    override fun createNotification(context: Context, group: NotifyGroup,
+                                    notifyId: NotifyId, data: Bundle): NotificationCompat.Builder =
+            buildNotificationBase(context, group).apply {
+                val issue = readData(data)
+                        ?: throw IllegalArgumentException("Data doesn't contains issue")
+                val isError = issue.priority == Priority.ERROR
+
+                setContentTitle(context.getText(
+                        if (isError) R.string.notify_logged_error_title
+                        else R.string.notify_logged_warning_title
+                ))
+                setContentText(issue.toString(false))
+                setStyle(
+                        NotificationCompat.BigTextStyle()
+                                .bigText(issue.toString(true))
+                )
+            }
+
+    override fun createSummaryNotification(context: Context, group: NotifyGroup,
+                                           notifyId: NotifyId, data: Map<NotifyId, Bundle>): NotificationCompat.Builder {
+        val allIssues = data.values.mapNotNull {
+            readData(it).alsoIfNull {
+                Log.w(LOG_TAG, "Data doesn't contains issue")
+            }
+        }
+
+        return buildNotificationBase(context, group).apply {
+            setContentTitle(context.getText(R.string.notify_logged_summary_title))
+            setContentText(context.getText(R.string.notify_logged_summary_text))
+            setNumber(allIssues.size)
+            setStyle(
+                    NotificationCompat.InboxStyle()
+                            .setBigContentTitle(context.getText(R.string.notify_logged_summary_title))
+                            .setSummaryText(context.getText(R.string.notify_logged_summary_text))
+                            .also { n ->
+                                allIssues.forEach {
+                                    n.addLine(it.toString(false))
+                                }
+                            }
+            )
+        }
+    }
 }

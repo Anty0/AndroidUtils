@@ -56,7 +56,7 @@
 
     <string name="but_refresh">Refresh</string>
 
-    <string name="issue_item_time_tag_format">%1$s | $2$s</string>
+    <string name="issue_item_time_tag_format">%1$s | %2$s</string>
     <string name="issue_item_time_unknown">Unknown time</string>
 
     <string name="debug_item_connectivity_check_connection_type">Check connection type</string>

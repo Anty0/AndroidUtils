@@ -19,11 +19,18 @@
 package eu.codetopic.utils.notifications.manager2
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.MainThread
 import eu.codetopic.utils.notifications.manager2.util.NotifyChannel
 import eu.codetopic.utils.notifications.manager2.util.NotifyGroup
 import eu.codetopic.java.utils.JavaExtensions.alsoIf
+import eu.codetopic.utils.AndroidExtensions.OrderedBroadcastResult
+import eu.codetopic.utils.AndroidExtensions.sendSuspendOrderedBroadcast
+import eu.codetopic.utils.AndroidExtensions.getKotlinSerializable
+import eu.codetopic.utils.UtilsBase
+import eu.codetopic.utils.UtilsBase.processNameNotifyManager
+import eu.codetopic.utils.bundle.SerializableBundleWrapper
 import eu.codetopic.utils.notifications.manager2.create.MultiNotificationBuilder
 import eu.codetopic.utils.notifications.manager2.create.NotificationBuilder
 import eu.codetopic.utils.notifications.manager2.data.NotifyId
@@ -35,18 +42,60 @@ import eu.codetopic.utils.notifications.manager2.save.NotifyData
  */
 object NotifyManager {
 
-    val isInitialized: Boolean
-        get() = NotifyData.isInitialized()
+    internal const val REQUEST_RESULT_UNKNOWN = 1
+    internal const val REQUEST_RESULT_FAIL = 0
+    internal const val REQUEST_RESULT_OK = -1
 
-    fun assertInitialized() {
-        if (!isInitialized) throw IllegalStateException("NotifyManager is not initialized")
+    internal const val REQUEST_EXTRA_THROWABLE = "EXTRA_THROWABLE"
+    internal const val REQUEST_EXTRA_RESULT = "EXTRA_RESULT"
+
+    private var initialized = false
+    private var usable = false
+
+    val isInitialized: Boolean
+        get() = initialized
+
+    val isUsable: Boolean
+        get() = usable
+
+    fun assertInitialized(context: Context) {
+        if (!isInitialized) throw IllegalStateException(
+                "NotifyManager is not initialized in this process: " +
+                        if (!isOnNotifyManagerProcess(context))
+                            "Not running in ':notify' process"
+                        else "Not yet initialized"
+        )
+    }
+
+    fun assertUsable() {
+        if (!isUsable) throw IllegalStateException("NotifyManager is not usable in this process")
+    }
+
+    fun isOnNotifyManagerProcess(context: Context) =
+            context.processNameNotifyManager == UtilsBase.Process.name
+
+    fun assertOnNotifyProcess(context: Context) {
+        if (!isOnNotifyManagerProcess(context))
+            throw IllegalStateException("Not running in ':notify' process")
     }
 
     @MainThread
     fun completeInitialization(context: Context) {
+        if (usable) throw IllegalStateException(
+                "NotifyManager is still initialized in this process"
+        )
+
+        usable = true
+        if (isOnNotifyManagerProcess(context)) initialized = true
+
         NotifyData.initialize(context)
-        cleanup(context)
-        refresh(context)
+
+        if (isInitialized) {
+            cleanup(context)
+            refresh(context)
+        } else {
+            requestRefresh(context, optimise = false)
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -84,7 +133,7 @@ object NotifyManager {
             groups.forEach { NotifyClassifier.install(context, it) }
 
     @MainThread
-    fun initChannels(context: Context, vararg channels: NotifyChannel) =
+    fun installChannels(context: Context, vararg channels: NotifyChannel) =
             channels.forEach { NotifyClassifier.install(context, it) }
 
     @MainThread
@@ -142,24 +191,30 @@ object NotifyManager {
             Notifier.cancelAll(context, groupId, channelId)
 
     @MainThread
-    fun getDataOf(notifyId: NotifyId): Bundle =
-            NotifyData.instance[notifyId]
-                    ?: throw IllegalArgumentException("Id doesn't exists: $notifyId")
+    fun getDataOf(notifyId: NotifyId): Bundle {
+        assertUsable()
+        return NotifyData.instance[notifyId]
+                ?: throw IllegalArgumentException("Id doesn't exists: $notifyId")
+    }
 
     @MainThread
-    fun getAllData(groupId: String? = null, channelId: String? = null) =
-            NotifyData.instance.getAll(groupId, channelId)
+    fun getAllData(groupId: String? = null, channelId: String? = null): Map<NotifyId, Bundle> {
+        assertUsable()
+        return NotifyData.instance.getAll(groupId, channelId)
+    }
 
     //--------------------------------------------------------------------------
 
     @MainThread
     fun requestRefresh(context: Context, optimise: Boolean = true) {
+        assertUsable()
         if (optimise && isInitialized) refresh(context)
         else context.sendBroadcast(RqRefreshReceiver.getStartIntent(context))
     }
 
     @MainThread
     fun requestNotify(context: Context, builder: NotificationBuilder, optimise: Boolean = true) {
+        assertUsable()
         if (optimise && isInitialized) notify(context, builder)
         else context.sendBroadcast(
                 RqNotifyReceiver.getStartIntent(context, builder)
@@ -169,6 +224,7 @@ object NotifyManager {
     @MainThread
     fun requestNotifyAll(context: Context, builder: MultiNotificationBuilder,
                          optimise: Boolean = true) {
+        assertUsable()
         if (optimise && isInitialized) notifyAll(context, builder)
         else context.sendBroadcast(
                 RqNotifyAllReceiver.getStartIntent(context, builder)
@@ -177,6 +233,7 @@ object NotifyManager {
 
     @MainThread
     fun requestCancel(context: Context, notifyId: NotifyId, optimise: Boolean = true) {
+        assertUsable()
         if (optimise && isInitialized) cancel(context, notifyId)
         else context.sendBroadcast(RqCancelReceiver.getStartIntent(context, notifyId))
     }
@@ -187,6 +244,7 @@ object NotifyManager {
 
     @MainThread
     fun requestCancelAll(context: Context, notifyIds: Collection<NotifyId>, optimise: Boolean = true) {
+        assertUsable()
         if (optimise && isInitialized) cancelAll(context, notifyIds)
         else context.sendBroadcast(RqCancelAllIdsReceiver.getStartIntent(context, notifyIds))
     }
@@ -194,9 +252,160 @@ object NotifyManager {
     @MainThread
     fun requestCancelAll(context: Context, groupId: String? = null,
                          channelId: String? = null, optimise: Boolean = true) {
+        assertUsable()
         if (optimise && isInitialized) cancelAll(context, groupId, channelId)
         else context.sendBroadcast(
                 RqCancelAllReceiver.getStartIntent(context, groupId, channelId)
+        )
+    }
+
+    //--------------------------------------------------------------------------
+
+    private fun getInitialResult(): OrderedBroadcastResult =
+            OrderedBroadcastResult(
+                    code = REQUEST_RESULT_UNKNOWN,
+                    data = null,
+                    extras = null
+            )
+
+    @MainThread
+    private suspend inline fun <T> sendSuspendRequest(context: Context, name: String, intent: Intent,
+                                                      resultExtractor: (result: OrderedBroadcastResult) -> T): T {
+        val result = context.sendSuspendOrderedBroadcast(intent, getInitialResult())
+        when (result.code) {
+            REQUEST_RESULT_OK -> return resultExtractor(result)
+            REQUEST_RESULT_FAIL ->
+                throw result.extras?.getSerializable(REQUEST_EXTRA_THROWABLE) as? Throwable
+                        ?: RuntimeException("Unknown fail result received from $name")
+            REQUEST_RESULT_UNKNOWN ->
+                throw RuntimeException("Failed to process broadcast by $name")
+            else -> throw RuntimeException("Unknown resultCode received from $name: ${result.code}")
+        }
+    }
+
+    @MainThread
+    private suspend inline fun <T> sendSuspendRequestNotNull(context: Context, name: String, intent: Intent,
+                                                             resultExtractor: (result: OrderedBroadcastResult) -> T?): T =
+            sendSuspendRequest(context, name, intent) {
+                resultExtractor(it)
+                        ?: throw RuntimeException("Failed to extract result of $name")
+            }
+
+    @MainThread
+    suspend fun requestSuspendRefresh(context: Context, optimise: Boolean = true) {
+        assertUsable()
+        return if (optimise && isInitialized) refresh(context)
+        else sendSuspendRequest(
+                context = context,
+                name = "RqRefreshReceiver",
+                intent = RqRefreshReceiver.getStartIntent(context),
+                resultExtractor = { Unit }
+        )
+    }
+
+    @MainThread
+    suspend fun requestSuspendNotify(context: Context, builder: NotificationBuilder,
+                                     optimise: Boolean = true): NotifyId {
+        assertUsable()
+        return if (optimise && isInitialized) notify(context, builder)
+        else sendSuspendRequestNotNull(
+                context = context,
+                name = "RqNotifyReceiver",
+                intent = RqNotifyReceiver.getStartIntent(context, builder),
+                resultExtractor = {
+                    it.extras?.getString(REQUEST_EXTRA_RESULT)?.let { NotifyId.parse(it) }
+                }
+        )
+    }
+
+    @MainThread
+    suspend fun requestSuspendNotifyAll(context: Context, builder: MultiNotificationBuilder,
+                                        optimise: Boolean = true): Map<NotifyId, Bundle> {
+        assertUsable()
+        return if (optimise && isInitialized) notifyAll(context, builder)
+        else sendSuspendRequestNotNull(
+                context = context,
+                name = "RqNotifyAllReceiver",
+                intent = RqNotifyAllReceiver.getStartIntent(context, builder),
+                resultExtractor = {
+                    it.extras
+                            ?.getKotlinSerializable(
+                                    name = REQUEST_EXTRA_RESULT,
+                                    loader = RqNotifyAllReceiver.RESULT_SERIALIZER
+                            )
+                            ?.map {
+                                NotifyId.parse(it.first) to it.second.bundle
+                            }
+                            ?.toMap()
+                }
+        )
+    }
+
+    @MainThread
+    suspend fun requestSuspendCancel(context: Context, notifyId: NotifyId,
+                                     optimise: Boolean = true): Bundle? {
+        assertUsable()
+        return if (optimise && isInitialized) cancel(context, notifyId)
+        else sendSuspendRequest(
+                context = context,
+                name = "RqCancelReceiver",
+                intent = RqCancelReceiver.getStartIntent(context, notifyId),
+                resultExtractor = {
+                    it.extras?.getKotlinSerializable<SerializableBundleWrapper>(
+                            name = REQUEST_EXTRA_RESULT
+                    )?.bundle
+                }
+        )
+    }
+
+    @MainThread
+    suspend fun requestSuspendCancelAll(context: Context, vararg notifyIds: NotifyId,
+                                        optimise: Boolean = true): Map<NotifyId, Bundle> =
+            requestSuspendCancelAll(context, notifyIds.asList(), optimise)
+
+    @MainThread
+    suspend fun requestSuspendCancelAll(context: Context, notifyIds: Collection<NotifyId>,
+                                        optimise: Boolean = true): Map<NotifyId, Bundle> {
+        assertUsable()
+        return if (optimise && isInitialized) cancelAll(context, notifyIds)
+        else sendSuspendRequestNotNull(
+                context = context,
+                name = "RqCancelAllIdsReceiver",
+                intent = RqCancelAllIdsReceiver.getStartIntent(context, notifyIds),
+                resultExtractor = {
+                    it.extras
+                            ?.getKotlinSerializable(
+                                    name = REQUEST_EXTRA_RESULT,
+                                    loader = RqCancelAllIdsReceiver.RESULT_SERIALIZER
+                            )
+                            ?.map {
+                                NotifyId.parse(it.first) to it.second.bundle
+                            }
+                            ?.toMap()
+                }
+        )
+    }
+
+    @MainThread
+    suspend fun requestSuspendCancelAll(context: Context, groupId: String? = null,
+                                        channelId: String? = null, optimise: Boolean = true): Map<NotifyId, Bundle> {
+        assertUsable()
+        return if (optimise && isInitialized) cancelAll(context, groupId, channelId)
+        else sendSuspendRequestNotNull(
+                context = context,
+                name = "RqCancelAllReceiver",
+                intent = RqCancelAllReceiver.getStartIntent(context, groupId, channelId),
+                resultExtractor = {
+                    it.extras
+                            ?.getKotlinSerializable(
+                                    name = REQUEST_EXTRA_RESULT,
+                                    loader = RqCancelAllReceiver.RESULT_SERIALIZER
+                            )
+                            ?.map {
+                                NotifyId.parse(it.first) to it.second.bundle
+                            }
+                            ?.toMap()
+                }
         )
     }
 }

@@ -20,11 +20,10 @@ package eu.codetopic.utils
 
 import android.app.Application
 import android.content.Context
+import android.os.Bundle
 import android.support.annotation.UiThread
 
 import com.squareup.leakcanary.LeakCanary
-
-import java.util.Arrays
 
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.JavaExtensions.letIfNull
@@ -34,64 +33,155 @@ import eu.codetopic.utils.debug.AndroidDebugModeExtension
 import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.log.AndroidLoggerExtension
-import eu.codetopic.utils.notifications.manager.NotificationsManager
+import eu.codetopic.utils.notifications.manager2.NotifyManager
 import eu.codetopic.utils.thread.LooperUtils
+import org.jetbrains.anko.bundleOf
 
 @UiThread
 object UtilsBase {
 
     private const val LOG_TAG = "UtilsBase"
 
-    private var profile: ProcessProfile? = null
+    const val PROCESS_NAME_PROVIDERS = ":providers"
+    const val PROCESS_NAME_NOTIFY_MANAGER = ":notify"
+    const val PROCESS_NAME_LEAKCANARY = ":leakcanary"
 
-    val ACTIVE_PROFILE: ProcessProfile get() = profile ?:
-            throw IllegalStateException("$LOG_TAG is not initialized")
+    const val PARAM_INITIALIZE_UTILS = "$LOG_TAG.INITIALIZE_UTILS"
 
-    fun initialize(app: Application, vararg profiles: ProcessProfile) {
-        if (profile != null) throw IllegalStateException("$LOG_TAG is still initialized")
+    val Context.processNamePrimary: String
+        get() = applicationContext.packageName
 
-        val processName = AndroidUtils.getCurrentProcessName().letIfNull {
-            Log.e(LOG_TAG, "initialize", RuntimeException(
-                    "Can't get CurrentProcessName, using main process name"))
-            return@letIfNull app.packageName
+    val Context.processNameProviders: String
+        get() = processNamePrimary + PROCESS_NAME_PROVIDERS
+
+    val Context.processNameNotifyManager: String
+        get() = processNamePrimary + PROCESS_NAME_NOTIFY_MANAGER
+
+    val Context.processNameLeakcanary: String
+        get() = processNamePrimary + PROCESS_NAME_LEAKCANARY
+
+    object Process {
+
+        private const val LOG_TAG = "${UtilsBase.LOG_TAG}.UtilsBase"
+
+        private var initialized: Boolean = false
+        private val paramsMap: MutableMap<String, Bundle> = mutableMapOf()
+        private var currProcName: String? = null
+
+        val isInitialized: Boolean
+            get() = initialized
+
+        fun initialize(app: Application) {
+            if (isInitialized) throw IllegalStateException("$LOG_TAG is still initialized")
+            initialized = true
+            currProcName = AndroidUtils.getCurrentProcessName(app).letIfNull {
+                Log.e(LOG_TAG, "initialize", RuntimeException(
+                        "Can't obtain current process name, using main process name"))
+                return@letIfNull app.processNamePrimary
+            }
         }
 
-        val providersProfile = ProcessProfile("${app.packageName}:providers", true)
-        val leakCanaryProfile = ProcessProfile("${app.packageName}:leakcanary", false)
+        val name: String
+            get() = currProcName ?: throw IllegalStateException("$LOG_TAG is not initialized")
 
-        profile = arrayOf(*profiles)
-                .plus(arrayOf(providersProfile, leakCanaryProfile))
-                .firstOrNull { processName == it.processName }
-                .letIfNull {
-                    Log.e(LOG_TAG, "initialize(app=$app, profiles=$profiles)", IllegalStateException("Can't find processName ("
-                            + processName + "), in provided ProcessProfiles, using empty ProcessProfile (utils will be disabled)"))
-                    ProcessProfile(processName, false)
-                }
+        val params: Bundle
+            get() = paramsOf(name)
 
-        completeInit(app)
+        fun isPrimaryProcess(context: Context): Boolean =
+                context.processNamePrimary == name
+
+        fun paramsOf(processName: String): Bundle =
+                paramsMap[processName]?.let { Bundle(it) } ?: Bundle.EMPTY
+
+        fun addParams(processName: String, params: Bundle) {
+            paramsMap.getOrPut(processName, ::Bundle).putAll(params)
+        }
+
+        fun addParams(vararg nameToParam: Pair<String, Bundle>) {
+            nameToParam.forEach { addParams(it.first, it.second) }
+        }
     }
 
-    private fun completeInit(app: Application) {
+    private var prepared: Boolean = false
+    private var initialized: Boolean = false
+    private var utilsInitialized: Boolean = false
+
+    val isPrepared: Boolean
+        get() = prepared
+
+    val isInitialized: Boolean
+        get() = initialized
+
+    val isUtilsInitialized: Boolean
+        get() = utilsInitialized
+
+    fun prepare(app: Application, initProcessParams: Process.() -> Unit) {
+        if (isPrepared) throw IllegalStateException("$LOG_TAG is still prepared")
+        prepared = true
+
+        Process.addParams(
+                app.processNameProviders to bundleOf(
+                        PARAM_INITIALIZE_UTILS to true
+                ),
+                app.processNameNotifyManager to bundleOf(
+                        PARAM_INITIALIZE_UTILS to true
+                ),
+                app.processNameLeakcanary to bundleOf(
+                        PARAM_INITIALIZE_UTILS to false
+                )
+        )
+
+        Process.initProcessParams()
+
+        Process.initialize(app)
+    }
+
+    /**
+     * Methods that should be called in init:
+     * - `LocaleManager.initialize() `
+     * - `eu.codetopic.java.utils.debug.DebugMode.setEnabled() (or in kotlin DebugBode.isEnabled = ?) `
+     * - `eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() ` using `Logger.getLogsHandler (or in kotlin Logger.logsHandler) `
+     * - `eu.codetopic.utils.broadcast.BroadcastsConnector.connect() `
+     * - `eu.codetopic.utils.notifications.manager2.NotifyManager.install*() `
+     */
+    fun initialize(app: Application, init: (processName: String, processParams: Bundle) -> Unit) {
+        if (isInitialized) throw IllegalStateException("$LOG_TAG is still initialized")
+        initialized = true
+
         android.util.Log.d(AndroidUtils.getAppLabel(app).toString(), "INITIALIZING:"
-                + "\n    - PROCESS_PROFILE=" + ACTIVE_PROFILE
-                + "\n    - DEBUG=" + BuildConfig.DEBUG
-                + "\n    - BUILD_TYPE=" + BuildConfig.BUILD_TYPE
-                + "\n    - VERSION_NAME=" + AndroidUtils.getApplicationVersionName(app)
-                + "\n    - VERSION_CODE=" + AndroidUtils.getApplicationVersionCode(app))
+                + "\n    - PROCESS_NAME=${Process.name}"
+                + "\n    - DEBUG=${BuildConfig.DEBUG}"
+                + "\n    - BUILD_TYPE=${BuildConfig.BUILD_TYPE}"
+                + "\n    - VERSION_NAME=${AndroidUtils.getApplicationVersionName(app)}"
+                + "\n    - VERSION_CODE=${AndroidUtils.getApplicationVersionCode(app)}"
+        )
 
-        val initialize = ACTIVE_PROFILE.initializeUtils
-        val primary = ACTIVE_PROFILE.isPrimaryProcess(app)
 
-        if (initialize) {
-            if (!LeakCanary.isInAnalyzerProcess(app)) {
-                LeakCanary.install(app)
+        val processName = Process.name
+        val processParams = Process.params
+
+        val initializeUtils = processParams.let {
+            if (it.containsKey(PARAM_INITIALIZE_UTILS)) {
+                return@let it.getBoolean(PARAM_INITIALIZE_UTILS, false)
+            } else {
+                Log.w(LOG_TAG, "initialize()" +
+                        " -> Parameter $LOG_TAG.PARAM_INITIALIZE_UTILS not found in" +
+                        " current process params, utils won't be initialized")
+                return@let false
             }
+        }
 
-            // Initialize JavaUtils -> DebugMode
+        utilsInitialized = initializeUtils
+
+        if (initializeUtils) {
+            // Initialize JavaUtils's DebugMode
             AndroidDebugModeExtension.install(app)
 
-            // Initialize logger
+            // Initialize JavaUtils's Logger
             AndroidLoggerExtension.install(app)
+
+            // Install LeakCanary
+            LeakCanary.install(app)
 
             // Initialize some util classes
             LocalBroadcast.initialize(app)
@@ -101,31 +191,11 @@ object UtilsBase {
             Identifiers.initialize(app)
         }
 
-        ACTIVE_PROFILE.additionalCommands.forEach { it.run() }
+        init(processName, processParams)
 
-        if (initialize && primary) {
-            // Initialize NotificationsManager
-            NotificationsManager.initialize(app)
+        if (initializeUtils) {
+            // Complete initialization of NotifyManager
+            NotifyManager.completeInitialization(app)
         }
     }
-
-    /**
-     * Methods that should be called in additionalCommands:
-     * - `LocaleManager.initialize() `
-     * - `eu.codetopic.java.utils.debug.DebugMode.setEnabled() (or in kotlin DebugBode.isEnabled = ?) `
-     * - `eu.codetopic.java.utils.log.LogsHandler.addOnLoggedListener() ` using `Logger.getLogsHandler (or in kotlin Logger.logsHandler) `
-     * - `eu.codetopic.utils.broadcast.BroadcastsConnector.connect() `
-     */
-    class ProcessProfile(val processName: String, val initializeUtils: Boolean,
-                         vararg val additionalCommands: Runnable) {
-
-        fun isPrimaryProcess(context: Context): Boolean = context.packageName == processName
-
-        override fun toString(): String {
-            return "ProcessProfile(processName='$processName', " +
-                    "initializeUtils=$initializeUtils, " +
-                    "additionalCommands=${Arrays.toString(additionalCommands)})"
-        }
-    }
-
 }

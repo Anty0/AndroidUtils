@@ -19,13 +19,11 @@
 package eu.codetopic.utils.log.issue
 
 import android.content.Context
-import android.graphics.Color
 import android.support.v4.content.ContextCompat
-import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.AndroidExtensions.getFormattedText
 import eu.codetopic.utils.R
-import eu.codetopic.utils.notifications.manager.data.NotificationId
+import eu.codetopic.utils.notifications.manager2.data.NotifyId
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import kotlinx.android.synthetic.main.item_issue.*
 import java.text.SimpleDateFormat
@@ -34,7 +32,7 @@ import java.util.*
 /**
  * @author anty
  */
-class IssueItem(val notifyId: NotificationId?, val issue: Issue) : CustomItem() {
+class IssueItem(val notifyId: NotifyId?, val issue: Issue) : CustomItem() {
 
     companion object {
 
@@ -60,7 +58,7 @@ class IssueItem(val notifyId: NotificationId?, val issue: Issue) : CustomItem() 
 
         holder.txtTag.text = holder.context.getFormattedText(
                 R.string.issue_item_time_tag_format,
-                notifyId?.whenTime?.let { DATE_FORMAT.format(it) }
+                notifyId?.timeWhen?.let { DATE_FORMAT.format(it) }
                         ?: holder.context.getString(R.string.issue_item_time_unknown),
                 issue.tag
         )

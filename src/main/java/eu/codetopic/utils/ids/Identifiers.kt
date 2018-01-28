@@ -47,6 +47,7 @@ class Identifiers private constructor(context: Context) : PreferencesData<Conten
         private const val LOG_TAG = "Identifiers"
         internal const val SAVE_VERSION = 0
 
+        @Suppress("UNUSED_PARAMETER")
         internal fun onUpgrade(editor: SharedPreferences.Editor, from: Int, to: Int) {
             // This function will be executed by provider in provider process
             when (from) {

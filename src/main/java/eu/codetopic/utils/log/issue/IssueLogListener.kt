@@ -30,14 +30,16 @@ import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.UtilsBase
 import eu.codetopic.utils.log.issue.Issue.Companion.toIssue
-import eu.codetopic.utils.notifications.manager.NotificationsManager
+import eu.codetopic.utils.notifications.manager2.NotifyManager
+import eu.codetopic.utils.notifications.manager2.create.NotificationBuilder
+import eu.codetopic.utils.notifications.manager2.create.NotificationBuilder.Companion.requestShow
 import eu.codetopic.utils.thread.LooperUtils
 
 /**
  * @author anty
  */
 class IssueLogListener private constructor(private val appContext: Context) :
-        LogsHandler.OnLoggedListener {
+        LogsHandler.OnLoggedListener, Thread.UncaughtExceptionHandler {
 
     companion object {
 
@@ -45,14 +47,17 @@ class IssueLogListener private constructor(private val appContext: Context) :
 
         private const val FATAL_EXCEPTION_LOG_TAG = "FatalExceptionHandler"
 
-        private val BLOCKLIST = arrayOf(
+        private val LIST_IGNORE = arrayOf(
                 LOG_TAG
         )
 
-        private val BLACKLIST = arrayOf(
+        private val LIST_NO_NOTIFICATION = arrayOf(
+                "Notifier",
+                "NotifyData",
                 "IssuesNotifyGroup",
-                "Notifications",
-                "NotificationsData"
+                "IssuesNotifyChannel",
+                "RqNotifyAllReceiver",
+                "RqNotifyReceiver"
         ) // TODO: check if all required classes are in this blacklist
 
         private var initialized = false
@@ -68,22 +73,22 @@ class IssueLogListener private constructor(private val appContext: Context) :
 
             // override default uncaught (fatal) exception handler
             val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-            Thread.setDefaultUncaughtExceptionHandler { thread, ex ->
-                listener.onLogged(
-                        LogLine(Priority.ERROR, FATAL_EXCEPTION_LOG_TAG, null, ex)
-                )
-                defaultHandler.uncaughtException(thread, ex)
+            Thread.setDefaultUncaughtExceptionHandler { thread, thr ->
+                listener.uncaughtException(thread, thr)
+                defaultHandler.uncaughtException(thread, thr)
             }
 
             // add listener to logs handler
             Logger.logsHandler.addOnLoggedListener(listener)
 
-            // initialize notifications and enable IssuesActivity, but only on primary process
-            if (UtilsBase.ACTIVE_PROFILE.isPrimaryProcess(context)) {
-                NotificationsManager.initChannel(context, IssuesNotifyChannel())
-                NotificationsManager.initGroup(context, IssuesNotifyGroup())
-            }
+            // initialize notifications
+            NotifyManager.installGroup(context, IssuesNotifyGroup())
+            NotifyManager.installChannel(context, IssuesNotifyChannel())
         }
+    }
+
+    override fun uncaughtException(thread: Thread, thr: Throwable) {
+        onLogged(LogLine(Priority.ERROR, FATAL_EXCEPTION_LOG_TAG, null, thr))
     }
 
     override fun onLogged(logLine: LogLine) {
@@ -91,29 +96,36 @@ class IssueLogListener private constructor(private val appContext: Context) :
 
         try {
             when (logLine.tag) {
-                in BLOCKLIST -> {} // ignore
-                in BLACKLIST -> {
+                in LIST_IGNORE -> {} // ignore
+                in LIST_NO_NOTIFICATION -> {
                     // If log line is from classes used by this IssueLogListener,
                     //  show only IssueInfoActivity directly.
                     // This protects application from error logging loop.
                     LooperUtils.runOnMainThread {
                         IssueInfoActivity.start(
                                 context = appContext,
-                                id = null,
+                                notifyId = null,
                                 issue = logLine.toIssue()
                         )
                     }
                 }
                 else -> {
                     // Safe log line. Let's show notification.
-                    NotificationsManager.requestNotify(
-                            context = appContext,
+
+                    NotificationBuilder.create(
                             groupId = IssuesNotifyGroup.ID,
                             channelId = IssuesNotifyChannel.ID,
-                            data = IssuesNotifyGroup.dataFor(logLine.toIssue()),
+                            init = {
+                                persistent = true
+                                refreshable = true
+                                data = IssuesNotifyChannel.dataFor(logLine.toIssue())
+                            }
+                    ).requestShow(
+                            appContext,
                             optimise = logLine.tag == FATAL_EXCEPTION_LOG_TAG
-                            // If this is fatal exception, process
-                            //  notification right now (because app will be killed).
+                            // If this is fatal exception, allow processing
+                            // of notification right now (because app may be killed),
+                            // but if not, disallow optimisation (executing on same thread).
                     )
                 }
             }

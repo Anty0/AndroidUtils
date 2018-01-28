@@ -194,7 +194,7 @@ internal object Notifier {
                         " -> failed to build notification", e)
             }
 
-    fun refreshSummaries(context: Context) {
+    private fun refreshSummaries(context: Context) {
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = NotifyData.instance.getAll()
 
@@ -224,10 +224,10 @@ internal object Notifier {
     fun refreshSummaryOf(context: Context, notifyId: NotifyId) =
             refreshSummaryOf(context, notifyId.idGroup, notifyId.idChannel)
 
-    fun refreshSummaryOf(context: Context, builder: MultiNotificationBuilder) =
+    private fun refreshSummaryOf(context: Context, builder: MultiNotificationBuilder) =
             refreshSummaryOf(context, builder.groupId, builder.channelId)
 
-    fun refreshSummaryOf(context: Context, groupId: String, channelId: String) {
+    private fun refreshSummaryOf(context: Context, groupId: String, channelId: String) {
         val notifyMap = NotifyData.instance.getAll(groupId, channelId)
                 .takeIf { it.isNotEmpty() }
         val summaryNotifyId = SummaryNotifyId(
@@ -243,6 +243,8 @@ internal object Notifier {
     }
 
     fun refresh(context: Context) {
+        NotifyManager.assertInitialized(context)
+
         val notifier = NotificationManagerCompat.from(context)
 
         NotifyData.instance.getAll().forEach {
@@ -253,7 +255,9 @@ internal object Notifier {
         refreshSummaries(context)
     }
 
-    fun bootCleanup() {
+    fun bootCleanup(context: Context) {
+        NotifyManager.assertInitialized(context)
+
         // Remove all non refreshable notifyIds,
         //  because they won't be visible again
         NotifyData.instance.removeAll(
@@ -262,15 +266,21 @@ internal object Notifier {
         )
     }
 
-    fun cleanup(context: Context) = cancelAll(
-            context,
-            NotifyData.instance.getAll().keys.filter {
-                !NotifyClassifier.hasGroup(it.idGroup) ||
-                        !NotifyClassifier.hasChannel(it.idChannel)
-            }
-    )
+    fun cleanup(context: Context): Map<NotifyId, Bundle> {
+        NotifyManager.assertInitialized(context)
+
+        return cancelAll(
+                context,
+                NotifyData.instance.getAll().keys.filter {
+                    !NotifyClassifier.hasGroup(it.idGroup) ||
+                            !NotifyClassifier.hasChannel(it.idChannel)
+                }
+        )
+    }
 
     fun notify(context: Context, builder: NotificationBuilder): NotifyId {
+        NotifyManager.assertInitialized(context)
+
         val (notifyId, data) = builder.build(context)
 
         NotifyData.instance.add(notifyId, data)
@@ -282,6 +292,8 @@ internal object Notifier {
     }
 
     fun notifyAll(context: Context, builder: MultiNotificationBuilder): Map<NotifyId, Bundle> {
+        NotifyManager.assertInitialized(context)
+
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = builder.build(context)
 
@@ -298,6 +310,8 @@ internal object Notifier {
     }
 
     fun cancel(context: Context, notifyId: NotifyId): Bundle? {
+        NotifyManager.assertInitialized(context)
+
         val data = NotifyData.instance.remove(notifyId)
         if (DebugMode.isEnabled && notifyId.isPersistent && data == null) {
             Log.e(LOG_TAG, "cancel(notifyId=$notifyId)",
@@ -312,6 +326,8 @@ internal object Notifier {
     }
 
     fun cancelAll(context: Context, notifyIds: Collection<NotifyId>): Map<NotifyId, Bundle> {
+        NotifyManager.assertInitialized(context)
+
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = NotifyData.instance.removeAll(notifyIds)
 
@@ -326,6 +342,8 @@ internal object Notifier {
 
     fun cancelAll(context: Context, groupId: String? = null,
                   channelId: String? = null): Map<NotifyId, Bundle> {
+        NotifyManager.assertInitialized(context)
+
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = NotifyData.instance.removeAll(groupId, channelId)
 
