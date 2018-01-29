@@ -270,18 +270,18 @@ object NotifyManager {
 
     @MainThread
     private suspend inline fun <T> sendSuspendRequest(context: Context, name: String, intent: Intent,
-                                                      resultExtractor: (result: OrderedBroadcastResult) -> T): T {
-        val result = context.sendSuspendOrderedBroadcast(intent, getInitialResult())
-        when (result.code) {
-            REQUEST_RESULT_OK -> return resultExtractor(result)
-            REQUEST_RESULT_FAIL ->
-                throw result.extras?.getSerializable(REQUEST_EXTRA_THROWABLE) as? Throwable
-                        ?: RuntimeException("Unknown fail result received from $name")
-            REQUEST_RESULT_UNKNOWN ->
-                throw RuntimeException("Failed to process broadcast by $name")
-            else -> throw RuntimeException("Unknown resultCode received from $name: ${result.code}")
-        }
-    }
+                                                      resultExtractor: (result: OrderedBroadcastResult) -> T): T =
+            context.sendSuspendOrderedBroadcast(intent, getInitialResult()).let {
+                when (it.code) {
+                    REQUEST_RESULT_OK -> resultExtractor(it)
+                    REQUEST_RESULT_FAIL ->
+                        throw it.extras?.getSerializable(REQUEST_EXTRA_THROWABLE) as? Throwable
+                                ?: RuntimeException("Unknown fail result received from $name")
+                    REQUEST_RESULT_UNKNOWN ->
+                        throw RuntimeException("Failed to process broadcast by $name")
+                    else -> throw RuntimeException("Unknown resultCode received from $name: ${it.code}")
+                }
+            }
 
     @MainThread
     private suspend inline fun <T> sendSuspendRequestNotNull(context: Context, name: String, intent: Intent,
