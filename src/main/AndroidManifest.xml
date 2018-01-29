@@ -75,7 +75,8 @@
         <receiver
             android:name=".notifications.manager.receiver.internal.SummaryNotifyDeleteReceiver"
             android:enabled="true"
-            android:exported="false" />
+            android:exported="false"
+            android:process=":notify" />
         <receiver
             android:name=".notifications.manager.receiver.internal.CommonNotifyLaunchReceiver"
             android:enabled="true"
