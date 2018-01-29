@@ -34,9 +34,6 @@ public final class PrefNames {
     // DashboardData
     public static final String FILE_NAME_DASHBOARD_DATA = "DashboardData";
     public static final String ADD_ENABLED_STATE = "_ENABLED_STATE";
-    // NotificationsData
-    public static final String FILE_NAME_NOTIFICATIONS_DATA = "NotificationsData";
-    //public static final String NOTIFICATIONS_MAP = "NOTIFICATIONS_MAP";
     // NotifyData
     public static final String FILE_NAME_NOTIFY_DATA = "NotifyData";
     public static final String NOTIFICATIONS_MAP = "NOTIFICATIONS_MAP";
