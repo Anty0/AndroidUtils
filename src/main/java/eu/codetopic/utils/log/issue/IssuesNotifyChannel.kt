@@ -115,6 +115,7 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
                 color = ContextCompat.getColor(context, R.color.materialRed)
                 setColorized(true)
 
+                setGroupAlertBehavior(NotificationCompat.GROUP_ALERT_CHILDREN)
                 setDefaults(NotificationCompat.DEFAULT_VIBRATE or NotificationCompat.DEFAULT_LIGHTS)
                 priority = NotificationCompat.PRIORITY_HIGH
 
