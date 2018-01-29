@@ -81,6 +81,15 @@ open class LoginDataExtension<out SP : SharedPreferences>(protected val provider
     }
 
     @Synchronized
+    open fun getCredentials(id: String): Pair<String?, String?> {
+        log("getCredentials", id)
+        return provider.preferences.let {
+            it.getString(formatKey(id, USERNAME), null) to
+                    it.getString(formatKey(id, PASSWORD), null)
+        }
+    }
+
+    @Synchronized
     open fun clearData(id: String) {
         log("clearData", id)
         provider.preferences.edit {
