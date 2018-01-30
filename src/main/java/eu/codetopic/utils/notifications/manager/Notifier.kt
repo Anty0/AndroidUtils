@@ -243,11 +243,12 @@ internal object Notifier {
 
         val notifier = NotificationManagerCompat.from(context)
 
-        NotifyData.instance.getAll().forEach {
-            val (notifyId, data) = it
-            notifyId.takeIf { it.isRefreshable }
-                    ?.showNotification(context, notifier, data, true)
-        }
+        NotifyData.instance.getAll()
+                .filter { it.key.isRefreshable }
+                .forEach {
+                    val (notifyId, data) = it
+                    notifyId.showNotification(context, notifier, data, true)
+                }
 
         refreshSummaries(context)
     }
@@ -255,9 +256,10 @@ internal object Notifier {
     fun bootCleanup(context: Context) {
         NotifyManager.assertInitialized(context)
 
-        // Remove all non refreshable notifyIds,
-        //  because they won't be visible again
-        NotifyData.instance.removeAll(
+        // Cancel all non refreshable notifyIds,
+        //  because they won't be visible again.
+        cancelAll(
+                context,
                 NotifyData.instance.getAll().keys
                         .filter { !it.isRefreshable }
         )
@@ -315,7 +317,16 @@ internal object Notifier {
                     IllegalStateException("Notification doesn't exists in NotifyData"))
         }
 
+        val channel = NotifyClassifier
+                .takeIf { it.hasChannel(notifyId.idChannel) }
+                ?.findChannel(notifyId.idChannel)
+        val group = NotifyClassifier
+                .takeIf { channel != null && it.hasGroup(notifyId.idGroup) }
+                ?.findGroup(notifyId.idGroup)
+
         notifyId.cancelNotification(context)
+
+        channel?.handleCancel(context, group, notifyId, data)
 
         refreshSummaryOf(context, notifyId)
 
@@ -328,8 +339,17 @@ internal object Notifier {
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = NotifyData.instance.removeAll(notifyIds)
 
-        notifyIds.forEach {
-            it.cancelNotification(notifier)
+        notifyIds.forEach { notifyId ->
+            val channel = NotifyClassifier
+                    .takeIf { it.hasChannel(notifyId.idChannel) }
+                    ?.findChannel(notifyId.idChannel)
+            val group = NotifyClassifier
+                    .takeIf { channel != null && it.hasGroup(notifyId.idGroup) }
+                    ?.findGroup(notifyId.idGroup)
+
+            notifyId.cancelNotification(notifier)
+
+            channel?.handleCancel(context, group, notifyId, notifyMap[notifyId])
         }
 
         refreshSummaries(context)
@@ -344,8 +364,35 @@ internal object Notifier {
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = NotifyData.instance.removeAll(groupId, channelId)
 
-        notifyMap.keys.forEach {
-            it.cancelNotification(notifier)
+        if (groupId != null && channelId != null) {
+            val channel = NotifyClassifier
+                    .takeIf { it.hasChannel(channelId) }
+                    ?.findChannel(channelId)
+            val group = NotifyClassifier
+                    .takeIf { channel != null && it.hasGroup(groupId) }
+                    ?.findGroup(groupId)
+
+            notifyMap.forEach {
+                val (notifyId, data) = it
+                notifyId.cancelNotification(notifier)
+
+                channel?.handleCancel(context, group, notifyId, data)
+            }
+        }
+
+        notifyMap.forEach {
+            val (notifyId, data) = it
+
+            val channel = NotifyClassifier
+                    .takeIf { it.hasChannel(notifyId.idChannel) }
+                    ?.findChannel(notifyId.idChannel)
+            val group = NotifyClassifier
+                    .takeIf { channel != null && it.hasGroup(notifyId.idGroup) }
+                    ?.findGroup(notifyId.idGroup)
+
+            notifyId.cancelNotification(notifier)
+
+            channel?.handleCancel(context, group, notifyId, data)
         }
 
         if (groupId != null && channelId != null)

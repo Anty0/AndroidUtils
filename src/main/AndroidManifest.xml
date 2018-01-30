@@ -31,11 +31,11 @@
     <application
         android:supportsRtl="false">
 
-        <activity android:name=".log.issue.IssuesActivity"
+        <activity android:name=".log.issue.ui.IssuesActivity"
             android:label="@string/activity_label_logged_issues"
             android:theme="@style/UtilsTheme.NoActionBar" />
         <activity
-            android:name=".log.issue.IssueInfoActivity"
+            android:name=".log.issue.ui.IssueInfoActivity"
             android:label="@string/activity_label_issue_info"
             android:excludeFromRecents="true"
             android:theme="@style/UtilsTheme.Dialog.NoActionBar" />

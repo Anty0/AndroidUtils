@@ -21,7 +21,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".log.issue.IssuesActivity">
+    tools:context=".log.issue.ui.IssuesActivity">
 
     <item
         android:id="@+id/item_done_all"

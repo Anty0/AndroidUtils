@@ -61,4 +61,7 @@ abstract class NotifyChannel(val id: String, val checkForIdOverrides: Boolean) {
 
     open fun handleDeleteIntent(context: Context, group: NotifyGroup,
                                 notifyId: NotifyId, data: Bundle) {}
+
+    open fun handleCancel(context: Context, group: NotifyGroup?,
+                          notifyId: NotifyId, data: Bundle?) {}
 }

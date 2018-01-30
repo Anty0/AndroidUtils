@@ -26,7 +26,10 @@ import eu.codetopic.java.utils.log.Logger
 import eu.codetopic.java.utils.log.LogsHandler
 import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.log.issue.Issue.Companion.toIssue
+import eu.codetopic.utils.log.issue.data.Issue.Companion.toIssue
+import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
+import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
+import eu.codetopic.utils.log.issue.ui.IssueInfoActivity
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder.Companion.requestShow

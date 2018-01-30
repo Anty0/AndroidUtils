@@ -62,7 +62,7 @@ public abstract class ViewHolderFragment extends Fragment {
 
     @Nullable
     @Override
-    public final View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                                    @Nullable final Bundle savedInstanceState) {
         ViewHolder.ViewCreator viewCreator = (context, parent) ->
                 onCreateContentView(LayoutInflater.from(context), parent, savedInstanceState);
@@ -75,7 +75,7 @@ public abstract class ViewHolderFragment extends Fragment {
     }
 
     @Nullable
-    public View onCreateContentView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                                     @Nullable Bundle savedInstanceState) {
         return null;
     }

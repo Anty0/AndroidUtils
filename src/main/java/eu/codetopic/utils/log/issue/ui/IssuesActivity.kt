@@ -16,7 +16,7 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue
+package eu.codetopic.utils.log.issue.ui
 
 import android.content.Context
 import android.content.Intent
@@ -29,6 +29,8 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial
 import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.AndroidExtensions.edit
 import eu.codetopic.utils.R
+import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
+import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter

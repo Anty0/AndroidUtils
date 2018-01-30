@@ -152,7 +152,7 @@ abstract class ArrayEditAdapter<E : Any, VH : UniversalAdapter.ViewHolder>() :
                             }
                         }
                     }
-                    else -> throw IllegalArgumentException("Unknown mode -> (mode=$mode)")
+                    // else -> throw IllegalArgumentException("Unknown mode -> (mode=$mode)")
                 }
 
                 if (realMode != NO_ANIMATIONS) {

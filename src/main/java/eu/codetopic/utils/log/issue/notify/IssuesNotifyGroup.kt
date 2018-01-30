@@ -16,7 +16,7 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue
+package eu.codetopic.utils.log.issue.notify
 
 import android.app.NotificationChannelGroup
 import android.content.Context
@@ -32,7 +32,7 @@ class IssuesNotifyGroup : NotifyGroup(ID, IssuesNotifyChannel.ID) {
     companion object {
 
         private const val LOG_TAG = "IssuesNotifyGroup"
-        const val ID = "eu.codetopic.utils.log.issue.$LOG_TAG"
+        const val ID = "eu.codetopic.utils.log.issue.notify.$LOG_TAG"
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

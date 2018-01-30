@@ -16,7 +16,7 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue
+package eu.codetopic.utils.log.issue.notify
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -34,6 +34,9 @@ import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId
+import eu.codetopic.utils.log.issue.data.Issue
+import eu.codetopic.utils.log.issue.ui.IssueInfoActivity
+import eu.codetopic.utils.log.issue.ui.IssuesActivity
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.util.NotifyGroup
 import eu.codetopic.utils.notifications.manager.util.SummarizedNotifyChannel
@@ -47,7 +50,7 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
     companion object {
 
         private const val LOG_TAG = "IssuesNotifyChannel"
-        const val ID = "eu.codetopic.utils.log.issue.$LOG_TAG"
+        const val ID = "eu.codetopic.utils.log.issue.notify.$LOG_TAG"
 
         private val idType = Identifiers.Type(ID)
 
@@ -105,13 +108,13 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
                 //setShowWhen(true)
                 //setStyle()
 
-                setSmallIcon(android.R.drawable.stat_sys_warning)
-                setLargeIcon(
+                setSmallIcon(R.drawable.ic_notify_bug)
+                /*setLargeIcon(
                         context.getIconics(GoogleMaterial.Icon.gmd_warning)
                                 .sizeDp(24)
                                 .colorRes(R.color.materialRed)
                                 .toBitmap()
-                )
+                )*/
                 color = ContextCompat.getColor(context, R.color.materialRed)
                 setColorized(true)
 

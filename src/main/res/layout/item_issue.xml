@@ -20,7 +20,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".log.issue.IssueItem"
+    tools:context=".log.issue.ui.IssueItem"
     android:id="@+id/boxClickTarget"
     android:layout_width="match_parent"
     android:layout_height="60dp"

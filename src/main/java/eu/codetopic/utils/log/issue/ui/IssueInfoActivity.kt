@@ -16,7 +16,7 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue
+package eu.codetopic.utils.log.issue.ui
 
 import android.content.Context
 import android.content.Intent
@@ -26,6 +26,7 @@ import eu.codetopic.java.utils.log.Log
 
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.R
+import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
 import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.requestCancel

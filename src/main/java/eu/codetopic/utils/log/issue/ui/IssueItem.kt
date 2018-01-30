@@ -16,13 +16,14 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue
+package eu.codetopic.utils.log.issue.ui
 
 import android.content.Context
 import android.support.v4.content.ContextCompat
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.AndroidExtensions.getFormattedText
 import eu.codetopic.utils.R
+import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import kotlinx.android.synthetic.main.item_issue.*
