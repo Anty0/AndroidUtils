@@ -42,10 +42,17 @@ abstract class NotifyChannel(val id: String, val checkForIdOverrides: Boolean) {
                 NotifyClassifier.findAllGroupsFor(channelId)
                         .map { combinedId(it.id, channelId) }
 
+        fun combinedIdsMap(channelId: String): Map<String, String> =
+                NotifyClassifier.findAllGroupsFor(channelId)
+                        .map { it.id.let { it to combinedId(it, channelId) } }
+                        .toMap()
+
         fun NotifyChannel.combinedIdFor(group: NotifyGroup): String =
                 combinedId(group.id, this.id)
 
         fun NotifyChannel.combinedIds(): List<String> = combinedIds(id)
+
+        fun NotifyChannel.combinedIdsMap(): Map<String, String> = combinedIdsMap(id)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

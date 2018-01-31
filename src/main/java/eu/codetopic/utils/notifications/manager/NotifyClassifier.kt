@@ -26,6 +26,7 @@ import eu.codetopic.utils.AndroidExtensions.notificationManager
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel.Companion.combinedIds
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel.Companion.combinedIdFor
+import eu.codetopic.utils.notifications.manager.util.NotifyChannel.Companion.combinedIdsMap
 import eu.codetopic.utils.notifications.manager.util.NotifyGroup
 
 /**
@@ -69,7 +70,7 @@ internal object NotifyClassifier {
         id.assert { it.isValidId() }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        // installation is required only on Oreo+ devices
+        // Installation is required only on Oreo+ devices
 
         if (NotifyManager.isOnNotifyManagerProcess(context)) {
             context.notificationManager.createNotificationChannelGroup(
@@ -82,13 +83,15 @@ internal object NotifyClassifier {
         id.assert { it.isValidId() }
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        // installation is required only on Oreo+ devices
+        // Installation is required only on Oreo+ devices
 
         if (NotifyManager.isOnNotifyManagerProcess(context)) {
             context.notificationManager.createNotificationChannels(
-                    combinedIds().map { id ->
-                        createChannel(context, id)
-                                .assert { it.id == id }
+                    combinedIdsMap().map {
+                        val (groupId, combinedId) = it
+                        createChannel(context, combinedId)
+                                .assert { it.id == combinedId }
+                                .apply { group = groupId }
                     }
             )
         }
@@ -96,7 +99,7 @@ internal object NotifyClassifier {
 
     private fun NotifyGroup.uninstall(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        // nothing to uninstall on versions bellow Oreo
+        // Nothing to uninstall on versions bellow Oreo
 
         if (NotifyManager.isOnNotifyManagerProcess(context)) {
             context.notificationManager.also { nm ->
@@ -113,7 +116,7 @@ internal object NotifyClassifier {
 
     private fun NotifyChannel.uninstall(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
-        // nothing to uninstall on versions bellow Oreo
+        // Nothing to uninstall on versions bellow Oreo
 
         if (NotifyManager.isOnNotifyManagerProcess(context)) {
             context.notificationManager.also {
@@ -165,7 +168,7 @@ internal object NotifyClassifier {
 
         CHANNELS[channel.id] = channel
 
-        // Create channels for all existing channel groups
+        // Create channel  for all existing channel groups
         channel.install(context)
     }
 

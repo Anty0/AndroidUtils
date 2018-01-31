@@ -40,7 +40,7 @@ import android.widget.LinearLayout
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.JavaExtensions.IfTrue
+import eu.codetopic.java.utils.JavaExtensions.ifTrue
 import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
@@ -134,7 +134,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
                 onAccountNavigationItemSelected(it)
             } else {
                 onNavigationItemSelected(it)
-            } IfTrue {
+            } ifTrue {
                 drawer.closeDrawer(GravityCompat.START)
             }
         }
