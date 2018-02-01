@@ -22,6 +22,7 @@ import android.content.Context
 import android.os.Build
 import android.support.annotation.MainThread
 import eu.codetopic.java.utils.debug.DebugAsserts.assert
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidExtensions.notificationManager
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel.Companion.combinedIds
@@ -34,6 +35,8 @@ import eu.codetopic.utils.notifications.manager.util.NotifyGroup
  */
 @MainThread
 internal object NotifyClassifier {
+
+    private const val LOG_TAG = "NotifyClassifier"
 
     private val REGEX_INVALID_OUT_OF_BRACKETS_CHARACTERS = Regex("[, ]")
     private val REGEX_BRACKETS = Regex("[()]")
@@ -74,7 +77,12 @@ internal object NotifyClassifier {
 
         if (NotifyManager.isOnNotifyManagerProcess(context)) {
             context.notificationManager.createNotificationChannelGroup(
-                    createGroup(context).assert { it.id == id }
+                    createGroup(context)
+                            .assert { it.id == id }
+                            .also {
+                                Log.d(LOG_TAG, "NotifyGroup.install(groupId=$id)" +
+                                        " -> (group=$it)")
+                            }
             )
         }
     }
@@ -90,8 +98,13 @@ internal object NotifyClassifier {
                     combinedIdsMap().map {
                         val (groupId, combinedId) = it
                         createChannel(context, combinedId)
-                                .assert { it.id == combinedId }
                                 .apply { group = groupId }
+                                .assert { it.id == combinedId }
+                                .also {
+                                    Log.d(LOG_TAG, "NotifyChannel.install(groupId=$groupId," +
+                                            " channelId=$id, combinedId=$combinedId)" +
+                                            " -> (channel=$it)")
+                                }
                     }
             )
         }
@@ -129,6 +142,32 @@ internal object NotifyClassifier {
         }
     }
 
+    private fun put(context: Context, group: NotifyGroup) {
+        GROUPS[group.id] = group
+
+        // Create group
+        group.install(context)
+
+        // Reinstall channels associated with this group
+        group.channelIds.forEach {
+            // When channel doesn't exist, it's ok.
+            // Because that channel will be probably added in future.
+            CHANNELS[it]?.install(context)
+        }
+    }
+
+    private fun put(context: Context, channel: NotifyChannel) {
+        CHANNELS[channel.id] = channel
+
+        // Create channel  for all existing channel groups
+        channel.install(context)
+
+        // Reinstall groups
+        /*findAllGroupsFor(channel.id).forEach {
+            it.install(context)
+        }*/
+    }
+
     fun validateGroupId(groupId: String): String =
             groupId.takeIf { it in GROUPS }
                     ?: throw IllegalArgumentException("Unknown groupId: '$groupId'")
@@ -149,27 +188,14 @@ internal object NotifyClassifier {
         if (hasGroup(group.id))
             throw IllegalArgumentException("Group with same id exist: '${group.id}'")
 
-        GROUPS[group.id] = group
-
-        // Create group
-        group.install(context)
-
-        // reinitialize group channels
-        group.channelIds.forEach {
-            // When channel doesn't exist, it's ok.
-            // Because that channel will be probably added in future.
-            CHANNELS[it]?.install(context)
-        }
+        put(context, group)
     }
 
     fun install(context: Context, channel: NotifyChannel) {
         if (hasChannel(channel.id))
             throw IllegalArgumentException("Channel with same id exist: '${channel.id}'")
 
-        CHANNELS[channel.id] = channel
-
-        // Create channel  for all existing channel groups
-        channel.install(context)
+        put(context, channel)
     }
 
     fun uninstallGroup(context: Context, groupId: String): NotifyGroup =
@@ -218,15 +244,11 @@ internal object NotifyClassifier {
 
     fun replace(context: Context, group: NotifyGroup) {
         validateGroup(group)
-
-        group.install(context)
-        GROUPS[group.id] = group
+        put(context, group)
     }
 
     fun replace(context: Context, channel: NotifyChannel) {
         validateChannel(channel)
-
-        channel.install(context)
-        CHANNELS[channel.id] = channel
+        put(context, channel)
     }
 }

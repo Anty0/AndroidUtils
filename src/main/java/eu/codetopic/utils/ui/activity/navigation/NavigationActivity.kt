@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.ui.activity.navigation
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -36,6 +37,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 
@@ -44,6 +46,7 @@ import eu.codetopic.java.utils.JavaExtensions.ifTrue
 import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
+import eu.codetopic.utils.simple.SimpleAnimatorListener
 import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
@@ -52,6 +55,8 @@ import kotlinx.android.synthetic.main.activity_navigation_header.*
 import kotlinx.android.synthetic.main.activity_navigation_header.view.*
 import kotlinx.android.synthetic.main.activity_navigation_base.*
 import kotlinx.android.synthetic.main.activity_module_toolbar.*
+import kotlin.math.ceil
+import kotlin.math.floor
 
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 abstract class NavigationActivity : BaseFragmentActivity() {
@@ -104,11 +109,13 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         setContentView(R.layout.activity_navigation_base)
         header = HeaderViews()
 
-        header.boxAccountsSwitch.setOnClickListener { isSwitchingAccounts = !isSwitchingAccounts }
+        header.boxAccountsSwitch.setOnClickListener {
+            isSwitchingAccounts = !isSwitchingAccounts
+        }
         header.butAccountEdit.apply {
             setImageDrawable(
                     getIconics(GoogleMaterial.Icon.gmd_edit)
-                            .actionBar()
+                            .sizeDp(24)
             )
             setOnClickListener { onEditAccountButtonClick(it) }
         }
@@ -116,6 +123,27 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         setNavigationViewAppIconDrawable(AndroidUtils.getActivityIcon(this, componentName))
         setHeaderBackgroundColor(AndroidUtils.getColorFromAttr(this,
                 R.attr.colorPrimaryDark, Color.BLACK))
+
+        header.imgAppIcon.setOnClickListener {
+            it.animate()
+                    .rotation(it.rotation.let { 360F * (ceil(it / 360F) + 1F) })
+                    .setDuration(
+                            it.context.resources
+                                    .getInteger(android.R.integer.config_longAnimTime)
+                                    .toLong()
+                    )
+                    .setInterpolator(DecelerateInterpolator())
+                    .setListener(object : SimpleAnimatorListener() {
+                        override fun onAnimationEnd(animation: Animator?) {
+                            it.rotation = 0F
+                        }
+
+                        override fun onAnimationCancel(animation: Animator?) {
+                            it.rotation = 0F
+                        }
+                    })
+                    .start()
+        }
 
         header.txtAppName.text = AndroidUtils.getAppLabel(this)
 
@@ -202,7 +230,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
                     getIconics(
                             if (switchingAccounts) GoogleMaterial.Icon.gmd_arrow_drop_up
                             else GoogleMaterial.Icon.gmd_arrow_drop_down
-                    ).actionBar()
+                    ).sizeDp(10)
             )
 
             header.boxAppName.visibility = View.GONE

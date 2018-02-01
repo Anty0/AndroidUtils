@@ -55,16 +55,16 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     protected val accessProvider: ISharedPreferencesProvider<SP>
             by lazy { PreferencesProvider() }
 
-    override final var isCreated = false
+    final override var isCreated = false
         private set
 
-    override final var isDestroyed = false
+    final override var isDestroyed = false
         private set
 
-    override final val broadcastActionChanged: String
+    final override val broadcastActionChanged: String
         get() = getBroadcastActionChanged(this)
 
-    override final val name: String?
+    final override val name: String?
         get() = preferencesProvider.name
 
     protected val preferences: SP
@@ -92,14 +92,16 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     protected inline fun edit(block: SharedPreferences.Editor.() -> Unit) = preferences.edit(block)
 
     @Synchronized
-    override final fun init() {
+    final override fun init() {
         if (isCreated) throw IllegalStateException(LOG_TAG + " is still initialized")
         if (isDestroyed) throw IllegalStateException(LOG_TAG + " is destroyed")
         isCreated = true
         try {
             onCreate()
         } catch (t: Throwable) {
-            destroy()
+            try {
+                destroy()
+            } catch (_: Throwable) {}
             throw t
         }
 
@@ -127,12 +129,12 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     }
 
     @Synchronized
-    override final fun destroy() {
+    final override fun destroy() {
         if (!isCreated) throw IllegalStateException(LOG_TAG + " is not initialized")
         if (isDestroyed) throw IllegalStateException(LOG_TAG + " is still destroyed")
+        onDestroy()
         isDestroyed = true
         isCreated = false
-        onDestroy()
     }
 
     protected open fun finalize() {

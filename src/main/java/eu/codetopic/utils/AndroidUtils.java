@@ -150,7 +150,7 @@ public final class AndroidUtils {
     }
 
     @CheckResult
-    public static Bitmap cropBitmap(Bitmap bitmap) {
+    public static Bitmap cropBitmapToSquare(Bitmap bitmap) {
         int width = bitmap.getWidth();
         int height = bitmap.getHeight();
 

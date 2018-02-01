@@ -129,12 +129,30 @@ object NotifyManager {
                     .alsoIf({ isInitialized }) { refresh(context) }
 
     @MainThread
+    fun replaceGroup(context: Context, group: NotifyGroup) =
+            NotifyClassifier.replace(context, group)
+                    .alsoIf({ isInitialized }) { refresh(context) }
+
+    @MainThread
+    fun replaceChannel(context: Context, channel: NotifyChannel) =
+            NotifyClassifier.replace(context, channel)
+                    .alsoIf({ isInitialized }) { refresh(context) }
+
+    @MainThread
     fun installGroups(context: Context, vararg groups: NotifyGroup) =
             groups.forEach { NotifyClassifier.install(context, it) }
 
     @MainThread
     fun installChannels(context: Context, vararg channels: NotifyChannel) =
             channels.forEach { NotifyClassifier.install(context, it) }
+
+    @MainThread
+    fun uninstallGroups(context: Context, vararg groupIds: String) =
+            groupIds.forEach { NotifyClassifier.uninstallGroup(context, it) }
+
+    @MainThread
+    fun uninstallChannels(context: Context, vararg channelIds: String) =
+            channelIds.forEach { NotifyClassifier.uninstallChannel(context, it) }
 
     @MainThread
     fun reinstallGroups(context: Context, vararg groupIds: String) =
@@ -144,6 +162,16 @@ object NotifyManager {
     @MainThread
     fun reinstallChannels(context: Context, vararg channelIds: String) =
             channelIds.forEach { NotifyClassifier.reinstallChannel(context, it) }
+                    .alsoIf({ isInitialized }) { refresh(context) }
+
+    @MainThread
+    fun replaceGroups(context: Context, vararg groups: NotifyGroup) =
+            groups.forEach { NotifyClassifier.replace(context, it) }
+                    .alsoIf({ isInitialized }) { refresh(context) }
+
+    @MainThread
+    fun replaceChannels(context: Context, vararg channels: NotifyChannel) =
+            channels.forEach { NotifyClassifier.replace(context, it) }
                     .alsoIf({ isInitialized }) { refresh(context) }
 
     fun findGroup(groupId: String): NotifyGroup =
