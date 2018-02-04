@@ -153,7 +153,10 @@ object AndroidExtensions {
         get() = AccountManager.get(this)
 
     val Context.baseActivity: Activity?
-        get() = this as? Activity ?: (this as? ContextWrapper)?.baseContext?.baseActivity
+        get() = internalGetBaseActivity()
+
+    private tailrec fun Context.internalGetBaseActivity(): Activity? =
+            this as? Activity ?: (this as? ContextWrapper)?.baseContext?.internalGetBaseActivity()
 
     suspend fun Context.sendSuspendOrderedBroadcast(intent: Intent,
                                                     initialResult: OrderedBroadcastResult = OrderedBroadcastResult(),

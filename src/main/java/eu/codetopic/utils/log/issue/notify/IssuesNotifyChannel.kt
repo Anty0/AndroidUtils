@@ -21,6 +21,7 @@ package eu.codetopic.utils.log.issue.notify
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
@@ -93,7 +94,10 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
 
     override fun handleSummaryContentIntent(context: Context, group: NotifyGroup,
                                             notifyId: NotifyId, data: Map<NotifyId, Bundle>) {
-        IssuesActivity.start(context)
+        context.startActivity(
+                IssuesActivity.getIntent(context)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
     }
 
     private fun buildNotificationBase(context: Context,

@@ -52,11 +52,9 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
 
         private const val LOG_TAG = "IssuesActivity"
 
-        fun start(context: Context) {
-            context.startActivity(
-                    Intent(context, IssuesActivity::class.java)
-            )
-        }
+        fun getIntent(context: Context): Intent =
+                Intent(context, IssuesActivity::class.java)
+
     }
 
     private var adapter: CustomItemAdapter<IssueItem>? = null
