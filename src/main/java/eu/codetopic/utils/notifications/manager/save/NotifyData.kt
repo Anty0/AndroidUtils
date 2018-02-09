@@ -28,10 +28,9 @@ import eu.codetopic.java.utils.JavaExtensions.letIf
 import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.PrefNames
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.data.preferences.PreferencesData
-import eu.codetopic.utils.data.preferences.preference.KotlinSerializedPreference
+import eu.codetopic.utils.data.preferences.preference.KSerializedPreference
 import eu.codetopic.utils.data.preferences.provider.ContentProviderPreferencesProvider
 import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
 import eu.codetopic.utils.data.preferences.support.PreferencesCompanionObject
@@ -67,17 +66,17 @@ internal class NotifyData private constructor(context: Context) :
         }
     }
 
-    private var notifyMapSave: Map<CommonPersistentNotifyId, SerializableBundleWrapper>
-            by KotlinSerializedPreference<Map<CommonPersistentNotifyId, SerializableBundleWrapper>>(
+    private var notifyMapSave: Map<CommonPersistentNotifyId, Bundle>
+            by KSerializedPreference<Map<CommonPersistentNotifyId, Bundle>>(
                     PrefNames.NOTIFICATIONS_MAP,
-                    (kSerializer<CommonPersistentNotifyId>() to kSerializer<SerializableBundleWrapper>()).map,
+                    (kSerializer<CommonPersistentNotifyId>() to BundleSerializer).map,
                     accessProvider,
                     { emptyMap() }
             )
 
     private val notifyMapCache by lazy { notifyMapSave.toMutableMap() }
 
-    private val notifyMap: MutableMap<CommonPersistentNotifyId, SerializableBundleWrapper>
+    private val notifyMap: MutableMap<CommonPersistentNotifyId, Bundle>
         get() =
             if (NotifyManager.isInitialized) notifyMapCache
             else notifyMapSave.toMutableMap()
@@ -90,37 +89,38 @@ internal class NotifyData private constructor(context: Context) :
     fun remove(id: NotifyId): Bundle? {
         NotifyManager.assertInitialized(context)
         return id.let { it as? CommonPersistentNotifyId }?.let {
-            notifyMap.remove(it)?.bundle?.also { notifyMapSave() }
+            notifyMap.remove(it)?.also { notifyMapSave() }
         }
     }
 
-    fun removeAll(ids: Collection<NotifyId>): Map<NotifyId, Bundle> {
+    fun removeAll(ids: Collection<NotifyId>): Map<out NotifyId, Bundle> {
         NotifyManager.assertInitialized(context)
 
         if (ids.isEmpty()) return emptyMap()
 
-        return ids.mapNotNull { id ->
-            id.let { it as? CommonPersistentNotifyId }?.let { pId ->
-                notifyMap.remove(pId)?.bundle?.let { pId to it }
-            }
-        }.toMap<NotifyId, Bundle>().alsoIf({ it.isNotEmpty() }) { notifyMapSave() }
+        return ids
+                .mapNotNull { id ->
+                    id.let { it as? CommonPersistentNotifyId }?.let { pId ->
+                        notifyMap.remove(pId)?.let { pId to it }
+                    }
+                }
+                .toMap<NotifyId, Bundle>()
+                .alsoIf({ it.isNotEmpty() }) { notifyMapSave() }
     }
 
-    fun removeAll(groupId: String? = null, channelId: String? = null): Map<NotifyId, Bundle> {
+    fun removeAll(groupId: String? = null, channelId: String? = null): Map<out NotifyId, Bundle> {
         NotifyManager.assertInitialized(context)
         return notifyMap
                 .letIf({ groupId != null }) { it.filter { it.key.idGroup == groupId } }
                 .letIf({ channelId != null }) { it.filter { it.key.idChannel == channelId } }
                 .onEach { notifyMap.remove(it.key) }
-                .map { it.key to it.value.bundle }.toMap<NotifyId, Bundle>()
                 .alsoIf({ it.isNotEmpty() }) { notifyMapSave() }
     }
 
-    fun removeAll(): Map<NotifyId, Bundle> {
+    fun removeAll(): Map<out NotifyId, Bundle> {
         NotifyManager.assertInitialized(context)
         return notifyMap.toMap()
                 .onEach { notifyMap.remove(it.key) }
-                .map { it.key to it.value.bundle }.toMap<NotifyId, Bundle>()
                 .alsoIf({ it.isNotEmpty() }) { notifyMapSave() }
     }
 
@@ -137,11 +137,11 @@ internal class NotifyData private constructor(context: Context) :
                     " -> Id generated for notification still exists in current context.")
         }
 
-        notifyMap[notifyId] = data.asSerializable()
+        notifyMap[notifyId] = data
         notifyMapSave()
     }
 
-    fun addAll(map: Map<NotifyId, Bundle>) {
+    fun addAll(map: Map<out NotifyId, Bundle>) {
         NotifyManager.assertInitialized(context)
 
         if (map.isEmpty()) return
@@ -160,25 +160,25 @@ internal class NotifyData private constructor(context: Context) :
         map.forEach {
             val (notifyId, data) = it
             if (notifyId is CommonPersistentNotifyId)
-                notifyMap[notifyId] = data.asSerializable()
+                notifyMap[notifyId] = data
         }
         notifyMapSave()
     }
 
     operator fun get(notifyId: NotifyId): Bundle? {
         if (notifyId !is CommonPersistentNotifyId) return null
-        return notifyMap[notifyId]?.bundle
+        return notifyMap[notifyId]
     }
 
-    fun getAll(): Map<NotifyId, Bundle> =
-            notifyMap.map { it.key to it.value.bundle }.toMap()
+    fun getAll(): Map<out NotifyId, Bundle> =
+            notifyMap.toMap()
 
     fun getAll(groupId: String? = null,
-                        channelId: String? = null): Map<NotifyId, Bundle> {
+                        channelId: String? = null): Map<out NotifyId, Bundle> {
         return notifyMap
                 .letIf({ groupId != null }) { it.filter { it.key.idGroup == groupId } }
                 .letIf({ channelId != null }) { it.filter { it.key.idChannel == channelId } }
-                .map { it.key to it.value.bundle }.toMap()
+                .toMap()
     }
 
     operator fun contains(id: NotifyId): Boolean = id in notifyMap

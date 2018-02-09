@@ -66,6 +66,11 @@ public abstract class SwipeLayoutInflater<T extends SwipeLayoutInflater<T, E>, E
         return self();
     }
 
+    public T withoutSwipeToRefresh() {
+        setUseSwipeRefresh(false);
+        return self();
+    }
+
     protected boolean isUseSwipeRefresh() {
         return mUseSwipeToRefresh;
     }
@@ -76,6 +81,11 @@ public abstract class SwipeLayoutInflater<T extends SwipeLayoutInflater<T, E>, E
 
     public T withFloatingActionButton() {
         setUseFloatingActionButton(true);
+        return self();
+    }
+
+    public T withoutFloatingActionButton() {
+        setUseFloatingActionButton(false);
         return self();
     }
 

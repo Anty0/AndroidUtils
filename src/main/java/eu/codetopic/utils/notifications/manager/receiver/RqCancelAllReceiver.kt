@@ -21,17 +21,15 @@ package eu.codetopic.utils.notifications.manager.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import eu.codetopic.java.utils.JavaExtensions
+import eu.codetopic.java.utils.JavaExtensions.kSerializer
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
-import kotlinx.serialization.internal.PairSerializer
-import kotlinx.serialization.internal.StringSerializer
+import eu.codetopic.utils.notifications.manager.data.NotifyId
+import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import kotlinx.serialization.json.JSON
-import kotlinx.serialization.list
+import kotlinx.serialization.map
 import org.jetbrains.anko.bundleOf
 
 /**
@@ -46,11 +44,7 @@ class RqCancelAllReceiver : BroadcastReceiver() {
         private const val EXTRA_GROUP_ID = "$NAME.GROUP_ID"
         private const val EXTRA_CHANNEL_ID = "$NAME.CHANNEL_ID"
 
-        internal val RESULT_SERIALIZER =
-                PairSerializer<String, SerializableBundleWrapper>(
-                        StringSerializer,
-                        JavaExtensions.kSerializer()
-                ).list
+        internal val RESULT_SERIALIZER = (NotifyIdSerializer to BundleSerializer).map
 
         internal fun getStartIntent(context: Context, groupId: String? = null,
                                     channelId: String? = null): Intent =
@@ -72,9 +66,7 @@ class RqCancelAllReceiver : BroadcastReceiver() {
                 setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
                         NotifyManager.REQUEST_EXTRA_RESULT to JSON.stringify(
                                 RESULT_SERIALIZER,
-                                result.map {
-                                    it.key.stringify() to it.value.asSerializable()
-                                }
+                                result.toMap()
                         )
                 ))
             }

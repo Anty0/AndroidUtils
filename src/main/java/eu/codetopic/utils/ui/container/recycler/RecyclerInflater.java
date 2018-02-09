@@ -23,6 +23,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,6 +38,8 @@ public abstract class RecyclerInflater<T extends RecyclerInflater<T, E>, E exten
     private static final String LOG_TAG = "RecyclerInflater";
     @LayoutRes private int mRecyclerLayoutResId = DEFAULT_RECYCLER_LAYOUT_ID;
     @IdRes private int mContentId = DEFAULT_CONTENT_VIEW_ID;
+    private RecyclerView.LayoutManager mLayoutManager = null;
+    private boolean mUseItemDivider = false;
 
     protected RecyclerInflater() {
     }
@@ -65,6 +68,37 @@ public abstract class RecyclerInflater<T extends RecyclerInflater<T, E>, E exten
 
     protected void setRecyclerContentId(@IdRes int recyclerContentId) {
         this.mContentId = recyclerContentId;
+    }
+
+    public T withLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        setLayoutManager(layoutManager);
+        return self();
+    }
+
+    public RecyclerView.LayoutManager getLayoutManager() {
+        return mLayoutManager;
+    }
+
+    public void setLayoutManager(RecyclerView.LayoutManager layoutManager) {
+        this.mLayoutManager = layoutManager;
+    }
+
+    public T withItemDivider() {
+        setUseItemDivider(true);
+        return self();
+    }
+
+    public T withoutItemDivider() {
+        setUseItemDivider(false);
+        return self();
+    }
+
+    public boolean isUseItemDivider() {
+        return mUseItemDivider;
+    }
+
+    public void setUseItemDivider(boolean useItemDivider) {
+        this.mUseItemDivider = useItemDivider;
     }
 
     protected View addRecyclerViewTo(@NonNull LayoutInflater inflater, View view) {

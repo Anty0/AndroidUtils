@@ -25,6 +25,7 @@ import eu.codetopic.utils.notifications.manager.NotifyClassifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel
 import eu.codetopic.utils.notifications.manager.util.NotifyGroup
+import kotlinx.serialization.*
 import kotlinx.serialization.internal.PairSerializer
 import kotlinx.serialization.internal.StringSerializer
 import kotlinx.serialization.json.JSON
@@ -32,35 +33,11 @@ import kotlinx.serialization.json.JSON
 /**
  * @author anty
  */
+
+// FIXME: This class should be sealed, but making it sealed causes problems with serialization... Why??
 abstract class NotifyId {
 
     companion object {
-
-        private const val TYPE_COMMON = "COMMON"
-        private const val TYPE_COMMON_PERSISTENT = "COMMON_PERSISTENT"
-        private const val TYPE_SUMMARY = "SUMMARY"
-
-        fun NotifyId.stringify(): String = JSON.stringify(
-                PairSerializer(StringSerializer, StringSerializer),
-                when (this) {
-                    is CommonNotifyId -> TYPE_COMMON to JSON.stringify(this)
-                    is CommonPersistentNotifyId -> TYPE_COMMON_PERSISTENT to JSON.stringify(this)
-                    is SummaryNotifyId -> TYPE_SUMMARY to JSON.stringify(this)
-                    else -> throw IllegalArgumentException("Unknown notifyId type: ${this::class}")
-                }
-        )
-
-        fun parse(str: String): NotifyId = JSON.parse(
-                PairSerializer(StringSerializer, StringSerializer), str)
-                .let {
-                    when (it.first) {
-                        TYPE_COMMON -> JSON.parse<CommonNotifyId>(it.second)
-                        TYPE_COMMON_PERSISTENT ->
-                            JSON.parse<CommonPersistentNotifyId>(it.second)
-                        TYPE_SUMMARY -> JSON.parse<SummaryNotifyId>(it.second)
-                        else -> throw IllegalArgumentException("Unknown notifyId type: ${it.first}")
-                    }
-                }
 
         val NotifyId.group: NotifyGroup
             get() = NotifyClassifier.findGroup(idGroup)
@@ -129,4 +106,101 @@ abstract class NotifyId {
             "NotifyId(isSummary=$isSummary, idGroup='$idGroup', idChannel='$idChannel'," +
                     " idNotify=$idNotify, isPersistent=$isPersistent," +
                     " isRefreshable=$isRefreshable, timeWhen=$timeWhen)"
+}
+
+@Serializer(forClass = NotifyId::class)
+object NotifyIdSerializer : KSerializer<NotifyId> { // TODO: Better way to serialize NotifyId
+
+    private const val TYPE_COMMON = "COMMON"
+    private const val TYPE_COMMON_PERSISTENT = "COMMON_PERSISTENT"
+    private const val TYPE_SUMMARY = "SUMMARY"
+
+    private val serializer =
+            PairSerializer(StringSerializer, StringSerializer)
+
+    override val serialClassDesc: KSerialClassDesc
+        get() = serializer.serialClassDesc
+
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
+    override fun save(output: KOutput, obj: NotifyId) = serializer.save(
+            output,
+            when (obj) {
+                is CommonNotifyId -> TYPE_COMMON to JSON.stringify(obj)
+                is CommonPersistentNotifyId -> TYPE_COMMON_PERSISTENT to JSON.stringify(obj)
+                is SummaryNotifyId -> TYPE_SUMMARY to JSON.stringify(obj)
+                else -> throw IllegalArgumentException("Unknown notifyId type: ${obj::class}")
+            }
+    )
+
+    override fun load(input: KInput): NotifyId = serializer.load(input).let {
+        when (it.first) {
+            TYPE_COMMON -> JSON.parse<CommonNotifyId>(it.second)
+            TYPE_COMMON_PERSISTENT ->
+                JSON.parse<CommonPersistentNotifyId>(it.second)
+            TYPE_SUMMARY -> JSON.parse<SummaryNotifyId>(it.second)
+            else -> throw IllegalArgumentException("Unknown notifyId type: ${it.first}")
+        }
+    }
+}
+
+@Serializable
+internal class CommonNotifyId(override val idGroup: String,
+                              override val idChannel: String,
+                              override val idNotify: Int,
+                              override val timeWhen: Long = System.currentTimeMillis()) : NotifyId() {
+
+    @Transient
+    override val isSummary: Boolean
+        get() = false
+
+    @Transient
+    override val isPersistent: Boolean
+        get() = false
+
+    @Transient
+    override val isRefreshable: Boolean
+        get() = false
+}
+
+@Serializable
+internal class CommonPersistentNotifyId(override val idGroup: String,
+                                        override val idChannel: String,
+                                        override val idNotify: Int,
+                                        override val timeWhen: Long = System.currentTimeMillis(),
+                                        override val isRefreshable: Boolean = true) : NotifyId() {
+
+    @Transient
+    override val isSummary: Boolean
+        get() = false
+
+    @Transient
+    override val isPersistent: Boolean
+        get() = true
+}
+
+@Serializable
+internal class SummaryNotifyId(override val idGroup: String,
+                               override val idChannel: String,
+                               override val timeWhen: Long = System.currentTimeMillis()) : NotifyId() {
+
+    companion object {
+
+        private const val SUMMARY_NOTIFICATION_ID = 1
+    }
+
+    @Transient
+    override val idNotify: Int
+        get() = SUMMARY_NOTIFICATION_ID
+
+    @Transient
+    override val isSummary: Boolean
+        get() = true
+
+    @Transient
+    override val isPersistent: Boolean
+        get() = false
+
+    @Transient
+    override val isRefreshable: Boolean
+        get() = false
 }

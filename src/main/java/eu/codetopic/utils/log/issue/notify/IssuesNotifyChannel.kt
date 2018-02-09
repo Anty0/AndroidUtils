@@ -93,7 +93,7 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
     }
 
     override fun handleSummaryContentIntent(context: Context, group: NotifyGroup,
-                                            notifyId: NotifyId, data: Map<NotifyId, Bundle>) {
+                                            notifyId: NotifyId, data: Map<out NotifyId, Bundle>) {
         context.startActivity(
                 IssuesActivity.getIntent(context)
                         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -156,7 +156,7 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
             }
 
     override fun createSummaryNotification(context: Context, group: NotifyGroup,
-                                           notifyId: NotifyId, data: Map<NotifyId, Bundle>): NotificationCompat.Builder {
+                                           notifyId: NotifyId, data: Map<out NotifyId, Bundle>): NotificationCompat.Builder {
         val allIssues = data.values.mapNotNull {
             readData(it).alsoIfNull {
                 Log.w(LOG_TAG, "Data doesn't contains issue")

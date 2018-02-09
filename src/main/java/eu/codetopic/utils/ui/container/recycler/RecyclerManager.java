@@ -20,6 +20,7 @@ package eu.codetopic.utils.ui.container.recycler;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -43,11 +44,24 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
     private ItemTouchHelper mLastTouchHelper = null;
 
     protected RecyclerManager(@NonNull View mainView, @Nullable int[] swipeSchemeColors,
-                              boolean useSwipeRefresh, boolean useFloatingActionButton) {
+                              boolean useSwipeRefresh, boolean useFloatingActionButton,
+                              RecyclerView.LayoutManager layoutManager, boolean useItemDivider) {
         super(mainView, swipeSchemeColors, useSwipeRefresh, useFloatingActionButton);
+
+        if (layoutManager == null) layoutManager = new LinearLayoutManager(getContext());
+
         mRecyclerView = mainView.findViewById(R.id.recyclerView);
         mRecyclerView.setEmptyView(mainView.findViewById(R.id.empty_view));
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        mRecyclerView.setLayoutManager(layoutManager);
+
+        if (useItemDivider && layoutManager instanceof LinearLayoutManager) {
+            mRecyclerView.addItemDecoration(
+                    new DividerItemDecoration(
+                            getContext(),
+                            ((LinearLayoutManager) layoutManager).getOrientation()
+                    )
+            );
+        }
     }
 
     public RecyclerView getRecyclerView() {
@@ -69,11 +83,6 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
 
     public synchronized T setAdapter(RecyclerView.Adapter<?> adapter) {
         getRecyclerView().setAdapter(adapter);
-        return self();
-    }
-
-    public synchronized T setLayoutManager(RecyclerView.LayoutManager layoutManager) {
-        getRecyclerView().setLayoutManager(layoutManager);
         return self();
     }
 

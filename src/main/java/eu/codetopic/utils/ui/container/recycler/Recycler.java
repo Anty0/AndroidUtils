@@ -20,6 +20,7 @@ package eu.codetopic.utils.ui.container.recycler;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
 public class Recycler {
@@ -44,16 +45,21 @@ public class Recycler {
         @Override
         protected RecyclerManagerImpl getManagerInstance(View view) {
             return new RecyclerManagerImpl(view, getSchemeColors(),
-                    isUseSwipeRefresh(), isUseFloatingActionButton());
+                    isUseSwipeRefresh(), isUseFloatingActionButton(),
+                    getLayoutManager(), isUseItemDivider());
         }
     }
 
     public static final class RecyclerManagerImpl extends RecyclerManager<RecyclerManagerImpl> {
 
-        protected RecyclerManagerImpl(@NonNull View mainView, @Nullable int[] swipeSchemeColors,
-                                      boolean useSwipeRefresh, boolean useFloatingActionButton) {
+        private RecyclerManagerImpl(@NonNull View mainView, @Nullable int[] swipeSchemeColors,
+                                    boolean useSwipeRefresh, boolean useFloatingActionButton,
+                                    RecyclerView.LayoutManager layoutManager,
+                                    boolean useItemDivider) {
 
-            super(mainView, swipeSchemeColors, useSwipeRefresh, useFloatingActionButton);
+            super(mainView, swipeSchemeColors,
+                    useSwipeRefresh, useFloatingActionButton,
+                    layoutManager, useItemDivider);
         }
 
         @Override

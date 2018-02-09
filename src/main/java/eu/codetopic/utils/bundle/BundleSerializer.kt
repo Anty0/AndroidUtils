@@ -16,26 +16,24 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.notifications.manager.data
+package eu.codetopic.utils.bundle
 
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
+import android.os.Bundle
+import eu.codetopic.utils.AndroidExtensions.deserializeBundle
+import eu.codetopic.utils.AndroidExtensions.serialize
+import kotlinx.serialization.*
+import kotlinx.serialization.internal.SerialClassDescImpl
 
 /**
  * @author anty
  */
-@Serializable
-internal class CommonPersistentNotifyId(override val idGroup: String,
-                                        override val idChannel: String,
-                                        override val idNotify: Int,
-                                        override val timeWhen: Long = System.currentTimeMillis(),
-                                        override val isRefreshable: Boolean = true) : NotifyId() {
+@Serializer(forClass = Bundle::class)
+object
+BundleSerializer : KSerializer<Bundle> {
 
-    @Transient
-    override val isSummary: Boolean
-        get() = false
+    override val serialClassDesc: KSerialClassDesc = SerialClassDescImpl("android.os.Bundle")
 
-    @Transient
-    override val isPersistent: Boolean
-        get() = true
+    override fun save(output: KOutput, obj: Bundle) = output.writeStringValue(obj.serialize())
+
+    override fun load(input: KInput): Bundle = deserializeBundle(input.readStringValue())
 }

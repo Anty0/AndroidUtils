@@ -23,10 +23,9 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.AndroidExtensions.putKotlinSerializableExtra
-import eu.codetopic.utils.AndroidExtensions.getKotlinSerializableExtra
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
+import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.*
 import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
@@ -49,17 +48,17 @@ class CommonNotifyDeleteReceiver : BroadcastReceiver() {
 
         internal fun getIntent(context: Context, notifyId: CommonNotifyId, data: Bundle): Intent =
                 Intent(context, CommonNotifyDeleteReceiver::class.java)
-                        .putKotlinSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
-                        .putKotlinSerializableExtra(EXTRA_NOTIFY_DATA, data.asSerializable())
+                        .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
+                        .putKSerializableExtra(EXTRA_NOTIFY_DATA, data, BundleSerializer)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
             NotifyManager.assertInitialized(context)
 
-            val notifyId = intent.getKotlinSerializableExtra<CommonNotifyId>(EXTRA_NOTIFY_ID)
+            val notifyId = intent.getKSerializableExtra<CommonNotifyId>(EXTRA_NOTIFY_ID)
                     ?: throw IllegalArgumentException("No notification id received by intent")
-            val data = intent.getKotlinSerializableExtra<SerializableBundleWrapper>(EXTRA_NOTIFY_DATA)?.bundle
+            val data = intent.getKSerializableExtra(EXTRA_NOTIFY_DATA, BundleSerializer)
                     ?: throw IllegalArgumentException("No notification data received by intent")
 
             val group = notifyId.group

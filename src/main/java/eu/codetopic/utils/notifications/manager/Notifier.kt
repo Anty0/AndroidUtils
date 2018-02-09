@@ -52,6 +52,7 @@ internal object Notifier {
 
     private const val LOG_TAG = "Notifier"
 
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     private fun NotifyId.launchIntent(context: Context, data: Bundle): PendingIntent =
             when (this) {
                 is CommonNotifyId -> PendingIntent.getBroadcast(
@@ -75,6 +76,7 @@ internal object Notifier {
                 else -> throw IllegalArgumentException("Unknown notifyId: ${this::class}")
             }
 
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     private fun NotifyId.deleteIntent(context: Context, data: Bundle): PendingIntent =
             when (this) {
                 is CommonNotifyId -> PendingIntent.getBroadcast(
@@ -120,7 +122,7 @@ internal object Notifier {
     }
 
     private fun NotifyId.buildSummaryNotification(context: Context,
-                                                  data: Map<NotifyId, Bundle>): Notification {
+                                                  data: Map<out NotifyId, Bundle>): Notification {
         val channel = channel as? SummarizedNotifyChannel
                 ?: throw IllegalArgumentException("Can't build summary notification:" +
                         " Channel is not SummarizedNotifyChannel")
@@ -173,7 +175,7 @@ internal object Notifier {
 
     private fun SummaryNotifyId.showSummaryNotification(context: Context,
                                                  notifier: NotificationManagerCompat,
-                                                 data: Map<NotifyId, Bundle>) =
+                                                 data: Map<out NotifyId, Bundle>) =
             try {
                 buildSummaryNotification(context, data).show(notifier, this)
             } catch (e: Exception) {
@@ -182,7 +184,7 @@ internal object Notifier {
             }
 
     private fun SummaryNotifyId.showSummaryNotification(context: Context,
-                                                        data: Map<NotifyId, Bundle>) =
+                                                        data: Map<out NotifyId, Bundle>) =
             try {
                 buildSummaryNotification(context, data).show(context, this)
             } catch (e: Exception) {
@@ -198,8 +200,9 @@ internal object Notifier {
             val groupId = group.id
             val groupNotifyMap = notifyMap.filter { it.key.idGroup == groupId }
             group.channelIds.forEach forChannels@ { channelId ->
-                val channel = NotifyClassifier.findChannel(channelId) as? SummarizedNotifyChannel
+                NotifyClassifier.findChannel(channelId) as? SummarizedNotifyChannel
                         ?: return@forChannels
+
                 val channelNotifyMap = groupNotifyMap
                         .filter { it.key.idChannel == channelId }
                         .takeIf { it.isNotEmpty() }
@@ -265,7 +268,7 @@ internal object Notifier {
         )
     }
 
-    fun cleanup(context: Context): Map<NotifyId, Bundle> {
+    fun cleanup(context: Context): Map<out NotifyId, Bundle> {
         NotifyManager.assertInitialized(context)
 
         return cancelAll(
@@ -290,7 +293,7 @@ internal object Notifier {
         return notifyId
     }
 
-    fun notifyAll(context: Context, builder: MultiNotificationBuilder): Map<NotifyId, Bundle> {
+    fun notifyAll(context: Context, builder: MultiNotificationBuilder): Map<out NotifyId, Bundle> {
         NotifyManager.assertInitialized(context)
 
         val notifier = NotificationManagerCompat.from(context)
@@ -333,7 +336,7 @@ internal object Notifier {
         return data
     }
 
-    fun cancelAll(context: Context, notifyIds: Collection<NotifyId>): Map<NotifyId, Bundle> {
+    fun cancelAll(context: Context, notifyIds: Collection<NotifyId>): Map<out NotifyId, Bundle> {
         NotifyManager.assertInitialized(context)
 
         val notifier = NotificationManagerCompat.from(context)
@@ -358,7 +361,7 @@ internal object Notifier {
     }
 
     fun cancelAll(context: Context, groupId: String? = null,
-                  channelId: String? = null): Map<NotifyId, Bundle> {
+                  channelId: String? = null): Map<out NotifyId, Bundle> {
         NotifyManager.assertInitialized(context)
 
         val notifier = NotificationManagerCompat.from(context)

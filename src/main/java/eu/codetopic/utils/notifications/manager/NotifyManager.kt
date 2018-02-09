@@ -27,10 +27,9 @@ import eu.codetopic.utils.notifications.manager.util.NotifyGroup
 import eu.codetopic.java.utils.JavaExtensions.alsoIf
 import eu.codetopic.utils.AndroidExtensions.OrderedBroadcastResult
 import eu.codetopic.utils.AndroidExtensions.sendSuspendOrderedBroadcast
-import eu.codetopic.utils.AndroidExtensions.getKotlinSerializable
+import eu.codetopic.utils.AndroidExtensions.getKSerializable
 import eu.codetopic.utils.UtilsBase
 import eu.codetopic.utils.UtilsBase.processNameNotifyManager
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
 import eu.codetopic.utils.notifications.manager.data.NotifyId
@@ -92,10 +91,13 @@ object NotifyManager {
 
         if (isInitialized) {
             cleanup(context)
-            refresh(context)
-        } else {
-            requestRefresh(context, optimise = false)
         }
+
+        // Don't refresh right now, only request it.
+        // Refreshing right now can cause notifications,
+        //  that was deleted by user to show and hide again,
+        //  because their deletion will be processed after initialization of NotifyManager.
+        requestRefresh(context, optimise = false)
     }
 
     //--------------------------------------------------------------------------
@@ -199,7 +201,7 @@ object NotifyManager {
             Notifier.notify(context, builder)
 
     @MainThread
-    fun notifyAll(context: Context, builder: MultiNotificationBuilder): Map<NotifyId, Bundle> =
+    fun notifyAll(context: Context, builder: MultiNotificationBuilder): Map<out NotifyId, Bundle> =
             Notifier.notifyAll(context, builder)
 
     @MainThread
@@ -207,11 +209,11 @@ object NotifyManager {
             Notifier.cancel(context, notifyId)
 
     @MainThread
-    fun cancelAll(context: Context, vararg notifyIds: NotifyId): Map<NotifyId, Bundle> =
+    fun cancelAll(context: Context, vararg notifyIds: NotifyId): Map<out NotifyId, Bundle> =
             Notifier.cancelAll(context, notifyIds.asList())
 
     @MainThread
-    fun cancelAll(context: Context, notifyIds: Collection<NotifyId>): Map<NotifyId, Bundle> =
+    fun cancelAll(context: Context, notifyIds: Collection<NotifyId>): Map<out NotifyId, Bundle> =
             Notifier.cancelAll(context, notifyIds)
 
     @MainThread
@@ -226,7 +228,7 @@ object NotifyManager {
     }
 
     @MainThread
-    fun getAllData(groupId: String? = null, channelId: String? = null): Map<NotifyId, Bundle> {
+    fun getAllData(groupId: String? = null, channelId: String? = null): Map<out NotifyId, Bundle> {
         assertUsable()
         return NotifyData.instance.getAll(groupId, channelId)
     }
@@ -341,14 +343,14 @@ object NotifyManager {
                 name = "RqNotifyReceiver",
                 intent = RqNotifyReceiver.getStartIntent(context, builder),
                 resultExtractor = {
-                    it.extras?.getString(REQUEST_EXTRA_RESULT)?.let { NotifyId.parse(it) }
+                    it.extras?.getKSerializable<NotifyId>(REQUEST_EXTRA_RESULT)
                 }
         )
     }
 
     @MainThread
     suspend fun requestSuspendNotifyAll(context: Context, builder: MultiNotificationBuilder,
-                                        optimise: Boolean = true): Map<NotifyId, Bundle> {
+                                        optimise: Boolean = true): Map<out NotifyId, Bundle> {
         assertUsable()
         return if (optimise && isInitialized) notifyAll(context, builder)
         else sendSuspendRequestNotNull(
@@ -357,14 +359,10 @@ object NotifyManager {
                 intent = RqNotifyAllReceiver.getStartIntent(context, builder),
                 resultExtractor = {
                     it.extras
-                            ?.getKotlinSerializable(
-                                    name = REQUEST_EXTRA_RESULT,
+                            ?.getKSerializable(
+                                    key = REQUEST_EXTRA_RESULT,
                                     loader = RqNotifyAllReceiver.RESULT_SERIALIZER
                             )
-                            ?.map {
-                                NotifyId.parse(it.first) to it.second.bundle
-                            }
-                            ?.toMap()
                 }
         )
     }
@@ -379,21 +377,19 @@ object NotifyManager {
                 name = "RqCancelReceiver",
                 intent = RqCancelReceiver.getStartIntent(context, notifyId),
                 resultExtractor = {
-                    it.extras?.getKotlinSerializable<SerializableBundleWrapper>(
-                            name = REQUEST_EXTRA_RESULT
-                    )?.bundle
+                    it.extras?.getBundle(REQUEST_EXTRA_RESULT)
                 }
         )
     }
 
     @MainThread
     suspend fun requestSuspendCancelAll(context: Context, vararg notifyIds: NotifyId,
-                                        optimise: Boolean = true): Map<NotifyId, Bundle> =
+                                        optimise: Boolean = true): Map<out NotifyId, Bundle> =
             requestSuspendCancelAll(context, notifyIds.asList(), optimise)
 
     @MainThread
     suspend fun requestSuspendCancelAll(context: Context, notifyIds: Collection<NotifyId>,
-                                        optimise: Boolean = true): Map<NotifyId, Bundle> {
+                                        optimise: Boolean = true): Map<out NotifyId, Bundle> {
         assertUsable()
         return if (optimise && isInitialized) cancelAll(context, notifyIds)
         else sendSuspendRequestNotNull(
@@ -402,21 +398,17 @@ object NotifyManager {
                 intent = RqCancelAllIdsReceiver.getStartIntent(context, notifyIds),
                 resultExtractor = {
                     it.extras
-                            ?.getKotlinSerializable(
-                                    name = REQUEST_EXTRA_RESULT,
+                            ?.getKSerializable(
+                                    key = REQUEST_EXTRA_RESULT,
                                     loader = RqCancelAllIdsReceiver.RESULT_SERIALIZER
                             )
-                            ?.map {
-                                NotifyId.parse(it.first) to it.second.bundle
-                            }
-                            ?.toMap()
                 }
         )
     }
 
     @MainThread
     suspend fun requestSuspendCancelAll(context: Context, groupId: String? = null,
-                                        channelId: String? = null, optimise: Boolean = true): Map<NotifyId, Bundle> {
+                                        channelId: String? = null, optimise: Boolean = true): Map<out NotifyId, Bundle> {
         assertUsable()
         return if (optimise && isInitialized) cancelAll(context, groupId, channelId)
         else sendSuspendRequestNotNull(
@@ -425,14 +417,10 @@ object NotifyManager {
                 intent = RqCancelAllReceiver.getStartIntent(context, groupId, channelId),
                 resultExtractor = {
                     it.extras
-                            ?.getKotlinSerializable(
-                                    name = REQUEST_EXTRA_RESULT,
+                            ?.getKSerializable(
+                                    key = REQUEST_EXTRA_RESULT,
                                     loader = RqCancelAllReceiver.RESULT_SERIALIZER
                             )
-                            ?.map {
-                                NotifyId.parse(it.first) to it.second.bundle
-                            }
-                            ?.toMap()
                 }
         )
     }

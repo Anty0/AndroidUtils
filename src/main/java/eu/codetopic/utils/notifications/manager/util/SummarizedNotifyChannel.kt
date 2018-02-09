@@ -30,11 +30,11 @@ abstract class SummarizedNotifyChannel(id: String, checkForIdOverrides: Boolean)
         NotifyChannel(id, checkForIdOverrides) {
 
     abstract fun createSummaryNotification(context: Context, group: NotifyGroup, notifyId: NotifyId,
-                                           data: Map<NotifyId, Bundle>): NotificationCompat.Builder
+                                           data: Map<out NotifyId, Bundle>): NotificationCompat.Builder
 
     open fun handleSummaryContentIntent(context: Context, group: NotifyGroup, notifyId: NotifyId,
-                                        data: Map<NotifyId, Bundle>) {}
+                                        data: Map<out NotifyId, Bundle>) {}
 
     open fun handleSummaryDeleteIntent(context: Context, group: NotifyGroup, notifyId: NotifyId,
-                                       data: Map<NotifyId, Bundle>) {}
+                                       data: Map<out NotifyId, Bundle>) {}
 }

@@ -65,20 +65,12 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
 
         adapter = CustomItemAdapter(this)
 
-        recyclerManager = Recycler.inflate().withSwipeToRefresh().on(this)
+        recyclerManager = Recycler.inflate().withSwipeToRefresh().withItemDivider().on(this)
                 .setEmptyImage(getIconics(GoogleMaterial.Icon.gmd_warning).sizeDp(72))
                 .setEmptyText(R.string.empty_view_text_no_logged_issues)
                 .setSmallEmptyText(R.string.empty_view_text_small_no_logged_issues)
                 .setOnRefreshListener(::update)
                 .setAdapter(adapter)
-                .apply {
-                    val layoutManager = LinearLayoutManager(this@IssuesActivity)
-                    setLayoutManager(layoutManager)
-                    recyclerView.addItemDecoration(DividerItemDecoration(
-                            this@IssuesActivity,
-                            layoutManager.orientation
-                    ))
-                }
     }
 
     override fun onStart() {

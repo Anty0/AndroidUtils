@@ -21,15 +21,13 @@ package eu.codetopic.utils.notifications.manager.create
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.MainThread
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.bundle.BundleListSerializer
 import eu.codetopic.utils.notifications.manager.NotifyClassifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 /**
  * @author anty
@@ -46,7 +44,7 @@ class MultiNotificationBuilder(val groupId: String, val channelId: String) {
                 MultiNotificationBuilder(groupId, channelId).apply(init)
 
         @MainThread
-        fun MultiNotificationBuilder.showAll(context: Context): Map<NotifyId, Bundle> =
+        fun MultiNotificationBuilder.showAll(context: Context): Map<out NotifyId, Bundle> =
                 NotifyManager.notifyAll(context, this)
 
         @MainThread
@@ -55,7 +53,7 @@ class MultiNotificationBuilder(val groupId: String, val channelId: String) {
 
         @MainThread
         suspend fun MultiNotificationBuilder.requestSuspendShowAll(context: Context,
-                                                                   optimise: Boolean = true): Map<NotifyId, Bundle> =
+                                                                   optimise: Boolean = true): Map<out NotifyId, Bundle> =
                 NotifyManager.requestSuspendNotifyAll(context, this, optimise)
 
         internal fun MultiNotificationBuilder.build(context: Context): Map<NotifyId, Bundle> {
@@ -81,23 +79,8 @@ class MultiNotificationBuilder(val groupId: String, val channelId: String) {
 
     var refreshable: Boolean = false
 
-    private var serializedData: List<SerializableBundleWrapper> = emptyList()
-
-    @Transient
-    val data: List<Bundle>
-        get() = serializedData.map { it.bundle }
-
-    fun addData(vararg data: Bundle) {
-        serializedData.toMutableList().addAll(
-                data.map { it.asSerializable() }
-        )
-    }
-
-    fun addData(data: Collection<Bundle>) {
-        serializedData.toMutableList().addAll(
-                data.map { it.asSerializable() }
-        )
-    }
+    @Serializable(with = BundleListSerializer::class)
+    var data: List<Bundle> = emptyList()
 
     operator fun component1() = groupId
     operator fun component2() = channelId

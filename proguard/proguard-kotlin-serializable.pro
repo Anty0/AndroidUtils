@@ -1,0 +1,3 @@
+-keepattributes *Annotation*, InnerClasses
+-dontnote kotlinx.serialization.SerializationKt
+-keep,includedescriptorclasses class eu.codetopic.utils.**$$serializer { *; }

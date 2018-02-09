@@ -27,10 +27,10 @@ import kotlinx.serialization.json.JSON
 /**
  * @author anty
  */
-open class KotlinSerializedPreference<T : Any>(override val key: String,
-                                               private val serializer: KSerializer<T>,
-                                               provider: ISharedPreferencesProvider<*>,
-                                               private val defaultValue: () -> T) :
+open class KSerializedPreference<T : Any>(override val key: String,
+                                          private val serializer: KSerializer<T>,
+                                          provider: ISharedPreferencesProvider<*>,
+                                          private val defaultValue: () -> T) :
         BasePreference<T, SharedPreferences>(provider) {
 
     constructor(key: String, serializer: KSerializer<T>,

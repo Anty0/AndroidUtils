@@ -22,11 +22,11 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.NotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
 import org.jetbrains.anko.bundleOf
 
 /**
@@ -42,21 +42,21 @@ class RqCancelReceiver : BroadcastReceiver() {
 
         internal fun getStartIntent(context: Context, notifyId: NotifyId): Intent =
                 Intent(context, RqCancelReceiver::class.java)
-                        .putExtra(EXTRA_NOTIFY_ID, notifyId.stringify())
+                        .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
             NotifyManager.assertInitialized(context)
 
-            val id = intent.getStringExtra(EXTRA_NOTIFY_ID)?.let { NotifyId.parse(it) }
+            val id = intent.getKSerializableExtra<NotifyId>(EXTRA_NOTIFY_ID)
                     ?: throw IllegalArgumentException("No notification id received by intent")
 
             val result = Notifier.cancel(context, id)
 
             if (isOrderedBroadcast) {
                 setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_RESULT to result?.asSerializable()
+                        NotifyManager.REQUEST_EXTRA_RESULT to result
                 ))
             }
         } catch (e: Exception) {

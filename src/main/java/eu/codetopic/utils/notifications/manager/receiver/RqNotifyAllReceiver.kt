@@ -23,18 +23,16 @@ import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.JavaExtensions.kSerializer
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
-import eu.codetopic.utils.AndroidExtensions.putKotlinSerializableExtra
-import eu.codetopic.utils.AndroidExtensions.getKotlinSerializableExtra
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
+import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
-import kotlinx.serialization.internal.PairSerializer
-import kotlinx.serialization.internal.StringSerializer
+import eu.codetopic.utils.notifications.manager.data.NotifyId
+import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import kotlinx.serialization.json.JSON
-import kotlinx.serialization.list
+import kotlinx.serialization.map
 import org.jetbrains.anko.bundleOf
 
 /**
@@ -48,15 +46,11 @@ class RqNotifyAllReceiver : BroadcastReceiver() {
         private const val NAME = "eu.codetopic.utils.notifications.manager.receiver.$LOG_TAG"
         private const val EXTRA_BUILDER = "$NAME.BUILDER"
 
-        internal val RESULT_SERIALIZER =
-                PairSerializer<String, SerializableBundleWrapper>(
-                        StringSerializer,
-                        kSerializer()
-                ).list
+        internal val RESULT_SERIALIZER = (NotifyIdSerializer to BundleSerializer).map
 
         internal fun getStartIntent(context: Context, builder: MultiNotificationBuilder): Intent {
             return Intent(context, RqNotifyAllReceiver::class.java)
-                    .putKotlinSerializableExtra(EXTRA_BUILDER, builder)
+                    .putKSerializableExtra(EXTRA_BUILDER, builder)
         }
     }
 
@@ -64,7 +58,7 @@ class RqNotifyAllReceiver : BroadcastReceiver() {
         try {
             NotifyManager.assertInitialized(context)
 
-            val builder = intent.getKotlinSerializableExtra<MultiNotificationBuilder>(EXTRA_BUILDER)
+            val builder = intent.getKSerializableExtra<MultiNotificationBuilder>(EXTRA_BUILDER)
                     ?: throw IllegalArgumentException("No notification builder received by intent")
 
             val result = Notifier.notifyAll(context, builder)
@@ -73,9 +67,7 @@ class RqNotifyAllReceiver : BroadcastReceiver() {
                 setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
                         NotifyManager.REQUEST_EXTRA_RESULT to JSON.stringify(
                                 RESULT_SERIALIZER,
-                                result.map {
-                                    it.key.stringify() to it.value.asSerializable()
-                                }
+                                result.toMap()
                         )
                 ))
             }

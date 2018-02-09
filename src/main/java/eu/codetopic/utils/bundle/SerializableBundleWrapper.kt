@@ -28,6 +28,8 @@ import kotlinx.serialization.Transient
 /**
  * @author anty
  */
+@Suppress("DEPRECATION")
+@Deprecated("Use BundleSerializer instead")
 @Serializable
 class SerializableBundleWrapper(private val bundleStr: String) {
 

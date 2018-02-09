@@ -21,18 +21,19 @@ package eu.codetopic.utils.notifications.manager.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.JavaExtensions.kSerializer
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
+import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.NotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
-import kotlinx.serialization.internal.PairSerializer
-import kotlinx.serialization.internal.StringSerializer
+import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.list
+import kotlinx.serialization.map
 import org.jetbrains.anko.bundleOf
 
 /**
@@ -46,21 +47,19 @@ class RqCancelAllIdsReceiver : BroadcastReceiver() {
         private const val NAME = "eu.codetopic.utils.notifications.manager.receiver.$LOG_TAG"
         private const val EXTRA_NOTIFY_IDS_LIST = "$NAME.NOTIFY_IDS_LIST"
 
-        internal val RESULT_SERIALIZER =
-                PairSerializer<String, SerializableBundleWrapper>(
-                        StringSerializer,
-                        kSerializer()
-                ).list
+        private val PARAM_NOTIFY_IDS_SERIALIZER = NotifyIdSerializer.list
+        internal val RESULT_SERIALIZER = (NotifyIdSerializer to BundleSerializer).map
 
         internal fun getStartIntent(context: Context, notifyIds: Collection<NotifyId>): Intent {
             if (notifyIds.size == 1)
                 return RqCancelReceiver.getStartIntent(context, notifyIds.first())
 
             return Intent(context, RqCancelAllIdsReceiver::class.java)
-                    .putExtra(EXTRA_NOTIFY_IDS_LIST, JSON.stringify(
-                            kSerializer<String>().list,
-                            notifyIds.map { it.stringify() }
-                    ))
+                    .putKSerializableExtra(
+                            name = EXTRA_NOTIFY_IDS_LIST,
+                            value = notifyIds.toList(),
+                            saver = PARAM_NOTIFY_IDS_SERIALIZER
+                    )
         }
     }
 
@@ -68,8 +67,8 @@ class RqCancelAllIdsReceiver : BroadcastReceiver() {
         try {
             NotifyManager.assertInitialized(context)
 
-            val notifyIds = intent.getStringExtra(EXTRA_NOTIFY_IDS_LIST)
-                    ?.let { JSON.parse(kSerializer<String>().list, it).map { NotifyId.parse(it) } }
+            val notifyIds = intent
+                    .getKSerializableExtra(EXTRA_NOTIFY_IDS_LIST, PARAM_NOTIFY_IDS_SERIALIZER)
                     ?: throw IllegalArgumentException("No notifications ids list received by intent")
 
             val result = Notifier.cancelAll(context, notifyIds)
@@ -78,9 +77,7 @@ class RqCancelAllIdsReceiver : BroadcastReceiver() {
                 setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
                         NotifyManager.REQUEST_EXTRA_RESULT to JSON.stringify(
                                 RESULT_SERIALIZER,
-                                result.map {
-                                    it.key.stringify() to it.value.asSerializable()
-                                }
+                                result.toMap()
                         )
                 ))
             }

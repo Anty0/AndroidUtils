@@ -22,8 +22,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.AndroidExtensions.putKotlinSerializableExtra
-import eu.codetopic.utils.AndroidExtensions.getKotlinSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
@@ -46,14 +46,14 @@ class CommonPersistentNotifyLaunchReceiver : BroadcastReceiver() {
 
         internal fun getIntent(context: Context, notifyId: CommonPersistentNotifyId): Intent =
                 Intent(context, CommonPersistentNotifyLaunchReceiver::class.java)
-                        .putKotlinSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
+                        .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
             NotifyManager.assertInitialized(context)
 
-            val notifyId = intent.getKotlinSerializableExtra<CommonPersistentNotifyId>(EXTRA_NOTIFY_ID)
+            val notifyId = intent.getKSerializableExtra<CommonPersistentNotifyId>(EXTRA_NOTIFY_ID)
                     ?: throw IllegalArgumentException("No notification id received by intent")
 
             val group = notifyId.group

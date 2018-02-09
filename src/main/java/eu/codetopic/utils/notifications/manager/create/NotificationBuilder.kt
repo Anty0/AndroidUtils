@@ -21,8 +21,7 @@ package eu.codetopic.utils.notifications.manager.create
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.MainThread
-import eu.codetopic.utils.bundle.SerializableBundleWrapper
-import eu.codetopic.utils.bundle.SerializableBundleWrapper.Companion.asSerializable
+import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.notifications.manager.NotifyClassifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
@@ -77,12 +76,8 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
 
     var refreshable: Boolean = false
 
-    private var serializedData: SerializableBundleWrapper? = null
-
-    @Transient
-    var data: Bundle
-        get() = serializedData?.bundle ?: Bundle.EMPTY
-    set(value) { serializedData = value.asSerializable() }
+    @Serializable(with = BundleSerializer::class)
+    var data: Bundle = Bundle.EMPTY
 
     operator fun component1() = groupId
     operator fun component2() = channelId

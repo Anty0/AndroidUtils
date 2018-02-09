@@ -22,12 +22,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.AndroidExtensions.putKotlinSerializableExtra
-import eu.codetopic.utils.AndroidExtensions.getKotlinSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
+import kotlinx.serialization.json.JSON
 import org.jetbrains.anko.bundleOf
 
 /**
@@ -43,21 +43,21 @@ class RqNotifyReceiver : BroadcastReceiver() {
 
         internal fun getStartIntent(context: Context, builder: NotificationBuilder): Intent =
                 Intent(context, RqNotifyReceiver::class.java)
-                        .putKotlinSerializableExtra(EXTRA_BUILDER, builder)
+                        .putKSerializableExtra(EXTRA_BUILDER, builder)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
             NotifyManager.assertInitialized(context)
 
-            val builder = intent.getKotlinSerializableExtra<NotificationBuilder>(EXTRA_BUILDER)
+            val builder = intent.getKSerializableExtra<NotificationBuilder>(EXTRA_BUILDER)
                     ?: throw IllegalArgumentException("No notification builder received by intent")
 
             val result = Notifier.notify(context, builder)
 
             if (isOrderedBroadcast) {
                 setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_RESULT to result.stringify()
+                        NotifyManager.REQUEST_EXTRA_RESULT to JSON.Companion.stringify(result)
                 ))
             }
         } catch (e: Exception) {

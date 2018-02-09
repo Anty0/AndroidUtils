@@ -34,6 +34,7 @@ import android.util.SparseArray
 import eu.codetopic.utils.data.getter.DataGetter
 import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter
 import android.os.Parcel
+import android.support.annotation.PluralsRes
 import android.support.annotation.RequiresApi
 import android.util.Base64
 import com.mikepenz.iconics.IconicsDrawable
@@ -131,6 +132,11 @@ object AndroidExtensions {
         return AndroidUtils.getFormattedText(getString(stringId), *args)
     }
 
+    fun Context.getFormattedQuantityText(@PluralsRes stringId: Int, quantity: Int,
+                                         vararg args: Any): CharSequence {
+        return AndroidUtils.getFormattedText(resources.getQuantityString(stringId, quantity), *args)
+    }
+
     fun Context.getResourceUri(@AnyRes resource: Int): Uri {
         return with (resources) {
             Uri.parse("""${ContentResolver.SCHEME_ANDROID_RESOURCE}://
@@ -223,39 +229,45 @@ object AndroidExtensions {
         }
     }
 
-    inline fun <reified T: Any> Bundle.putKotlinSerializable(name: String, value: T) =
-            putString(name, JSON.stringify(value))
+    inline fun <reified T: Any> Bundle.putKSerializable(key: String, value: T?,
+                                                        json: JSON = JSON.plain) =
+            putString(key, value?. let { json.stringify(value) })
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun <T> Bundle.putKotlinSerializable(name: String, value: T,
-                                                     saver: KSerialSaver<T>) =
-            putString(name, JSON.stringify(saver, value))
+    inline fun <T> Bundle.putKSerializable(key: String, value: T, saver: KSerialSaver<T>,
+                                           json: JSON = JSON.plain) =
+            putString(key, json.stringify(saver, value))
 
-    inline fun <reified T: Any> Bundle.getKotlinSerializable(name: String): T? =
-            getString(name)?.let { JSON.parse(it) }
+    inline fun <reified T: Any> Bundle.getKSerializable(key: String,
+                                                        json: JSON = JSON.plain): T? =
+            getString(key)?.let { json.parse(it) }
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun <T> Bundle.getKotlinSerializable(name: String, loader: KSerialLoader<T>): T? =
-            getString(name)?.let { JSON.parse(loader, it) }
+    inline fun <T> Bundle.getKSerializable(key: String, loader: KSerialLoader<T>,
+                                           json: JSON = JSON.plain): T? =
+            getString(key)?.let { json.parse(loader, it) }
 
     //////////////////////////////////////
     //////REGION - Intent/////////////////
     //////////////////////////////////////
 
-    inline fun <reified T: Any> Intent.putKotlinSerializableExtra(name: String, value: T): Intent =
-            putExtra(name, JSON.stringify(value))
+    inline fun <reified T: Any> Intent.putKSerializableExtra(name: String, value: T?,
+                                                             json: JSON = JSON.plain): Intent =
+            putExtra(name, value?.let { json.stringify(value) })
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun <T> Intent.putKotlinSerializableExtra(name: String, value: T,
-                                                     saver: KSerialSaver<T>): Intent =
-            putExtra(name, JSON.stringify(saver, value))
+    inline fun <T> Intent.putKSerializableExtra(name: String, value: T, saver: KSerialSaver<T>,
+                                                json: JSON = JSON.plain): Intent =
+            putExtra(name, json.stringify(saver, value))
 
-    inline fun <reified T: Any> Intent.getKotlinSerializableExtra(name: String): T? =
-            getStringExtra(name)?.let { JSON.parse(it) }
+    inline fun <reified T: Any> Intent.getKSerializableExtra(name: String,
+                                                             json: JSON = JSON.plain): T? =
+            getStringExtra(name)?.let { json.parse(it) }
 
     @Suppress("NOTHING_TO_INLINE")
-    inline fun <T> Intent.getKotlinSerializableExtra(name: String, loader: KSerialLoader<T>): T? =
-            getStringExtra(name)?.let { JSON.parse(loader, it) }
+    inline fun <T> Intent.getKSerializableExtra(name: String, loader: KSerialLoader<T>,
+                                                json: JSON = JSON.plain): T? =
+            getStringExtra(name)?.let { json.parse(loader, it) }
 
     @Suppress("NOTHING_TO_INLINE")
     inline fun Array<Intent>.asPendingActivities(context: Context, requestCode: Int,

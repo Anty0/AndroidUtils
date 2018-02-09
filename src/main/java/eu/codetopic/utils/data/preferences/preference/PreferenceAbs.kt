@@ -41,11 +41,11 @@ abstract class PreferenceAbs<T> {
         return "ID{${id ?: DEFAULT_ID}}-$key"
     }
 
-    operator open fun getValue(thisRef: Any?, property: KProperty<*>): T {
+    open operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return getValue(thisRef, null)
     }
 
-    operator open fun getValue(thisRef: Any?, property: KProperty<*>, id: String?): T {
+    open operator fun getValue(thisRef: Any?, property: KProperty<*>, id: String?): T {
         return getValue(thisRef, id)
     }
 

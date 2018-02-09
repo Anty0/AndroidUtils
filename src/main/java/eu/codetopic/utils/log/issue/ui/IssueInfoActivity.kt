@@ -26,9 +26,10 @@ import eu.codetopic.java.utils.log.Log
 
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.R
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
 import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.stringify
 import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.requestCancel
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
@@ -48,8 +49,8 @@ class IssueInfoActivity : AppCompatActivity() {
         fun start(context: Context, notifyId: NotifyId?, issue: Issue) {
             context.startActivity(
                     Intent(context, IssueInfoActivity::class.java)
-                            .putExtra(EXTRA_NOTIFY_ID, notifyId?.stringify())
-                            .putExtra(EXTRA_ISSUE, JSON.stringify(issue))
+                            .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
+                            .putKSerializableExtra(EXTRA_ISSUE, issue)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
         }
@@ -57,8 +58,8 @@ class IssueInfoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val notifyId = intent?.getStringExtra(EXTRA_NOTIFY_ID)?.let { NotifyId.parse(it) }
-        val issue = intent?.getStringExtra(EXTRA_ISSUE)?.let { JSON.parse<Issue>(it) }
+        val notifyId = intent?.getKSerializableExtra<NotifyId>(EXTRA_NOTIFY_ID)
+        val issue = intent?.getKSerializableExtra<Issue>(EXTRA_ISSUE)
                 ?: run {
                     Log.w(LOG_TAG, "No Issue received in intent")
                     return finish()
