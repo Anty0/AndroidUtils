@@ -17,7 +17,7 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources> <!--TODO: cleanup and remove all string that can be probably used in release-->
+<resources> <!--TODO: cleanup and remove all strings that may be used in release-->
     <string name="activity_label_logged_issues">Logged issues</string>
     <string name="activity_label_issue_info">Logged issue info</string>
     <string name="activity_label_error_info">Logged error info</string>
@@ -37,6 +37,8 @@
     <string name="notify_logged_warning_title">Warning logged</string>
     <string name="notify_logged_summary_title">Issues logged</string>
     <string name="notify_logged_summary_text">By application</string>
+    <string name="notify_issues_group_name">Issues</string>
+    <string name="notify_issues_channel_name">Logged issues</string>
 
     <string name="description_drop_down_arrow">Dropdown arrow</string>
     <string name="description_edit_button">Edit button</string>
@@ -65,4 +67,19 @@
     <string name="debug_item_logging_refresh_lines">Refresh LastLoggedLines</string>
     <string name="debug_item_issues_log_warning">Log warning</string>
     <string name="debug_item_issues_log_error">Log error</string>
+    <string name="debug_item_notify_refresh">Refresh</string>
+    <string name="debug_item_notify_show_one">Show one</string>
+    <string name="debug_item_notify_show_multi">Show multi</string>
+    <string name="debug_item_notify_cancel_all">Cancel all</string>
+    <string name="debug_item_notify_toast_refresh_done">Refresh done</string>
+    <string name="debug_item_notify_toast_show_one_done">Show one done</string>
+    <string name="debug_item_notify_toast_show_multi_done">Show multi done</string>
+    <string name="debug_item_notify_toast_cancel_all_done">Cancel all done</string>
+    <string name="debug_item_notify_notification_title">Test notification</string>
+    <string name="debug_item_notify_notification_text">Just some test notification</string>
+    <string name="debug_item_notify_notification_click_toast_text">You clicked test notification!</string>
+    <string name="debug_item_notify_notification_delete_toast_text">You deleted test notification!</string>
+    <string name="debug_item_notify_notification_cancel_toast_text">Test notification was canceled!</string>
+    <string name="debug_item_notify_group_name">NotifyManager debug</string>
+    <string name="debug_item_notify_channel_name">Test notification</string>
 </resources>

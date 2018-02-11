@@ -37,6 +37,7 @@ public final class PrefNames {
     // NotifyData
     public static final String FILE_NAME_NOTIFY_DATA = "NotifyData";
     public static final String NOTIFICATIONS_MAP = "NOTIFICATIONS_MAP";
+    public static final String DISABLED_CHANNELS_LIST = "DISABLED_CHANNELS_LIST";
 
     private PrefNames() {
     }

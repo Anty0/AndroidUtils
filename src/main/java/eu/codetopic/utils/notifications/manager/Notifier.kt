@@ -137,7 +137,11 @@ internal object Notifier {
 
     private fun Notification.show(notifier: NotificationManagerCompat, notifyId: NotifyId) {
         try {
-            notifier.notify(notifyId.tag, notifyId.idNotify, this)
+            if (NotifyData.instance.isChannelEnabled(notifyId.idGroup, notifyId.idChannel)) {
+                notifier.notify(notifyId.tag, notifyId.idNotify, this)
+            } else {
+                notifier.cancel(notifyId.tag, notifyId.idNotify)
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "Notification.show(notifyId=$notifyId)" +
                     " -> Failed to show notification", e)
@@ -227,18 +231,29 @@ internal object Notifier {
             refreshSummaryOf(context, builder.groupId, builder.channelId)
 
     private fun refreshSummaryOf(context: Context, groupId: String, channelId: String) {
-        val notifyMap = NotifyData.instance.getAll(groupId, channelId)
-                .takeIf { it.isNotEmpty() }
-        val summaryNotifyId = SummaryNotifyId(
-                idGroup = groupId,
-                idChannel = channelId,
-                timeWhen = notifyMap?.keys?.maxBy { it.timeWhen }?.timeWhen
-                        ?: System.currentTimeMillis()
-        )
+        if (NotifyClassifier.hasChannel(channelId)) {
+            NotifyClassifier.findChannel(channelId) as? SummarizedNotifyChannel ?: return
 
-        if (notifyMap != null)
-            summaryNotifyId.showSummaryNotification(context, notifyMap)
-        else summaryNotifyId.cancelNotification(context)
+            val notifyMap = NotifyData.instance.getAll(groupId, channelId)
+                    .takeIf { it.isNotEmpty() }
+            val summaryNotifyId = SummaryNotifyId(
+                    idGroup = groupId,
+                    idChannel = channelId,
+                    timeWhen = notifyMap?.keys?.maxBy { it.timeWhen }?.timeWhen
+                            ?: System.currentTimeMillis()
+            )
+
+            if (notifyMap != null)
+                summaryNotifyId.showSummaryNotification(context, notifyMap)
+            else summaryNotifyId.cancelNotification(context)
+        } else {
+            val summaryNotifyId = SummaryNotifyId(
+                    idGroup = groupId,
+                    idChannel = channelId
+            )
+
+            summaryNotifyId.cancelNotification(context)
+        }
     }
 
     fun refresh(context: Context) {
@@ -248,6 +263,27 @@ internal object Notifier {
 
         NotifyData.instance.getAll()
                 .filter { it.key.isRefreshable }
+                .forEach {
+                    val (notifyId, data) = it
+                    notifyId.showNotification(context, notifier, data, true)
+                }
+
+        refreshSummaries(context)
+    }
+
+    fun refresh(context: Context, groupId: String?, channelId: String?) {
+        NotifyManager.assertInitialized(context)
+
+        val notifier = NotificationManagerCompat.from(context)
+
+        NotifyData.instance.getAll()
+                .filter {
+                    it.key.let {
+                        it.isRefreshable
+                                && it.idGroup == groupId
+                                && it.idChannel == channelId
+                    }
+                }
                 .forEach {
                     val (notifyId, data) = it
                     notifyId.showNotification(context, notifier, data, true)
@@ -381,21 +417,21 @@ internal object Notifier {
 
                 channel?.handleCancel(context, group, notifyId, data)
             }
-        }
+        } else {
+            notifyMap.forEach {
+                val (notifyId, data) = it
 
-        notifyMap.forEach {
-            val (notifyId, data) = it
+                val channel = NotifyClassifier
+                        .takeIf { it.hasChannel(notifyId.idChannel) }
+                        ?.findChannel(notifyId.idChannel)
+                val group = NotifyClassifier
+                        .takeIf { channel != null && it.hasGroup(notifyId.idGroup) }
+                        ?.findGroup(notifyId.idGroup)
 
-            val channel = NotifyClassifier
-                    .takeIf { it.hasChannel(notifyId.idChannel) }
-                    ?.findChannel(notifyId.idChannel)
-            val group = NotifyClassifier
-                    .takeIf { channel != null && it.hasGroup(notifyId.idGroup) }
-                    ?.findGroup(notifyId.idGroup)
+                notifyId.cancelNotification(notifier)
 
-            notifyId.cancelNotification(notifier)
-
-            channel?.handleCancel(context, group, notifyId, data)
+                channel?.handleCancel(context, group, notifyId, data)
+            }
         }
 
         if (groupId != null && channelId != null)

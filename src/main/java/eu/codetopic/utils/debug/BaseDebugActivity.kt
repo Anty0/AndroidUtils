@@ -21,11 +21,10 @@ package eu.codetopic.utils.debug
 import android.os.Bundle
 import android.support.annotation.CallSuper
 
-import java.util.ArrayList
-
 import eu.codetopic.utils.debug.items.ConnectivityDebugItem
 import eu.codetopic.utils.debug.items.IssuesDebugItem
 import eu.codetopic.utils.debug.items.LoggingDebugItem
+import eu.codetopic.utils.debug.items.notify.NotifyManagerDebugItem
 import eu.codetopic.utils.ui.activity.modular.module.BackButtonModule
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.activity.modular.ModularActivity
@@ -50,6 +49,7 @@ abstract class BaseDebugActivity : ModularActivity(ToolbarModule(), BackButtonMo
     @CallSuper
     protected open fun prepareDebugItems(items: MutableList<CustomItem>) {
         items.add(ConnectivityDebugItem())
+        items.add(NotifyManagerDebugItem())
         items.add(IssuesDebugItem())
         items.add(LoggingDebugItem())
         // add here Utils debug items

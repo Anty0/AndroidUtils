@@ -33,6 +33,7 @@ import eu.codetopic.utils.UtilsBase.processNameNotifyManager
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
 import eu.codetopic.utils.notifications.manager.data.NotifyId
+import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import eu.codetopic.utils.notifications.manager.receiver.*
 import eu.codetopic.utils.notifications.manager.save.NotifyData
 
@@ -188,6 +189,17 @@ object NotifyManager {
     fun hasChannel(channelId: String): Boolean =
             NotifyClassifier.hasChannel(channelId)
 
+    fun setChannelEnabled(context: Context, groupId: String, channelId: String, enable: Boolean) {
+        assertInitialized(context)
+        NotifyData.instance.setChannelEnabled(groupId, channelId, enable)
+        Notifier.refresh(context, groupId, channelId)
+    }
+
+    fun isChannelEnabled(groupId: String, channelId: String): Boolean {
+        assertUsable()
+        return NotifyData.instance.isChannelEnabled(groupId, channelId)
+    }
+
     //--------------------------------------------------------------------------
 
     @MainThread
@@ -289,6 +301,16 @@ object NotifyManager {
         )
     }
 
+    @MainThread
+    fun requestSetChannelEnabled(context: Context, groupId: String, channelId: String,
+                                 enable: Boolean, optimise: Boolean = true) {
+        assertUsable()
+        if (optimise && isInitialized) setChannelEnabled(context, groupId, channelId, enable)
+        else context.sendBroadcast(
+                RqSetEnabledReceiver.getStartIntent(context, groupId, channelId, enable)
+        )
+    }
+
     //--------------------------------------------------------------------------
 
     private fun getInitialResult(): OrderedBroadcastResult =
@@ -343,7 +365,7 @@ object NotifyManager {
                 name = "RqNotifyReceiver",
                 intent = RqNotifyReceiver.getStartIntent(context, builder),
                 resultExtractor = {
-                    it.extras?.getKSerializable<NotifyId>(REQUEST_EXTRA_RESULT)
+                    it.extras?.getKSerializable(REQUEST_EXTRA_RESULT, NotifyIdSerializer)
                 }
         )
     }
@@ -422,6 +444,20 @@ object NotifyManager {
                                     loader = RqCancelAllReceiver.RESULT_SERIALIZER
                             )
                 }
+        )
+    }
+
+    @MainThread
+    suspend fun requestSuspendSetChannelEnabled(context: Context, groupId: String,
+                                                channelId: String, enable: Boolean,
+                                                optimise: Boolean = true) {
+        assertUsable()
+        return if (optimise && isInitialized) setChannelEnabled(context, groupId, channelId, enable)
+        else sendSuspendRequest(
+                context = context,
+                name = "RqSetEnabledReceiver",
+                intent = RqSetEnabledReceiver.getStartIntent(context, groupId, channelId, enable),
+                resultExtractor = { Unit }
         )
     }
 }

@@ -22,8 +22,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
 import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
+import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
@@ -34,32 +34,40 @@ import org.jetbrains.anko.bundleOf
 /**
  * @author anty
  */
-class RqNotifyReceiver : BroadcastReceiver() {
+class RqSetEnabledReceiver : BroadcastReceiver() {
 
     companion object {
 
-        private const val LOG_TAG = "RqNotifyReceiver"
+        private const val LOG_TAG = "RqSetEnabledReceiver"
         private const val NAME = "eu.codetopic.utils.notifications.manager.receiver.$LOG_TAG"
-        private const val EXTRA_BUILDER = "$NAME.BUILDER"
+        private const val EXTRA_GROUP_ID = "$NAME.GROUP_ID"
+        private const val EXTRA_CHANNEL_ID = "$NAME.CHANNEL_ID"
+        private const val EXTRA_ENABLE = "$NAME.CHANNEL_ID"
 
-        internal fun getStartIntent(context: Context, builder: NotificationBuilder): Intent =
-                Intent(context, RqNotifyReceiver::class.java)
-                        .putKSerializableExtra(EXTRA_BUILDER, builder)
+        internal fun getStartIntent(context: Context, groupId: String,
+                                    channelId: String, enable: Boolean): Intent =
+                Intent(context, RqSetEnabledReceiver::class.java)
+                        .putExtra(EXTRA_GROUP_ID, groupId)
+                        .putExtra(EXTRA_CHANNEL_ID, channelId)
+                        .putExtra(EXTRA_ENABLE, enable)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
             NotifyManager.assertInitialized(context)
 
-            val builder = intent.getKSerializableExtra<NotificationBuilder>(EXTRA_BUILDER)
-                    ?: throw IllegalArgumentException("No notification builder received by intent")
+            val groupId = intent.getStringExtra(EXTRA_GROUP_ID)
+                    ?: throw IllegalArgumentException("No group id received by intent")
+            val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)
+                    ?: throw IllegalArgumentException("No channel id received by intent")
+            val enable = intent.takeIf { it.hasExtra(EXTRA_ENABLE) }
+                    ?.getBooleanExtra(EXTRA_ENABLE, true)
+                    ?: throw IllegalArgumentException("No target enable state received by intent")
 
-            val result = Notifier.notify(context, builder)
+            NotifyManager.setChannelEnabled(context, groupId, channelId, enable)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_RESULT to JSON.stringify(NotifyIdSerializer, result)
-                ))
+                setResult(NotifyManager.REQUEST_RESULT_OK, null, null)
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)

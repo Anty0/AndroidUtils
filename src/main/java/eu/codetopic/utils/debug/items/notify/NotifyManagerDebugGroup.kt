@@ -16,7 +16,7 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package eu.codetopic.utils.log.issue.notify
+package eu.codetopic.utils.debug.items.notify
 
 import android.app.NotificationChannelGroup
 import android.content.Context
@@ -28,15 +28,15 @@ import eu.codetopic.utils.notifications.manager.util.NotifyGroup
 /**
  * @author anty
  */
-class IssuesNotifyGroup : NotifyGroup(ID, IssuesNotifyChannel.ID) {
+class NotifyManagerDebugGroup : NotifyGroup(ID, NotifyManagerDebugChannel.ID) {
 
     companion object {
 
-        private const val LOG_TAG = "IssuesNotifyGroup"
-        const val ID = "eu.codetopic.utils.log.issue.notify.$LOG_TAG"
+        private const val LOG_TAG = "NotifyManagerDebugGroup"
+        const val ID = "eu.codetopic.utils.debug.items.notify.$LOG_TAG"
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun createGroup(context: Context): NotificationChannelGroup =
-            NotificationChannelGroup(id, context.getText(R.string.notify_issues_group_name))
+            NotificationChannelGroup(id, context.getText(R.string.debug_item_notify_group_name))
 }

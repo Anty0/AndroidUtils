@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ utils
-  ~ Copyright (C)   2017  anty
+  ~ Copyright (C)   2018  anty
   ~
   ~ This program is free  software: you can redistribute it and/or modify
   ~ it under the terms  of the GNU General Public License as published by
@@ -19,22 +19,38 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    style="?android:attr/buttonBarStyle"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/resultText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone"/>
+    android:gravity="center_horizontal"
+    android:orientation="horizontal">
 
     <Button
         style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/checkButton"
+        android:id="@+id/butRefresh"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/debug_item_connectivity_check_connection_type"/>
+        android:text="@string/debug_item_notify_refresh"/>
+
+    <Button
+        style="?android:attr/buttonBarButtonStyle"
+        android:id="@+id/butShowOne"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/debug_item_notify_show_one"/>
+
+    <Button
+        style="?android:attr/buttonBarButtonStyle"
+        android:id="@+id/butShowMulti"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/debug_item_notify_show_multi"/>
+
+    <Button
+        style="?android:attr/buttonBarButtonStyle"
+        android:id="@+id/butCancelAll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/debug_item_notify_cancel_all"/>
 
 </LinearLayout>

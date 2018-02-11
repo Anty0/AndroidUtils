@@ -30,6 +30,7 @@ import eu.codetopic.java.utils.JavaExtensions.letIfNull
 import eu.codetopic.utils.broadcast.BroadcastsConnector
 import eu.codetopic.utils.broadcast.LocalBroadcast
 import eu.codetopic.utils.debug.AndroidDebugModeExtension
+import eu.codetopic.utils.debug.items.notify.NotifyManagerDebugItem
 import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.log.AndroidLoggerExtension
@@ -179,6 +180,9 @@ object UtilsBase {
 
             // Initialize JavaUtils's Logger
             AndroidLoggerExtension.install(app)
+
+            // Install NotifyManagerDebugItem's notification channel and group
+            NotifyManagerDebugItem.initialize(app)
 
             // Install LeakCanary
             LeakCanary.install(app)

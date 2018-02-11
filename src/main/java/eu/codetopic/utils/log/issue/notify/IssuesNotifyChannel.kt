@@ -69,7 +69,7 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
     override fun createChannel(context: Context, combinedId: String): NotificationChannel =
             android.app.NotificationChannel(
                     combinedId,
-                    LOG_TAG, // TODO: better name
+                    context.getText(R.string.notify_issues_channel_name),
                     NotificationManager.IMPORTANCE_HIGH
             ).apply {
                 enableLights(true)

@@ -39,6 +39,9 @@ import eu.codetopic.utils.notifications.manager.NotifyClassifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
+import kotlinx.serialization.internal.PairSerializer
+import kotlinx.serialization.internal.StringSerializer
+import kotlinx.serialization.list
 import kotlinx.serialization.map
 
 /**
@@ -85,6 +88,40 @@ internal class NotifyData private constructor(context: Context) :
         NotifyManager.assertInitialized(context)
         notifyMapSave = notifyMap
     }
+
+    private var disabledChannelsListSave: List<Pair<String, String>>
+            by KSerializedPreference<List<Pair<String, String>>>(
+                    PrefNames.DISABLED_CHANNELS_LIST,
+                    PairSerializer(StringSerializer, StringSerializer).list,
+                    accessProvider,
+                    { emptyList() }
+            )
+
+    private val disabledChannelsListCache by lazy { disabledChannelsListSave.toMutableList() }
+
+    private val disabledChannelsList: MutableList<Pair<String, String>>
+        get() =
+            if (NotifyManager.isInitialized) disabledChannelsListCache
+            else disabledChannelsListSave.toMutableList()
+
+    private fun disabledChannelsListSave() {
+        NotifyManager.assertInitialized(context)
+        disabledChannelsListSave = disabledChannelsList
+    }
+
+    fun setChannelEnabled(groupId: String, channelId: String, enable: Boolean) {
+        NotifyManager.assertInitialized(context)
+        disabledChannelsList.toMutableList().apply {
+            (groupId to channelId).also {
+                if (enable) remove(it)
+                else add(it)
+            }
+        }
+        disabledChannelsListSave()
+    }
+
+    fun isChannelEnabled(groupId: String, channelId: String): Boolean =
+            (groupId to channelId) !in disabledChannelsList
 
     fun remove(id: NotifyId): Bundle? {
         NotifyManager.assertInitialized(context)
