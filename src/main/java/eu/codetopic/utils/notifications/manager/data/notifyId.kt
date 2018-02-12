@@ -21,6 +21,7 @@ package eu.codetopic.utils.notifications.manager.data
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.MainThread
+import eu.codetopic.java.utils.JavaExtensions.to
 import eu.codetopic.utils.notifications.manager.NotifyClassifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel
@@ -48,8 +49,11 @@ abstract class NotifyId {
         val NotifyId.idCombined: String
             get() = NotifyChannel.combinedId(idGroup, idChannel)
 
-        val NotifyId.tag: String
-            get() = "TAG(isSummary=$isSummary, combinedId=$idCombined)"
+        val NotifyId.tag: String?
+            get() =
+                if (hasTag)
+                    "TAG(isSummary=$isSummary, combinedId=$idCombined)"
+                else null
 
         @MainThread
         fun NotifyId.cancel(context: Context): Bundle? =
@@ -78,6 +82,7 @@ abstract class NotifyId {
     // Metadata
     abstract val isPersistent: Boolean
     abstract val isRefreshable: Boolean
+    abstract val hasTag: Boolean
     abstract val timeWhen: Long
 
     override fun equals(other: Any?): Boolean {
@@ -105,7 +110,7 @@ abstract class NotifyId {
     override fun toString(): String =
             "NotifyId(isSummary=$isSummary, idGroup='$idGroup', idChannel='$idChannel'," +
                     " idNotify=$idNotify, isPersistent=$isPersistent," +
-                    " isRefreshable=$isRefreshable, timeWhen=$timeWhen)"
+                    " isRefreshable=$isRefreshable, hasTag=$hasTag, timeWhen=$timeWhen)"
 }
 
 @Serializer(forClass = NotifyId::class)
@@ -147,6 +152,7 @@ object NotifyIdSerializer : KSerializer<NotifyId> { // TODO: Better way to seria
 internal class CommonNotifyId(override val idGroup: String,
                               override val idChannel: String,
                               override val idNotify: Int,
+                              override val hasTag: Boolean = true,
                               override val timeWhen: Long = System.currentTimeMillis()) : NotifyId() {
 
     @Transient
@@ -168,13 +174,16 @@ internal class CommonPersistentNotifyId(override val idGroup: String,
                                         override val idNotify: Int,
                                         override val timeWhen: Long = System.currentTimeMillis(),
                                         override val isRefreshable: Boolean = true) : NotifyId() {
-
     @Transient
     override val isSummary: Boolean
         get() = false
 
     @Transient
     override val isPersistent: Boolean
+        get() = true
+
+    @Transient
+    override val hasTag: Boolean
         get() = true
 }
 
@@ -203,4 +212,8 @@ internal class SummaryNotifyId(override val idGroup: String,
     @Transient
     override val isRefreshable: Boolean
         get() = false
+
+    @Transient
+    override val hasTag: Boolean
+        get() = true
 }

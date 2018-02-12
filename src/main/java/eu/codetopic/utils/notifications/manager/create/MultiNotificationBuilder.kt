@@ -39,6 +39,11 @@ class MultiNotificationBuilder(val groupId: String, val channelId: String) {
 
         private const val LOG_TAG = "MultiNotificationBuilder"
 
+        @Suppress("NOTHING_TO_INLINE")
+        inline fun create(groupId: String, channelId: String, vararg data: Bundle): MultiNotificationBuilder =
+                MultiNotificationBuilder(groupId, channelId)
+                        .apply { this.data = data.asList() }
+
         inline fun create(groupId: String, channelId: String,
                           init: MultiNotificationBuilder.() -> Unit): MultiNotificationBuilder =
                 MultiNotificationBuilder(groupId, channelId).apply(init)
@@ -55,22 +60,6 @@ class MultiNotificationBuilder(val groupId: String, val channelId: String) {
         suspend fun MultiNotificationBuilder.requestSuspendShowAll(context: Context,
                                                                    optimise: Boolean = true): Map<out NotifyId, Bundle> =
                 NotifyManager.requestSuspendNotifyAll(context, this, optimise)
-
-        internal fun MultiNotificationBuilder.build(context: Context): Map<NotifyId, Bundle> {
-            val (groupId, channelId, timeWhen, persistent, refreshable, data) = this
-            val group = NotifyClassifier.findGroup(groupId)
-            val channel = NotifyClassifier.findChannel(channelId)
-
-            return data.map {
-                val notifyId = channel.nextId(context, group, it)
-
-                val id = if (persistent)
-                    CommonPersistentNotifyId(groupId, channelId, notifyId, timeWhen, refreshable)
-                else CommonNotifyId(groupId, channelId, notifyId, timeWhen)
-
-                return@map id to it
-            }.toMap()
-        }
     }
 
     var timeWhen: Long = System.currentTimeMillis()

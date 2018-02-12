@@ -29,9 +29,7 @@ import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
-import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder.Companion.build
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager.create.NotificationBuilder.Companion.build
 import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
@@ -51,6 +49,34 @@ import eu.codetopic.utils.notifications.manager.util.SummarizedNotifyChannel
 internal object Notifier {
 
     private const val LOG_TAG = "Notifier"
+
+    private fun NotificationBuilder.build(context: Context, hasTag: Boolean): Pair<NotifyId, Bundle> {
+        val (groupId, channelId, timeWhen, persistent, refreshable, data) = this
+        val group = NotifyClassifier.findGroup(groupId)
+        val channel = NotifyClassifier.findChannel(channelId)
+        val notifyId = channel.nextId(context, group, data)
+
+        val id = if (persistent && hasTag)
+            CommonPersistentNotifyId(groupId, channelId, notifyId, timeWhen, refreshable)
+        else CommonNotifyId(groupId, channelId, notifyId, hasTag, timeWhen)
+        return id to data
+    }
+
+    private fun MultiNotificationBuilder.build(context: Context, hasTag: Boolean): Map<NotifyId, Bundle> {
+        val (groupId, channelId, timeWhen, persistent, refreshable, data) = this
+        val group = NotifyClassifier.findGroup(groupId)
+        val channel = NotifyClassifier.findChannel(channelId)
+
+        return data.map {
+            val notifyId = channel.nextId(context, group, it)
+
+            val id = if (persistent && hasTag)
+                CommonPersistentNotifyId(groupId, channelId, notifyId, timeWhen, refreshable)
+            else CommonNotifyId(groupId, channelId, notifyId, hasTag, timeWhen)
+
+            return@map id to it
+        }.toMap()
+    }
 
     @Suppress("REDUNDANT_ELSE_IN_WHEN")
     private fun NotifyId.launchIntent(context: Context, data: Bundle): PendingIntent =
@@ -316,10 +342,34 @@ internal object Notifier {
         )
     }
 
+
+    fun build(context: Context, builder: NotificationBuilder, hasTag: Boolean): Pair<NotifyId, Notification> {
+        NotifyManager.assertUsable()
+
+        DebugMode.ifEnabled {
+            if (builder.persistent) {
+                Log.w(LOG_TAG, "build(builder=$builder)" +
+                        " -> Notification for raw build can't be persistent." +
+                        " Notification will be build as non persistent.")
+            }
+        }
+
+        builder.apply {
+            persistent = false
+            refreshable = false
+        }
+
+        val (notifyId, data) = builder.build(context, hasTag)
+
+        val notification = notifyId.buildNotification(context, data, false)
+
+        return notifyId to notification
+    }
+
     fun notify(context: Context, builder: NotificationBuilder): NotifyId {
         NotifyManager.assertInitialized(context)
 
-        val (notifyId, data) = builder.build(context)
+        val (notifyId, data) = builder.build(context, true)
 
         NotifyData.instance.add(notifyId, data)
 
@@ -333,7 +383,7 @@ internal object Notifier {
         NotifyManager.assertInitialized(context)
 
         val notifier = NotificationManagerCompat.from(context)
-        val notifyMap = builder.build(context)
+        val notifyMap = builder.build(context, true)
 
         NotifyData.instance.addAll(notifyMap)
 

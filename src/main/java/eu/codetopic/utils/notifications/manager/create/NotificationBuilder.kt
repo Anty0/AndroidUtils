@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.notifications.manager.create
 
+import android.app.Notification
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.MainThread
@@ -40,9 +41,17 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
 
         private const val LOG_TAG = "NotificationBuilder"
 
+        @Suppress("NOTHING_TO_INLINE")
+        inline fun create(groupId: String, channelId: String): NotificationBuilder =
+                NotificationBuilder(groupId, channelId)
+
         inline fun create(groupId: String, channelId: String,
                           init: NotificationBuilder.() -> Unit): NotificationBuilder =
                 NotificationBuilder(groupId, channelId).apply(init)
+
+        @MainThread
+        fun NotificationBuilder.build(context: Context, hasTag: Boolean): Pair<NotifyId, Notification> =
+                NotifyManager.build(context, this, hasTag)
 
         @MainThread
         fun NotificationBuilder.show(context: Context): NotifyId =
@@ -56,18 +65,6 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
         suspend fun NotificationBuilder.requestSuspendShow(context: Context,
                                                            optimise: Boolean = true): NotifyId =
                 NotifyManager.requestSuspendNotify(context, this, optimise)
-
-        internal fun NotificationBuilder.build(context: Context): Pair<NotifyId, Bundle> {
-            val (groupId, channelId, timeWhen, persistent, refreshable, data) = this
-            val group = NotifyClassifier.findGroup(groupId)
-            val channel = NotifyClassifier.findChannel(channelId)
-            val notifyId = channel.nextId(context, group, data)
-
-            val id = if (persistent)
-                CommonPersistentNotifyId(groupId, channelId, notifyId, timeWhen, refreshable)
-            else CommonNotifyId(groupId, channelId, notifyId, timeWhen)
-            return id to data
-        }
     }
 
     var timeWhen: Long = System.currentTimeMillis()

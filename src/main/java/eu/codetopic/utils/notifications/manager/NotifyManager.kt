@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.notifications.manager
 
+import android.app.Notification
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -207,6 +208,10 @@ object NotifyManager {
 
     @MainThread
     fun cleanup(context: Context) = Notifier.cleanup(context)
+
+    @MainThread
+    fun build(context: Context, builder: NotificationBuilder, hasTag: Boolean): Pair<NotifyId, Notification> =
+            Notifier.build(context, builder, hasTag)
 
     @MainThread
     fun notify(context: Context, builder: NotificationBuilder): NotifyId =
