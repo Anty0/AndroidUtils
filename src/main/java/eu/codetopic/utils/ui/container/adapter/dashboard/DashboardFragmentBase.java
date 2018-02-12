@@ -18,7 +18,9 @@
 
 package eu.codetopic.utils.ui.container.adapter.dashboard;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -42,15 +44,27 @@ public abstract class DashboardFragmentBase extends NavigationFragment {
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
         mAdapter = new DashboardAdapter(getContext(), getHolder(), mItemsGetters);
         mAdapter.activate();
     }
 
     @Override
-    public View onCreateContentView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mRecyclerManager = Recycler.inflate().on(inflater, container, false).setAdapter(mAdapter)
+    public void onDetach() {
+        mAdapter.deactivate();
+        mAdapter = null;
+
+        super.onDetach();
+    }
+
+    @Override
+    @Nullable
+    public View onCreateContentView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                                    @Nullable Bundle savedInstanceState) {
+        mRecyclerManager = Recycler.inflate().on(inflater, container, false)
+                .setAdapter(mAdapter)
                 .setItemTouchHelper(new ItemTouchHelper.Callback() {
                     @Override
                     public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
@@ -84,9 +98,13 @@ public abstract class DashboardFragmentBase extends NavigationFragment {
     }
 
     @Override
-    public void onDestroy() {
-        mAdapter.deactivate();
-        mAdapter = null;
-        super.onDestroy();
+    public void onDestroyView() {
+        mRecyclerManager = null;
+
+        super.onDestroyView();
+    }
+
+    public Recycler.RecyclerManagerImpl getRecyclerManager() {
+        return mRecyclerManager;
     }
 }

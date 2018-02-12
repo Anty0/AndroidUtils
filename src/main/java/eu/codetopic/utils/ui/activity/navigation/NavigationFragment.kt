@@ -31,20 +31,20 @@ abstract class NavigationFragment : LoadingFragment {
     }
 
     protected open val navigationActivity: NavigationActivity?
-        get() = activity.takeIf { it is NavigationActivity? } as NavigationActivity?
+        get() = activity as? NavigationActivity
 
     constructor()
 
     constructor(loadingViewHolderClass: Class<out LoadingVH>) : super(loadingViewHolderClass)
 
-    protected open fun <T : Fragment> switchFragment(clazz: Class<out T>): T? {
+    open fun <T : Fragment> switchFragment(clazz: Class<out T>): T? {
         navigationActivity?.apply { return replaceFragment(clazz) } ?:
                 Log.e(LOG_TAG, "switchFragment(clazz=$clazz) -> " +
                         "Failed to switch fragment: No NavigationActivity available.")
         return null
     }
 
-    protected open fun removeSelf() =
+    open fun removeSelf() =
             navigationActivity?.apply { removeCurrentFragment() } ?:
                     Log.e(LOG_TAG, "removeSelf() -> " +
                             "Failed to remove fragment: No NavigationActivity available.")
