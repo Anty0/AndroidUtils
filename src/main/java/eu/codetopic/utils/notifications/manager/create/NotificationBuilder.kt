@@ -45,6 +45,10 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
         inline fun create(groupId: String, channelId: String): NotificationBuilder =
                 NotificationBuilder(groupId, channelId)
 
+        @Suppress("NOTHING_TO_INLINE")
+        inline fun create(groupId: String, channelId: String, data: Bundle): NotificationBuilder =
+                NotificationBuilder(groupId, channelId).apply { this.data = data }
+
         inline fun create(groupId: String, channelId: String,
                           init: NotificationBuilder.() -> Unit): NotificationBuilder =
                 NotificationBuilder(groupId, channelId).apply(init)

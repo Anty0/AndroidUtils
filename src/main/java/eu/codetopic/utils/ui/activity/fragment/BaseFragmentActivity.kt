@@ -64,7 +64,7 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
     override fun onStart() {
         super.onStart()
 
-        // Let's fix problem with theme of navigation menu after screen rotation.
+        updateTitle()
         updateTheme()
     }
 
