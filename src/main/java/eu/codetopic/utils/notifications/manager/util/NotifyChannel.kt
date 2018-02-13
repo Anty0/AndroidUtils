@@ -55,6 +55,9 @@ abstract class NotifyChannel(val id: String, val checkForIdOverrides: Boolean) {
         fun NotifyChannel.combinedIdsMap(): Map<String, String> = combinedIdsMap(id)
     }
 
+    open val defaultEnabled: Boolean
+        get() = true
+
     @RequiresApi(Build.VERSION_CODES.O)
     abstract fun createChannel(context: Context, combinedId: String): NotificationChannel
 

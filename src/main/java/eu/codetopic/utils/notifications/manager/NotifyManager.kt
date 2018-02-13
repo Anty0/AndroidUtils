@@ -199,6 +199,7 @@ object NotifyManager {
     fun isChannelEnabled(groupId: String, channelId: String): Boolean {
         assertUsable()
         return NotifyData.instance.isChannelEnabled(groupId, channelId)
+                ?: findChannel(channelId).defaultEnabled
     }
 
     //--------------------------------------------------------------------------

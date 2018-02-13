@@ -163,7 +163,10 @@ internal object Notifier {
 
     private fun Notification.show(notifier: NotificationManagerCompat, notifyId: NotifyId) {
         try {
-            if (NotifyData.instance.isChannelEnabled(notifyId.idGroup, notifyId.idChannel)) {
+            val enabled = NotifyData.instance.isChannelEnabled(notifyId.idGroup, notifyId.idChannel)
+                    ?: notifyId.channel.defaultEnabled
+
+            if (enabled) {
                 notifier.notify(notifyId.tag, notifyId.idNotify, this)
             } else {
                 notifier.cancel(notifyId.tag, notifyId.idNotify)
