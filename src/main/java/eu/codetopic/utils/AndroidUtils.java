@@ -33,7 +33,9 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
@@ -160,6 +162,21 @@ public final class AndroidUtils {
         else
             //noinspection SuspiciousNameCombination
             return Bitmap.createBitmap(bitmap, 0, height / 2 - width / 2, width, width);
+    }
+
+    @CheckResult
+    public static Bitmap drawableToBitmap(Drawable drawable) {
+        final Bitmap bitmap = Bitmap.createBitmap(
+                drawable.getIntrinsicWidth(),
+                drawable.getIntrinsicHeight(),
+                Bitmap.Config.ARGB_8888
+        );
+
+        final Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
     }
 
     /////////////////////////////////////

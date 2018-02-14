@@ -23,6 +23,7 @@ import android.app.Activity
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.*
+import android.content.res.TypedArray
 import android.graphics.Color
 import android.net.Uri
 import android.net.wifi.WifiManager
@@ -183,6 +184,13 @@ object AndroidExtensions {
 
     data class OrderedBroadcastResult(val code: Int = 0, val data: String? = null,
                                       val extras: Bundle? = null)
+
+    /////////////////////////////////////////
+    //////REGION - ATTRIBUTES////////////////
+    /////////////////////////////////////////
+
+    inline fun <R> TypedArray.use(block: (TypedArray) -> R): R =
+            try { block(this) } finally { recycle() }
 
     //////////////////////////////////////
     //////REGION - BUNDLES////////////////

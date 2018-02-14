@@ -18,6 +18,8 @@
 
 package eu.codetopic.utils.ui.activity.fragment
 
+import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.IdRes
@@ -29,10 +31,17 @@ import android.support.v7.widget.Toolbar
 import android.view.ContextThemeWrapper
 import android.view.View
 
+import eu.codetopic.java.utils.JavaExtensions.letIf
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidUtils
+import eu.codetopic.utils.AndroidExtensions.use
 import eu.codetopic.utils.R
+import kotlinx.android.extensions.CacheImplementation
+import kotlinx.android.extensions.ContainerOptions
+import kotlinx.android.synthetic.main.activity_module_toolbar.*
+import kotlinx.android.synthetic.main.activity_navigation_base.*
 
+@ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rework fragment replacing
 
     companion object {
@@ -58,14 +67,12 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
 
     override fun onContentChanged() {
         super.onContentChanged()
-        updateTheme()
+        updateProviderFragment()
     }
 
     override fun onStart() {
         super.onStart()
-
-        updateTitle()
-        updateTheme()
+        updateProviderFragment()
     }
 
     private fun <T : Fragment> initFragment(fragmentClass: Class<out T>, bundle: Bundle? = null): T? = try {
@@ -132,10 +139,8 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
     override fun onAttachFragment(fragment: Fragment) {
         super.onAttachFragment(fragment)
 
-        if (FRAGMENT_TAG_CURRENT == fragment.tag) {
-            applyFragmentTitle(fragment)
-            applyFragmentTheme(fragment)
-        }
+        if (FRAGMENT_TAG_CURRENT == fragment.tag)
+            applyProviderFragment(fragment)
 
         //System.runFinalization();
         //System.gc();
@@ -143,43 +148,78 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
 
     protected open fun getDefaultTitle(): CharSequence = AndroidUtils.getAppLabel(this)
 
-    fun updateTitle() = applyFragmentTitle(currentFragment)
+    fun updateProviderFragment() = applyProviderFragment(currentFragment)
 
-    private fun applyFragmentTitle(fragment: Fragment?) {
-        title = if (fragment is TitleProvider) fragment.title else getDefaultTitle()
-    }
+    @SuppressLint("InlinedApi")
+    private fun applyProviderFragment(fragment: Fragment?) {
+        val targetTitle = if (fragment is TitleProvider) fragment.title else getDefaultTitle()
 
-    fun updateTheme() = applyFragmentTheme(currentFragment)
+        val themedContext =
+                if (fragment is ThemeProvider)
+                    ContextThemeWrapper(layoutInflater.context, fragment.themeId)
+                else this
 
-    private fun applyFragmentTheme(fragment: Fragment?) {
-        if (fragment !is ThemeProvider) return
-        val themeId = fragment.themeId
-        val themedContext = ContextThemeWrapper(layoutInflater.context, themeId)
-
-        findViewById<Toolbar>(R.id.toolbar)?.apply {
-            AndroidUtils.getColorFromAttr(themedContext, R.attr.colorPrimary, -1)
-                    .takeIf { it != -1 }?.let { setBackgroundColor(it) }
-
-            AndroidUtils.getColorFromAttr(themedContext, R.attr.titleTextColor, -1)
-                    .takeIf { it != -1 }?.let { setTitleTextColor(it) }
-
-            AndroidUtils.getColorFromAttr(themedContext, R.attr.subtitleTextColor, -1)
-                    .takeIf { it != -1 }?.let { setSubtitleTextColor(it) }
+        val colorsAttrs = intArrayOf(
+                R.attr.colorPrimary,
+                R.attr.titleTextColor,
+                R.attr.subtitleTextColor,
+                R.attr.colorPrimaryDark
+        ).letIf({ Build.VERSION.SDK_INT >= 21 }) {
+            it + intArrayOf(
+                    android.R.attr.navigationBarColor,
+                    android.R.attr.statusBarColor
+            )
         }
+
+        val colors = themedContext.obtainStyledAttributes(colorsAttrs)
+                .use { tArray ->
+                    (0 until colorsAttrs.size).map {
+                        tArray.getColor(it, -1)
+                                .takeIf { it != -1 }
+                    }
+                }
+
+        title = targetTitle
 
         if (Build.VERSION.SDK_INT >= 21) {
-            AndroidUtils.getColorFromAttr(themedContext, android.R.attr.navigationBarColor, -1)
-                    .takeIf { it != -1 }?.let { window.navigationBarColor = it }
+            run taskDescription@ {
+                val primaryColor = colors[colorsAttrs.indexOf(R.attr.colorPrimary)]
+                        ?: return@taskDescription
+                /*val icon =
+                        if (fragment is IconProvider) fragment.icon
+                        else AndroidUtils.drawableToBitmap(
+                                AndroidUtils.getActivityIcon(themedContext, componentName)
+                        )*/
+                //val title = targetTitle.toString()
 
-            AndroidUtils.getColorFromAttr(themedContext, android.R.attr.statusBarColor, -1)
-                    .takeIf { it != -1 }?.let { window.statusBarColor = it }
+                //setTaskDescription(ActivityManager.TaskDescription(title, icon, primaryColor))
+                setTaskDescription(ActivityManager.TaskDescription(null, null, primaryColor))
+            }
+
+            colors[colorsAttrs.indexOf(android.R.attr.navigationBarColor)]
+                    ?.let { window.navigationBarColor = it }
+
+            colors[colorsAttrs.indexOf(android.R.attr.statusBarColor)]
+                    ?.let { window.statusBarColor = it }
         }
 
-        findViewById<NavigationView>(R.id.navigationView)?.apply {
+        toolbar?.apply {
+            colors[colorsAttrs.indexOf(R.attr.colorPrimary)]
+                    ?.let { setBackgroundColor(it) }
+
+            colors[colorsAttrs.indexOf(R.attr.titleTextColor)]
+                    ?.let { setTitleTextColor(it) }
+
+            colors[colorsAttrs.indexOf(R.attr.subtitleTextColor)]
+                    ?.let { setSubtitleTextColor(it) }
+        }
+
+        navigationView?.apply {
             getHeaderView(0).findViewById<View>(R.id.boxHeader)?.apply {
-                AndroidUtils.getColorFromAttr(themedContext, R.attr.colorPrimaryDark, -1)
-                        .takeIf { it != -1 }?.let { setBackgroundColor(it) }
+                colors[colorsAttrs.indexOf(R.attr.colorPrimaryDark)]
+                        ?.let { setBackgroundColor(it) }
             }
         }
+
     }
 }
