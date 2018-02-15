@@ -31,10 +31,11 @@ import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
 import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.requestCancel
+import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.synthetic.main.activity_error_info.*
-import kotlinx.serialization.json.JSON
+import kotlinx.serialization.internal.NullableSerializer
 
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 class IssueInfoActivity : AppCompatActivity() {
@@ -46,10 +47,13 @@ class IssueInfoActivity : AppCompatActivity() {
         private const val EXTRA_NOTIFY_ID = "EXTRA_NOTIFY_ID"
         private const val EXTRA_ISSUE = "EXTRA_ISSUE"
 
+        private val EXTRA_NOTIFY_ID_SERIALIZER = NullableSerializer(NotifyIdSerializer)
+
         fun start(context: Context, notifyId: NotifyId?, issue: Issue) {
             context.startActivity(
                     Intent(context, IssueInfoActivity::class.java)
-                            .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
+                            .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId,
+                                    EXTRA_NOTIFY_ID_SERIALIZER)
                             .putKSerializableExtra(EXTRA_ISSUE, issue)
                             .setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             )
@@ -58,7 +62,7 @@ class IssueInfoActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val notifyId = intent?.getKSerializableExtra<NotifyId>(EXTRA_NOTIFY_ID)
+        val notifyId = intent?.getKSerializableExtra(EXTRA_NOTIFY_ID, EXTRA_NOTIFY_ID_SERIALIZER)
         val issue = intent?.getKSerializableExtra<Issue>(EXTRA_ISSUE)
                 ?: run {
                     Log.w(LOG_TAG, "No Issue received in intent")
