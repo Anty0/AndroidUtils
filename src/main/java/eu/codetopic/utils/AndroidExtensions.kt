@@ -22,6 +22,7 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.SearchManager
 import android.content.*
 import android.content.res.TypedArray
 import android.graphics.Color
@@ -155,6 +156,9 @@ object AndroidExtensions {
 
     val Context.wifiManager
         get() = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+
+    val Context.searchManager
+        get() = getSystemService(Context.SEARCH_SERVICE) as SearchManager
 
     val Context.accountManager
         get() = AccountManager.get(this)

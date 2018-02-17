@@ -27,6 +27,7 @@ import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.NotifyId
+import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import org.jetbrains.anko.bundleOf
 
 /**
@@ -42,14 +43,14 @@ class RqCancelReceiver : BroadcastReceiver() {
 
         internal fun getStartIntent(context: Context, notifyId: NotifyId): Intent =
                 Intent(context, RqCancelReceiver::class.java)
-                        .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
+                        .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId, NotifyIdSerializer)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
             NotifyManager.assertInitialized(context)
 
-            val id = intent.getKSerializableExtra<NotifyId>(EXTRA_NOTIFY_ID)
+            val id = intent.getKSerializableExtra(EXTRA_NOTIFY_ID, NotifyIdSerializer)
                     ?: throw IllegalArgumentException("No notification id received by intent")
 
             val result = Notifier.cancel(context, id)

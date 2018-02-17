@@ -211,7 +211,7 @@ internal class SummaryNotifyId(override val idGroup: String,
 
     @Transient
     override val isRefreshable: Boolean
-        get() = false
+        get() = true
 
     @Transient
     override val hasTag: Boolean

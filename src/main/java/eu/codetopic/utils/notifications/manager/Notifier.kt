@@ -126,24 +126,23 @@ internal object Notifier {
                 else -> throw IllegalArgumentException("Unknown notifyId: ${this::class}")
             }
 
-    private fun NotificationCompat.Builder.normalize(context: Context,
-                                                     notifyId: NotifyId, data: Bundle,
-                                                     isRefresh: Boolean): NotificationCompat.Builder {
+    private fun NotificationCompat.Builder.normalize(context: Context, notifyId: NotifyId,
+                                                     data: Bundle): NotificationCompat.Builder {
         val combinedId = notifyId.idCombined
         return this.apply {
             setChannelId(combinedId)
             setGroup(combinedId)
             setGroupSummary(notifyId.isSummary)
-            setOnlyAlertOnce(isRefresh)
+            setOnlyAlertOnce(notifyId.isRefreshable)
             setWhen(notifyId.timeWhen)
             setContentIntent(notifyId.launchIntent(context, data))
             setDeleteIntent(notifyId.deleteIntent(context, data))
         }
     }
 
-    private fun NotifyId.buildNotification(context: Context, data: Bundle, isRefresh: Boolean): Notification {
+    private fun NotifyId.buildNotification(context: Context, data: Bundle): Notification {
         return channel.createNotification(context, group, this, data)
-                .normalize(context, this, data, isRefresh)
+                .normalize(context, this, data)
                 .build()
     }
 
@@ -154,7 +153,7 @@ internal object Notifier {
                         " Channel is not SummarizedNotifyChannel")
 
         return channel.createSummaryNotification(context, group, this, data)
-                .normalize(context, this, Bundle.EMPTY, true)
+                .normalize(context, this, Bundle.EMPTY)
                 .build()
     }
 
@@ -178,17 +177,17 @@ internal object Notifier {
     }
 
     private fun NotifyId.showNotification(context: Context, notifier: NotificationManagerCompat,
-                                          data: Bundle, isRefresh: Boolean) =
+                                          data: Bundle) =
             try {
-                buildNotification(context, data, isRefresh).show(notifier, this)
+                buildNotification(context, data).show(notifier, this)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "NotifyId.showNotification(this=$this, data=$data)" +
                         " -> failed to build notification", e)
             }
 
-    private fun NotifyId.showNotification(context: Context, data: Bundle, isRefresh: Boolean) =
+    private fun NotifyId.showNotification(context: Context, data: Bundle) =
             try {
-                buildNotification(context, data, isRefresh).show(context, this)
+                buildNotification(context, data).show(context, this)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "NotifyId.showNotification(this=$this, data=$data)" +
                         " -> failed to build notification", e)
@@ -294,7 +293,7 @@ internal object Notifier {
                 .filter { it.key.isRefreshable }
                 .forEach {
                     val (notifyId, data) = it
-                    notifyId.showNotification(context, notifier, data, true)
+                    notifyId.showNotification(context, notifier, data)
                 }
 
         refreshSummaries(context)
@@ -315,7 +314,7 @@ internal object Notifier {
                 }
                 .forEach {
                     val (notifyId, data) = it
-                    notifyId.showNotification(context, notifier, data, true)
+                    notifyId.showNotification(context, notifier, data)
                 }
 
         refreshSummaries(context)
@@ -364,7 +363,7 @@ internal object Notifier {
 
         val (notifyId, data) = builder.build(context, hasTag)
 
-        val notification = notifyId.buildNotification(context, data, false)
+        val notification = notifyId.buildNotification(context, data)
 
         return notifyId to notification
     }
@@ -376,7 +375,7 @@ internal object Notifier {
 
         NotifyData.instance.add(notifyId, data)
 
-        notifyId.showNotification(context, data, false)
+        notifyId.showNotification(context, data)
         refreshSummaryOf(context, notifyId)
 
         return notifyId
@@ -392,7 +391,7 @@ internal object Notifier {
 
         notifyMap.forEach {
             val (notifyId, data) = it
-            notifyId.showNotification(context, notifier, data, false)
+            notifyId.showNotification(context, notifier, data)
         }
 
         refreshSummaryOf(context, builder)

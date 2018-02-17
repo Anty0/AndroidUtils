@@ -23,17 +23,17 @@ import android.support.v7.widget.RecyclerView
 import java.util.concurrent.locks.ReentrantLock
 
 import eu.codetopic.java.utils.log.Log
+import eu.codetopic.java.utils.simple.SimpleSuspendLock
 import eu.codetopic.utils.R
 import eu.codetopic.utils.thread.LooperUtils
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper
 import eu.codetopic.utils.ui.container.items.custom.LoadingItem
-import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.async
-import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.coroutines.experimental.asReference
+import org.jetbrains.anko.coroutines.experimental.bg
 
 abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>(context) {
 
@@ -43,12 +43,12 @@ abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>
         private val EDIT_TAG = Any()
     }
 
-    private val suspendLock = ReentrantLock()
+    private val suspendLock = SimpleSuspendLock()
 
     private var page: Int? = null
     var nextPage: Int
         private set(value) { page = value }
-        get() = page ?: run { startingPage.apply { page = this } }
+        get() = page ?: run { startingPage.also { page = it } }
     protected open val startingPage: Int
         get() = 0
 
@@ -69,7 +69,7 @@ abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>
                 else base.notifyItemRemoved(super.itemCount)
             }
         }
-    private val loadingItem by lazy(::generateLoadingItem)
+    private lateinit var loadingItem: CustomItem
 
     override val itemCount: Int
         get() = super.itemCount.let { if (showLoadingItem) it + 1 else it }
@@ -80,60 +80,82 @@ abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>
     override val isEmpty: Boolean
         get() = !showLoadingItem && super.isEmpty
 
-    protected open fun generateLoadingItem(): CustomItem {
-        val useCardView = base is RecyclerView.Adapter<*>
-        return object : LoadingItem(context, R.string.wait_text_loading) {
-            override fun getWrappers(context: Context): Array<CustomItemWrapper> {
-                return if (useCardView) CardViewWrapper.WRAPPER else emptyArray()
+    protected var useCardView = true
+        set(value) {
+            field = value
+            if (::loadingItem.isInitialized) {
+                loadingItem = generateLoadingItem()
+                if (showLoadingItem)
+                    base.notifyItemChanged(super.itemCount)
             }
         }
-    }
+
+    protected open fun generateLoadingItem(): CustomItem =
+            object : LoadingItem(context, R.string.wait_text_loading) {
+                override fun getWrappers(context: Context): Array<CustomItemWrapper> {
+                    return if (useCardView) CardViewWrapper.WRAPPER else emptyArray()
+                }
+            }
 
     override fun onBindViewHolder(holder: UniversalAdapter.ViewHolder, position: Int) {
         try {
             super.onBindViewHolder(holder, position)
         } finally {
-            if (showLoadingItem && position == super.itemCount)
+            if (showLoadingItem && position >= super.itemCount - 1) // last item or loading item
                 loadNextPage(false)
         }
     }
 
-    fun loadNextPage(force: Boolean) {
+    fun loadNextPage(force: Boolean): Job? {
         when {
             suspendLock.tryLock() -> {
-                val page: Int = nextPage++
-                val firstPage = page == startingPage
-
-                val editor = edit()
-                editor.takeIf { firstPage }?.apply {
-                    clear()
-                    notifyAllItemsChanged()
-                }
-
-                val adapterRef = this.asReference()
-                val nextPageLoader = onLoadNextPage(page, editor)
-                launch(UI) {
-                    val result = nextPageLoader.await()
-                    editor.tag = EDIT_TAG
-                    editor.apply()
-
-                    adapterRef().apply {
-                        showLoadingItem = result
-                        if (firstPage) base.takeIf { !it.hasOnlySimpleDataChangedReporting() }
-                                ?.notifyDataSetChanged() // first page auto scroll down fix
+                return doLoadNextPage().also {
+                    it.invokeOnCompletion(onCancelling = true) {
                         suspendLock.unlock()
                     }
                 }
             }
             force -> {
-                Log.d(LOG_TAG, "loadNextPage(force=$force) -> Still loading, " +
-                        "trying to wait one more looper loop.")
-                LooperUtils.postOnContextThread(context) {
-                    loadNextPage(true)
+                return launch {
+                    suspendLock.suspendLock()
+                    doLoadNextPage().also {
+                        it.invokeOnCompletion(onCancelling = true) {
+                            suspendLock.unlock()
+                        }
+                    }.join()
                 }
             }
             else -> Log.d(LOG_TAG, "loadNextPage(force=$force) -> Still loading, " +
                     "skipping next page load.")
+        }
+        return null
+    }
+
+    private fun doLoadNextPage(): Job {
+        val page: Int = nextPage++
+        val firstPage = page == startingPage
+
+        val editor = edit()
+        editor.takeIf { firstPage }?.apply {
+            clear()
+            notifyAllItemsChanged()
+        }
+
+        val self = this.asReference()
+        val nextPageLoader = onLoadNextPage(page, editor)
+        return launch(UI) {
+            val result = nextPageLoader.await()
+            editor.tag = EDIT_TAG
+            editor.apply()
+
+            self().apply {
+                showLoadingItem = result
+                if (firstPage && isBaseAttached) {
+                    // first page auto scroll down fix
+                    base.takeIf { !it.hasOnlySimpleDataChangedReporting() }
+                            ?.notifyDataSetChanged()
+                }
+            }
         }
     }
 
@@ -144,17 +166,20 @@ abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>
         super.onAttachToContainer(container)
     }
 
-    fun reset() {
+    fun reset(): Job? {
         page = null
-        loadNextPage(true)
+        return loadNextPage(true)
     }
 
     override fun getItem(position: Int): CustomItem {
-        return if (position == super.itemCount) loadingItem else super.getItem(position)
+        return if (position == super.itemCount) {
+            if (::loadingItem.isInitialized) loadingItem
+            else generateLoadingItem().also { loadingItem = it }
+        } else super.getItem(position)
     }
 
     override fun getItemPosition(item: CustomItem): Int {
-        return if (item == loadingItem) super.itemCount else super.getItemPosition(item)
+        return if (::loadingItem.isInitialized && item == loadingItem) super.itemCount else super.getItemPosition(item)
     }
 
     override fun getItems(contents: Array<CustomItem>): Array<CustomItem> {
