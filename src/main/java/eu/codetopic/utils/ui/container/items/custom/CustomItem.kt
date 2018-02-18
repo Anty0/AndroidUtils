@@ -58,9 +58,7 @@ abstract class CustomItem : Serializable {
     }
 
     fun bindViewHolder(holder: UniversalAdapter.ViewHolder, itemPosition: Int) {
-        if (holder !is ViewHolder.UniversalHolder)
-            throw IllegalArgumentException("Invalid holder (unknown holder): ${holder.javaClass}")
-        bindViewHolder(holder.base, itemPosition)
+        bindViewHolder(ViewHolder.fromUniversalHolder(holder), itemPosition)
     }
 
     fun bindViewHolder(holder: ViewHolder, itemPosition: Int) {
@@ -119,6 +117,15 @@ abstract class CustomItem : Serializable {
     class ViewHolder internal constructor(val context: Context, val itemView: View,
                                           val parentHolder: ViewHolder?,
                                           @param:LayoutRes @field:LayoutRes val layoutResId: Int) : LayoutContainer {
+
+        companion object {
+
+            fun fromUniversalHolder(holder: UniversalAdapter.ViewHolder): ViewHolder {
+                if (holder !is ViewHolder.UniversalHolder)
+                    throw IllegalArgumentException("Invalid holder (unknown holder): ${holder.javaClass}")
+                return holder.base
+            }
+        }
 
         override val containerView: View get() = itemView
 

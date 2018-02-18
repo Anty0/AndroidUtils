@@ -20,6 +20,9 @@
 <resources>
 
     <style name="UtilsTheme" parent="UtilsTheme.Base">
+        <item name="android:colorPrimary">@color/utilsColorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/utilsColorPrimaryDark</item>
+        <item name="android:colorAccent">@color/utilsColorAccent</item>
         <!--<item name="android:navigationBarColor">@color/navigationBarColor</item>-->
 
         <item name="android:windowContentTransitions">true</item>
@@ -30,6 +33,9 @@
     </style>
 
     <style name="UtilsTheme.NoActionBar" parent="UtilsTheme.NoActionBar.Base">
+        <item name="android:colorPrimary">@color/utilsColorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/utilsColorPrimaryDark</item>
+        <item name="android:colorAccent">@color/utilsColorAccent</item>
         <!--<item name="android:navigationBarColor">@color/navigationBarColor</item>-->
 
         <item name="android:windowContentTransitions">true</item>
@@ -40,6 +46,9 @@
     </style>
 
     <style name="UtilsTheme.Dialog" parent="UtilsTheme.Dialog.Base">
+        <item name="android:colorPrimary">@color/utilsColorPrimary</item>
+        <item name="android:colorPrimaryDark">@color/utilsColorPrimaryDark</item>
+        <item name="android:colorAccent">@color/utilsColorAccent</item>
         <!--<item name="android:navigationBarColor">@color/navigationBarColor</item>-->
 
         <item name="android:windowContentTransitions">true</item>
