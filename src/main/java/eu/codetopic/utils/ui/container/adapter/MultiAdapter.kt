@@ -98,6 +98,7 @@ class MultiAdapter<T : CustomItem>(
                     sortWith(comparator)
                 }
                 .also { addAll(it) }
+       tag = EDIT_TAG
     }
 
     override fun assertAllowApplyChanges(editTag: Any?,

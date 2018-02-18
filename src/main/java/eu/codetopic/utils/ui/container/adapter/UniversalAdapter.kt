@@ -36,6 +36,7 @@ import android.widget.SpinnerAdapter
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ui.view.ViewUtils
+import eu.codetopic.java.utils.JavaExtensions.to
 import eu.codetopic.utils.ui.view.ViewExtensions.getTag
 import eu.codetopic.utils.ui.view.ViewExtensions.setTag
 import eu.codetopic.utils.AndroidExtensions.getOrPut
@@ -369,15 +370,19 @@ abstract class UniversalAdapter<VH : UniversalAdapter.ViewHolder> {// TODO: 26.5
             adapter.onBindViewHolder(holder, i)
 
             val remoteViews = RemoteViews(context.packageName, R.layout.widget_list_custom_item)
-            remoteViews.setImageViewBitmap(R.id.image_view_content, ViewUtils.drawViewToBitmap(holder.itemView, false))
+            remoteViews.setImageViewBitmap(
+                    R.id.image_view_content,
+                    ViewUtils.drawViewToBitmap(holder.itemView, false)
+            )
 
-            (holder.itemView.getTag(VIEW_TAG_WIDGET_ITEM_CLICK_LISTENER)
-                    as? WidgetItemClickListener)?.let {
-                remoteViews.setOnClickPendingIntent(
-                        R.id.content_frame_layout,
-                        it.getOnClickIntent(context)
-                )
-            }
+            holder.itemView.getTag(VIEW_TAG_WIDGET_ITEM_CLICK_LISTENER)
+                    .to<WidgetItemClickListener>()
+                    ?.let {
+                        remoteViews.setOnClickPendingIntent(
+                                R.id.content_frame_layout,
+                                it.getOnClickIntent(context)
+                        )
+                    }
 
             return remoteViews
         }
