@@ -35,10 +35,12 @@ import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 
-import eu.codetopic.utils.AndroidExtensions;
+import eu.codetopic.utils.*;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.LooperUtils;
 import kotlin.Unit;
+
+import static eu.codetopic.utils.ExtensionsKt.getIconics;
 
 public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
 
@@ -54,10 +56,8 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
         mContext = mainView.getContext();
         mMainView = mainView;
         mFAB = mainView.findViewById(R.id.floatingActionButton);
-        mFAB.setImageDrawable(
-                AndroidExtensions.INSTANCE.getIconics(getContext(),
-                        GoogleMaterial.Icon.gmd_add).actionBar()
-        );
+        mFAB.setImageDrawable(getIconics(getContext(),
+                GoogleMaterial.Icon.gmd_add).actionBar());
         mSwipeRefreshLayout = mainView.findViewById(R.id.swipe_refresh_layout);
 
         //Log.d(LOG_TAG, "<init> for " + mContext.getClass().getName());

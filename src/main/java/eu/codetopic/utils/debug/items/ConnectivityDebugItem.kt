@@ -22,7 +22,7 @@ import android.content.Context
 import android.view.View
 import android.widget.TextView
 
-import eu.codetopic.utils.AndroidExtensions.getFormattedText
+import eu.codetopic.utils.getFormattedText
 import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.R
 import eu.codetopic.utils.network.NetworkManager.NetworkType.*

@@ -21,7 +21,6 @@ package eu.codetopic.utils.notifications.manager.data
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.MainThread
-import eu.codetopic.java.utils.JavaExtensions.to
 import eu.codetopic.utils.notifications.manager.NotifyClassifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel

@@ -26,7 +26,7 @@ import android.support.annotation.UiThread
 import com.squareup.leakcanary.LeakCanary
 
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.JavaExtensions.letIfNull
+import eu.codetopic.java.utils.letIfNull
 import eu.codetopic.utils.broadcast.BroadcastsConnector
 import eu.codetopic.utils.broadcast.LocalBroadcast
 import eu.codetopic.utils.debug.AndroidDebugModeExtension

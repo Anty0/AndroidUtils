@@ -20,7 +20,7 @@ package eu.codetopic.utils.data.preferences.preference
 
 import android.content.SharedPreferences
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import eu.codetopic.utils.AndroidExtensions.edit
+import eu.codetopic.utils.edit
 
 /**
  * @author anty

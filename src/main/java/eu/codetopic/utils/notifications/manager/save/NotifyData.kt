@@ -22,9 +22,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.annotation.MainThread
-import eu.codetopic.java.utils.JavaExtensions.kSerializer
-import eu.codetopic.java.utils.JavaExtensions.alsoIf
-import eu.codetopic.java.utils.JavaExtensions.letIf
+import eu.codetopic.java.utils.kSerializer
+import eu.codetopic.java.utils.alsoIf
+import eu.codetopic.java.utils.letIf
 import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.PrefNames
@@ -40,10 +40,8 @@ import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import kotlinx.serialization.internal.BooleanSerializer
-import kotlinx.serialization.internal.NullableSerializer
 import kotlinx.serialization.internal.PairSerializer
 import kotlinx.serialization.internal.StringSerializer
-import kotlinx.serialization.list
 import kotlinx.serialization.map
 
 /**

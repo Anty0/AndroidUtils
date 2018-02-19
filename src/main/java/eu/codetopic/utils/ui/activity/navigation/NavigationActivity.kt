@@ -42,8 +42,8 @@ import android.widget.LinearLayout
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
 
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.JavaExtensions.ifTrue
-import eu.codetopic.utils.AndroidExtensions.getIconics
+import eu.codetopic.java.utils.ifTrue
+import eu.codetopic.utils.getIconics
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
 import eu.codetopic.utils.simple.SimpleAnimatorListener
@@ -56,7 +56,6 @@ import kotlinx.android.synthetic.main.activity_navigation_header.view.*
 import kotlinx.android.synthetic.main.activity_navigation_base.*
 import kotlinx.android.synthetic.main.activity_module_toolbar.*
 import kotlin.math.ceil
-import kotlin.math.floor
 
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 abstract class NavigationActivity : BaseFragmentActivity() {

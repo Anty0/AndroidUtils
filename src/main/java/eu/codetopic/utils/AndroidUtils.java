@@ -94,7 +94,7 @@ public final class AndroidUtils {
     }
 
     /**
-     * Use AndroidExtensions.getFormattedText() instead
+     * Use extensions.getFormattedText() instead
      */
     @Deprecated
     @CheckResult
@@ -123,7 +123,7 @@ public final class AndroidUtils {
     }
 
     /**
-     * Use AndroidExtensions.getResourceUri() instead
+     * Use extensions.getResourceUri() instead
      */
     @Deprecated
     @CheckResult

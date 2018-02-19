@@ -23,7 +23,7 @@ import android.os.Build
 import android.support.annotation.MainThread
 import eu.codetopic.java.utils.debug.DebugAsserts.assert
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.AndroidExtensions.notificationManager
+import eu.codetopic.utils.notificationManager
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel.Companion.combinedIds
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel.Companion.combinedIdFor

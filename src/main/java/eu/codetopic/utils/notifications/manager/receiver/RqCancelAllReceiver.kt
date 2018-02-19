@@ -21,12 +21,10 @@ package eu.codetopic.utils.notifications.manager.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import eu.codetopic.java.utils.JavaExtensions.kSerializer
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
-import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.map

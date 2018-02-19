@@ -22,13 +22,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
-import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
-import eu.codetopic.utils.notifications.manager.Notifier
 import eu.codetopic.utils.notifications.manager.NotifyManager
-import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
-import kotlinx.serialization.json.JSON
 import org.jetbrains.anko.bundleOf
 
 /**

@@ -21,13 +21,11 @@ package eu.codetopic.utils.log.issue.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.widget.DividerItemDecoration
-import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
-import eu.codetopic.utils.AndroidExtensions.getIconics
-import eu.codetopic.utils.AndroidExtensions.edit
+import eu.codetopic.utils.getIconics
+import eu.codetopic.utils.edit
 import eu.codetopic.utils.R
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup

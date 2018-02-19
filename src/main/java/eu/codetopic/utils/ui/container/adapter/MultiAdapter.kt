@@ -20,7 +20,7 @@ package eu.codetopic.utils.ui.container.adapter
 
 import android.content.Context
 import android.support.annotation.UiThread
-import eu.codetopic.utils.AndroidExtensions.edit
+import eu.codetopic.utils.edit
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 
 /**

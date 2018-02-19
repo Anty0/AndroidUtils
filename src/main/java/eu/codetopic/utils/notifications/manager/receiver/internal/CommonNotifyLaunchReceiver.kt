@@ -23,8 +23,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
-import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
+import eu.codetopic.utils.putKSerializableExtra
+import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.NotifyManager

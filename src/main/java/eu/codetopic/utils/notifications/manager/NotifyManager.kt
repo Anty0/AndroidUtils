@@ -25,10 +25,10 @@ import android.os.Bundle
 import android.support.annotation.MainThread
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel
 import eu.codetopic.utils.notifications.manager.util.NotifyGroup
-import eu.codetopic.java.utils.JavaExtensions.alsoIf
-import eu.codetopic.utils.AndroidExtensions.OrderedBroadcastResult
-import eu.codetopic.utils.AndroidExtensions.sendSuspendOrderedBroadcast
-import eu.codetopic.utils.AndroidExtensions.getKSerializable
+import eu.codetopic.java.utils.alsoIf
+import eu.codetopic.utils.OrderedBroadcastResult
+import eu.codetopic.utils.sendSuspendOrderedBroadcast
+import eu.codetopic.utils.getKSerializable
 import eu.codetopic.utils.UtilsBase
 import eu.codetopic.utils.UtilsBase.processNameNotifyManager
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder

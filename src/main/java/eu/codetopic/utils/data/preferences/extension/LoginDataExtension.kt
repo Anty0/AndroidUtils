@@ -26,7 +26,7 @@ import eu.codetopic.utils.PrefNames.LOGGED_IN
 import eu.codetopic.utils.PrefNames.PASSWORD
 import eu.codetopic.utils.PrefNames.USERNAME
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import eu.codetopic.utils.AndroidExtensions.edit
+import eu.codetopic.utils.edit
 
 open class LoginDataExtension<out SP : SharedPreferences>(protected val provider: ISharedPreferencesProvider<SP>) {
 

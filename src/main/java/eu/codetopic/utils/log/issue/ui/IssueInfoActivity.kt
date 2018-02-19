@@ -26,8 +26,8 @@ import eu.codetopic.java.utils.log.Log
 
 import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.R
-import eu.codetopic.utils.AndroidExtensions.putKSerializableExtra
-import eu.codetopic.utils.AndroidExtensions.getKSerializableExtra
+import eu.codetopic.utils.putKSerializableExtra
+import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.requestCancel

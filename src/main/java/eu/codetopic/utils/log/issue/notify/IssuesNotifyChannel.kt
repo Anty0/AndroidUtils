@@ -27,11 +27,9 @@ import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
-import com.mikepenz.google_material_typeface_library.GoogleMaterial
-import eu.codetopic.java.utils.JavaExtensions.alsoIfNull
+import eu.codetopic.java.utils.alsoIfNull
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.AndroidExtensions.getIconics
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId

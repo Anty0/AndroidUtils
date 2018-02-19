@@ -19,8 +19,8 @@
 package eu.codetopic.utils.bundle
 
 import android.os.Bundle
-import eu.codetopic.utils.AndroidExtensions.deserializeBundle
-import eu.codetopic.utils.AndroidExtensions.serialize
+import eu.codetopic.utils.deserializeBundle
+import eu.codetopic.utils.serialize
 import kotlinx.serialization.*
 import kotlinx.serialization.internal.SerialClassDescImpl
 

@@ -25,7 +25,7 @@ import java.util.Collections
 
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter.CalculatingMode.*
-import eu.codetopic.java.utils.JavaExtensions.forEachIterate
+import eu.codetopic.java.utils.forEachIterate
 import eu.codetopic.java.utils.debug.DebugMode
 
 abstract class ArrayEditAdapter<E : Any, VH : UniversalAdapter.ViewHolder>() :

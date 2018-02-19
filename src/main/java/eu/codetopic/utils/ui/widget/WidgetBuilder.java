@@ -39,12 +39,14 @@ import android.widget.RemoteViews;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 
-import eu.codetopic.utils.AndroidExtensions;
+import eu.codetopic.utils.*;
 import eu.codetopic.utils.AndroidUtils;
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ids.Identifiers;
 import eu.codetopic.utils.ui.container.adapter.widget.CustomItemWidgetAdapter;
 import eu.codetopic.utils.ui.container.adapter.widget.WidgetCustomItemsProvider;
+
+import static eu.codetopic.utils.ExtensionsKt.getIconics;
 
 public class WidgetBuilder {
 
@@ -231,7 +233,7 @@ public class WidgetBuilder {
 
         baseView.setImageViewBitmap(
                 R.id.image_button_refresh,
-                AndroidExtensions.INSTANCE.getIconics(mContext,
+                getIconics(mContext,
                         GoogleMaterial.Icon.gmd_refresh).actionBar().toBitmap()
         );
 

@@ -21,24 +21,17 @@ package eu.codetopic.utils.debug.items.notify
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
 import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
-import eu.codetopic.java.utils.JavaExtensions.alsoIfNull
-import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.util.NotifyChannel
-import eu.codetopic.utils.notifications.manager.util.NotifyChannel.Companion.combinedIdFor
 import eu.codetopic.utils.notifications.manager.util.NotifyGroup
-import eu.codetopic.utils.notifications.manager.util.SummarizedNotifyChannel
-import kotlinx.serialization.json.JSON
 import org.jetbrains.anko.longToast
 
 /**

@@ -21,7 +21,7 @@ package eu.codetopic.utils.log.issue.ui
 import android.content.Context
 import android.support.v4.content.ContextCompat
 import eu.codetopic.java.utils.log.base.Priority
-import eu.codetopic.utils.AndroidExtensions.getFormattedText
+import eu.codetopic.utils.getFormattedText
 import eu.codetopic.utils.R
 import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId

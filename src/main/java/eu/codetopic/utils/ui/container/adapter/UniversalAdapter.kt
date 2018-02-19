@@ -36,10 +36,10 @@ import android.widget.SpinnerAdapter
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ui.view.ViewUtils
-import eu.codetopic.java.utils.JavaExtensions.to
+import eu.codetopic.java.utils.to
 import eu.codetopic.utils.ui.view.ViewExtensions.getTag
 import eu.codetopic.utils.ui.view.ViewExtensions.setTag
-import eu.codetopic.utils.AndroidExtensions.getOrPut
+import eu.codetopic.utils.getOrPut
 
 abstract class UniversalAdapter<VH : UniversalAdapter.ViewHolder> {// TODO: 26.5.16 add WidgetAdapter support
 

@@ -29,7 +29,7 @@ import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.broadcast.LocalBroadcast
 
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
-import eu.codetopic.utils.AndroidExtensions.edit
+import eu.codetopic.utils.edit
 
 abstract class PreferencesData<out SP : SharedPreferences> (
         context: Context, private val preferencesProvider: ISharedPreferencesProvider<SP>) :

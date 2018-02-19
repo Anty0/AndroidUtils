@@ -23,18 +23,16 @@ import android.app.ActivityManager
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.IdRes
-import android.support.design.widget.NavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.ContextThemeWrapper
 import android.view.View
 
-import eu.codetopic.java.utils.JavaExtensions.letIf
+import eu.codetopic.java.utils.letIf
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidUtils
-import eu.codetopic.utils.AndroidExtensions.use
+import eu.codetopic.utils.use
 import eu.codetopic.utils.R
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions

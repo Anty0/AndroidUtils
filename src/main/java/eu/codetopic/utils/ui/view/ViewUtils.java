@@ -43,18 +43,17 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import eu.codetopic.java.utils.JavaExtensions;
+import eu.codetopic.java.utils.*;
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
-import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.LooperUtils;
 import kotlin.Unit;
 
-import static eu.codetopic.java.utils.JavaExtensions.Anchor.RIGHT;
+import static eu.codetopic.java.utils.Anchor.RIGHT;
+import static eu.codetopic.java.utils.ExtensionsKt.addBeforeEveryLine;
+import static eu.codetopic.java.utils.ExtensionsKt.fillToLen;
 
 public class ViewUtils { // TODO: rework to kotlin (and move to ViewExtensions)
 
@@ -260,7 +259,7 @@ public class ViewUtils { // TODO: rework to kotlin (and move to ViewExtensions)
         StringBuilder sb = new StringBuilder("-->");
 
         //draw visibility
-        sb.append(JavaExtensions.fillToLen(visibilityToString(view.getVisibility()), 9, RIGHT)).append(" -> ");
+        sb.append(fillToLen(visibilityToString(view.getVisibility()), 9, RIGHT)).append(" -> ");
 
         //draw id
         sb.append(viewIdToString(view)).append(" -> ");
@@ -284,7 +283,7 @@ public class ViewUtils { // TODO: rework to kotlin (and move to ViewExtensions)
             StringBuilder csb = new StringBuilder();
             for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++)
                 csb.append("\n").append(drawViewHierarchy(((ViewGroup) view).getChildAt(i)));
-            sb.append(JavaExtensions.addBeforeEveryLine(csb.toString(), "\t"));
+            sb.append(addBeforeEveryLine(csb.toString(), "\t"));
             sb.append("\n}");
         }
         return sb.toString();
