@@ -21,10 +21,13 @@ package eu.codetopic.utils.notifications.manager
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent.FLAG_RECEIVER_FOREGROUND
+import android.os.Build
 import android.os.Bundle
 import android.support.annotation.MainThread
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
+import eu.codetopic.java.utils.alsoIf
 import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId
@@ -84,19 +87,31 @@ internal object Notifier {
                 is CommonNotifyId -> PendingIntent.getBroadcast(
                         context,
                         CommonNotifyLaunchReceiver.REQUEST_CODE_TYPE.nextId(),
-                        CommonNotifyLaunchReceiver.getIntent(context, this, data),
+                        CommonNotifyLaunchReceiver.getIntent(context, this, data)
+                                .also {
+                                    if (Build.VERSION.SDK_INT >= 16)
+                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                },
                         PendingIntent.FLAG_UPDATE_CURRENT
                 )
                 is CommonPersistentNotifyId -> PendingIntent.getBroadcast(
                         context,
                         CommonPersistentNotifyLaunchReceiver.REQUEST_CODE_TYPE.nextId(),
-                        CommonPersistentNotifyLaunchReceiver.getIntent(context, this),
+                        CommonPersistentNotifyLaunchReceiver.getIntent(context, this)
+                                .also {
+                                    if (Build.VERSION.SDK_INT >= 16)
+                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                },
                         PendingIntent.FLAG_UPDATE_CURRENT
                 )
                 is SummaryNotifyId -> PendingIntent.getBroadcast(
                         context,
                         SummaryNotifyLaunchReceiver.REQUEST_CODE_TYPE.nextId(),
-                        SummaryNotifyLaunchReceiver.getIntent(context, this),
+                        SummaryNotifyLaunchReceiver.getIntent(context, this)
+                                .also {
+                                    if (Build.VERSION.SDK_INT >= 16)
+                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                },
                         PendingIntent.FLAG_UPDATE_CURRENT
                 )
                 else -> throw IllegalArgumentException("Unknown notifyId: ${this::class}")
@@ -108,19 +123,31 @@ internal object Notifier {
                 is CommonNotifyId -> PendingIntent.getBroadcast(
                         context,
                         CommonNotifyDeleteReceiver.REQUEST_CODE_TYPE.nextId(),
-                        CommonNotifyDeleteReceiver.getIntent(context, this, data),
+                        CommonNotifyDeleteReceiver.getIntent(context, this, data)
+                                .also {
+                                    if (Build.VERSION.SDK_INT >= 16)
+                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                },
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_ONE_SHOT
                 )
                 is CommonPersistentNotifyId -> PendingIntent.getBroadcast(
                         context,
                         CommonPersistentNotifyDeleteReceiver.REQUEST_CODE_TYPE.nextId(),
-                        CommonPersistentNotifyDeleteReceiver.getIntent(context, this),
+                        CommonPersistentNotifyDeleteReceiver.getIntent(context, this)
+                                .also {
+                                    if (Build.VERSION.SDK_INT >= 16)
+                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                },
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_ONE_SHOT
                 )
                 is SummaryNotifyId -> PendingIntent.getBroadcast(
                         context,
                         SummaryNotifyDeleteReceiver.REQUEST_CODE_TYPE.nextId(),
-                        SummaryNotifyDeleteReceiver.getIntent(context, this),
+                        SummaryNotifyDeleteReceiver.getIntent(context, this)
+                                .also {
+                                    if (Build.VERSION.SDK_INT >= 16)
+                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                },
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_ONE_SHOT
                 )
                 else -> throw IllegalArgumentException("Unknown notifyId: ${this::class}")

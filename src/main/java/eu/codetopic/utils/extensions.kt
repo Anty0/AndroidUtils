@@ -24,6 +24,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.SearchManager
 import android.content.*
+import android.content.pm.PackageManager
+import android.content.pm.PackageManager.GET_META_DATA
 import android.content.res.TypedArray
 import android.graphics.Color
 import android.net.Uri
@@ -189,6 +191,14 @@ suspend fun Context.sendSuspendOrderedBroadcast(intent: Intent,
 
 data class OrderedBroadcastResult(val code: Int = 0, val data: String? = null,
                                   val extras: Bundle? = null)
+
+//////////////////////////////////////
+//////REGION - PACKAGE_MANAGER////////
+//////////////////////////////////////
+
+fun PackageManager.isAppInstalled(packageName: String): Boolean =
+        getInstalledApplications(GET_META_DATA)
+                .firstOrNull { it.packageName == packageName } != null
 
 /////////////////////////////////////////
 //////REGION - ATTRIBUTES////////////////
