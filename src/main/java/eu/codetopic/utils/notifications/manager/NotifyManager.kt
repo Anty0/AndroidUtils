@@ -251,6 +251,11 @@ object NotifyManager {
         return NotifyData.instance.getAll(groupId, channelId)
     }
 
+    fun getOnChangeBroadcastAction(): String {
+        assertUsable()
+        return NotifyData.instance.broadcastActionChanged
+    }
+
     //--------------------------------------------------------------------------
 
     @MainThread
