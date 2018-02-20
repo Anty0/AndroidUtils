@@ -90,7 +90,7 @@ inline fun SharedPreferences.edit(block: SharedPreferences.Editor.() -> Unit) =
 inline fun <T : Any> ArrayEditAdapter<T, *>.edit(block: ArrayEditAdapter.Editor<T>.() -> Unit) =
         edit().apply { block() }.apply()
 
-inline fun broadcast(crossinline block: BroadcastReceiver.(context: Context, intent: Intent?) -> Unit): BroadcastReceiver {
+inline fun receiver(crossinline block: BroadcastReceiver.(context: Context, intent: Intent?) -> Unit): BroadcastReceiver {
     return object: BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent?) = block(context, intent)
     }
@@ -178,7 +178,7 @@ suspend fun Context.sendSuspendOrderedBroadcast(intent: Intent,
         suspendCoroutine<OrderedBroadcastResult> { cont ->
             sendOrderedBroadcast(
                     intent, receiverPermission,
-                    broadcast { _, _ ->
+                    receiver { _, _ ->
                         cont.resume(OrderedBroadcastResult(
                                 code = resultCode,
                                 data = resultData,
