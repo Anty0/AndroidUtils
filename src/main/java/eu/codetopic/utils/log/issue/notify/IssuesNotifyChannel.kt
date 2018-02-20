@@ -22,6 +22,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
@@ -95,7 +96,7 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, checkForIdOverrides = tr
                                             notifyId: NotifyId, data: Map<out NotifyId, Bundle>) {
         context.startActivity(
                 IssuesActivity.getIntent(context)
-                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .addFlags(FLAG_ACTIVITY_NEW_TASK)
         )
     }
 
