@@ -343,7 +343,7 @@ abstract class UniversalAdapter<VH : UniversalAdapter.ViewHolder> {// TODO: 26.5
 
         override fun notifyDataSetChanged() {
             if (appWidgetIds == null) {
-                Log.w(LOG_TAG, "notifyDataSetChanged() -> Can't notify" +
+                Log.e(LOG_TAG, "notifyDataSetChanged() -> Can't notify" +
                         " about data set change without valid AppWidgetIds")
                 return
             }

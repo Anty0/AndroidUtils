@@ -49,6 +49,7 @@ class IssueItem(val notifyId: NotifyId?, val issue: Issue) : CustomItem() {
                     when (issue.priority) {
                         Priority.ERROR -> R.color.materialRed
                         Priority.WARN -> R.color.materialOrange
+                        Priority.BREAK_EVENT -> R.color.materialBlue
                         else -> R.color.materialYellow
                     }
             ))

@@ -165,7 +165,7 @@ object UtilsBase {
             if (it.containsKey(PARAM_INITIALIZE_UTILS)) {
                 return@let it.getBoolean(PARAM_INITIALIZE_UTILS, false)
             } else {
-                Log.w(LOG_TAG, "initialize()" +
+                Log.e(LOG_TAG, "initialize()" +
                         " -> Parameter $LOG_TAG.PARAM_INITIALIZE_UTILS not found in" +
                         " current process params, utils won't be initialized")
                 return@let false

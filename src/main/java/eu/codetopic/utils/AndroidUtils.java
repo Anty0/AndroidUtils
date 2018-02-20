@@ -332,7 +332,7 @@ public final class AndroidUtils {
                         if (clsName.equals(componentInfo.name))
                             return componentInfo.enabled && componentInfo.applicationInfo.enabled;
                 } catch (Exception e) {
-                    Log.d(LOG_TAG, "isComponentEnabled", e);
+                    Log.w(LOG_TAG, "isComponentEnabled", e);
                 }
                 return false;
         }
@@ -427,7 +427,7 @@ public final class AndroidUtils {
             context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(uri)));
             return true;
         } catch (Exception e) {
-            Log.w(LOG_TAG, e);
+            Log.w(LOG_TAG, "openUri(uri=" + uri + ") -> Failed to open uri", e);
             Toast.makeText(context, failMessage, Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -499,13 +499,14 @@ public final class AndroidUtils {
             return sw.toString().trim();
         } catch (IOException e) {
             Log.w(LOG_TAG, "getCurrentProcessName()" +
-                    " -> Failed to obtain process name using main method");
+                    " -> Failed to obtain process name using primary strategy" +
+                    " -> Using fallback strategy");
 
             final ActivityManager actManager = (ActivityManager)
                     context.getSystemService(Context.ACTIVITY_SERVICE);
             if (actManager == null) {
-                Log.w(LOG_TAG, "getCurrentProcessName()" +
-                        " -> Failed to obtain process name using secondary method" +
+                Log.e(LOG_TAG, "getCurrentProcessName()" +
+                        " -> Failed to obtain process name using fallback strategy" +
                         " -> ActivityManager is null");
                 return null;
             }
@@ -513,8 +514,8 @@ public final class AndroidUtils {
             final List<ActivityManager.RunningAppProcessInfo> processesInfo =
                     actManager.getRunningAppProcesses();
             if (processesInfo == null) {
-                Log.w(LOG_TAG, "getCurrentProcessName()" +
-                        " -> Failed to obtain process name using secondary method" +
+                Log.e(LOG_TAG, "getCurrentProcessName()" +
+                        " -> Failed to obtain process name using fallback strategy" +
                         " -> List of RunningAppProcessInfo is null");
                 return null;
             }
@@ -526,8 +527,8 @@ public final class AndroidUtils {
             }
 
 
-            Log.w(LOG_TAG, "getCurrentProcessName()" +
-                    " -> Failed to obtain process name using secondary method" +
+            Log.e(LOG_TAG, "getCurrentProcessName()" +
+                    " -> Failed to obtain process name using fallback strategy" +
                     " -> Current process not found");
             return null;
         } finally {

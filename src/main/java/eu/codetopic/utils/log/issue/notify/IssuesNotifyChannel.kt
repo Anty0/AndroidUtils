@@ -30,6 +30,7 @@ import android.support.v4.content.ContextCompat
 import eu.codetopic.java.utils.alsoIfNull
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.log.base.Priority
+import eu.codetopic.java.utils.log.base.Priority.*
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId
@@ -44,7 +45,7 @@ import kotlinx.serialization.json.JSON
 /**
  * @author anty
  */
-class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
+class IssuesNotifyChannel : SummarizedNotifyChannel(ID, checkForIdOverrides = true) {
 
     companion object {
 
@@ -140,11 +141,14 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
             buildNotificationBase(context, group).apply {
                 val issue = readData(data)
                         ?: throw IllegalArgumentException("Data doesn't contains issue")
-                val isError = issue.priority == Priority.ERROR
 
                 setContentTitle(context.getText(
-                        if (isError) R.string.notify_logged_error_title
-                        else R.string.notify_logged_warning_title
+                        when (issue.priority) {
+                            ERROR -> R.string.notify_logged_error_title
+                            WARN -> R.string.notify_logged_warning_title
+                            BREAK_EVENT -> R.string.notify_logged_break_event_title
+                            else -> R.string.notify_logged_issue_title
+                        }
                 ))
                 setContentText(issue.toString(false))
                 setStyle(
@@ -157,18 +161,21 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, true) {
                                            notifyId: NotifyId, data: Map<out NotifyId, Bundle>): NotificationCompat.Builder {
         val allIssues = data.values.mapNotNull {
             readData(it).alsoIfNull {
-                Log.w(LOG_TAG, "Data doesn't contains issue")
+                Log.e(LOG_TAG, "Data doesn't contains issue")
             }
         }
 
+        val title = context.getText(R.string.notify_logged_summary_title)
+        val text = context.getText(R.string.notify_logged_summary_text)
+
         return buildNotificationBase(context, group).apply {
-            setContentTitle(context.getText(R.string.notify_logged_summary_title))
-            setContentText(context.getText(R.string.notify_logged_summary_text))
+            setContentTitle(title)
+            setContentText(text)
             setNumber(allIssues.size)
             setStyle(
                     NotificationCompat.InboxStyle()
-                            .setBigContentTitle(context.getText(R.string.notify_logged_summary_title))
-                            .setSummaryText(context.getText(R.string.notify_logged_summary_text))
+                            .setSummaryText(title)
+                            .setBigContentTitle(title)
                             .also { n ->
                                 allIssues.forEach {
                                     n.addLine(it.toString(false))

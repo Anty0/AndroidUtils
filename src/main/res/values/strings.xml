@@ -22,6 +22,7 @@
     <string name="activity_label_issue_info">Logged issue info</string>
     <string name="activity_label_error_info">Logged error info</string>
     <string name="activity_label_warn_info">Logged warning info</string>
+    <string name="activity_label_break_event_info">Logged event info</string>
 
     <string name="text_default_no_list_items">Nothing to show</string>
     <string name="text_no_time">No time</string>
@@ -35,6 +36,8 @@
 
     <string name="notify_logged_error_title">Error logged</string>
     <string name="notify_logged_warning_title">Warning logged</string>
+    <string name="notify_logged_break_event_title">Event logged</string>
+    <string name="notify_logged_issue_title">Issue logged</string>
     <string name="notify_logged_summary_title">Issues logged</string>
     <string name="notify_logged_summary_text">By application</string>
     <string name="notify_issues_group_name">Issues</string>
@@ -65,6 +68,7 @@
     <string name="debug_item_connectivity_info_result_text">Any: %1$s, Wi-Fi: %2$s, Mobile: %3$s</string>
     <string name="debug_item_timed_components_refresh_info">Refresh TimedComponentsManager info</string>
     <string name="debug_item_logging_refresh_lines">Refresh LastLoggedLines</string>
+    <string name="debug_item_issues_log_break_event">Log event</string>
     <string name="debug_item_issues_log_warning">Log warning</string>
     <string name="debug_item_issues_log_error">Log error</string>
     <string name="debug_item_notify_refresh">Refresh</string>

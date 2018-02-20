@@ -24,7 +24,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import eu.codetopic.java.utils.log.Log
 
-import eu.codetopic.java.utils.log.base.Priority
+import eu.codetopic.java.utils.log.base.Priority.*
 import eu.codetopic.utils.R
 import eu.codetopic.utils.putKSerializableExtra
 import eu.codetopic.utils.getKSerializableExtra
@@ -34,7 +34,7 @@ import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.requestC
 import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
-import kotlinx.android.synthetic.main.activity_error_info.*
+import kotlinx.android.synthetic.main.activity_issue_info.*
 import kotlinx.serialization.internal.NullableSerializer
 
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
@@ -65,20 +65,23 @@ class IssueInfoActivity : AppCompatActivity() {
         val notifyId = intent?.getKSerializableExtra(EXTRA_NOTIFY_ID, EXTRA_NOTIFY_ID_SERIALIZER)
         val issue = intent?.getKSerializableExtra<Issue>(EXTRA_ISSUE)
                 ?: run {
-                    Log.w(LOG_TAG, "No Issue received in intent")
+                    Log.e(LOG_TAG, "No Issue received by intent")
                     return finish()
                 }
 
         val title = getText(
-                if (Priority.ERROR == issue.priority)
-                    R.string.activity_label_error_info
-                else R.string.activity_label_warn_info
+                when (issue.priority) {
+                    ERROR -> R.string.activity_label_error_info
+                    WARN -> R.string.activity_label_warn_info
+                    BREAK_EVENT -> R.string.activity_label_break_event_info
+                    else -> R.string.activity_label_issue_info
+                }
         )
 
         setFinishOnTouchOutside(false)
         setTitle(title)
 
-        setContentView(R.layout.activity_error_info)
+        setContentView(R.layout.activity_issue_info)
 
         butExit.setOnClickListener { finish() }
 

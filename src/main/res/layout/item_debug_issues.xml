@@ -27,6 +27,13 @@
 
     <Button
         style="?android:attr/buttonBarButtonStyle"
+        android:id="@+id/butLogBreakEvent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/debug_item_issues_log_break_event"/>
+
+    <Button
+        style="?android:attr/buttonBarButtonStyle"
         android:id="@+id/butLogWarning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

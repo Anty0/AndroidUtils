@@ -43,7 +43,7 @@
             android:layout_alignParentLeft="true"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:scaleType="center"
             android:contentDescription="@string/description_but_exit"
             app:iiv_icon="gmd-close"
@@ -72,7 +72,7 @@
             android:layout_alignParentRight="true"
             android:clickable="true"
             android:focusable="true"
-            android:background="?attr/selectableItemBackground"
+            android:background="?attr/selectableItemBackgroundBorderless"
             android:scaleType="center"
             android:contentDescription="@string/description_but_done"
             app:iiv_icon="gmd-done"
@@ -80,35 +80,35 @@
             app:iiv_padding="8dp" />
     </RelativeLayout>
 
-    <FrameLayout
+    <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clipToPadding="false"
         android:minHeight="48dp">
 
         <android.support.v4.widget.NestedScrollView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:clipToPadding="false">
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/txtMessage"
-                    style="@style/TextAppearance.AppCompat.Subhead"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:scrollHorizontally="true"
-                    android:paddingLeft="?attr/dialogPreferredPadding"
-                    android:paddingRight="?attr/dialogPreferredPadding"/>
+                    android:orientation="vertical">
 
-                <android.support.v4.widget.Space
-                    android:layout_width="wrap_content"
-                    android:layout_height="18dp"
-                    android:layout_gravity="center_horizontal" />
-            </LinearLayout>
+                    <TextView
+                        android:id="@+id/txtMessage"
+                        style="@style/TextAppearance.AppCompat.Subhead"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="?attr/dialogPreferredPadding"
+                        android:paddingRight="?attr/dialogPreferredPadding"/>
+
+                    <android.support.v4.widget.Space
+                        android:layout_width="wrap_content"
+                        android:layout_height="18dp"
+                        android:layout_gravity="center_horizontal" />
+                </LinearLayout>
         </android.support.v4.widget.NestedScrollView>
-    </FrameLayout>
+    </HorizontalScrollView>
 </android.support.v7.widget.AlertDialogLayout>

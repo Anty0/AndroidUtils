@@ -19,15 +19,13 @@
 package eu.codetopic.utils.debug.items
 
 import android.content.Context
-import android.view.View
-import android.widget.TextView
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.Logger
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper
 import kotlinx.android.synthetic.main.item_debug_issues.*
+import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @author anty
@@ -40,12 +38,16 @@ class IssuesDebugItem : CustomItem() {
     }
 
     override fun onBindViewHolder(holder: CustomItem.ViewHolder, itemPosition: Int) {
-        holder.butLogError.setOnClickListener {
+        holder.butLogError.onClick {
             Log.e(LOG_TAG, "Test message", RuntimeException("Test exception"))
         }
 
-        holder.butLogWarning.setOnClickListener {
+        holder.butLogWarning.onClick {
             Log.w(LOG_TAG, "Test warning message")
+        }
+
+        holder.butLogBreakEvent.onClick {
+            Log.b(LOG_TAG, "Test event message")
         }
     }
 

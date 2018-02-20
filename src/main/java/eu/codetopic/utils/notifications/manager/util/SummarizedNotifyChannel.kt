@@ -26,8 +26,9 @@ import eu.codetopic.utils.notifications.manager.data.NotifyId
 /**
  * @author anty
  */
-abstract class SummarizedNotifyChannel(id: String, checkForIdOverrides: Boolean) :
-        NotifyChannel(id, checkForIdOverrides) {
+abstract class SummarizedNotifyChannel(id: String, checkForIdOverrides: Boolean,
+                                       defaultEnabled: Boolean = true) :
+        NotifyChannel(id, checkForIdOverrides, defaultEnabled) {
 
     abstract fun createSummaryNotification(context: Context, group: NotifyGroup, notifyId: NotifyId,
                                            data: Map<out NotifyId, Bundle>): NotificationCompat.Builder

@@ -23,9 +23,8 @@ import android.support.annotation.MainThread
 import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.log.Logger
-import eu.codetopic.java.utils.log.LogsHandler
 import eu.codetopic.java.utils.log.base.LogLine
-import eu.codetopic.java.utils.log.base.Priority
+import eu.codetopic.java.utils.log.base.Priority.*
 import eu.codetopic.utils.log.issue.data.Issue.Companion.toIssue
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
@@ -38,14 +37,15 @@ import eu.codetopic.utils.thread.LooperUtils
 /**
  * @author anty
  */
-class IssueLogListener private constructor(private val appContext: Context) :
-        LogsHandler.OnLoggedListener, Thread.UncaughtExceptionHandler {
+class IssueLogListener private constructor(private val appContext: Context) {
 
     companion object {
 
         private const val LOG_TAG = "IssueLogListener"
 
         private const val FATAL_EXCEPTION_LOG_TAG = "FatalExceptionHandler"
+
+        private val issuePriorities = arrayOf(BREAK_EVENT, WARN, ERROR)
 
         private val LIST_IGNORE = arrayOf(
                 LOG_TAG
@@ -74,12 +74,17 @@ class IssueLogListener private constructor(private val appContext: Context) :
             // override default uncaught (fatal) exception handler
             val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
             Thread.setDefaultUncaughtExceptionHandler { thread, thr ->
-                listener.uncaughtException(thread, thr)
+                listener.processLogLine(
+                        LogLine(ERROR, FATAL_EXCEPTION_LOG_TAG, null, thr)
+                )
                 defaultHandler.uncaughtException(thread, thr)
             }
 
             // add listener to logs handler
-            Logger.logsHandler.addOnLoggedListener(listener)
+            Logger.logsHandler.addOnLoggedListener onLogged@ {
+                if (!DebugMode.isEnabled || it.priority !in issuePriorities) return@onLogged
+                listener.processLogLine(it)
+            }
 
             // initialize notifications
             NotifyManager.installGroup(context, IssuesNotifyGroup())
@@ -87,13 +92,7 @@ class IssueLogListener private constructor(private val appContext: Context) :
         }
     }
 
-    override fun uncaughtException(thread: Thread, thr: Throwable) {
-        onLogged(LogLine(Priority.ERROR, FATAL_EXCEPTION_LOG_TAG, null, thr))
-    }
-
-    override fun onLogged(logLine: LogLine) {
-        if (!DebugMode.isEnabled) return
-
+    fun processLogLine(logLine: LogLine) {
         try {
             when (logLine.tag) {
                 in LIST_IGNORE -> {} // ignore
@@ -130,10 +129,7 @@ class IssueLogListener private constructor(private val appContext: Context) :
                 }
             }
         } catch (t: Throwable) {
-            Log.e(LOG_TAG, "Failed to process logged issue", t)
+            Log.e(LOG_TAG, "Failed to process log line", t)
         }
     }
-
-    override val filterPriorities: Array<Priority>?
-        get() = arrayOf(Priority.WARN, Priority.ERROR)
 }

@@ -65,7 +65,7 @@ class NotifyManagerDebugItem : CustomItem() {
                 NotifyManager.requestSuspendRefresh(holder.context)
                 holder.context.longToast(R.string.debug_item_notify_toast_refresh_done)
             } catch (e: Exception) {
-                Log.w(LOG_TAG, "butRefresh.onClick()", e)
+                Log.e(LOG_TAG, "butRefresh.onClick()", e)
             }
         }
 
@@ -80,7 +80,7 @@ class NotifyManagerDebugItem : CustomItem() {
                 }.requestSuspendShow(holder.context)
                 holder.context.longToast(R.string.debug_item_notify_toast_show_one_done)
             } catch (e: Exception) {
-                Log.w(LOG_TAG, "butShowOne.onClick()", e)
+                Log.e(LOG_TAG, "butShowOne.onClick()", e)
             }
         }
 
@@ -95,7 +95,7 @@ class NotifyManagerDebugItem : CustomItem() {
                 }.requestSuspendShowAll(holder.context)
                 holder.context.longToast(R.string.debug_item_notify_toast_show_multi_done)
             } catch (e: Exception) {
-                Log.w(LOG_TAG, "butShowMulti.onClick()", e)
+                Log.e(LOG_TAG, "butShowMulti.onClick()", e)
             }
         }
 
@@ -109,7 +109,7 @@ class NotifyManagerDebugItem : CustomItem() {
                 )
                 holder.context.longToast(R.string.debug_item_notify_toast_cancel_all_done)
             } catch (e: Exception) {
-                Log.w(LOG_TAG, "butCancelAll.onClick()", e)
+                Log.e(LOG_TAG, "butCancelAll.onClick()", e)
             }
         }
     }

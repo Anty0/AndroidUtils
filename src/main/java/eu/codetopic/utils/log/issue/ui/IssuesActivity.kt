@@ -24,21 +24,24 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
-import eu.codetopic.utils.getIconics
-import eu.codetopic.utils.edit
-import eu.codetopic.utils.R
+import eu.codetopic.utils.*
+import eu.codetopic.utils.broadcast.LocalBroadcast
+import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
 import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter
 import eu.codetopic.utils.ui.container.recycler.Recycler
 import eu.codetopic.utils.ui.view.holder.loading.LoadingModularActivity
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.coroutines.experimental.asReference
+import org.jetbrains.anko.coroutines.experimental.bg
 
 /**
  * @author anty
@@ -55,6 +58,10 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
 
     }
 
+    private val updateReceiver = receiver { _, _ -> update() }
+
+    private var issuesList: List<Pair<NotifyId, Issue>>? = null
+
     private var adapter: CustomItemAdapter<IssueItem>? = null
     private var recyclerManager: Recycler.RecyclerManagerImpl? = null
 
@@ -67,13 +74,22 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
                 .setEmptyImage(getIconics(GoogleMaterial.Icon.gmd_warning).sizeDp(72))
                 .setEmptyText(R.string.empty_view_text_no_logged_issues)
                 .setSmallEmptyText(R.string.empty_view_text_small_no_logged_issues)
-                .setOnRefreshListener(::update)
+                .setOnRefreshListener { -> updateWithRefreshing() }
                 .setAdapter(adapter)
+
+        updateWithLoading()
     }
 
     override fun onStart() {
         super.onStart()
-        update()
+
+        register()
+    }
+
+    override fun onStop() {
+        unregister()
+
+        super.onStop()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -89,20 +105,21 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.item_done_all -> {
-                val thisRef = this.asReference()
-                val holderRef = holder.asReference()
+                val self = this.asReference()
+                val holder = holder
 
                 launch(UI) {
-                    holderRef().showLoading()
+                    holder.showLoading()
 
                     NotifyManager.requestSuspendCancelAll(
-                        context = thisRef(),
+                        context = self(),
                         groupId = IssuesNotifyGroup.ID,
                         channelId = IssuesNotifyChannel.ID
                     )
-                    thisRef().update()
 
-                    holderRef().hideLoading()
+                    self().update().join()
+
+                    holder.hideLoading()
                 }
             }
             else -> return super.onOptionsItemSelected(item)
@@ -110,33 +127,77 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
         return true
     }
 
-    private fun update() {
+    private fun register(): Job {
+        LocalBroadcast.registerReceiver(
+                receiver = updateReceiver,
+                filter = intentFilter(
+                        NotifyManager.getOnChangeBroadcastAction()
+                )
+        )
+
+        return update()
+    }
+
+    private fun unregister() {
+        LocalBroadcast.unregisterReceiver(updateReceiver)
+    }
+
+    private fun updateWithRefreshing(): Job {
+        val self = this.asReference()
+        return launch(UI) {
+            self().update().join()
+
+            self().recyclerManager?.setRefreshing(false)
+        }
+    }
+
+    private fun updateWithLoading(): Job {
+        val holder = holder
+        val self = this.asReference()
+        return launch(UI) {
+            holder.showLoading()
+
+            self().update().join()
+
+            holder.hideLoading()
+        }
+    }
+
+    private fun update(): Job {
+        val self = this.asReference()
+        return launch(UI) {
+            self().issuesList = bg {
+                NotifyManager
+                        .getAllData(
+                                groupId = IssuesNotifyGroup.ID,
+                                channelId = IssuesNotifyChannel.ID
+                        )
+                        .entries
+                        .sortedBy { it.key.timeWhen }
+                        .mapNotNull map@ {
+                            val (id, data) = it
+                            return@map IssuesNotifyChannel.readData(data)
+                                    ?.let { id to it }
+                        }
+            }.await()
+
+            self().updateUi()
+        }
+    }
+
+    private fun updateUi() {
         adapter?.edit {
             clear()
 
-            addAll(
-                    NotifyManager
-                            .getAllData(
-                                    groupId = IssuesNotifyGroup.ID,
-                                    channelId = IssuesNotifyChannel.ID
-                            )
-                            .mapNotNull {
-                                val (id, data) = it
-                                val issue = IssuesNotifyChannel.readData(data)
-                                        ?: return@mapNotNull null
-
-                                return@mapNotNull IssueItem(id, issue)
-                            }
-                            .sortedBy {
-                                it.notifyId?.timeWhen
-                                        ?: System.currentTimeMillis()
-                            }
-            )
+            issuesList
+                    ?.map {
+                        val (id, issue) = it
+                        IssueItem(id, issue)
+                    }
+                    ?.also { addAll(it) }
 
             notifyAllItemsChanged()
         }
-
-        recyclerManager?.setRefreshing(false)
     }
 
     override fun onDestroy() {

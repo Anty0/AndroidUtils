@@ -23,6 +23,7 @@ import android.util.Log
 import eu.codetopic.java.utils.log.base.LogLine
 import eu.codetopic.java.utils.log.base.LogTarget
 import eu.codetopic.java.utils.log.base.Priority
+import eu.codetopic.java.utils.log.base.Priority.*
 import kotlin.coroutines.experimental.buildSequence
 
 class AndroidLogTarget : LogTarget {
@@ -55,12 +56,13 @@ class AndroidLogTarget : LogTarget {
 
     private fun getPriorityId(priority: Priority): Int =
             when (priority) {
-                Priority.ASSERT -> Log.ASSERT
-                Priority.DEBUG -> Log.DEBUG
-                Priority.ERROR -> Log.ERROR
-                Priority.INFO -> Log.INFO
-                Priority.VERBOSE -> Log.VERBOSE
-                Priority.WARN -> Log.WARN
+                ASSERT -> Log.ASSERT
+                DEBUG -> Log.DEBUG
+                ERROR -> Log.ERROR
+                INFO -> Log.INFO
+                VERBOSE -> Log.VERBOSE
+                BREAK_EVENT -> Log.WARN
+                WARN -> Log.WARN
                 else -> Log.ERROR
             }
 }
