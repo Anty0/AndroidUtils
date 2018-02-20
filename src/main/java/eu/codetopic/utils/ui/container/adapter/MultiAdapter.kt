@@ -51,7 +51,7 @@ class MultiAdapter<T : CustomItem>(
     }
 
     @UiThread
-    fun mapAddAll(id: String, items: List<T>) {
+    fun mapAddAll(id: String, items: Collection<T>) {
         try {
             getId(id).addAll(items)
         } finally {
