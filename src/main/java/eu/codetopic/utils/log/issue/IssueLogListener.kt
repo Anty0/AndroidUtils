@@ -31,7 +31,7 @@ import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
 import eu.codetopic.utils.log.issue.ui.IssueInfoActivity
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager.create.NotificationBuilder.Companion.requestShow
+import eu.codetopic.utils.notifications.manager.requestShow
 import eu.codetopic.utils.thread.LooperUtils
 
 /**

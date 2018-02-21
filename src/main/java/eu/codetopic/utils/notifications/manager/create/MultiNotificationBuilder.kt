@@ -47,19 +47,6 @@ class MultiNotificationBuilder(val groupId: String, val channelId: String) {
         inline fun create(groupId: String, channelId: String,
                           init: MultiNotificationBuilder.() -> Unit): MultiNotificationBuilder =
                 MultiNotificationBuilder(groupId, channelId).apply(init)
-
-        @MainThread
-        fun MultiNotificationBuilder.showAll(context: Context): Map<out NotifyId, Bundle> =
-                NotifyManager.notifyAll(context, this)
-
-        @MainThread
-        fun MultiNotificationBuilder.requestShowAll(context: Context, optimise: Boolean = true) =
-                NotifyManager.requestNotifyAll(context, this, optimise)
-
-        @MainThread
-        suspend fun MultiNotificationBuilder.requestSuspendShowAll(context: Context,
-                                                                   optimise: Boolean = true): Map<out NotifyId, Bundle> =
-                NotifyManager.requestSuspendNotifyAll(context, this, optimise)
     }
 
     var timeWhen: Long = System.currentTimeMillis()

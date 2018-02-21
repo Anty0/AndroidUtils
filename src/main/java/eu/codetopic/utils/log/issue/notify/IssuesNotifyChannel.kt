@@ -38,6 +38,7 @@ import eu.codetopic.utils.ids.Identifiers.Companion.nextId
 import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.log.issue.ui.IssueInfoActivity
 import eu.codetopic.utils.log.issue.ui.IssuesActivity
+import eu.codetopic.utils.notifications.manager.combinedIdFor
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.util.NotifyGroup
 import eu.codetopic.utils.notifications.manager.util.SummarizedNotifyChannel

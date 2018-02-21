@@ -27,8 +27,8 @@ import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.*
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.group
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.channel
+import eu.codetopic.utils.notifications.manager.data.channel
+import eu.codetopic.utils.notifications.manager.data.group
 import eu.codetopic.utils.notifications.manager.save.NotifyData
 
 /**

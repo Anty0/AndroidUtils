@@ -30,8 +30,8 @@ import eu.codetopic.utils.putKSerializableExtra
 import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.requestCancel
 import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
+import eu.codetopic.utils.notifications.manager.data.requestCancel
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.synthetic.main.activity_issue_info.*

@@ -24,9 +24,9 @@ import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.R
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
-import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder.Companion.requestSuspendShowAll
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager.create.NotificationBuilder.Companion.requestSuspendShow
+import eu.codetopic.utils.notifications.manager.requestSuspendShow
+import eu.codetopic.utils.notifications.manager.requestSuspendShowAll
 import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper

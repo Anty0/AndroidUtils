@@ -26,9 +26,9 @@ import eu.codetopic.utils.putKSerializableExtra
 import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.NotifyManager
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.group
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.channel
 import eu.codetopic.utils.notifications.manager.data.SummaryNotifyId
+import eu.codetopic.utils.notifications.manager.data.channel
+import eu.codetopic.utils.notifications.manager.data.group
 import eu.codetopic.utils.notifications.manager.save.NotifyData
 import eu.codetopic.utils.notifications.manager.util.SummarizedNotifyChannel
 
@@ -42,12 +42,15 @@ class SummaryNotifyLaunchReceiver : BroadcastReceiver() {
         private const val NAME = "eu.codetopic.utils.notifications.manager.receiver.$LOG_TAG"
         private const val NAME_REQUEST_CODE_TYPE = "$NAME.LAST_REQUEST_CODE"
         private const val EXTRA_NOTIFY_ID = "$NAME.NOTIFY_ID"
+        private const val EXTRA_AUTO_CANCEL = "$NAME.NOTIFY_DATA"
 
         internal val REQUEST_CODE_TYPE = Identifiers.Type(NAME_REQUEST_CODE_TYPE)
 
-        internal fun getIntent(context: Context, notifyId: SummaryNotifyId): Intent =
+        internal fun getIntent(context: Context, notifyId: SummaryNotifyId,
+                               autoCancel: Boolean): Intent =
                 Intent(context, SummaryNotifyLaunchReceiver::class.java)
                         .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
+                        .putExtra(EXTRA_AUTO_CANCEL, autoCancel)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -61,10 +64,17 @@ class SummaryNotifyLaunchReceiver : BroadcastReceiver() {
             val channel = notifyId.channel as? SummarizedNotifyChannel
                     ?: throw IllegalArgumentException("Received launch request on summary" +
                             " notification with channel without summary implementation.")
+            val autoCancel = intent.getBooleanExtra(EXTRA_AUTO_CANCEL, false)
 
             val data = NotifyData.instance.getAll(notifyId.idGroup, notifyId.idChannel)
 
             channel.handleSummaryContentIntent(context, group, notifyId, data)
+
+            if (autoCancel) {
+                context.sendBroadcast(
+                        SummaryNotifyDeleteReceiver.getIntent(context, notifyId)
+                )
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }

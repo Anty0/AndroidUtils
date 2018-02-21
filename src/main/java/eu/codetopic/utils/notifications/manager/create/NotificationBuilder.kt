@@ -52,23 +52,6 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
         inline fun create(groupId: String, channelId: String,
                           init: NotificationBuilder.() -> Unit): NotificationBuilder =
                 NotificationBuilder(groupId, channelId).apply(init)
-
-        @MainThread
-        fun NotificationBuilder.build(context: Context, hasTag: Boolean): Pair<NotifyId, Notification> =
-                NotifyManager.build(context, this, hasTag)
-
-        @MainThread
-        fun NotificationBuilder.show(context: Context): NotifyId =
-                NotifyManager.notify(context, this)
-
-        @MainThread
-        fun NotificationBuilder.requestShow(context: Context, optimise: Boolean = true) =
-                NotifyManager.requestNotify(context, this, optimise)
-
-        @MainThread
-        suspend fun NotificationBuilder.requestSuspendShow(context: Context,
-                                                           optimise: Boolean = true): NotifyId =
-                NotifyManager.requestSuspendNotify(context, this, optimise)
     }
 
     var timeWhen: Long = System.currentTimeMillis()

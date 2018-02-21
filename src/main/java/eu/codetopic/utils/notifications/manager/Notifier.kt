@@ -21,26 +21,18 @@ package eu.codetopic.utils.notifications.manager
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent.FLAG_RECEIVER_FOREGROUND
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.MainThread
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
-import eu.codetopic.java.utils.alsoIf
 import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.ids.Identifiers.Companion.nextId
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
-import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.idCombined
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.group
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.channel
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.tag
-import eu.codetopic.utils.notifications.manager.data.SummaryNotifyId
+import eu.codetopic.utils.notifications.manager.data.*
 import eu.codetopic.utils.notifications.manager.receiver.internal.*
 import eu.codetopic.utils.notifications.manager.save.NotifyData
 import eu.codetopic.utils.notifications.manager.util.SummarizedNotifyChannel
@@ -82,35 +74,39 @@ internal object Notifier {
     }
 
     @Suppress("REDUNDANT_ELSE_IN_WHEN")
-    private fun NotifyId.launchIntent(context: Context, data: Bundle): PendingIntent =
+    private fun NotifyId.launchIntent(context: Context, data: Bundle,
+                                      autoCancel: Boolean): PendingIntent =
             when (this) {
                 is CommonNotifyId -> PendingIntent.getBroadcast(
                         context,
                         CommonNotifyLaunchReceiver.REQUEST_CODE_TYPE.nextId(),
-                        CommonNotifyLaunchReceiver.getIntent(context, this, data)
+                        CommonNotifyLaunchReceiver
+                                .getIntent(context, this, data, autoCancel)
                                 .also {
                                     if (Build.VERSION.SDK_INT >= 16)
-                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                        it.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
                                 },
                         PendingIntent.FLAG_UPDATE_CURRENT
                 )
                 is CommonPersistentNotifyId -> PendingIntent.getBroadcast(
                         context,
                         CommonPersistentNotifyLaunchReceiver.REQUEST_CODE_TYPE.nextId(),
-                        CommonPersistentNotifyLaunchReceiver.getIntent(context, this)
+                        CommonPersistentNotifyLaunchReceiver
+                                .getIntent(context, this, autoCancel)
                                 .also {
                                     if (Build.VERSION.SDK_INT >= 16)
-                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                        it.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
                                 },
                         PendingIntent.FLAG_UPDATE_CURRENT
                 )
                 is SummaryNotifyId -> PendingIntent.getBroadcast(
                         context,
                         SummaryNotifyLaunchReceiver.REQUEST_CODE_TYPE.nextId(),
-                        SummaryNotifyLaunchReceiver.getIntent(context, this)
+                        SummaryNotifyLaunchReceiver
+                                .getIntent(context, this, autoCancel)
                                 .also {
                                     if (Build.VERSION.SDK_INT >= 16)
-                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                        it.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
                                 },
                         PendingIntent.FLAG_UPDATE_CURRENT
                 )
@@ -126,7 +122,7 @@ internal object Notifier {
                         CommonNotifyDeleteReceiver.getIntent(context, this, data)
                                 .also {
                                     if (Build.VERSION.SDK_INT >= 16)
-                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                        it.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
                                 },
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_ONE_SHOT
                 )
@@ -136,7 +132,7 @@ internal object Notifier {
                         CommonPersistentNotifyDeleteReceiver.getIntent(context, this)
                                 .also {
                                     if (Build.VERSION.SDK_INT >= 16)
-                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                        it.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
                                 },
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_ONE_SHOT
                 )
@@ -146,7 +142,7 @@ internal object Notifier {
                         SummaryNotifyDeleteReceiver.getIntent(context, this)
                                 .also {
                                     if (Build.VERSION.SDK_INT >= 16)
-                                        it.addFlags(FLAG_RECEIVER_FOREGROUND)
+                                        it.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
                                 },
                         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_ONE_SHOT
                 )
@@ -156,13 +152,17 @@ internal object Notifier {
     private fun NotificationCompat.Builder.normalize(context: Context, notifyId: NotifyId,
                                                      data: Bundle): NotificationCompat.Builder {
         val combinedId = notifyId.idCombined
+        // If notification is auto-cancel, we must call delete intent manually from launch intent,
+        //  because of never resolved bug in android.
+        val autoCancel = (build().flags and Notification.FLAG_AUTO_CANCEL) != 0
+
         return this.apply {
             setChannelId(combinedId)
             setGroup(combinedId)
             setGroupSummary(notifyId.isSummary)
             setOnlyAlertOnce(notifyId.isRefreshable)
             setWhen(notifyId.timeWhen)
-            setContentIntent(notifyId.launchIntent(context, data))
+            setContentIntent(notifyId.launchIntent(context, data, autoCancel))
             setDeleteIntent(notifyId.deleteIntent(context, data))
         }
     }
@@ -372,7 +372,8 @@ internal object Notifier {
     }
 
 
-    fun build(context: Context, builder: NotificationBuilder, hasTag: Boolean): Pair<NotifyId, Notification> {
+    fun build(context: Context, builder: NotificationBuilder,
+              hasTag: Boolean): Pair<NotifyId, Notification> {
         NotifyManager.assertUsable()
 
         DebugMode.ifEnabled {

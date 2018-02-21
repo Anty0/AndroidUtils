@@ -29,8 +29,8 @@ import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.group
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.channel
+import eu.codetopic.utils.notifications.manager.data.channel
+import eu.codetopic.utils.notifications.manager.data.group
 
 /**
  * @author anty
@@ -43,13 +43,16 @@ class CommonNotifyLaunchReceiver : BroadcastReceiver() {
         private const val NAME_REQUEST_CODE_TYPE = "$NAME.LAST_REQUEST_CODE"
         private const val EXTRA_NOTIFY_ID = "$NAME.NOTIFY_ID"
         private const val EXTRA_NOTIFY_DATA = "$NAME.NOTIFY_DATA"
+        private const val EXTRA_AUTO_CANCEL = "$NAME.NOTIFY_DATA"
 
         internal val REQUEST_CODE_TYPE = Identifiers.Type(NAME_REQUEST_CODE_TYPE)
 
-        internal fun getIntent(context: Context, notifyId: CommonNotifyId, data: Bundle): Intent =
+        internal fun getIntent(context: Context, notifyId: CommonNotifyId, data: Bundle,
+                               autoCancel: Boolean): Intent =
                 Intent(context, CommonNotifyLaunchReceiver::class.java)
                         .putKSerializableExtra(EXTRA_NOTIFY_ID, notifyId)
                         .putKSerializableExtra(EXTRA_NOTIFY_DATA, data, BundleSerializer)
+                        .putExtra(EXTRA_AUTO_CANCEL, autoCancel)
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -60,11 +63,18 @@ class CommonNotifyLaunchReceiver : BroadcastReceiver() {
                     ?: throw IllegalArgumentException("No notification id received by intent")
             val data = intent.getKSerializableExtra(EXTRA_NOTIFY_DATA, BundleSerializer)
                     ?: throw IllegalArgumentException("No notification data received by intent")
+            val autoCancel = intent.getBooleanExtra(EXTRA_AUTO_CANCEL, false)
 
             val group = notifyId.group
             val channel = notifyId.channel
 
             channel.handleContentIntent(context, group, notifyId, data)
+
+            if (autoCancel) {
+                context.sendBroadcast(
+                        CommonNotifyDeleteReceiver.getIntent(context, notifyId, data)
+                )
+            }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
         }

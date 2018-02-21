@@ -29,8 +29,8 @@ import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.notifications.manager.*
 import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.group
-import eu.codetopic.utils.notifications.manager.data.NotifyId.Companion.channel
+import eu.codetopic.utils.notifications.manager.data.channel
+import eu.codetopic.utils.notifications.manager.data.group
 
 /**
  * @author anty

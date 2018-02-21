@@ -37,41 +37,6 @@ import kotlinx.serialization.json.JSON
 // FIXME: This class should be sealed, but making it sealed causes problems with serialization... Why??
 abstract class NotifyId {
 
-    companion object {
-
-        val NotifyId.group: NotifyGroup
-            get() = NotifyClassifier.findGroup(idGroup)
-
-        val NotifyId.channel: NotifyChannel
-            get() = NotifyClassifier.findChannel(idChannel)
-
-        val NotifyId.idCombined: String
-            get() = NotifyChannel.combinedId(idGroup, idChannel)
-
-        val NotifyId.tag: String?
-            get() =
-                if (hasTag)
-                    "TAG(isSummary=$isSummary, combinedId=$idCombined)"
-                else null
-
-        @MainThread
-        fun NotifyId.cancel(context: Context): Bundle? =
-                NotifyManager.cancel(context, this)
-
-        @MainThread
-        fun NotifyId.requestCancel(context: Context, optimise: Boolean = true) =
-                NotifyManager.requestCancel(context, this, optimise)
-
-        @MainThread
-        suspend fun NotifyId.requestSuspendCancel(context: Context,
-                                                  optimise: Boolean = true): Bundle? =
-                NotifyManager.requestSuspendCancel(context, this, optimise)
-
-        @get:MainThread
-        val NotifyId.data: Bundle
-            get() = NotifyManager.getDataOf(this)
-    }
-
     // Part of notification identity
     abstract val isSummary: Boolean
     abstract val idGroup: String
@@ -216,3 +181,35 @@ internal class SummaryNotifyId(override val idGroup: String,
     override val hasTag: Boolean
         get() = true
 }
+
+val NotifyId.group: NotifyGroup
+    get() = NotifyClassifier.findGroup(idGroup)
+
+val NotifyId.channel: NotifyChannel
+    get() = NotifyClassifier.findChannel(idChannel)
+
+val NotifyId.idCombined: String
+    get() = NotifyChannel.combinedId(idGroup, idChannel)
+
+val NotifyId.tag: String?
+    get() =
+        if (hasTag)
+            "TAG(isSummary=$isSummary, combinedId=$idCombined)"
+        else null
+
+@MainThread
+fun NotifyId.cancel(context: Context): Bundle? =
+        NotifyManager.cancel(context, this)
+
+@MainThread
+fun NotifyId.requestCancel(context: Context, optimise: Boolean = true) =
+        NotifyManager.requestCancel(context, this, optimise)
+
+@MainThread
+suspend fun NotifyId.requestSuspendCancel(context: Context,
+                                          optimise: Boolean = true): Bundle? =
+        NotifyManager.requestSuspendCancel(context, this, optimise)
+
+@get:MainThread
+val NotifyId.data: Bundle
+    get() = NotifyManager.getDataOf(this)
