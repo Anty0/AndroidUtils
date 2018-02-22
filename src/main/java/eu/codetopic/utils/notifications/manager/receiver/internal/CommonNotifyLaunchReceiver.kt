@@ -43,7 +43,7 @@ class CommonNotifyLaunchReceiver : BroadcastReceiver() {
         private const val NAME_REQUEST_CODE_TYPE = "$NAME.LAST_REQUEST_CODE"
         private const val EXTRA_NOTIFY_ID = "$NAME.NOTIFY_ID"
         private const val EXTRA_NOTIFY_DATA = "$NAME.NOTIFY_DATA"
-        private const val EXTRA_AUTO_CANCEL = "$NAME.NOTIFY_DATA"
+        private const val EXTRA_AUTO_CANCEL = "$NAME.AUTO_CANCEL"
 
         internal val REQUEST_CODE_TYPE = Identifiers.Type(NAME_REQUEST_CODE_TYPE)
 

@@ -17,33 +17,46 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    style="?android:attr/buttonBarStyle"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/butLogBreakEvent"
+    <HorizontalScrollView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/debug_item_issues_log_break_event"/>
+        android:layout_gravity="center_horizontal"
+        tools:ignore="UselessParent">
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/butLogWarning"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/debug_item_issues_log_warning"/>
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/butLogError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/debug_item_issues_log_error"/>
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/butLogBreakEvent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/debug_item_issues_log_break_event"/>
 
-</LinearLayout>
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/butLogWarning"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/debug_item_issues_log_warning"/>
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/butLogError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/debug_item_issues_log_error"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+</FrameLayout>

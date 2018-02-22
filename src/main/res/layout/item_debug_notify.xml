@@ -17,40 +17,54 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    style="?android:attr/buttonBarStyle"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_horizontal"
-    android:orientation="horizontal">
+    android:layout_height="wrap_content">
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/butRefresh"
+    <HorizontalScrollView
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/debug_item_notify_refresh"/>
+        android:layout_gravity="center_horizontal"
+        tools:ignore="UselessParent">
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/butShowOne"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/debug_item_notify_show_one"/>
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/butShowMulti"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/debug_item_notify_show_multi"/>
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/butRefresh"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/debug_item_notify_refresh"/>
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:id="@+id/butCancelAll"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/debug_item_notify_cancel_all"/>
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/butShowOne"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/debug_item_notify_show_one"/>
 
-</LinearLayout>
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/butShowMulti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/debug_item_notify_show_multi"/>
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:id="@+id/butCancelAll"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/debug_item_notify_cancel_all"/>
+
+        </LinearLayout>
+    </HorizontalScrollView>
+</FrameLayout>

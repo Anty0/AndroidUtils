@@ -37,16 +37,22 @@ import kotlinx.serialization.json.JSON
 // FIXME: This class should be sealed, but making it sealed causes problems with serialization... Why??
 abstract class NotifyId {
 
+    companion object {
+         fun forCommon(groupId: String, channelId: String, id: Int,
+                       hasTag: Boolean = true): NotifyId =
+                 CommonNotifyId(groupId, channelId, id, hasTag)
+    }
+
     // Part of notification identity
     abstract val isSummary: Boolean
     abstract val idGroup: String
     abstract val idChannel: String
     abstract val idNotify: Int
+    abstract val hasTag: Boolean
 
     // Metadata
     abstract val isPersistent: Boolean
     abstract val isRefreshable: Boolean
-    abstract val hasTag: Boolean
     abstract val timeWhen: Long
 
     override fun equals(other: Any?): Boolean {
@@ -59,6 +65,7 @@ abstract class NotifyId {
         if (idGroup != other.idGroup) return false
         if (idChannel != other.idChannel) return false
         if (idNotify != other.idNotify) return false
+        if (hasTag != other.hasTag) return false
 
         return true
     }
