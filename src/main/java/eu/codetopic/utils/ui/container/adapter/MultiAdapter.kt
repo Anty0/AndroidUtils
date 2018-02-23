@@ -20,6 +20,7 @@ package eu.codetopic.utils.ui.container.adapter
 
 import android.content.Context
 import android.support.annotation.UiThread
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.edit
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 
@@ -91,6 +92,8 @@ class MultiAdapter<T : CustomItem>(
 
     @UiThread
     fun mapUpdate() = edit {
+        Log.d(LOG_TAG, "mapUpdate() -> (map=$map)")
+
         clear()
         mutableListOf<T>()
                 .apply {
