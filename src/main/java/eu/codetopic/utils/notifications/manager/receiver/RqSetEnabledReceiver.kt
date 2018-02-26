@@ -21,6 +21,7 @@ package eu.codetopic.utils.notifications.manager.receiver
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import eu.codetopic.java.utils.letIfNull
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import org.jetbrains.anko.bundleOf
@@ -38,7 +39,7 @@ class RqSetEnabledReceiver : BroadcastReceiver() {
         private const val EXTRA_CHANNEL_ID = "$NAME.CHANNEL_ID"
         private const val EXTRA_ENABLE = "$NAME.CHANNEL_ID"
 
-        internal fun getStartIntent(context: Context, groupId: String,
+        internal fun getStartIntent(context: Context, groupId: String?,
                                     channelId: String, enable: Boolean): Intent =
                 Intent(context, RqSetEnabledReceiver::class.java)
                         .putExtra(EXTRA_GROUP_ID, groupId)
@@ -50,8 +51,9 @@ class RqSetEnabledReceiver : BroadcastReceiver() {
         try {
             NotifyManager.assertInitialized(context)
 
-            val groupId = intent.getStringExtra(EXTRA_GROUP_ID)
-                    ?: throw IllegalArgumentException("No group id received by intent")
+            val groupId = intent.takeIf { it.hasExtra(EXTRA_GROUP_ID) }
+                    .letIfNull { throw IllegalArgumentException("No group id received by intent") }
+                    .getStringExtra(EXTRA_GROUP_ID)
             val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)
                     ?: throw IllegalArgumentException("No channel id received by intent")
             val enable = intent.takeIf { it.hasExtra(EXTRA_ENABLE) }

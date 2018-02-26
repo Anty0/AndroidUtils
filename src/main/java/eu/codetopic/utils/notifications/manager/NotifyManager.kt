@@ -208,14 +208,14 @@ object NotifyManager {
     fun hasChannel(channelId: String): Boolean =
             NotifyClassifier.hasChannel(channelId)
 
-    fun setChannelEnabled(context: Context, groupId: String, channelId: String, enable: Boolean) {
+    fun setChannelEnabled(context: Context, groupId: String?, channelId: String, enable: Boolean) {
         assertInitialized(context)
         assertPostInitCleanupDone()
         NotifyData.instance.setChannelEnabled(groupId, channelId, enable)
         Notifier.refresh(context, groupId, channelId)
     }
 
-    fun isChannelEnabled(groupId: String, channelId: String): Boolean {
+    fun isChannelEnabled(groupId: String?, channelId: String): Boolean {
         assertUsable()
         return NotifyData.instance.isChannelEnabled(groupId, channelId)
                 ?: findChannel(channelId).defaultEnabled
@@ -332,7 +332,7 @@ object NotifyManager {
     }
 
     @MainThread
-    fun requestSetChannelEnabled(context: Context, groupId: String, channelId: String,
+    fun requestSetChannelEnabled(context: Context, groupId: String?, channelId: String,
                                  enable: Boolean, optimise: Boolean = true) {
         assertUsable()
         if (optimise && isInitialized) setChannelEnabled(context, groupId, channelId, enable)
@@ -478,7 +478,7 @@ object NotifyManager {
     }
 
     @MainThread
-    suspend fun requestSuspendSetChannelEnabled(context: Context, groupId: String,
+    suspend fun requestSuspendSetChannelEnabled(context: Context, groupId: String?,
                                                 channelId: String, enable: Boolean,
                                                 optimise: Boolean = true) {
         assertUsable()

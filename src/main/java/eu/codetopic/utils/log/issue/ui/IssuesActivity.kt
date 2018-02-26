@@ -76,6 +76,7 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
                 .setSmallEmptyText(R.string.empty_view_text_small_no_logged_issues)
                 .setOnRefreshListener { -> updateWithRefreshing() }
                 .setAdapter(adapter)
+        // TODO: add item touch helper and allow removing items by swiping them
 
         updateWithLoading()
     }

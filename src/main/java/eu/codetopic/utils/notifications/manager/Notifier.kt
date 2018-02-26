@@ -341,8 +341,8 @@ internal object Notifier {
                 .filter {
                     it.key.let {
                         it.isRefreshable
-                                && it.idGroup == groupId
-                                && it.idChannel == channelId
+                                && (groupId == null || it.idGroup == groupId)
+                                && (channelId == null || it.idChannel == channelId)
                     }
                 }
                 .forEach {

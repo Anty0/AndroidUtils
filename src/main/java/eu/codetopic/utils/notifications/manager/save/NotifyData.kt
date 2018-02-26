@@ -40,6 +40,7 @@ import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import kotlinx.serialization.internal.BooleanSerializer
+import kotlinx.serialization.internal.NullableSerializer
 import kotlinx.serialization.internal.PairSerializer
 import kotlinx.serialization.internal.StringSerializer
 import kotlinx.serialization.map
@@ -89,17 +90,18 @@ internal class NotifyData private constructor(context: Context) :
         notifyMapSave = notifyMap
     }
 
-    private var channelsEnableMapSave: Map<Pair<String, String>, Boolean>
-            by KSerializedPreference<Map<Pair<String, String>, Boolean>>(
+    private var channelsEnableMapSave: Map<Pair<String?, String>, Boolean>
+            by KSerializedPreference<Map<Pair<String?, String>, Boolean>>(
                     PrefNames.CHANNELS_ENABLE_MAP,
-                    (PairSerializer(StringSerializer, StringSerializer) to BooleanSerializer).map,
+                    (PairSerializer(NullableSerializer(StringSerializer),
+                            StringSerializer) to BooleanSerializer).map,
                     accessProvider,
                     { emptyMap() }
             )
 
     private val channelsEnableMapCache by lazy { channelsEnableMapSave.toMutableMap() }
 
-    private val channelsEnableMap: MutableMap<Pair<String, String>, Boolean>
+    private val channelsEnableMap: MutableMap<Pair<String?, String>, Boolean>
         get() =
             if (NotifyManager.isInitialized) channelsEnableMapCache
             else channelsEnableMapSave.toMutableMap()
@@ -109,7 +111,7 @@ internal class NotifyData private constructor(context: Context) :
         channelsEnableMapSave = channelsEnableMap
     }
 
-    fun setChannelEnabled(groupId: String, channelId: String, enable: Boolean?) {
+    fun setChannelEnabled(groupId: String?, channelId: String, enable: Boolean?) {
         NotifyManager.assertInitialized(context)
         val key = groupId to channelId
         if (enable == null) channelsEnableMap.remove(key)
@@ -117,8 +119,9 @@ internal class NotifyData private constructor(context: Context) :
         channelsEnableMapSave()
     }
 
-    fun isChannelEnabled(groupId: String, channelId: String): Boolean? =
-            channelsEnableMap[groupId to channelId]
+    fun isChannelEnabled(groupId: String?, channelId: String): Boolean? =
+            if (groupId == null) channelsEnableMap[null to channelId]
+            else channelsEnableMap[groupId to channelId] ?: channelsEnableMap[null to channelId]
 
     fun remove(id: NotifyId): Bundle? {
         NotifyManager.assertInitialized(context)

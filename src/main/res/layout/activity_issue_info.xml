@@ -48,6 +48,7 @@
             android:contentDescription="@string/description_but_exit"
             app:iiv_icon="gmd-close"
             app:iiv_color="@color/white"
+            app:iiv_size="32dp"
             app:iiv_padding="8dp" />
 
         <android.support.v7.widget.DialogTitle
@@ -77,6 +78,7 @@
             android:contentDescription="@string/description_but_done"
             app:iiv_icon="gmd-done"
             app:iiv_color="@color/white"
+            app:iiv_size="32dp"
             app:iiv_padding="8dp" />
     </RelativeLayout>
 

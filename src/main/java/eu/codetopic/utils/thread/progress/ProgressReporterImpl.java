@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.thread.progress;
 
+import android.support.annotation.AnyThread;
 import android.support.annotation.WorkerThread;
 
 public abstract class ProgressReporterImpl implements ProgressReporter {
@@ -53,6 +54,7 @@ public abstract class ProgressReporterImpl implements ProgressReporter {
 
     @Override
     public synchronized void startShowingProgress() {
+        if (showingProgress && max == 100 && progress == 0 && !intermediate) return;
         showingProgress = true;
         max = 100;
         progress = 0;
@@ -62,6 +64,7 @@ public abstract class ProgressReporterImpl implements ProgressReporter {
 
     @Override
     public synchronized void stopShowingProgress() {
+        if (!showingProgress && max == 100 && progress == 0 && intermediate) return;
         showingProgress = false;
         max = 100;
         progress = 0;
@@ -71,6 +74,7 @@ public abstract class ProgressReporterImpl implements ProgressReporter {
 
     @Override
     public synchronized void setMaxProgress(int max) {
+        if (this.max == max && !intermediate) return;
         this.max = max;
         intermediate = false;
         update();
@@ -78,6 +82,7 @@ public abstract class ProgressReporterImpl implements ProgressReporter {
 
     @Override
     public synchronized void reportProgress(int progress) {
+        if (this.progress == progress && !intermediate) return;
         this.progress = progress;
         intermediate = false;
         update();
@@ -98,7 +103,7 @@ public abstract class ProgressReporterImpl implements ProgressReporter {
         onChange(getProgressInfo());
     }
 
-    @WorkerThread
+    @AnyThread
     protected abstract void onChange(ProgressInfo info);
 
 }
