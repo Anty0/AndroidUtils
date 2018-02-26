@@ -29,16 +29,16 @@ import kotlinx.android.synthetic.main.item_loading.view.*
  */
 
 open class LoadingItem(private val title: CharSequence,
-                       private val text: CharSequence? = null) : CustomItem() {
+                       private val subtitle: CharSequence? = null) : CustomItem() {
 
-    constructor(context: Context, @StringRes titleId: Int, @StringRes textId: Int? = null)
-            : this(context.getText(titleId), textId?.let { context.getText(it) })
+    constructor(context: Context, @StringRes titleId: Int, @StringRes subtitleId: Int? = null)
+            : this(context.getText(titleId), subtitleId?.let { context.getText(it) })
 
     override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
         holder.itemView.txtTitle.text = title
 
         holder.itemView.txtText.apply {
-            text = this@LoadingItem.text
+            text = this@LoadingItem.subtitle
             visibility = if (text != null) View.VISIBLE else View.GONE
         }
     }
@@ -46,10 +46,10 @@ open class LoadingItem(private val title: CharSequence,
     override fun onBindRemoteViewHolder(holder: CustomItemRemoteViewHolder, itemPosition: Int) {
         holder.itemView.setTextViewText(R.id.txtTitle, title)
 
-        holder.itemView.setTextViewText(R.id.txtText, text)
+        holder.itemView.setTextViewText(R.id.txtText, subtitle)
         holder.itemView.setViewVisibility(
                 R.id.txtText,
-                if (text != null) View.VISIBLE else View.GONE
+                if (subtitle != null) View.VISIBLE else View.GONE
         )
     }
 
@@ -59,16 +59,16 @@ open class LoadingItem(private val title: CharSequence,
 }
 
 open class CardLoadingItem(private val title: CharSequence,
-                           private val text: CharSequence? = null) : CustomItem() {
+                           private val subtitle: CharSequence? = null) : CustomItem() {
 
-    constructor(context: Context, @StringRes titleId: Int, @StringRes textId: Int? = null)
-            : this(context.getText(titleId), textId?.let { context.getText(it) })
+    constructor(context: Context, @StringRes titleId: Int, @StringRes subtitleId: Int? = null)
+            : this(context.getText(titleId), subtitleId?.let { context.getText(it) })
 
     override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
         holder.itemView.txtTitle.text = title
 
         holder.itemView.txtText.apply {
-            text = this@CardLoadingItem.text
+            text = this@CardLoadingItem.subtitle
             visibility = if (text != null) View.VISIBLE else View.GONE
         }
     }
