@@ -40,7 +40,7 @@ abstract class BaseDebugActivity : ModularActivity(ToolbarModule(), BackButtonMo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Recycler.inflate().on(this)
+        Recycler.inflate().withItemDivider().on(this)
                 .setAdapter(mutableListOf<CustomItem>().apply {
                     prepareDebugItems(this)
                 })

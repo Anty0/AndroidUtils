@@ -26,6 +26,7 @@ import eu.codetopic.utils.R
 import eu.codetopic.utils.log.issue.data.Issue
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
+import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import kotlinx.android.synthetic.main.item_issue.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -42,7 +43,7 @@ class IssueItem(val notifyId: NotifyId?, val issue: Issue) : CustomItem() {
         private val DATE_FORMAT = SimpleDateFormat("yyyy.MM.dd HH:mm:ss", Locale.getDefault())
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, itemPosition: Int) {
+    override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
         holder.txtPriority.apply {
             setTextColor(ContextCompat.getColor(
                     holder.context,
@@ -90,9 +91,7 @@ class IssueItem(val notifyId: NotifyId?, val issue: Issue) : CustomItem() {
         }
     }
 
-    override fun getItemLayoutResId(context: Context): Int = R.layout.item_issue
-
-    //override fun getWrappers(context: Context): Array<CustomItemWrapper> = CardViewWrapper.WRAPPER
+    override fun getLayoutResId(context: Context): Int = R.layout.item_issue
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

@@ -50,14 +50,25 @@ object NotifyManager {
     internal const val REQUEST_EXTRA_THROWABLE = "EXTRA_THROWABLE"
     internal const val REQUEST_EXTRA_RESULT = "EXTRA_RESULT"
 
+    private var postInitCleanupDone = false
     private var initialized = false
     private var usable = false
+
+    val isPostInitCleanupDone: Boolean
+        get() = postInitCleanupDone
 
     val isInitialized: Boolean
         get() = initialized
 
     val isUsable: Boolean
         get() = usable
+
+    fun assertPostInitCleanupDone() {
+        if (!isPostInitCleanupDone)
+            throw IllegalStateException(
+                    "NotifyManager did not finished post init clean up in this process yet"
+            )
+    }
 
     fun assertInitialized(context: Context) {
         if (!isInitialized) throw IllegalStateException(
@@ -81,7 +92,7 @@ object NotifyManager {
     }
 
     @MainThread
-    fun completeInitialization(context: Context) {
+    fun initialize(context: Context) {
         if (usable) throw IllegalStateException(
                 "NotifyManager is still initialized in this process"
         )
@@ -90,6 +101,13 @@ object NotifyManager {
         if (isOnNotifyManagerProcess(context)) initialized = true
 
         NotifyData.initialize(context)
+    }
+
+    @MainThread
+    fun postInitCleanupAndRefresh(context: Context) {
+        assertUsable()
+
+        postInitCleanupDone = true
 
         if (isInitialized) {
             cleanup(context)
@@ -192,6 +210,7 @@ object NotifyManager {
 
     fun setChannelEnabled(context: Context, groupId: String, channelId: String, enable: Boolean) {
         assertInitialized(context)
+        assertPostInitCleanupDone()
         NotifyData.instance.setChannelEnabled(groupId, channelId, enable)
         Notifier.refresh(context, groupId, channelId)
     }

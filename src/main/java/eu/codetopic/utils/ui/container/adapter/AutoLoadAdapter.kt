@@ -26,10 +26,7 @@ import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.simple.SimpleSuspendLock
 import eu.codetopic.utils.R
 import eu.codetopic.utils.thread.LooperUtils
-import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper
-import eu.codetopic.utils.ui.container.items.custom.CustomItem
-import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper
-import eu.codetopic.utils.ui.container.items.custom.LoadingItem
+import eu.codetopic.utils.ui.container.items.custom.*
 import kotlinx.coroutines.experimental.*
 import kotlinx.coroutines.experimental.android.UI
 import org.jetbrains.anko.coroutines.experimental.asReference
@@ -69,7 +66,12 @@ abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>
                 else base.notifyItemRemoved(super.itemCount)
             }
         }
-    private lateinit var loadingItem: CustomItem
+    var loadingItem: CustomItem = EmptyCustomItem()
+        set(value) {
+            field = value
+            if (isBaseAttached && showLoadingItem)
+                base.notifyItemChanged(super.itemCount)
+        }
 
     override val itemCount: Int
         get() = super.itemCount.let { if (showLoadingItem) it + 1 else it }
@@ -80,24 +82,7 @@ abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>
     override val isEmpty: Boolean
         get() = !showLoadingItem && super.isEmpty
 
-    protected var useCardView = true
-        set(value) {
-            field = value
-            if (::loadingItem.isInitialized) {
-                loadingItem = generateLoadingItem()
-                if (showLoadingItem)
-                    base.notifyItemChanged(super.itemCount)
-            }
-        }
-
-    protected open fun generateLoadingItem(): CustomItem =
-            object : LoadingItem(context, R.string.wait_text_loading) {
-                override fun getWrappers(context: Context): Array<CustomItemWrapper> {
-                    return if (useCardView) CardViewWrapper.WRAPPER else emptyArray()
-                }
-            }
-
-    override fun onBindViewHolder(holder: UniversalAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: UniversalViewHolder, position: Int) {
         try {
             super.onBindViewHolder(holder, position)
         } finally {
@@ -171,19 +156,12 @@ abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>
         return loadNextPage(true)
     }
 
-    override fun getItem(position: Int): CustomItem {
-        return if (position == super.itemCount) {
-            if (::loadingItem.isInitialized) loadingItem
-            else generateLoadingItem().also { loadingItem = it }
-        } else super.getItem(position)
-    }
+    override fun getItem(position: Int): CustomItem =
+            if (position == super.itemCount) loadingItem
+            else super.getItem(position)
 
     override fun getItemPosition(item: CustomItem): Int {
-        return if (::loadingItem.isInitialized && item == loadingItem) super.itemCount else super.getItemPosition(item)
-    }
-
-    override fun getItems(contents: Array<CustomItem>): Array<CustomItem> {
-        throw UnsupportedOperationException("Not supported")
+        return if (item == loadingItem) super.itemCount else super.getItemPosition(item)
     }
 
     override fun assertAllowApplyChanges(editTag: Any?,

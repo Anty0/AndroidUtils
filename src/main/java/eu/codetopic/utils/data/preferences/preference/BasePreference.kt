@@ -32,13 +32,15 @@ abstract class BasePreference<T, out SP : SharedPreferences>(
 
     open val preferences: SP get() = provider.preferences
 
-    override fun getValue(key: String): T = preferences.getValue(key)
+    override fun get(key: String): T = preferences.getValue(key)
 
     protected abstract fun SharedPreferences.getValue(key: String): T
 
-    override fun setValue(key: String, value: T) = preferences.edit { putValue(key, value) }
+    override fun set(key: String, value: T) = preferences.edit { putValue(key, value) }
 
     protected abstract fun SharedPreferences.Editor.putValue(key: String, value: T)
+
+    override fun unset(key: String) = preferences.edit { remove(key) }
 
     override fun isSet(key: String): Boolean = preferences.contains(key)
 }

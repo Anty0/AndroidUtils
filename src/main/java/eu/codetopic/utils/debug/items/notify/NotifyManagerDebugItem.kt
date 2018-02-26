@@ -27,9 +27,8 @@ import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
 import eu.codetopic.utils.notifications.manager.requestSuspendShow
 import eu.codetopic.utils.notifications.manager.requestSuspendShowAll
-import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
-import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper
+import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import kotlinx.android.synthetic.main.item_debug_notify.*
 import org.jetbrains.anko.longToast
 import org.jetbrains.anko.sdk25.coroutines.onClick
@@ -58,7 +57,7 @@ class NotifyManagerDebugItem : CustomItem() {
         }
     }
 
-    override fun onBindViewHolder(holder: CustomItem.ViewHolder, itemPosition: Int) {
+    override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
         holder.butRefresh.onClick {
             try {
                 assertInitialized()
@@ -114,7 +113,5 @@ class NotifyManagerDebugItem : CustomItem() {
         }
     }
 
-    override fun getItemLayoutResId(context: Context) = R.layout.item_debug_notify
-
-    override fun getWrappers(context: Context): Array<CustomItemWrapper> = CardViewWrapper.WRAPPER
+    override fun getLayoutResId(context: Context) = R.layout.item_debug_notify
 }

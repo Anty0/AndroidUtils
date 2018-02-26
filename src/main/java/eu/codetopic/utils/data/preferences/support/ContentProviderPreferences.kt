@@ -104,9 +104,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
     private val preferencesChangeListener = OnSharedPreferenceChangeListener { _, key ->
         Log.d(LOG_TAG, "onSharedPreferenceChange(key=$key)")
-        val uri: Uri = buildUriSegmentBase(authority, Segment.DATA)
-                .appendQueryParameter(Query.KEY, key).build()
-        context.contentResolver.notifyChange(uri, null)
+        onChange(key)
     }
 
     @CallSuper
@@ -125,6 +123,13 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
     }
 
     abstract fun onPreparePreferencesProvider(): ISharedPreferencesProvider<SP>
+
+    @CallSuper
+    protected open fun onChange(key: String) {
+        val uri: Uri = buildUriSegmentBase(authority, Segment.DATA)
+                .appendQueryParameter(Query.KEY, key).build()
+        context.contentResolver.notifyChange(uri, null)
+    }
 
     override fun getType(uri: Uri): String? = null
 

@@ -120,7 +120,8 @@ internal object NotifyClassifier {
                 nm.deleteNotificationChannelGroup(id)
             }
 
-            if (NotifyManager.isInitialized) NotifyManager.cleanup(context)
+            if (NotifyManager.isInitialized && NotifyManager.isPostInitCleanupDone)
+                NotifyManager.cleanup(context)
         }
     }
 
@@ -135,7 +136,8 @@ internal object NotifyClassifier {
                 }
             }
 
-            if (NotifyManager.isInitialized) NotifyManager.cleanup(context)
+            if (NotifyManager.isInitialized && NotifyManager.isPostInitCleanupDone)
+                NotifyManager.cleanup(context)
         }
     }
 

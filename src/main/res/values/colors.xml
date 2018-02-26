@@ -28,6 +28,8 @@
     <color name="white">#fff</color>
     <color name="red">#f00</color>
 
+    <color name="materialWhite">#E5E5E5</color>
+    <color name="materialDarkWhite">#C5C5C5</color>
     <color name="materialBlue">#BBDEFB</color>
     <color name="materialRed">#ff8a80</color>
     <color name="materialLightRed">#ff9e80</color>

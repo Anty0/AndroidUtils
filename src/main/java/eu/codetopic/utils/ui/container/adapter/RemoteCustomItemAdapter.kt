@@ -1,6 +1,6 @@
 /*
  * utils
- * Copyright (C)   2017  anty
+ * Copyright (C)   2018  anty
  *
  * This program is free  software: you can redistribute it and/or modify
  * it under the terms  of the GNU General Public License as published by
@@ -23,11 +23,11 @@ import android.view.ViewGroup
 
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 
-open class CustomItemAdapter<T : CustomItem> : ArrayEditAdapter<T, UniversalViewHolder> {
+open class RemoteCustomItemAdapter<T : CustomItem> : ArrayEditAdapter<T, UniversalRemoteViewHolder> {
 
     companion object {
 
-        private const val LOG_TAG = "CustomItemAdapter"
+        private const val LOG_TAG = "RemoteCustomItemAdapter"
     }
 
     val context: Context
@@ -38,12 +38,12 @@ open class CustomItemAdapter<T : CustomItem> : ArrayEditAdapter<T, UniversalView
 
     constructor(context: Context, vararg data: T) : super(*data) { this.context = context }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): UniversalViewHolder =
-            CustomItem.createViewHolder(context, parent, viewType).forUniversalAdapter
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): UniversalRemoteViewHolder =
+            CustomItem.createRemoteViewHolder(context, viewType).forUniversalAdapter
 
-    override fun onBindViewHolder(holder: UniversalViewHolder, position: Int) =
-            getItem(position).bindViewHolder(holder, position)
+    override fun onBindViewHolder(holder: UniversalRemoteViewHolder, position: Int) =
+            getItem(position).bindRemoteViewHolder(holder, position)
 
     override fun getItemViewType(position: Int): Int =
-            getItem(position).getLayoutResId(context)
+            getItem(position).getRemoteLayoutResId(context)
 }

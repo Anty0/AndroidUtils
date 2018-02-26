@@ -122,6 +122,7 @@ class IssueLogListener private constructor(private val appContext: Context) {
                     ).requestShow(
                             appContext,
                             optimise = logLine.tag == FATAL_EXCEPTION_LOG_TAG
+                                    && NotifyManager.isPostInitCleanupDone
                             // If this is fatal exception, allow processing
                             // of notification right now (because app may be killed),
                             // but if not, disallow optimisation (executing on same thread).

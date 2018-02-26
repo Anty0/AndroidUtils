@@ -26,9 +26,8 @@ import eu.codetopic.utils.getFormattedText
 import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.R
 import eu.codetopic.utils.network.NetworkManager.NetworkType.*
-import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
-import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper
+import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 
 class ConnectivityDebugItem : CustomItem() {
 
@@ -37,7 +36,7 @@ class ConnectivityDebugItem : CustomItem() {
         private const val LOG_TAG = "ConnectivityDebugItem"
     }
 
-    override fun onBindViewHolder(holder: CustomItem.ViewHolder, itemPosition: Int) {
+    override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
         val resultText = holder.itemView.findViewById<TextView>(R.id.resultText)
 
         holder.itemView.findViewById<View>(R.id.checkButton).setOnClickListener {
@@ -50,7 +49,5 @@ class ConnectivityDebugItem : CustomItem() {
         }
     }
 
-    override fun getItemLayoutResId(context: Context) = R.layout.item_debug_connectivity
-
-    override fun getWrappers(context: Context): Array<CustomItemWrapper> = CardViewWrapper.WRAPPER
+    override fun getLayoutResId(context: Context) = R.layout.item_debug_connectivity
 }

@@ -26,8 +26,7 @@ import android.support.annotation.UiThread;
 import android.view.View;
 
 import eu.codetopic.utils.simple.SimpleAnimatorListener;
-import eu.codetopic.utils.ui.view.ViewExtensions;
-import eu.codetopic.utils.ui.view.ViewUtils;
+import eu.codetopic.utils.ui.view.ExtensionsKt;
 
 @UiThread
 public class ViewVisibilityAnimator {
@@ -87,10 +86,10 @@ public class ViewVisibilityAnimator {
 
     public static ViewVisibilityAnimator getAnimatorFor(View view) {
         ViewVisibilityAnimator animator = (ViewVisibilityAnimator)
-                ViewExtensions.INSTANCE.getTag(view, VIEW_ANIMATOR_TAG);
+                ExtensionsKt.getTag(view, VIEW_ANIMATOR_TAG);
         if (animator != null) return animator;
         animator = new ViewVisibilityAnimator(view);
-        ViewExtensions.INSTANCE.setTag(view, VIEW_ANIMATOR_TAG, animator);
+        ExtensionsKt.setTag(view, VIEW_ANIMATOR_TAG, animator);
         return animator;
     }
 

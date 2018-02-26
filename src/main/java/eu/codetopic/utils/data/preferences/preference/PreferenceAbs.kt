@@ -42,44 +42,56 @@ abstract class PreferenceAbs<T> {
     }
 
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        return getValue(thisRef, null)
+        return get(thisRef, null)
     }
 
     open operator fun getValue(thisRef: Any?, property: KProperty<*>, id: String?): T {
-        return getValue(thisRef, id)
+        return get(thisRef, id)
     }
 
-    open fun getValue(syncObj: Any?, id: String? = null): T {
+    open operator fun get(syncObj: Any?, id: String? = null): T {
         return synchronized(syncObj ?: this) {
             try {
-                getValue(formatKey(id))
+                get(formatKey(id))
             } catch (e: Exception) {
                 Log.e(name ?: LOG_TAG, "${formatKey(id)}: Failed to load", e); fallBackValue
             }
         }
     }
 
-    protected abstract fun getValue(key: String): T
+    protected abstract fun get(key: String): T
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
-        setValue(thisRef, null, value)
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, value: T) {
+        set(thisRef, null, value)
     }
 
-    operator fun setValue(thisRef: Any?, property: KProperty<*>, id: String?, value: T) {
-        setValue(thisRef, id, value)
+    open operator fun setValue(thisRef: Any?, property: KProperty<*>, id: String?, value: T) {
+        set(thisRef, id, value)
     }
 
-    fun setValue(syncObj: Any?, id: String?, value: T) {
+    open operator fun set(syncObj: Any?, id: String?, value: T) {
         synchronized(syncObj ?: this) {
             try {
-                setValue(formatKey(id), value)
+                set(formatKey(id), value)
             } catch (e: Exception) {
                 Log.e(name ?: LOG_TAG, "${formatKey(id)}: Failed to save", e)
             }
         }
     }
 
-    protected abstract fun setValue(key: String, value: T)
+    protected abstract fun set(key: String, value: T)
+
+    open fun unset(syncObj: Any?, id: String?) {
+        synchronized(syncObj ?: this) {
+            try {
+                unset(formatKey(id))
+            } catch (e: Exception) {
+                Log.e(name ?: LOG_TAG, "${formatKey(id)}: Failed to save", e)
+            }
+        }
+    }
+
+    protected abstract fun unset(key: String)
 
     open fun isSet(syncObj: Any?, id: String? = null): Boolean {
         return synchronized(syncObj ?: this) {

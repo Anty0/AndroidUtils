@@ -30,7 +30,9 @@ import java.util.Collection;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter;
+import eu.codetopic.utils.ui.container.adapter.ExtensionsKt;
 import eu.codetopic.utils.ui.container.adapter.UniversalAdapter;
+import eu.codetopic.utils.ui.container.adapter.UniversalViewHolder;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.recycler.utils.EmptyRecyclerView;
 import eu.codetopic.utils.ui.container.recycler.utils.RecyclerItemClickListener;
@@ -77,8 +79,8 @@ public abstract class RecyclerManager<T extends RecyclerManager<T>> extends Swip
         return setAdapter(new CustomItemAdapter<>(getContext(), adapterData));
     }
 
-    public synchronized T setAdapter(UniversalAdapter<?> adapter) {
-        return setAdapter(adapter.forRecyclerView());
+    public synchronized T setAdapter(UniversalAdapter<? extends UniversalViewHolder> adapter) {
+        return setAdapter(ExtensionsKt.forRecyclerView(adapter));
     }
 
     public synchronized T setAdapter(RecyclerView.Adapter<?> adapter) {

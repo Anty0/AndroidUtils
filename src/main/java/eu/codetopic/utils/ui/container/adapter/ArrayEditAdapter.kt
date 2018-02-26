@@ -28,7 +28,7 @@ import eu.codetopic.utils.ui.container.adapter.ArrayEditAdapter.CalculatingMode.
 import eu.codetopic.java.utils.forEachIterate
 import eu.codetopic.java.utils.debug.DebugMode
 
-abstract class ArrayEditAdapter<E : Any, VH : UniversalAdapter.ViewHolder>() :
+abstract class ArrayEditAdapter<E : Any, VH : UniversalHolder<*>>() :
         UniversalAdapter<VH>(), Iterable<E> {
 
     companion object {
@@ -56,14 +56,7 @@ abstract class ArrayEditAdapter<E : Any, VH : UniversalAdapter.ViewHolder>() :
         Collections.addAll(this.data, *data)
     }
 
-    override fun getItem(position: Int): E =
-            synchronized(dataLock) { data[position] }
-
-    open fun getItems(contents: Array<E>): Array<E> = synchronized(dataLock) {
-        // FIXME: find better kotlin way to do this
-        @Suppress("PLATFORM_CLASS_MAPPED_TO_KOTLIN", "UNCHECKED_CAST")
-        (data as java.util.Collection<E>).toArray(contents)
-    }
+    override fun getItem(position: Int): E = synchronized(dataLock) { data[position] }
 
     open fun getItemPosition(item: E): Int = synchronized(dataLock) { data.indexOf(item) }
 
@@ -177,7 +170,7 @@ abstract class ArrayEditAdapter<E : Any, VH : UniversalAdapter.ViewHolder>() :
         NO_ANIMATIONS, EQUALS_DETECTION, FROM_MODIFICATIONS
     }
 
-    class Editor<E : Any>(adapter: ArrayEditAdapter<E, *>) {// TODO: 24.10.16 maybe rework to use AccessibleList instead of own implementation of editor
+    class Editor<E : Any>(adapter: ArrayEditAdapter<E, *>) {
 
         companion object {
 

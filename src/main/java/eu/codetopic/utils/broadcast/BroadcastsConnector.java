@@ -182,6 +182,9 @@ public final class BroadcastsConnector extends BroadcastReceiver {
                 case LOCAL:
                     lbm.sendBroadcast(intentTo);
                     break;
+                case ORDERED_GLOBAL:
+                    context.sendOrderedBroadcast(intentTo, null);
+                    break;
                 default:
                     Log.e(LOG_TAG, "Detected problem in " + LOG_TAG
                             + ": can't recognise BroadcastTargetingType in " + connection);
@@ -191,7 +194,7 @@ public final class BroadcastsConnector extends BroadcastReceiver {
     }
 
     public enum BroadcastTargetingType {
-        GLOBAL, LOCAL
+        GLOBAL, LOCAL, ORDERED_GLOBAL
     }
 
     public static class Connection { // TODO: Add option to pass filter lambda function

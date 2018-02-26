@@ -24,10 +24,7 @@ import android.content.SharedPreferences
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.PrefNames.*
 import eu.codetopic.utils.data.preferences.PreferencesData
-import eu.codetopic.utils.data.preferences.VersionedPreferencesData
-import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider
 
-import eu.codetopic.utils.data.preferences.preference.IntPreference
 import eu.codetopic.utils.data.preferences.preference.StringPreference
 import eu.codetopic.utils.data.preferences.provider.ContentProviderPreferencesProvider
 import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
@@ -70,10 +67,10 @@ class Identifiers private constructor(context: Context) : PreferencesData<Conten
 
     private val lastPref = StringPreference(LAST_IDENTIFIER, accessProvider, "")
 
-    private fun Type.getLastValue() = lastPref.getValue(this, name)
+    private fun Type.getLastValue() = lastPref[this, name]
             .takeIf { it.isNotEmpty() }?.toIntOrNull() ?: min
 
-    private fun Type.setLastValue(value: Int) = lastPref.setValue(this, name, value.toString())
+    private fun Type.setLastValue(value: Int) { lastPref[this, name] = value.toString() }
 
     private fun Type.getNextValue() = getNext(getLastValue()).also { setLastValue(it) }
 

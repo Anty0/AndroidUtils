@@ -29,7 +29,9 @@ import java.util.List;
 
 import eu.codetopic.utils.R;
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter;
+import eu.codetopic.utils.ui.container.adapter.ExtensionsKt;
 import eu.codetopic.utils.ui.container.adapter.UniversalAdapter;
+import eu.codetopic.utils.ui.container.adapter.UniversalViewHolder;
 import eu.codetopic.utils.ui.container.items.custom.CustomItem;
 import eu.codetopic.utils.ui.container.swipe.SwipeLayoutManager;
 
@@ -58,8 +60,8 @@ public abstract class ListViewManager<T extends ListViewManager<T>> extends Swip
         return setAdapter(new CustomItemAdapter<>(getContext(), adapterData));
     }
 
-    public synchronized T setAdapter(UniversalAdapter<?> adapter) {
-        return setAdapter(adapter.forListView());
+    public synchronized T setAdapter(UniversalAdapter<? extends UniversalViewHolder> adapter) {
+        return setAdapter(ExtensionsKt.forListView(adapter));
     }
 
     public synchronized T setAdapter(ListAdapter adapter) {

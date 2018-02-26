@@ -193,13 +193,16 @@ object UtilsBase {
             LooperUtils.initialize(app)
             BroadcastsConnector.initialize(app)
             Identifiers.initialize(app)
+
+            // Initialize NotifyManager
+            NotifyManager.initialize(app)
         }
 
         init(processName, processParams)
 
         if (initializeUtils) {
-            // Complete initialization of NotifyManager
-            NotifyManager.completeInitialization(app)
+            // Complete cleanup of NotifyManager
+            NotifyManager.postInitCleanupAndRefresh(app)
         }
     }
 }

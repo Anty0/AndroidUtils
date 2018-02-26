@@ -21,9 +21,8 @@ package eu.codetopic.utils.debug.items
 import android.content.Context
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.R
-import eu.codetopic.utils.ui.container.items.custom.CardViewWrapper
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
-import eu.codetopic.utils.ui.container.items.custom.CustomItemWrapper
+import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import kotlinx.android.synthetic.main.item_debug_issues.*
 import org.jetbrains.anko.sdk25.coroutines.onClick
 
@@ -37,7 +36,7 @@ class IssuesDebugItem : CustomItem() {
         private const val LOG_TAG = "IssuesDebugItem"
     }
 
-    override fun onBindViewHolder(holder: CustomItem.ViewHolder, itemPosition: Int) {
+    override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
         holder.butLogError.onClick {
             Log.e(LOG_TAG, "Test message", RuntimeException("Test exception"))
         }
@@ -51,7 +50,5 @@ class IssuesDebugItem : CustomItem() {
         }
     }
 
-    override fun getItemLayoutResId(context: Context) = R.layout.item_debug_issues
-
-    override fun getWrappers(context: Context): Array<CustomItemWrapper> = CardViewWrapper.WRAPPER
+    override fun getLayoutResId(context: Context) = R.layout.item_debug_issues
 }

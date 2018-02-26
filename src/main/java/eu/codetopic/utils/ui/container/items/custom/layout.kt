@@ -1,6 +1,6 @@
 /*
  * utils
- * Copyright (C)   2017  anty
+ * Copyright (C)   2018  anty
  *
  * This program is free  software: you can redistribute it and/or modify
  * it under the terms  of the GNU General Public License as published by
@@ -19,20 +19,34 @@
 package eu.codetopic.utils.ui.container.items.custom
 
 import android.content.Context
-import android.support.annotation.IdRes
 import android.support.annotation.LayoutRes
 
-open class LayoutItemWrapper(@param:LayoutRes @field:LayoutRes private val layoutRes: Int,
-                             @param:IdRes @field:IdRes private val contentViewId: Int) : CustomItemWrapper() {
+/**
+ * @author anty
+ */
+
+open class LayoutItem(
+        @param:LayoutRes @field:LayoutRes @get:LayoutRes private val layoutRes: Int
+) : CustomItem() {
 
     companion object {
 
-        private const val LOG_TAG = "LayoutItemWrapper"
+        private const val LOG_TAG = "LayoutItem"
     }
 
-    override fun onBindViewHolder(holder: CustomItem.ViewHolder, itemPosition: Int) {}
+    override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {}
 
-    override fun getItemLayoutResId(context: Context): Int = layoutRes
+    override fun getLayoutResId(context: Context): Int = layoutRes
+}
 
-    override fun getContentViewId(context: Context): Int = contentViewId
+open class WidgetLayoutItem(@LayoutRes layoutRes: Int) : LayoutItem(layoutRes) {
+
+    companion object {
+
+        private const val LOG_TAG = "WidgetLayoutItem"
+    }
+
+    override fun onBindRemoteViewHolder(holder: CustomItemRemoteViewHolder, itemPosition: Int) {}
+
+    override fun getRemoteLayoutResId(context: Context): Int = getLayoutResId(context)
 }

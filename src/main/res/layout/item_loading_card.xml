@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   ~ utils
-  ~ Copyright (C)   2017  anty
+  ~ Copyright (C)   2018  anty
   ~
   ~ This program is free  software: you can redistribute it and/or modify
   ~ it under the terms  of the GNU General Public License as published by
@@ -17,18 +17,17 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent">
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="?attr/cardViewTheme"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    app:cardUseCompatPadding="true"
+    app:contentPaddingTop="16dp"
+    app:contentPaddingBottom="16dp">
 
-    <ListView
-        android:id="@+id/content_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-    <include
-        android:id="@+id/empty_view"
-        layout="@layout/base_empty_view"
-        android:visibility="gone"/>
-
-</FrameLayout>
+    <include layout="@layout/item_loading" />
+</android.support.v7.widget.CardView>
