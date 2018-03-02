@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.debug.items.notify
 
+import android.annotation.SuppressLint
 import android.content.Context
 import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.log.Log
@@ -42,11 +43,27 @@ class NotifyManagerDebugItem : CustomItem() {
 
         private const val LOG_TAG = "NotifyManagerDebugItem"
 
-        fun initialize(context: Context) {
-            DebugMode.ifEnabled {
-                NotifyManager.installGroup(context, NotifyManagerDebugGroup())
-                NotifyManager.installChannel(context, NotifyManagerDebugChannel())
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var CONTEXT: Context
+
+        private val DEBUG_MODE_CHANGED_LISTENER = {
+            if (DebugMode.isEnabled) {
+                if (!NotifyManager.hasGroup(NotifyManagerDebugGroup.ID))
+                    NotifyManager.installGroup(CONTEXT, NotifyManagerDebugGroup())
+                if (!NotifyManager.hasChannel(NotifyManagerDebugChannel.ID))
+                    NotifyManager.installChannel(CONTEXT, NotifyManagerDebugChannel())
+            } else {
+                if (NotifyManager.hasGroup(NotifyManagerDebugGroup.ID))
+                    NotifyManager.uninstallGroup(CONTEXT, NotifyManagerDebugGroup.ID)
+                if (NotifyManager.hasChannel(NotifyManagerDebugChannel.ID))
+                    NotifyManager.uninstallChannel(CONTEXT, NotifyManagerDebugChannel.ID)
             }
+        }
+
+        fun initialize(context: Context) {
+            CONTEXT = context.applicationContext
+            DebugMode.addChangeListener(DEBUG_MODE_CHANGED_LISTENER)
+            DEBUG_MODE_CHANGED_LISTENER()
         }
 
         private fun assertInitialized() {

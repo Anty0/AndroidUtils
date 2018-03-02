@@ -24,23 +24,28 @@ import android.annotation.TargetApi;
 @TargetApi(11)
 public class SimpleAnimatorListener implements Animator.AnimatorListener {
 
+    private boolean canceled = false;
+
     @Override
     public void onAnimationStart(Animator animation) {
-
+        canceled = false;
     }
 
     @Override
     public void onAnimationEnd(Animator animation) {
-
+        if (!canceled) onAnimationNaturalEnd(animation);
     }
 
     @Override
     public void onAnimationCancel(Animator animation) {
-
+        canceled = true;
     }
 
     @Override
     public void onAnimationRepeat(Animator animation) {
+        canceled = false;
+    }
 
+    public void onAnimationNaturalEnd(Animator animation) {
     }
 }

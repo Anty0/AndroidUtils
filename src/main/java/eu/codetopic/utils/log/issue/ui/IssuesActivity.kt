@@ -21,9 +21,14 @@ package eu.codetopic.utils.log.issue.ui
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.helper.ItemTouchHelper
+import android.support.v7.widget.helper.ItemTouchHelper.LEFT
+import android.support.v7.widget.helper.ItemTouchHelper.RIGHT
 import android.view.Menu
 import android.view.MenuItem
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
+import eu.codetopic.java.utils.to
 import eu.codetopic.utils.*
 import eu.codetopic.utils.broadcast.LocalBroadcast
 import eu.codetopic.utils.log.issue.data.Issue
@@ -31,8 +36,12 @@ import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.NotifyId
+import eu.codetopic.utils.notifications.manager.data.requestCancel
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter
+import eu.codetopic.utils.ui.container.adapter.UniversalRecyclerBase.RecyclerViewHolder
+import eu.codetopic.utils.ui.container.adapter.UniversalViewHolder
+import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import eu.codetopic.utils.ui.container.recycler.Recycler
 import eu.codetopic.utils.ui.view.holder.loading.LoadingModularActivity
 import kotlinx.android.extensions.CacheImplementation
@@ -42,6 +51,7 @@ import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.coroutines.experimental.asReference
 import org.jetbrains.anko.coroutines.experimental.bg
+import org.jetbrains.anko.ctx
 
 /**
  * @author anty
@@ -76,7 +86,27 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
                 .setSmallEmptyText(R.string.empty_view_text_small_no_logged_issues)
                 .setOnRefreshListener { -> updateWithRefreshing() }
                 .setAdapter(adapter)
-        // TODO: add item touch helper and allow removing items by swiping them
+                .setItemTouchHelper(object : ItemTouchHelper.Callback() {
+
+                    fun getItem(viewHolder: RecyclerView.ViewHolder): IssueItem? =
+                            viewHolder.adapterPosition.takeIf { it != -1 }
+                                    ?.let { adapter?.getItem(it) }
+                                    .to<IssueItem>()
+
+                    override fun getMovementFlags(recyclerView: RecyclerView,
+                                                  viewHolder: RecyclerView.ViewHolder): Int =
+                            makeMovementFlags(0, LEFT or RIGHT)
+
+                    override fun onMove(recyclerView: RecyclerView,
+                                        viewHolder: RecyclerView.ViewHolder,
+                                        target: RecyclerView.ViewHolder): Boolean {
+                        return false
+                    }
+
+                    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                        getItem(viewHolder)?.notifyId?.requestCancel(ctx)
+                    }
+                })
 
         updateWithLoading()
     }

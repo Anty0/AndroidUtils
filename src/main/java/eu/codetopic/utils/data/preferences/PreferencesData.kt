@@ -110,21 +110,21 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     @CallSuper
     @Synchronized
     protected open fun onCreate() {
-        Log.d(LOG_TAG, "onCreate(name=$name)")
+        Log.v(LOG_TAG, "onCreate(name=$name)")
         preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     @CallSuper
     @Synchronized
     protected open fun onChanged(key: String?) {
-        Log.d(LOG_TAG, "onChanged(name=$name, key=$key)")
+        Log.v(LOG_TAG, "onChanged(name=$name, key=$key)")
         LocalBroadcast.sendBroadcast(generateIntentActionChanged(key))
     }
 
     @CallSuper
     @Synchronized
     protected open fun onDestroy() {
-        Log.d(LOG_TAG, "onDestroy(name=$name)")
+        Log.v(LOG_TAG, "onDestroy(name=$name)")
         preferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 

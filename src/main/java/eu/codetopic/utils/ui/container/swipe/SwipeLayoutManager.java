@@ -60,17 +60,6 @@ public abstract class SwipeLayoutManager<T extends SwipeLayoutManager<T>> {
                 GoogleMaterial.Icon.gmd_add).actionBar());
         mSwipeRefreshLayout = mainView.findViewById(R.id.swipe_refresh_layout);
 
-        //Log.d(LOG_TAG, "<init> for " + mContext.getClass().getName());
-
-        /*ArrayList<Module> modules = new ArrayList<>(ModulesManager.getInstance().getModules());
-        Collections.sort(modules);// TODO: 9.5.16 use it to init modules colors (and use to obtaining styles attributes method in Utils)
-        int[] colors = new int[0];
-        for (Module module : modules) {
-            TypedArray a = module.getTheme().obtainStyledAttributes(new int[]{R.attr.colorPrimary});
-            int color = a.getColor(0, -1);
-            if (color != -1 && !Arrays.contains(colors, color)) colors = Arrays.add(colors, color);
-            a.recycle();
-        }*/
         if (swipeSchemeColors != null)
             mSwipeRefreshLayout.setColorSchemeColors(swipeSchemeColors);
         mSwipeRefreshLayout.setEnabled(useSwipeRefresh);

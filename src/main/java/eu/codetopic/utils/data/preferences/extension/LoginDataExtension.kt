@@ -36,7 +36,7 @@ open class LoginDataExtension<out SP : SharedPreferences>(protected val provider
     }
 
     private fun log(methodName: String, id: String) {
-        Log.d(LOG_TAG, "$methodName: { name: '${provider.name}', id: '$id' }")
+        Log.v(LOG_TAG, "$methodName: { name: '${provider.name}', id: '$id' }")
     }
 
     protected open fun formatKey(id: String, key: String): String {

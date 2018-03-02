@@ -158,7 +158,7 @@ class SecurePreferences<out SP : SharedPreferences>(
         val encryptedValue = preferences.getString(formattedKey, null)
         val value = decrypt(encryptedValue)
 
-        Log.d(LOG_TAG, "getVal(key=$key, formattedKey=$formattedKey, " +
+        Log.v(LOG_TAG, "getVal(key=$key, formattedKey=$formattedKey, " +
                 "encryptedValue=(isNull=${encryptedValue == null}, isEmpty=${encryptedValue.isNullOrEmpty()}), " +
                 "value=(isNull=${value == null}, isEmpty=${value.isNullOrEmpty()}))")
 
@@ -173,7 +173,7 @@ class SecurePreferences<out SP : SharedPreferences>(
         val formattedKey = formatKey(key)
         val encryptedValues = preferences.getStringSet(formattedKey, null)
 
-        Log.d(LOG_TAG, "getStringSet(key=$key, formattedKey=$formattedKey)")
+        Log.v(LOG_TAG, "getStringSet(key=$key, formattedKey=$formattedKey)")
 
         return encryptedValues?.map { decrypt(it) ?: it }?.toSet() ?: defaultValues
     }
@@ -239,7 +239,7 @@ class SecurePreferences<out SP : SharedPreferences>(
             val formattedKey = formatKey(key)
             val encryptedValue = encrypt(value)
 
-            Log.d(LOG_TAG, "put(key=$key, formattedKey=$formattedKey, " +
+            Log.v(LOG_TAG, "put(key=$key, formattedKey=$formattedKey, " +
                     "value=(isNull=${value == null}, isEmpty=${value.isNullOrEmpty()}), " +
                     "encryptedValue=(isNull=${encryptedValue == null}, isEmpty=${encryptedValue.isNullOrEmpty()}))")
 
@@ -254,7 +254,7 @@ class SecurePreferences<out SP : SharedPreferences>(
         override fun putStringSet(key: String, values: Set<String>?): SharedPreferences.Editor {
             val formattedKey = formatKey(key)
 
-            Log.d(LOG_TAG, "putStringSet(key=$key, formattedKey=$formattedKey)")
+            Log.v(LOG_TAG, "putStringSet(key=$key, formattedKey=$formattedKey)")
 
             editor.putStringSet(formattedKey, values?.map { encrypt(it) }?.toSet())
             return this

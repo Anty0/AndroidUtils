@@ -32,18 +32,18 @@
 }
 
 # remove listening for logged issues
--assumenosideeffects class eu.codetopic.utils.log.issue.** { *; }
+# -assumenosideeffects class eu.codetopic.utils.log.issue.** { *; }
 
 # remove Logging
--assumenosideeffects class eu.codetopic.java.utils.log.Log {
-    public static *** v(...);
-    public static *** d(...);
-    public static *** i(...);
-    public static *** w(...);
-}
+#-assumenosideeffects class eu.codetopic.java.utils.log.Log {
+#    public static *** v(...);
+#    public static *** d(...);
+#    public static *** i(...);
+#    public static *** w(...);
+#}
 
 # remove debug classes
--assumenosideeffects class eu.codetopic.utils.debug.BaseDebugActivity
+#-assumenosideeffects class eu.codetopic.utils.debug.BaseDebugActivity
 -assumenosideeffects class * extends eu.codetopic.utils.debug.BaseDebugActivity
 
 # Fix warnings caused by android packages

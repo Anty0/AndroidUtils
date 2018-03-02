@@ -160,7 +160,7 @@ internal object Notifier {
             setChannelId(combinedId)
             setGroup(combinedId)
             setGroupSummary(notifyId.isSummary)
-            setOnlyAlertOnce(notifyId.isRefreshable)
+            if (notifyId.isRefreshable) setOnlyAlertOnce(true)
             setWhen(notifyId.timeWhen)
             setContentIntent(notifyId.launchIntent(context, data, autoCancel))
             setDeleteIntent(notifyId.deleteIntent(context, data))

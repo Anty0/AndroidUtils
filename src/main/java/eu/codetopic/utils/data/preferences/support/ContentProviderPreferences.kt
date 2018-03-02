@@ -103,13 +103,13 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
     protected val preferences: SP get() = preferencesProvider.preferences
 
     private val preferencesChangeListener = OnSharedPreferenceChangeListener { _, key ->
-        Log.d(LOG_TAG, "onSharedPreferenceChange(key=$key)")
+        Log.v(LOG_TAG, "onSharedPreferenceChange(key=$key)")
         onChange(key)
     }
 
     @CallSuper
     override fun onCreate(): Boolean {
-        Log.d(LOG_TAG, "onCreate()")
+        Log.v(LOG_TAG, "onCreate()")
         preferencesProvider = onPreparePreferencesProvider()
         preferences.registerOnSharedPreferenceChangeListener(preferencesChangeListener)
         return true
@@ -117,7 +117,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
     @CallSuper
     override fun shutdown() {
-        Log.d(LOG_TAG, "shutdown()")
+        Log.v(LOG_TAG, "shutdown()")
         preferences.unregisterOnSharedPreferenceChangeListener(preferencesChangeListener)
         super.shutdown()
     }
@@ -147,7 +147,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
     override fun query(uri: Uri, projection: Array<out String>?, selection: String?,
                        selectionArgs: Array<out String>?, sortOrder: String?): Cursor? {
-        Log.d(LOG_TAG, "query(uri=$uri)")
+        Log.v(LOG_TAG, "query(uri=$uri)")
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return null
 
         when (path[0]) {
@@ -192,7 +192,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
     }
 
     override fun insert(uri: Uri, values: ContentValues?): Uri? {
-        Log.d(LOG_TAG, "insert(uri=$uri)")
+        Log.v(LOG_TAG, "insert(uri=$uri)")
         if (values == null) return null
 
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return null
@@ -221,7 +221,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
     }
 
     override fun delete(uri: Uri, selection: String?, selectionArgs: Array<out String>?): Int {
-        Log.d(LOG_TAG, "delete(uri=$uri)")
+        Log.v(LOG_TAG, "delete(uri=$uri)")
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return 0
 
         return when (path[0]) {
@@ -244,7 +244,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
     override fun update(uri: Uri, values: ContentValues?, selection: String?,
                         selectionArgs: Array<out String>?): Int {
-        Log.d(LOG_TAG, "delete(uri=$uri)")
+        Log.v(LOG_TAG, "delete(uri=$uri)")
         if (values == null) return 0
 
         val path = uri.pathSegments.takeIf { it.size == 1 } ?: return 0

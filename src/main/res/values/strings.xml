@@ -17,22 +17,16 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<resources> <!--TODO: cleanup and remove all strings that may be used in release-->
+<resources>
+
     <string name="activity_label_logged_issues">Logged issues</string>
     <string name="activity_label_issue_info">Logged issue info</string>
     <string name="activity_label_error_info">Logged error info</string>
     <string name="activity_label_warn_info">Logged warning info</string>
     <string name="activity_label_break_event_info">Logged event info</string>
 
-    <string name="text_default_no_list_items">Nothing to show</string>
-    <string name="text_no_time">No time</string>
-    <string name="text_time_format">%1$d minutes, %2$d seconds</string>
-
-    <string name="location_unknown">Unknown location</string>
-    <string name="location_none">No address</string>
-
     <string name="empty_view_text_no_logged_issues">No logged issues</string>
-    <string name="empty_view_text_small_no_logged_issues">All unresolved issues will appear here.</string>
+    <string name="empty_view_text_small_no_logged_issues">All not yet resolved issues will appear here.</string>
 
     <string name="notify_logged_error_title">Error logged</string>
     <string name="notify_logged_warning_title">Warning logged</string>
@@ -43,23 +37,7 @@
     <string name="notify_issues_group_name">Issues</string>
     <string name="notify_issues_channel_name">Logged issues</string>
 
-    <string name="description_drop_down_arrow">Dropdown arrow</string>
-    <string name="description_edit_button">Edit button</string>
-    <string name="description_icon">Icon</string>
-    <string name="description_list_item_content">List item content</string>
-    <string name="description_empty_view_image">Empty list image</string>
-    <string name="description_but_exit">Exit button</string>
-    <string name="description_but_done">Done button</string>
-
-    <string name="navigation_drawer_open">Open navigation</string>
-    <string name="navigation_drawer_close">Close navigation</string>
-
-    <string name="wait_text_loading">Loading…</string>
-    <string name="wait_text_please_wait">Please wait…</string>
-
     <string name="menu_item_done_all">Done all</string>
-
-    <string name="but_refresh">Refresh</string>
 
     <string name="issue_item_time_tag_format">%1$s | %2$s</string>
     <string name="issue_item_time_unknown">Unknown time</string>
@@ -86,4 +64,6 @@
     <string name="debug_item_notify_notification_cancel_toast_text">Test notification was canceled!</string>
     <string name="debug_item_notify_group_name">NotifyManager debug</string>
     <string name="debug_item_notify_channel_name">Test notification</string>
+
+    <string name="empty_string" translatable="false">""</string>
 </resources>

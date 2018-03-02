@@ -33,7 +33,6 @@ import android.view.ViewGroup
 import eu.codetopic.java.utils.debug.DebugMode
 
 import java.util.ArrayList
-import java.util.Arrays
 import java.util.LinkedHashMap
 
 import eu.codetopic.java.utils.log.Log
@@ -48,7 +47,7 @@ abstract class ModularActivity @JvmOverloads constructor(vararg modules: Activit
     private val modulesMap = LinkedHashMap<Class<out ActivityCallBackModule>, ActivityCallBackModule>()
 
     init {
-        if (DebugMode.isEnabled) Log.d(LOG_TAG, "<init>(modules=$modules)")
+        if (DebugMode.isEnabled) Log.v(LOG_TAG, "<init>(modules=$modules)")
 
         modules.forEach {
             try {

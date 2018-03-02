@@ -19,6 +19,7 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_gravity="center"
@@ -36,7 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
         android:visibility="gone"
-        android:contentDescription="@string/description_empty_view_image"/>
+        tools:ignore="ContentDescription" />
 
     <TextView
         android:id="@+id/empty_text"
@@ -44,7 +45,6 @@
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
         android:lines="1"
-        android:text="@string/text_default_no_list_items"
         android:textColor="?android:attr/textColorPrimary"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 

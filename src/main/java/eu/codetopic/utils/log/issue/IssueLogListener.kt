@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.log.issue
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.support.annotation.MainThread
 import eu.codetopic.java.utils.debug.DebugMode
@@ -37,20 +38,18 @@ import eu.codetopic.utils.thread.LooperUtils
 /**
  * @author anty
  */
-class IssueLogListener private constructor(private val appContext: Context) {
+class IssueLogListener private constructor(val appContext: Context) {
 
     companion object {
 
         private const val LOG_TAG = "IssueLogListener"
-
         private const val FATAL_EXCEPTION_LOG_TAG = "FatalExceptionHandler"
 
-        private val issuePriorities = arrayOf(BREAK_EVENT, WARN, ERROR)
+        private val ISSUE_PRIORITIES = arrayOf(BREAK_EVENT, WARN, ERROR)
 
         private val LIST_IGNORE = arrayOf(
                 LOG_TAG
         )
-
         private val LIST_NO_NOTIFICATION = arrayOf(
                 "Notifier",
                 "NotifyData",
@@ -58,41 +57,65 @@ class IssueLogListener private constructor(private val appContext: Context) {
                 "IssuesNotifyChannel",
                 "RqNotifyAllReceiver",
                 "RqNotifyReceiver"
-        ) // TODO: check if all required classes are in this blacklist
+        )
+
+        @SuppressLint("StaticFieldLeak")
+        private lateinit var INSTANCE: IssueLogListener
+
+        private val LOGGED_LISTENER: (LogLine) -> Unit = onLogged@ {
+            if (it.priority !in ISSUE_PRIORITIES) return@onLogged
+            INSTANCE.processLogLine(it)
+        }
+
+        private lateinit var DEFAULT_UNCAUGHT_HANDLER: Thread.UncaughtExceptionHandler
+        private val UNCAUGHT_HANDLER = Thread.UncaughtExceptionHandler handler@ { thread, thr ->
+            INSTANCE.processLogLine(
+                    LogLine(ERROR, FATAL_EXCEPTION_LOG_TAG, null, thr)
+            )
+            DEFAULT_UNCAUGHT_HANDLER.uncaughtException(thread, thr)
+        }
+
+        private val DEBUG_MODE_CHANGED_LISTENER = {
+            if (DebugMode.isEnabled) {
+                if (!NotifyManager.hasGroup(IssuesNotifyGroup.ID))
+                    NotifyManager.installGroup(INSTANCE.appContext, IssuesNotifyGroup())
+                if (!NotifyManager.hasChannel(IssuesNotifyChannel.ID))
+                    NotifyManager.installChannel(INSTANCE.appContext, IssuesNotifyChannel())
+            } else {
+                if (NotifyManager.hasGroup(IssuesNotifyGroup.ID))
+                    NotifyManager.uninstallGroup(INSTANCE.appContext, IssuesNotifyGroup.ID)
+                if (NotifyManager.hasChannel(IssuesNotifyChannel.ID))
+                    NotifyManager.uninstallChannel(INSTANCE.appContext, IssuesNotifyChannel.ID)
+            }
+        }
 
         private var initialized = false
 
         @MainThread
         @Synchronized
         fun initialize(context: Context) {
-            if (!DebugMode.isEnabled || initialized) return
+            if (initialized) return
             initialized = true
 
             // create listener
-            val listener = IssueLogListener(context.applicationContext)
+            INSTANCE = IssueLogListener(context.applicationContext)
 
             // override default uncaught (fatal) exception handler
-            val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
-            Thread.setDefaultUncaughtExceptionHandler { thread, thr ->
-                listener.processLogLine(
-                        LogLine(ERROR, FATAL_EXCEPTION_LOG_TAG, null, thr)
-                )
-                defaultHandler.uncaughtException(thread, thr)
-            }
+            DEFAULT_UNCAUGHT_HANDLER = Thread.getDefaultUncaughtExceptionHandler()
+            Thread.setDefaultUncaughtExceptionHandler(UNCAUGHT_HANDLER)
 
             // add listener to logs handler
-            Logger.logsHandler.addOnLoggedListener onLogged@ {
-                if (!DebugMode.isEnabled || it.priority !in issuePriorities) return@onLogged
-                listener.processLogLine(it)
-            }
+            Logger.logsHandler.addOnLoggedListener(LOGGED_LISTENER)
 
-            // initialize notifications
-            NotifyManager.installGroup(context, IssuesNotifyGroup())
-            NotifyManager.installChannel(context, IssuesNotifyChannel())
+            // add DebugMode change listener
+            DebugMode.addChangeListener(DEBUG_MODE_CHANGED_LISTENER)
+            DEBUG_MODE_CHANGED_LISTENER()
         }
     }
 
     fun processLogLine(logLine: LogLine) {
+        if (!DebugMode.isEnabled) return
+
         try {
             when (logLine.tag) {
                 in LIST_IGNORE -> {} // ignore

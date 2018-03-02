@@ -65,6 +65,4 @@
             android:gravity="end"
             android:textSize="14sp" />
     </LinearLayout>
-
-    <!-- TODO: done button -->
 </LinearLayout>

@@ -37,6 +37,7 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
@@ -123,33 +124,12 @@ abstract class NavigationActivity : BaseFragmentActivity() {
         setHeaderBackgroundColor(AndroidUtils.getColorFromAttr(this,
                 R.attr.colorPrimaryDark, Color.BLACK))
 
-        header.imgAppIcon.setOnClickListener {
-            it.animate()
-                    .rotation(it.rotation.let { 360F * (ceil(it / 360F) + 1F) })
-                    .setDuration(
-                            it.context.resources
-                                    .getInteger(android.R.integer.config_longAnimTime)
-                                    .toLong()
-                    )
-                    .setInterpolator(DecelerateInterpolator())
-                    .setListener(object : SimpleAnimatorListener() {
-                        override fun onAnimationEnd(animation: Animator?) {
-                            it.rotation = 0F
-                        }
-
-                        override fun onAnimationCancel(animation: Animator?) {
-                            it.rotation = 0F
-                        }
-                    })
-                    .start()
-        }
-
         header.txtAppName.text = AndroidUtils.getAppLabel(this)
 
         setSupportActionBar(toolbar)
 
         drawerToggle = ActionBarDrawerToggle(this, drawer, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close)
+                R.string.empty_string, R.string.empty_string)
                 .also {
                     drawer.addDrawerListener(it)
                     it.syncState()
@@ -165,6 +145,7 @@ abstract class NavigationActivity : BaseFragmentActivity() {
                 drawer.closeDrawer(GravityCompat.START)
             }
         }
+
         invalidateNavigationMenu()
     }
 

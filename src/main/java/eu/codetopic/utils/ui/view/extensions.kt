@@ -21,18 +21,35 @@ package eu.codetopic.utils.ui.view
 import android.support.annotation.CheckResult
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import eu.codetopic.utils.R
 import org.jetbrains.anko.forEachChild
+import org.jetbrains.anko.inputMethodManager
 
 /**
  * @author anty
  */
 
-private val VIEW_TAG_KEY_TAGS_HASH_MAP = R.id.view_tag_key_tags_hash_map
+/////////////////////////
+//////REGION - OTHER/////
+/////////////////////////
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Boolean.asViewVisibility(): Int =
+        if (this) View.VISIBLE else View.GONE
+
+fun View.hideKeyboard() {
+    context.inputMethodManager.hideSoftInputFromWindow(
+            windowToken,
+            InputMethodManager.HIDE_IMPLICIT_ONLY
+    )
+}
 
 /////////////////////////
 //////REGION - TAGS//////
 /////////////////////////
+
+private val VIEW_TAG_KEY_TAGS_HASH_MAP = R.id.view_tag_key_tags_hash_map
 
 @Suppress("UNCHECKED_CAST")
 private fun View.getTags(): MutableMap<String, Any?> =

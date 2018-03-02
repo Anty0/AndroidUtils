@@ -88,8 +88,7 @@ public final class AndroidUtils {
 
     @CheckResult
     public static Spanned fromHtml(String source) {
-        if (Build.VERSION.SDK_INT >= 24) return Html.fromHtml(source, 0);
-        //noinspection deprecation
+        if (Build.VERSION.SDK_INT >= 24) return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
         return Html.fromHtml(source);
     }
 
@@ -106,20 +105,6 @@ public final class AndroidUtils {
     @CheckResult
     public static CharSequence getFormattedText(String text, Object... args) {
         return fromHtml(String.format(text, args));
-    }
-
-    @CheckResult
-    public static CharSequence getTimeFromLong(Context context, long time) {
-        if (time < 0) return context.getText(R.string.text_no_time);
-        return getFormattedText(context, R.string.text_time_format, TimeUnit.MILLISECONDS.toMinutes(time), // TODO: 26.3.16 use plural string
-                TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MILLISECONDS.toMinutes(time) * 60);
-    }
-
-    @CheckResult
-    public static String locationToString(Context context, double latitude, double longitude) {
-        return Double.isNaN(latitude) || Double.isNaN(longitude) ? context.getString(R.string.location_unknown) :
-                Location.convert(latitude, Location.FORMAT_DEGREES) + ", " +
-                        Location.convert(longitude, Location.FORMAT_DEGREES);
     }
 
     /**
