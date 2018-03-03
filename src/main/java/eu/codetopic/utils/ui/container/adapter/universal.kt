@@ -343,12 +343,12 @@ class UniversalRecyclerBase<VH : UniversalViewHolder>(
 
         override fun getItemViewType(position: Int): Int = adapter.getItemViewType(position)
 
-        override fun onAttachedToRecyclerView(recyclerView: RecyclerView?) {
+        override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
             adapter.onAttachToContainer(recyclerView)
             super.onAttachedToRecyclerView(recyclerView)
         }
 
-        override fun onDetachedFromRecyclerView(recyclerView: RecyclerView?) {
+        override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
             super.onDetachedFromRecyclerView(recyclerView)
             adapter.onDetachFromContainer(recyclerView)
         }
