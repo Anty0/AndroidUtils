@@ -55,7 +55,7 @@ open class LoadingItem(private val title: CharSequence,
 
     override fun getLayoutResId(context: Context): Int = R.layout.item_loading
 
-    override fun getRemoteLayoutResId(context: Context): Int = R.layout.item_loading
+    override fun getRemoteLayoutResId(context: Context): Int = R.layout.item_loading_small
 }
 
 open class CardLoadingItem(private val title: CharSequence,
