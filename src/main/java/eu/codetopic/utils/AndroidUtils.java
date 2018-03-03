@@ -89,6 +89,7 @@ public final class AndroidUtils {
     @CheckResult
     public static Spanned fromHtml(String source) {
         if (Build.VERSION.SDK_INT >= 24) return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        //noinspection deprecation
         return Html.fromHtml(source);
     }
 
