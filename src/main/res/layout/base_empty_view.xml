@@ -44,7 +44,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:lines="1"
+        android:singleLine="true"
+        android:ellipsize="end"
         android:textColor="?android:attr/textColorPrimary"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
@@ -56,6 +57,7 @@
         android:visibility="gone"
         android:gravity="center_horizontal"
         android:maxWidth="300dp"
+        android:ellipsize="end"
         android:textColor="?android:attr/textColorPrimary"
         android:textAppearance="?android:attr/textAppearanceSmall"/>
 </LinearLayout>

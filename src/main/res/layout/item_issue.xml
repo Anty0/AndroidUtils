@@ -38,6 +38,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
+        android:lines="1"
         android:textSize="28sp"
         android:fontFamily="monospace"
         android:typeface="monospace"
@@ -55,7 +56,8 @@
             android:id="@+id/txtMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lines="1"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textSize="16sp" />
 
         <TextView
@@ -63,6 +65,8 @@
             android:id="@+id/txtTag"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:gravity="end"
             android:textSize="14sp" />
     </LinearLayout>

@@ -27,8 +27,8 @@
     android:paddingRight="16dp">
 
     <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36sp"
+        android:layout_height="36sp"
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:indeterminate="true"/>
@@ -44,7 +44,8 @@
             android:id="@+id/txtTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lines="1"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:textSize="16sp"
             android:textStyle="bold"
             android:textColor="@color/materialWhite" />
@@ -53,7 +54,8 @@
             android:id="@+id/txtText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:lines="1"
+            android:singleLine="true"
+            android:ellipsize="end"
             android:gravity="end"
             android:textSize="14sp"
             android:textColor="@color/materialDarkWhite" />
