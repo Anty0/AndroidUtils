@@ -33,7 +33,7 @@ class NotifyManagerDebugGroup : NotifyGroup(ID, NotifyManagerDebugChannel.ID) {
     companion object {
 
         private const val LOG_TAG = "NotifyManagerDebugGroup"
-        const val ID = "eu.codetopic.utils.debug.items.notify.$LOG_TAG"
+        const val ID = "eu.codetopic.utils.debug.items.notify.group"
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

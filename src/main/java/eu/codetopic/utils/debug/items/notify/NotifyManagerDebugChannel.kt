@@ -43,7 +43,7 @@ class NotifyManagerDebugChannel : NotifyChannel(ID, true) {
     companion object {
 
         private const val LOG_TAG = "NotifyManagerDebugChannel"
-        const val ID = "eu.codetopic.utils.debug.items.notify.$LOG_TAG"
+        const val ID = "eu.codetopic.utils.debug.items.notify.channel"
 
         private val idType = Identifiers.Type(ID)
     }

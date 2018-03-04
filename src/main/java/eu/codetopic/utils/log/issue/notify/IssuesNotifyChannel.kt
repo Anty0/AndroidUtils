@@ -52,7 +52,7 @@ class IssuesNotifyChannel : SummarizedNotifyChannel(ID, checkForIdOverrides = tr
     companion object {
 
         private const val LOG_TAG = "IssuesNotifyChannel"
-        const val ID = "eu.codetopic.utils.log.issue.notify.$LOG_TAG"
+        const val ID = "eu.codetopic.utils.log.issue.notify.channel"
 
         private val idType = Identifiers.Type(ID)
 
