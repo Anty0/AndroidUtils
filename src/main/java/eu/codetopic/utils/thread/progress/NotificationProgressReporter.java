@@ -57,8 +57,10 @@ public class NotificationProgressReporter extends ProgressReporterImpl {
                 info.getProgress(), info.isIntermediate());
 
         LooperUtils.runOnMainThread(() -> {
-                ((NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE))
-                        .notify(mId, mNotification.build());
+            NotificationManager manager = (NotificationManager)
+                    mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (manager == null) return Unit.INSTANCE;
+            manager.notify(mId, mNotification.build());
             return Unit.INSTANCE;
         });
     }

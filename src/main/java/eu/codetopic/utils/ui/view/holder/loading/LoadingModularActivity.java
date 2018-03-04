@@ -41,6 +41,7 @@ public abstract class LoadingModularActivity extends ModularActivity {
 
     private LoadingModularActivity(LoadingModule loadingModule,
                                    ActivityCallBackModule... additionalModules) {
+        //noinspection deprecation
         super(ArrayTools.add(additionalModules, 0, loadingModule));
     }
 

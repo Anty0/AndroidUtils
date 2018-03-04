@@ -19,18 +19,15 @@
 package eu.codetopic.utils.ui.container.adapter
 
 import android.content.Context
-import android.support.v7.widget.RecyclerView
-import java.util.concurrent.locks.ReentrantLock
-
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.simple.SimpleSuspendLock
-import eu.codetopic.utils.R
-import eu.codetopic.utils.thread.LooperUtils
-import eu.codetopic.utils.ui.container.items.custom.*
-import kotlinx.coroutines.experimental.*
+import eu.codetopic.utils.ui.container.items.custom.CustomItem
+import eu.codetopic.utils.ui.container.items.custom.EmptyCustomItem
+import kotlinx.coroutines.experimental.Deferred
+import kotlinx.coroutines.experimental.Job
 import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.coroutines.experimental.asReference
-import org.jetbrains.anko.coroutines.experimental.bg
 
 abstract class AutoLoadAdapter(context: Context) : CustomItemAdapter<CustomItem>(context) {
 

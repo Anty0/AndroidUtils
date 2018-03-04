@@ -19,7 +19,6 @@
 package eu.codetopic.utils.thread.progress;
 
 import android.support.annotation.AnyThread;
-import android.support.annotation.WorkerThread;
 
 public abstract class ProgressReporterImpl implements ProgressReporter {
 

@@ -39,9 +39,6 @@ import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.data.requestCancel
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter
-import eu.codetopic.utils.ui.container.adapter.UniversalRecyclerBase.RecyclerViewHolder
-import eu.codetopic.utils.ui.container.adapter.UniversalViewHolder
-import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import eu.codetopic.utils.ui.container.recycler.Recycler
 import eu.codetopic.utils.ui.view.holder.loading.LoadingModularActivity
 import kotlinx.android.extensions.CacheImplementation

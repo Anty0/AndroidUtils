@@ -20,7 +20,6 @@ package eu.codetopic.utils.ids
 
 import android.content.Context
 import android.content.SharedPreferences
-import eu.codetopic.utils.PrefNames
 import eu.codetopic.utils.PrefNames.FILE_NAME_IDENTIFIERS
 import eu.codetopic.utils.data.preferences.provider.BasicSharedPreferencesProvider
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider

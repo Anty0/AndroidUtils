@@ -18,11 +18,14 @@
 
 package eu.codetopic.utils.simple
 
+import android.os.Build
+import android.support.annotation.RequiresApi
 import android.transition.Transition
 
 /**
  * @author anty
  */
+@RequiresApi(Build.VERSION_CODES.KITKAT)
 open class SimpleTransitionListener : Transition.TransitionListener {
 
     override fun onTransitionEnd(transition: Transition) {}

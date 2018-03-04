@@ -18,7 +18,6 @@
 
 package eu.codetopic.utils.ui.container.adapter
 
-import android.content.Context
 import android.database.DataSetObservable
 import android.database.DataSetObserver
 import android.support.annotation.LayoutRes
@@ -30,10 +29,9 @@ import android.widget.ListAdapter
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import android.widget.SpinnerAdapter
-
+import eu.codetopic.utils.getOrPut
 import eu.codetopic.utils.ui.view.getTag
 import eu.codetopic.utils.ui.view.setTag
-import eu.codetopic.utils.getOrPut
 
 abstract class UniversalAdapter<VH : UniversalHolder<*>> {
 

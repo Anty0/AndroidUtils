@@ -26,14 +26,12 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
-import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareQueryOrDeleteUri
-import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareInsertOrUpdateUri
-import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Segment
-import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Query
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Column
+import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Query
+import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Segment
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareAllKeysQueryUri
-import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareUriBase
+import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareInsertOrUpdateUri
+import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareQueryOrDeleteUri
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareUriSegmentBase
 import java.util.*
 

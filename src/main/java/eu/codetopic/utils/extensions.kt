@@ -154,18 +154,6 @@ fun Context.getResourceUri(@AnyRes resource: Int): Uri {
 fun Context.getIconics(icon: IIcon): IconicsDrawable =
         IconicsDrawable(this, icon).colorDefault(this)
 
-val Context.notificationManager
-    get() = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-val Context.wifiManager
-    get() = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-
-val Context.searchManager
-    get() = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-
-val Context.accountManager
-    get() = AccountManager.get(this)
-
 val Context.baseActivity: Activity?
     get() = internalGetBaseActivity()
 

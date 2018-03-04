@@ -36,7 +36,6 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 
 import eu.codetopic.utils.*;
-import eu.codetopic.utils.R;
 import eu.codetopic.utils.thread.LooperUtils;
 import kotlin.Unit;
 

@@ -25,7 +25,7 @@ import eu.codetopic.utils.data.preferences.IPreferencesData
 /**
  * @author anty
  */
-interface IPreferencesCompanionObject<T : IPreferencesData> : Lazy<T> {
+interface IPreferencesCompanionObject<out T : IPreferencesData> : Lazy<T> {
 
     val getter: DataGetter<T>
 

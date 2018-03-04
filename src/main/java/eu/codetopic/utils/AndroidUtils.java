@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.ActivityManager;
 import android.app.NotificationManager;
@@ -35,9 +36,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -70,7 +69,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
 
 import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
@@ -219,6 +217,7 @@ public final class AndroidUtils {
 
     public static int[] getSystemStyleableInts(String styleableName) {
         try {
+            @SuppressLint("PrivateApi")
             Field field = Class.forName("com.android.internal.R$styleable")
                     .getDeclaredField(styleableName);
             field.setAccessible(true);
@@ -231,6 +230,7 @@ public final class AndroidUtils {
 
     public static int getSystemStyleableInt(String styleableName) {
         try {
+            @SuppressLint("PrivateApi")
             Field field = Class.forName("com.android.internal.R$styleable")
                     .getDeclaredField(styleableName);
             field.setAccessible(true);
@@ -295,6 +295,8 @@ public final class AndroidUtils {
             case PackageManager.COMPONENT_ENABLED_STATE_ENABLED:
                 return true;
             case PackageManager.COMPONENT_ENABLED_STATE_DISABLED:
+            case PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER:
+            case PackageManager.COMPONENT_ENABLED_STATE_DISABLED_UNTIL_USED:
                 return false;
             case PackageManager.COMPONENT_ENABLED_STATE_DEFAULT:
             default:
@@ -391,6 +393,7 @@ public final class AndroidUtils {
                 return false;
             }
 
+            //noinspection deprecation
             if (!Objects.equals(firstValue, secondValue)
                     || (secondValue == null && !second.containsKey(key))) {
                 return false;
@@ -449,10 +452,14 @@ public final class AndroidUtils {
 
     @TargetApi(23)
     public static int cancelNotificationsByTag(Context context, @NonNull String tag) {
-        int canceled = 0;
         NotificationManager manager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
-        for (StatusBarNotification notification : manager.getActiveNotifications()) {
+        if (manager == null) return 0;
+        StatusBarNotification[] notifications = manager.getActiveNotifications();
+        if (notifications == null) return 0;
+
+        int canceled = 0;
+        for (StatusBarNotification notification : notifications) {
             String nTag = notification.getTag();
             if (tag.equals(nTag)) {
                 manager.cancel(nTag, notification.getId());
@@ -532,6 +539,7 @@ public final class AndroidUtils {
 
     @CheckResult
     public static boolean isStorageWritable() {
+        //noinspection deprecation
         return Objects.equals(Environment.MEDIA_MOUNTED, Environment.getExternalStorageState());
     }
 }

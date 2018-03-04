@@ -19,7 +19,6 @@
 package eu.codetopic.utils.data.preferences.preference
 
 import android.content.SharedPreferences
-import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JSON

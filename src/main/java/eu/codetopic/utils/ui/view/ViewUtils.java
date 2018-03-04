@@ -46,7 +46,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eu.codetopic.java.utils.*;
-import eu.codetopic.java.utils.Objects;
 import eu.codetopic.java.utils.log.Log;
 import eu.codetopic.utils.thread.LooperUtils;
 import kotlin.Unit;
@@ -177,6 +176,7 @@ public class ViewUtils { // TODO: rework to kotlin (and move to ViewExtensions)
     @SuppressWarnings("unchecked")
     public static <T extends View> List<T> findViewsByClass(Class<T> clazz, View view) {
         List<T> views = new ArrayList<>();
+        //noinspection deprecation
         if (Objects.equals(view.getClass(), clazz)) views.add((T) view);
         if (!(view instanceof ViewGroup)) return views;
         for (int i = 0, count = ((ViewGroup) view).getChildCount(); i < count; i++) {

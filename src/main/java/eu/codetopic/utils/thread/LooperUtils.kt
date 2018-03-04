@@ -22,8 +22,6 @@ import android.content.Context
 import android.os.Handler
 import android.view.View
 
-import eu.codetopic.java.utils.log.Log
-
 object LooperUtils {
 
     private const val LOG_TAG = "LooperUtils"
@@ -36,7 +34,7 @@ object LooperUtils {
 
     @Synchronized
     fun initialize(context: Context) {
-        if (initialized) throw IllegalStateException(LOG_TAG + " is still initialized")
+        if (initialized) throw IllegalStateException("$LOG_TAG is still initialized")
         initialized = true
 
         val looper = context.applicationContext.mainLooper

@@ -18,7 +18,6 @@
 
 package eu.codetopic.utils.ui.activity.navigation
 
-import android.animation.Animator
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -37,26 +36,21 @@ import android.support.v7.app.ActionBarDrawerToggle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.widget.LinearLayout
 import com.mikepenz.google_material_typeface_library.GoogleMaterial
-
-import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.ifTrue
-import eu.codetopic.utils.getIconics
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidUtils
 import eu.codetopic.utils.R
-import eu.codetopic.utils.simple.SimpleAnimatorListener
+import eu.codetopic.utils.getIconics
 import eu.codetopic.utils.ui.activity.fragment.BaseFragmentActivity
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.extensions.LayoutContainer
+import kotlinx.android.synthetic.main.activity_module_toolbar.*
+import kotlinx.android.synthetic.main.activity_navigation_base.*
 import kotlinx.android.synthetic.main.activity_navigation_header.*
 import kotlinx.android.synthetic.main.activity_navigation_header.view.*
-import kotlinx.android.synthetic.main.activity_navigation_base.*
-import kotlinx.android.synthetic.main.activity_module_toolbar.*
-import kotlin.math.ceil
 
 @ContainerOptions(CacheImplementation.SPARSE_ARRAY)
 abstract class NavigationActivity : BaseFragmentActivity() {

@@ -74,7 +74,7 @@ public class ViewHolder {
             view = LayoutInflater.from(context)
                     .inflate(wrappingInfo.getWrappingLayoutRes(), parent, attachToParent);
 
-            parent = (ViewGroup) view.findViewById(wrappingInfo.getContentViewId());
+            parent = view.findViewById(wrappingInfo.getContentViewId());
             View result = viewCreator.createView(context, parent);
             if (result != null) parent.addView(result);
         } else {
@@ -208,7 +208,7 @@ public class ViewHolder {
             if (wrappingInfo == null) throw new IllegalArgumentException("Can't apply ViewHolder" +
                     " that haven't got base layout on base layout");
 
-            ViewGroup parent = (ViewGroup) baseView.findViewById(wrappingInfo.getContentViewId());
+            ViewGroup parent = baseView.findViewById(wrappingInfo.getContentViewId());
             View result = viewCreator.createView(context, parent);
             if (result != null) parent.addView(result);
             setView(baseView);

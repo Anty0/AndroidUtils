@@ -18,6 +18,7 @@
 
 package eu.codetopic.utils.broadcast;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -37,9 +38,14 @@ import eu.codetopic.java.utils.log.Log;
 public final class BroadcastsConnector extends BroadcastReceiver {
 
     private static final String LOG_TAG = "BroadcastsConnector";
+
+    @SuppressLint("StaticFieldLeak")
     private static final BroadcastsConnector mInstance = new BroadcastsConnector();
+
     private static final HashMap<String, List<Connection>> mConnections = new HashMap<>();
     private static final HashMap<String, List<Connection>> mGroups = new HashMap<>();
+
+    @SuppressLint("StaticFieldLeak")
     private static Context mContext = null;
     private static boolean mRegistered = false;
 
@@ -111,6 +117,7 @@ public final class BroadcastsConnector extends BroadcastReceiver {
         List<Connection> connections = mConnections.get(actionFrom);
         if (connections == null) return;
         for (Connection connection : connections)
+            //noinspection deprecation
             if (Objects.equals(connection.getIntent().getAction(), actionTo))
                 connection.addSkip();
     }

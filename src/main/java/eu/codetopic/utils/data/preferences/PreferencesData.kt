@@ -69,8 +69,8 @@ abstract class PreferencesData<out SP : SharedPreferences> (
 
     protected val preferences: SP
         get() {
-            if (!isCreated) throw IllegalStateException(LOG_TAG + " is not initialized")
-            if (isDestroyed) throw IllegalStateException(LOG_TAG + " is still destroyed")
+            if (!isCreated) throw IllegalStateException("$LOG_TAG is not initialized")
+            if (isDestroyed) throw IllegalStateException("$LOG_TAG is still destroyed")
             return preferencesProvider.preferences
         }
 
@@ -93,8 +93,8 @@ abstract class PreferencesData<out SP : SharedPreferences> (
 
     @Synchronized
     final override fun init() {
-        if (isCreated) throw IllegalStateException(LOG_TAG + " is still initialized")
-        if (isDestroyed) throw IllegalStateException(LOG_TAG + " is destroyed")
+        if (isCreated) throw IllegalStateException("$LOG_TAG is still initialized")
+        if (isDestroyed) throw IllegalStateException("$LOG_TAG is destroyed")
         isCreated = true
         try {
             onCreate()
@@ -130,8 +130,8 @@ abstract class PreferencesData<out SP : SharedPreferences> (
 
     @Synchronized
     final override fun destroy() {
-        if (!isCreated) throw IllegalStateException(LOG_TAG + " is not initialized")
-        if (isDestroyed) throw IllegalStateException(LOG_TAG + " is still destroyed")
+        if (!isCreated) throw IllegalStateException("$LOG_TAG is not initialized")
+        if (isDestroyed) throw IllegalStateException("$LOG_TAG is still destroyed")
         onDestroy()
         isDestroyed = true
         isCreated = false

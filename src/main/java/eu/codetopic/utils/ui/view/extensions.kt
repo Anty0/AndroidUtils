@@ -59,7 +59,7 @@ private fun View.getTags(): MutableMap<String, Any?> =
                 }
 
 fun View.setTag(key: String, tag: Any?) {
-    getTags().put(key, tag)
+    getTags()[key] = tag
 }
 
 @CheckResult

@@ -18,18 +18,9 @@
 
 package eu.codetopic.utils.notifications.manager.create
 
-import android.app.Notification
-import android.content.Context
 import android.os.Bundle
-import android.support.annotation.MainThread
 import eu.codetopic.utils.bundle.BundleSerializer
-import eu.codetopic.utils.notifications.manager.NotifyClassifier
-import eu.codetopic.utils.notifications.manager.NotifyManager
-import eu.codetopic.utils.notifications.manager.data.CommonNotifyId
-import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
-import eu.codetopic.utils.notifications.manager.data.NotifyId
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Transient
 
 /**
  * @author anty

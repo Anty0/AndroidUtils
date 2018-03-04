@@ -34,11 +34,11 @@ open class PreferencesCompanionObject<T : IPreferencesData>(private val log_tag:
     private var initializer: ((Context) -> T)? = initializer
     @Volatile private var _instance: T? = null
 
-    override final val getter: DataGetter<T> by lazy(getterInitializer)
+    final override val getter: DataGetter<T> by lazy(getterInitializer)
 
-    override final val instance: T get() = value
+    final override val instance: T get() = value
 
-    override final val value: T
+    final override val value: T
         get() {
             val v1 = _instance
             if (v1 != null) return v1
@@ -48,7 +48,7 @@ open class PreferencesCompanionObject<T : IPreferencesData>(private val log_tag:
             }
         }
 
-    override final fun initialize(context: Context) {
+    final override fun initialize(context: Context) {
         synchronized(this) {
             if (_instance != null) throw IllegalStateException("$log_tag is still initialized")
             else {
@@ -60,8 +60,8 @@ open class PreferencesCompanionObject<T : IPreferencesData>(private val log_tag:
         }
     }
 
-    override final fun isInitialized(): Boolean = _instance != null
+    final override fun isInitialized(): Boolean = _instance != null
 
-    override final fun toString(): String =
+    final override fun toString(): String =
             if (isInitialized()) value.toString() else "Lazy value of $log_tag not initialized yet."
 }

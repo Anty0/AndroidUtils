@@ -21,7 +21,6 @@ package eu.codetopic.utils.log.issue.notify
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
-import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Build
 import android.os.Bundle
@@ -30,7 +29,6 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import eu.codetopic.java.utils.alsoIfNull
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.java.utils.log.base.Priority
 import eu.codetopic.java.utils.log.base.Priority.*
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ids.Identifiers
