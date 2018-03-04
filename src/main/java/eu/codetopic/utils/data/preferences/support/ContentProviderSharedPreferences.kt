@@ -24,6 +24,7 @@ import android.content.SharedPreferences
 import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 import android.os.Handler
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.prepareQueryOrDeleteUri
@@ -45,6 +46,36 @@ class ContentProviderSharedPreferences private constructor(
         private val CONTENT = Any()
 
         private val instancesMap = mutableMapOf<String, ContentProviderSharedPreferences>()
+
+        private inline fun <T : Cursor?, R> T.use(block: (T) -> R): R {
+            // Cursor cannot be casted to Closeable on low api, so we must use own function
+            //  instead of one included in kotlin for closing Cursors, to avoid casting problems.
+
+            var exception: Throwable? = null
+            try {
+                return block(this)
+            } catch (e: Throwable) {
+                exception = e
+                throw e
+            } finally {
+                closeFinally(exception)
+            }
+        }
+
+        private fun Cursor?.closeFinally(cause: Throwable?) {
+            when {
+                this == null -> Unit
+                cause == null -> close()
+                else ->
+                    try {
+                        close()
+                    } catch (closeException: Throwable) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                            cause.addSuppressed(closeException)
+                        }
+                    }
+            }
+        }
 
         fun getInstance(context: Context, authority: String): ContentProviderSharedPreferences {
             return instancesMap[authority] ?:
