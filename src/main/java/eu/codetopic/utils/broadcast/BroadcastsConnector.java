@@ -173,6 +173,7 @@ public final class BroadcastsConnector extends BroadcastReceiver {
             if (!connection.isEnabled() || connection.skip()) continue;
             Intent intentTo = new Intent(connection.getIntent());
             Bundle extras = intentTo.getExtras();
+            if (extras != null) extras = (Bundle) extras.clone();
             intentTo.putExtras(intent);
             if (extras != null) intentTo.putExtras(extras);
             switch (connection.getTargetingType()) {
