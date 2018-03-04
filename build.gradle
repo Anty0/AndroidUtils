@@ -16,8 +16,6 @@
  * along  with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.google.common.collect.Iterables
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
@@ -54,7 +52,7 @@ android {
     buildTypes {
         def proguardList = ['proguard-rules.pro']
         proguardList.addAll(file('./proguard/').listFiles().collect())
-        def proguardArray = Iterables.toArray(proguardList, Object.class)
+        def proguardArray = proguardList.toArray()
 
         release {
             consumerProguardFiles proguardArray
