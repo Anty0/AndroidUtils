@@ -23,7 +23,8 @@ import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.letIfNull
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.ChannelsEnabler
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import org.jetbrains.anko.bundleOf
 
 /**
@@ -49,7 +50,7 @@ class RqSetEnabledReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized(context)
+            NotifyBase.assertInitialized(context)
 
             val groupId = intent.takeIf { it.hasExtra(EXTRA_GROUP_ID) }
                     .letIfNull { throw IllegalArgumentException("No group id received by intent") }
@@ -60,17 +61,17 @@ class RqSetEnabledReceiver : BroadcastReceiver() {
                     ?.getBooleanExtra(EXTRA_ENABLE, true)
                     ?: throw IllegalArgumentException("No target enable state received by intent")
 
-            NotifyManager.setChannelEnabled(context, groupId, channelId, enable)
+            ChannelsEnabler.setChannelEnabled(context, groupId, channelId, enable)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_OK, null, null)
+                setResult(REQUEST_RESULT_OK, null, null)
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_FAIL, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_THROWABLE to e
+                setResult(REQUEST_RESULT_FAIL, null, bundleOf(
+                        REQUEST_EXTRA_THROWABLE to e
                 ))
             }
         }

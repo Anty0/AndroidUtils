@@ -31,7 +31,7 @@ import eu.codetopic.utils.data.preferences.support.VersionedContentProviderPrefe
 class IdentifiersProvider : VersionedContentProviderPreferences<SharedPreferences>(AUTHORITY, Identifiers.SAVE_VERSION) {
 
     companion object {
-        const val AUTHORITY = "eu.codetopic.utils.ids.data"
+        const val AUTHORITY = "eu.codetopic.utils.ids.data" // FIXME: authority based on applicationId
     }
 
     override fun onPreparePreferencesProvider(): ISharedPreferencesProvider<SharedPreferences> {

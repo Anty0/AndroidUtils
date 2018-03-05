@@ -30,9 +30,10 @@ import eu.codetopic.utils.log.issue.data.Issue.Companion.toIssue
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
 import eu.codetopic.utils.log.issue.ui.IssueInfoActivity
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager.requestShow
+import eu.codetopic.utils.notifications.manager.show
 import eu.codetopic.utils.thread.LooperUtils
 
 /**
@@ -52,6 +53,7 @@ class IssueLogListener private constructor(val appContext: Context) {
         )
         private val LIST_NO_NOTIFICATION = arrayOf(
                 "Notifier",
+                "NotifyManager",
                 "NotifyData",
                 "IssuesNotifyGroup",
                 "IssuesNotifyChannel",
@@ -142,10 +144,10 @@ class IssueLogListener private constructor(val appContext: Context) {
                                 refreshable = true
                                 data = IssuesNotifyChannel.dataFor(logLine.toIssue())
                             }
-                    ).requestShow(
+                    ).show(
                             appContext,
                             optimise = logLine.tag == FATAL_EXCEPTION_LOG_TAG
-                                    && NotifyManager.isPostInitCleanupDone
+                                    && NotifyBase.isPostInitCleanupDone
                             // If this is fatal exception, allow processing
                             // of notification right now (because app may be killed),
                             // but if not, disallow optimisation (executing on same thread).

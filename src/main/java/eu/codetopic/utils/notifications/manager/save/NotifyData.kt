@@ -22,10 +22,10 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.annotation.MainThread
-import eu.codetopic.java.utils.kSerializer
 import eu.codetopic.java.utils.alsoIf
-import eu.codetopic.java.utils.letIf
 import eu.codetopic.java.utils.debug.DebugMode
+import eu.codetopic.java.utils.kSerializer
+import eu.codetopic.java.utils.letIf
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.PrefNames
 import eu.codetopic.utils.bundle.BundleSerializer
@@ -35,8 +35,8 @@ import eu.codetopic.utils.data.preferences.provider.ContentProviderPreferencesPr
 import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
 import eu.codetopic.utils.data.preferences.support.PreferencesCompanionObject
 import eu.codetopic.utils.data.preferences.support.PreferencesGetterAbs
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import eu.codetopic.utils.notifications.manager.NotifyClassifier
-import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import kotlinx.serialization.internal.BooleanSerializer
@@ -82,11 +82,11 @@ internal class NotifyData private constructor(context: Context) :
 
     private val notifyMap: MutableMap<CommonPersistentNotifyId, Bundle>
         get() =
-            if (NotifyManager.isInitialized) notifyMapCache
+            if (NotifyBase.isInitialized) notifyMapCache
             else notifyMapSave.toMutableMap()
 
     private fun notifyMapSave() {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
         notifyMapSave = notifyMap
     }
 
@@ -103,16 +103,16 @@ internal class NotifyData private constructor(context: Context) :
 
     private val channelsEnableMap: MutableMap<Pair<String?, String>, Boolean>
         get() =
-            if (NotifyManager.isInitialized) channelsEnableMapCache
+            if (NotifyBase.isInitialized) channelsEnableMapCache
             else channelsEnableMapSave.toMutableMap()
 
     private fun channelsEnableMapSave() {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
         channelsEnableMapSave = channelsEnableMap
     }
 
     fun setChannelEnabled(groupId: String?, channelId: String, enable: Boolean?) {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
         val key = groupId to channelId
         if (enable == null) channelsEnableMap.remove(key)
         else channelsEnableMap[key] = enable
@@ -124,14 +124,14 @@ internal class NotifyData private constructor(context: Context) :
             else channelsEnableMap[groupId to channelId] ?: channelsEnableMap[null to channelId]
 
     fun remove(id: NotifyId): Bundle? {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
         return id.let { it as? CommonPersistentNotifyId }?.let {
             notifyMap.remove(it)?.also { notifyMapSave() }
         }
     }
 
     fun removeAll(ids: Collection<NotifyId>): Map<out NotifyId, Bundle> {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
 
         if (ids.isEmpty()) return emptyMap()
 
@@ -146,7 +146,7 @@ internal class NotifyData private constructor(context: Context) :
     }
 
     fun removeAll(groupId: String? = null, channelId: String? = null): Map<out NotifyId, Bundle> {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
         return notifyMap
                 .letIf({ groupId != null }) { it.filter { it.key.idGroup == groupId } }
                 .letIf({ channelId != null }) { it.filter { it.key.idChannel == channelId } }
@@ -155,14 +155,14 @@ internal class NotifyData private constructor(context: Context) :
     }
 
     fun removeAll(): Map<out NotifyId, Bundle> {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
         return notifyMap.toMap()
                 .onEach { notifyMap.remove(it.key) }
                 .alsoIf({ it.isNotEmpty() }) { notifyMapSave() }
     }
 
     fun add(notifyId: NotifyId, data: Bundle) {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
 
         if (notifyId !is CommonPersistentNotifyId) return
         // Ignore add requests of non persistent notifications
@@ -179,7 +179,7 @@ internal class NotifyData private constructor(context: Context) :
     }
 
     fun addAll(map: Map<out NotifyId, Bundle>) {
-        NotifyManager.assertInitialized(context)
+        NotifyBase.assertInitialized(context)
 
         if (map.isEmpty()) return
 

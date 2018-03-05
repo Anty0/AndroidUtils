@@ -72,7 +72,7 @@ internal object NotifyClassifier {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // Installation is required only on Oreo+ devices
 
-        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+        if (NotifyBase.isOnNotifyManagerProcess(context)) {
             context.notificationManager.createNotificationChannelGroup(
                     createGroup(context)
                             .assert { it.id == id }
@@ -90,7 +90,7 @@ internal object NotifyClassifier {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // Installation is required only on Oreo+ devices
 
-        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+        if (NotifyBase.isOnNotifyManagerProcess(context)) {
             context.notificationManager.createNotificationChannels(
                     combinedIdsMap().map {
                         val (groupId, combinedId) = it
@@ -111,7 +111,7 @@ internal object NotifyClassifier {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // Nothing to uninstall on versions bellow Oreo
 
-        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+        if (NotifyBase.isOnNotifyManagerProcess(context)) {
             context.notificationManager.also { nm ->
                 findAllChannelsOf(this.id).forEach { channel ->
                     nm.deleteNotificationChannel(channel.combinedIdFor(this))
@@ -120,8 +120,8 @@ internal object NotifyClassifier {
                 nm.deleteNotificationChannelGroup(id)
             }
 
-            if (NotifyManager.isInitialized && NotifyManager.isPostInitCleanupDone)
-                NotifyManager.cleanup(context)
+            if (NotifyBase.isInitialized && NotifyBase.isPostInitCleanupDone)
+                Notifier.cleanup(context)
         }
     }
 
@@ -129,15 +129,15 @@ internal object NotifyClassifier {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         // Nothing to uninstall on versions bellow Oreo
 
-        if (NotifyManager.isOnNotifyManagerProcess(context)) {
+        if (NotifyBase.isOnNotifyManagerProcess(context)) {
             context.notificationManager.also {
                 combinedIds().forEach { id ->
                     it.deleteNotificationChannel(id)
                 }
             }
 
-            if (NotifyManager.isInitialized && NotifyManager.isPostInitCleanupDone)
-                NotifyManager.cleanup(context)
+            if (NotifyBase.isInitialized && NotifyBase.isPostInitCleanupDone)
+                Notifier.cleanup(context)
         }
     }
 

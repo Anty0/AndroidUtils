@@ -32,7 +32,7 @@ class NotifyProvider : VersionedContentProviderPreferences<SharedPreferences>(AU
 
     companion object {
 
-        const val AUTHORITY = "eu.codetopic.utils.notifications.manager.data"
+        const val AUTHORITY = "eu.codetopic.utils.notifications.manager.data" // FIXME: authority based on applicationId
     }
 
     override fun onPreparePreferencesProvider(): ISharedPreferencesProvider<SharedPreferences> {

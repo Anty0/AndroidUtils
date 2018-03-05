@@ -22,15 +22,15 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.putKSerializableExtra
 import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.ids.Identifiers
-import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import eu.codetopic.utils.notifications.manager.data.SummaryNotifyId
 import eu.codetopic.utils.notifications.manager.data.channel
 import eu.codetopic.utils.notifications.manager.data.group
 import eu.codetopic.utils.notifications.manager.save.NotifyData
 import eu.codetopic.utils.notifications.manager.util.SummarizedNotifyChannel
+import eu.codetopic.utils.putKSerializableExtra
 
 /**
  * @author anty
@@ -55,7 +55,7 @@ class SummaryNotifyLaunchReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized(context)
+            NotifyBase.assertInitialized(context)
 
             val notifyId = intent.getKSerializableExtra<SummaryNotifyId>(EXTRA_NOTIFY_ID)
                     ?: throw IllegalArgumentException("No notification id received by intent")

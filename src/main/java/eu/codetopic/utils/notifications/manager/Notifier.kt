@@ -280,8 +280,8 @@ internal object Notifier {
     }
 
     fun refreshSummaryOf(context: Context, notifyId: NotifyId) {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         refreshSummaryOf(context, notifyId.idGroup, notifyId.idChannel)
     }
@@ -316,8 +316,8 @@ internal object Notifier {
     }
 
     fun refresh(context: Context) {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         val notifier = NotificationManagerCompat.from(context)
 
@@ -332,8 +332,8 @@ internal object Notifier {
     }
 
     fun refresh(context: Context, groupId: String?, channelId: String?) {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         val notifier = NotificationManagerCompat.from(context)
 
@@ -354,8 +354,8 @@ internal object Notifier {
     }
 
     fun bootCleanup(context: Context) {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         // Cancel all non refreshable notifyIds,
         //  because they won't be visible again.
@@ -367,8 +367,8 @@ internal object Notifier {
     }
 
     fun cleanup(context: Context): Map<out NotifyId, Bundle> {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         return cancelAll(
                 context,
@@ -382,7 +382,7 @@ internal object Notifier {
 
     fun build(context: Context, builder: NotificationBuilder,
               hasTag: Boolean): Pair<NotifyId, Notification> {
-        NotifyManager.assertUsable()
+        NotifyBase.assertUsable()
 
         DebugMode.ifEnabled {
             if (builder.persistent) {
@@ -405,8 +405,8 @@ internal object Notifier {
     }
 
     fun notify(context: Context, builder: NotificationBuilder): NotifyId {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         val (notifyId, data) = builder.build(context, true)
 
@@ -419,8 +419,8 @@ internal object Notifier {
     }
 
     fun notifyAll(context: Context, builder: MultiNotificationBuilder): Map<out NotifyId, Bundle> {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = builder.build(context, true)
@@ -438,8 +438,8 @@ internal object Notifier {
     }
 
     fun cancel(context: Context, notifyId: NotifyId): Bundle? {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         val data = NotifyData.instance.remove(notifyId)
         if (DebugMode.isEnabled && notifyId.isPersistent && data == null) {
@@ -464,8 +464,8 @@ internal object Notifier {
     }
 
     fun cancelAll(context: Context, notifyIds: Collection<NotifyId>): Map<out NotifyId, Bundle> {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = NotifyData.instance.removeAll(notifyIds)
@@ -490,8 +490,8 @@ internal object Notifier {
 
     fun cancelAll(context: Context, groupId: String? = null,
                   channelId: String? = null): Map<out NotifyId, Bundle> {
-        NotifyManager.assertInitialized(context)
-        NotifyManager.assertPostInitCleanupDone()
+        NotifyBase.assertInitialized(context)
+        NotifyBase.assertPostInitCleanupDone()
 
         val notifier = NotificationManagerCompat.from(context)
         val notifyMap = NotifyData.instance.removeAll(groupId, channelId)

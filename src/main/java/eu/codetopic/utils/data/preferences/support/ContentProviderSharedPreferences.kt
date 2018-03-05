@@ -26,6 +26,8 @@ import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Handler
+import eu.codetopic.java.utils.alsoIfNull
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Column
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Query
 import eu.codetopic.utils.data.preferences.support.ContentProviderPreferences.Companion.Segment
@@ -40,6 +42,8 @@ class ContentProviderSharedPreferences private constructor(
         SharedPreferences {
 
     companion object {
+
+        private const val LOG_TAG = "ContentProviderSharedPreferences"
 
         private val CONTENT = Any()
 
@@ -96,18 +100,22 @@ class ContentProviderSharedPreferences private constructor(
         }
     }
 
-    val name
+    /*val name
         get() = query(prepareQueryOrDeleteUri(authority, Segment.CONTROL, Segment.CONTROL_VALUE_NAME))
-                .use { findValueByKey(it, Segment.CONTROL_VALUE_NAME) ?: "unknown" }
+                ?.use { findValueByKey(it, Segment.CONTROL_VALUE_NAME) } ?: "unknown"*/
 
     init {
         context.contentResolver.registerContentObserver(prepareUriSegmentBase(authority, Segment.DATA),
                 false, changesObserver)
     }
 
-    private fun query(uri: Uri): Cursor {
+    private fun query(uri: Uri): Cursor? {
         return context.contentResolver.query(uri, null,
                 null, null, null)
+                ?.alsoIfNull {
+                    Log.e(LOG_TAG, "query(uri=$uri)",
+                            NullPointerException("Received null cursor from query request"))
+                }
     }
 
     private fun findValueByKey(cursor: Cursor, key: String): String? {
@@ -124,7 +132,7 @@ class ContentProviderSharedPreferences private constructor(
 
     private fun get(key: String): String? {
         return query(prepareQueryOrDeleteUri(authority, Segment.DATA, key))
-                .use { findValueByKey(it, key) }
+                ?.use { findValueByKey(it, key) }
     }
 
     private fun notifyChanged(key: String?) {
@@ -149,13 +157,13 @@ class ContentProviderSharedPreferences private constructor(
 
     override fun contains(key: String): Boolean {
         return query(prepareQueryOrDeleteUri(authority, Segment.CONTAINS, key))
-                .use { findValueByKey(it, key)?.toBoolean() ?: false }
+                ?.use { findValueByKey(it, key)?.toBoolean() } ?: false
     }
 
     override fun getAll(): MutableMap<String, *> {
         return mutableMapOf(
                 *query(prepareAllKeysQueryUri(authority, Segment.DATA))
-                        .use {
+                        ?.use {
                             val pairs = mutableListOf<Pair<String, String?>>()
                             it.moveToFirst()
                             while (!it.isAfterLast) {
@@ -164,6 +172,7 @@ class ContentProviderSharedPreferences private constructor(
                             }
                             return@use pairs.toTypedArray()
                         }
+                        ?: emptyArray()
         )
     }
 

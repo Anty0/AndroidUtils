@@ -22,19 +22,17 @@ import android.app.Application
 import android.content.Context
 import android.os.Bundle
 import android.support.annotation.UiThread
-
 import com.squareup.leakcanary.LeakCanary
-
-import eu.codetopic.java.utils.log.Log
 import eu.codetopic.java.utils.letIfNull
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.broadcast.BroadcastsConnector
 import eu.codetopic.utils.broadcast.LocalBroadcast
 import eu.codetopic.utils.debug.AndroidDebugModeExtension
 import eu.codetopic.utils.debug.items.notify.NotifyManagerDebugItem
-import eu.codetopic.utils.network.NetworkManager
 import eu.codetopic.utils.ids.Identifiers
 import eu.codetopic.utils.log.AndroidLoggerExtension
-import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.network.NetworkManager
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import eu.codetopic.utils.thread.LooperUtils
 import org.jetbrains.anko.bundleOf
 
@@ -195,14 +193,14 @@ object UtilsBase {
             Identifiers.initialize(app)
 
             // Initialize NotifyManager
-            NotifyManager.initialize(app)
+            NotifyBase.initialize(app)
         }
 
         init(processName, processParams)
 
         if (initializeUtils) {
             // Complete cleanup of NotifyManager
-            NotifyManager.postInitCleanupAndRefresh(app)
+            NotifyBase.postInitCleanupAndRefresh(app)
         }
     }
 }

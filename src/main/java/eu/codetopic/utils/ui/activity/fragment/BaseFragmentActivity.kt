@@ -28,13 +28,12 @@ import android.support.v4.app.FragmentTransaction
 import android.support.v7.app.AppCompatActivity
 import android.view.ContextThemeWrapper
 import android.view.View
-
 import eu.codetopic.java.utils.letIf
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.AndroidUtils
-import eu.codetopic.utils.use
 import eu.codetopic.utils.R
 import eu.codetopic.utils.ui.view.hideKeyboard
+import eu.codetopic.utils.use
 import kotlinx.android.extensions.CacheImplementation
 import kotlinx.android.extensions.ContainerOptions
 import kotlinx.android.synthetic.main.activity_module_toolbar.*
@@ -109,7 +108,10 @@ abstract class BaseFragmentActivity : AppCompatActivity() {// TODO: 12.5.16 rewo
     fun <T : Fragment> replaceFragment(ft: FragmentTransaction, fragment: T?): T? {
         onBeforeReplaceFragment(ft, fragment)
 
-        currentFocus?.hideKeyboard()
+        currentFocus?.apply {
+            hideKeyboard(force = true)
+            clearFocus()
+        }
 
         val currFragment = currentFragment
 

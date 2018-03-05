@@ -26,8 +26,8 @@ import eu.codetopic.utils.R
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
-import eu.codetopic.utils.notifications.manager.requestSuspendShow
-import eu.codetopic.utils.notifications.manager.requestSuspendShowAll
+import eu.codetopic.utils.notifications.manager.sShow
+import eu.codetopic.utils.notifications.manager.sShowAll
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import kotlinx.android.synthetic.main.item_debug_notify.*
@@ -78,7 +78,7 @@ class NotifyManagerDebugItem : CustomItem() {
         holder.butRefresh.onClick {
             try {
                 assertInitialized()
-                NotifyManager.requestSuspendRefresh(holder.context)
+                NotifyManager.sRefresh(holder.context)
                 holder.context.longToast(R.string.debug_item_notify_toast_refresh_done)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "butRefresh.onClick()", e)
@@ -93,7 +93,7 @@ class NotifyManagerDebugItem : CustomItem() {
                         channelId = NotifyManagerDebugChannel.ID) {
                     persistent = true
                     refreshable = true
-                }.requestSuspendShow(holder.context)
+                }.sShow(holder.context)
                 holder.context.longToast(R.string.debug_item_notify_toast_show_one_done)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "butShowOne.onClick()", e)
@@ -108,7 +108,7 @@ class NotifyManagerDebugItem : CustomItem() {
                         channelId = NotifyManagerDebugChannel.ID) {
                     persistent = true
                     refreshable = true
-                }.requestSuspendShowAll(holder.context)
+                }.sShowAll(holder.context)
                 holder.context.longToast(R.string.debug_item_notify_toast_show_multi_done)
             } catch (e: Exception) {
                 Log.e(LOG_TAG, "butShowMulti.onClick()", e)
@@ -118,7 +118,7 @@ class NotifyManagerDebugItem : CustomItem() {
         holder.butCancelAll.onClick {
             try {
                 assertInitialized()
-                NotifyManager.requestSuspendCancelAll(
+                NotifyManager.sCancelAll(
                         context = holder.context,
                         groupId = NotifyManagerDebugGroup.ID,
                         channelId = NotifyManagerDebugChannel.ID

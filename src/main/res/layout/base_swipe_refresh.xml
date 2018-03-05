@@ -17,7 +17,7 @@
   ~ along  with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<FrameLayout
+<android.support.design.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -59,4 +59,4 @@
         android:clickable="true"
         android:focusable="true" /> <!--Icon will be added after inflating-->
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>

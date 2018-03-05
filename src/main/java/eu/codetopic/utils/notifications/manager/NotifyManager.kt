@@ -20,105 +20,26 @@ package eu.codetopic.utils.notifications.manager
 
 import android.app.Notification
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.support.annotation.MainThread
-import eu.codetopic.utils.notifications.manager.util.NotifyChannel
-import eu.codetopic.utils.notifications.manager.util.NotifyGroup
 import eu.codetopic.java.utils.alsoIf
-import eu.codetopic.utils.OrderedBroadcastResult
-import eu.codetopic.utils.sendSuspendOrderedBroadcast
+import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.getKSerializable
-import eu.codetopic.utils.UtilsBase
-import eu.codetopic.utils.UtilsBase.processNameNotifyManager
 import eu.codetopic.utils.notifications.manager.create.MultiNotificationBuilder
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import eu.codetopic.utils.notifications.manager.receiver.*
 import eu.codetopic.utils.notifications.manager.save.NotifyData
+import eu.codetopic.utils.notifications.manager.util.NotifyChannel
+import eu.codetopic.utils.notifications.manager.util.NotifyGroup
 
 /**
  * @author anty
  */
 object NotifyManager {
 
-    internal const val REQUEST_RESULT_UNKNOWN = 1
-    internal const val REQUEST_RESULT_FAIL = 0
-    internal const val REQUEST_RESULT_OK = -1
-
-    internal const val REQUEST_EXTRA_THROWABLE = "EXTRA_THROWABLE"
-    internal const val REQUEST_EXTRA_RESULT = "EXTRA_RESULT"
-
-    private var postInitCleanupDone = false
-    private var initialized = false
-    private var usable = false
-
-    val isPostInitCleanupDone: Boolean
-        get() = postInitCleanupDone
-
-    val isInitialized: Boolean
-        get() = initialized
-
-    val isUsable: Boolean
-        get() = usable
-
-    fun assertPostInitCleanupDone() {
-        if (!isPostInitCleanupDone)
-            throw IllegalStateException(
-                    "NotifyManager did not finished post init clean up in this process yet"
-            )
-    }
-
-    fun assertInitialized(context: Context) {
-        if (!isInitialized) throw IllegalStateException(
-                "NotifyManager is not initialized in this process: " +
-                        if (!isOnNotifyManagerProcess(context))
-                            "Not running in ':notify' process"
-                        else "Not yet initialized"
-        )
-    }
-
-    fun assertUsable() {
-        if (!isUsable) throw IllegalStateException("NotifyManager is not usable in this process")
-    }
-
-    fun isOnNotifyManagerProcess(context: Context) =
-            context.processNameNotifyManager == UtilsBase.Process.name
-
-    fun assertOnNotifyProcess(context: Context) {
-        if (!isOnNotifyManagerProcess(context))
-            throw IllegalStateException("Not running in ':notify' process")
-    }
-
-    @MainThread
-    fun initialize(context: Context) {
-        if (usable) throw IllegalStateException(
-                "NotifyManager is still initialized in this process"
-        )
-
-        usable = true
-        if (isOnNotifyManagerProcess(context)) initialized = true
-
-        NotifyData.initialize(context)
-    }
-
-    @MainThread
-    fun postInitCleanupAndRefresh(context: Context) {
-        assertUsable()
-
-        postInitCleanupDone = true
-
-        if (isInitialized) {
-            cleanup(context)
-        }
-
-        // Don't refresh right now, only request it.
-        // Refreshing right now can cause notifications,
-        //  that was deleted by user to show and hide again,
-        //  because their deletion will be processed after initialization of NotifyManager.
-        requestRefresh(context, optimise = false)
-    }
+    private const val LOG_TAG = "NotifyManager"
 
     //--------------------------------------------------------------------------
 
@@ -133,32 +54,32 @@ object NotifyManager {
     @MainThread
     fun uninstallGroup(context: Context, groupId: String): NotifyGroup =
             NotifyClassifier.uninstallGroup(context, groupId)
-                    .alsoIf({ isInitialized }) { cleanup(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.cleanup(context) }
 
     @MainThread
     fun uninstallChannel(context: Context, channelId: String): NotifyChannel =
             NotifyClassifier.uninstallChannel(context, channelId)
-                    .alsoIf({ isInitialized }) { cleanup(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.cleanup(context) }
 
     @MainThread
     fun reinstallGroup(context: Context, groupId: String) =
             NotifyClassifier.reinstallGroup(context, groupId)
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     @MainThread
     fun reinstallChannel(context: Context, channelId: String) =
             NotifyClassifier.reinstallChannel(context, channelId)
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     @MainThread
     fun replaceGroup(context: Context, group: NotifyGroup) =
             NotifyClassifier.replace(context, group)
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     @MainThread
     fun replaceChannel(context: Context, channel: NotifyChannel) =
             NotifyClassifier.replace(context, channel)
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     @MainThread
     fun installGroups(context: Context, vararg groups: NotifyGroup) =
@@ -179,22 +100,22 @@ object NotifyManager {
     @MainThread
     fun reinstallGroups(context: Context, vararg groupIds: String) =
             groupIds.forEach { NotifyClassifier.reinstallGroup(context, it) }
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     @MainThread
     fun reinstallChannels(context: Context, vararg channelIds: String) =
             channelIds.forEach { NotifyClassifier.reinstallChannel(context, it) }
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     @MainThread
     fun replaceGroups(context: Context, vararg groups: NotifyGroup) =
             groups.forEach { NotifyClassifier.replace(context, it) }
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     @MainThread
     fun replaceChannels(context: Context, vararg channels: NotifyChannel) =
             channels.forEach { NotifyClassifier.replace(context, it) }
-                    .alsoIf({ isInitialized }) { refresh(context) }
+                    .alsoIf({ NotifyBase.isInitialized }) { Notifier.refresh(context) }
 
     fun findGroup(groupId: String): NotifyGroup =
             NotifyClassifier.findGroup(groupId)
@@ -208,286 +129,300 @@ object NotifyManager {
     fun hasChannel(channelId: String): Boolean =
             NotifyClassifier.hasChannel(channelId)
 
-    fun setChannelEnabled(context: Context, groupId: String?, channelId: String, enable: Boolean) {
-        assertInitialized(context)
-        assertPostInitCleanupDone()
-        NotifyData.instance.setChannelEnabled(groupId, channelId, enable)
-        Notifier.refresh(context, groupId, channelId)
-    }
-
-    fun isChannelEnabled(groupId: String?, channelId: String): Boolean {
-        assertUsable()
-        return NotifyData.instance.isChannelEnabled(groupId, channelId)
-                ?: findChannel(channelId).defaultEnabled
-    }
+    fun isChannelEnabled(groupId: String?, channelId: String): Boolean =
+            ChannelsEnabler.isChannelEnabled(groupId, channelId)
 
     //--------------------------------------------------------------------------
 
-    @MainThread
-    fun refresh(context: Context) = Notifier.refresh(context)
-
-    @MainThread
-    fun cleanup(context: Context) = Notifier.cleanup(context)
-
-    @MainThread
-    fun build(context: Context, builder: NotificationBuilder, hasTag: Boolean): Pair<NotifyId, Notification> =
-            Notifier.build(context, builder, hasTag)
-
-    @MainThread
-    fun notify(context: Context, builder: NotificationBuilder): NotifyId =
-            Notifier.notify(context, builder)
-
-    @MainThread
-    fun notifyAll(context: Context, builder: MultiNotificationBuilder): Map<out NotifyId, Bundle> =
-            Notifier.notifyAll(context, builder)
-
-    @MainThread
-    fun cancel(context: Context, notifyId: NotifyId): Bundle? =
-            Notifier.cancel(context, notifyId)
-
-    @MainThread
-    fun cancelAll(context: Context, vararg notifyIds: NotifyId): Map<out NotifyId, Bundle> =
-            Notifier.cancelAll(context, notifyIds.asList())
-
-    @MainThread
-    fun cancelAll(context: Context, notifyIds: Collection<NotifyId>): Map<out NotifyId, Bundle> =
-            Notifier.cancelAll(context, notifyIds)
-
-    @MainThread
-    fun cancelAll(context: Context, groupId: String? = null, channelId: String? = null) =
-            Notifier.cancelAll(context, groupId, channelId)
+    fun getOnChangeBroadcastAction(): String {
+        NotifyBase.assertUsable()
+        return NotifyData.instance.broadcastActionChanged
+    }
 
     @MainThread
     fun getDataOf(notifyId: NotifyId): Bundle {
-        assertUsable()
-        return NotifyData.instance[notifyId]
-                ?: throw IllegalArgumentException("Id doesn't exists: $notifyId")
+        try {
+            NotifyBase.assertUsable()
+            return NotifyData.instance[notifyId]
+                    ?: throw IllegalArgumentException("Id doesn't exists: $notifyId")
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "getDataOf(notifyId=$notifyId)", e)
+        }
+        return Bundle.EMPTY
     }
 
     @MainThread
     fun getAllData(groupId: String? = null, channelId: String? = null): Map<out NotifyId, Bundle> {
-        assertUsable()
-        return NotifyData.instance.getAll(groupId, channelId)
+        try {
+            NotifyBase.assertUsable()
+            return NotifyData.instance.getAll(groupId, channelId)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "getAllData(groupId=$groupId, channelId=$channelId)", e)
+        }
+        return emptyMap()
     }
 
-    fun getOnChangeBroadcastAction(): String {
-        assertUsable()
-        return NotifyData.instance.broadcastActionChanged
+    @MainThread
+    fun build(context: Context, builder: NotificationBuilder,
+              hasTag: Boolean): Pair<NotifyId, Notification> =
+            Notifier.build(context, builder, hasTag)
+
+    @MainThread
+    fun buildOrNull(context: Context, builder: NotificationBuilder,
+                    hasTag: Boolean): Pair<NotifyId, Notification>? {
+        try {
+            return Notifier.build(context, builder, hasTag)
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "buildOrNull(builder=$builder, hasTag=$hasTag)", e)
+        }
+        return null
     }
 
     //--------------------------------------------------------------------------
 
     @MainThread
-    fun requestRefresh(context: Context, optimise: Boolean = true) {
-        assertUsable()
-        if (optimise && isInitialized) refresh(context)
-        else context.sendBroadcast(RqRefreshReceiver.getStartIntent(context))
+    fun refresh(context: Context, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            if (optimise && NotifyBase.isInitialized) Notifier.refresh(context)
+            else context.sendBroadcast(RqRefreshReceiver.getStartIntent(context))
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "refresh(optimise=$optimise)", e)
+        }
     }
 
     @MainThread
-    fun requestNotify(context: Context, builder: NotificationBuilder, optimise: Boolean = true) {
-        assertUsable()
-        if (optimise && isInitialized) notify(context, builder)
-        else context.sendBroadcast(
-                RqNotifyReceiver.getStartIntent(context, builder)
-        )
-    }
-
-    @MainThread
-    fun requestNotifyAll(context: Context, builder: MultiNotificationBuilder,
-                         optimise: Boolean = true) {
-        assertUsable()
-        if (optimise && isInitialized) notifyAll(context, builder)
-        else context.sendBroadcast(
-                RqNotifyAllReceiver.getStartIntent(context, builder)
-        )
-    }
-
-    @MainThread
-    fun requestCancel(context: Context, notifyId: NotifyId, optimise: Boolean = true) {
-        assertUsable()
-        if (optimise && isInitialized) cancel(context, notifyId)
-        else context.sendBroadcast(RqCancelReceiver.getStartIntent(context, notifyId))
-    }
-
-    @MainThread
-    fun requestCancelAll(context: Context, vararg notifyIds: NotifyId, optimise: Boolean = true) =
-            requestCancelAll(context, notifyIds.asList(), optimise)
-
-    @MainThread
-    fun requestCancelAll(context: Context, notifyIds: Collection<NotifyId>, optimise: Boolean = true) {
-        assertUsable()
-        if (optimise && isInitialized) cancelAll(context, notifyIds)
-        else context.sendBroadcast(RqCancelAllIdsReceiver.getStartIntent(context, notifyIds))
-    }
-
-    @MainThread
-    fun requestCancelAll(context: Context, groupId: String? = null,
-                         channelId: String? = null, optimise: Boolean = true) {
-        assertUsable()
-        if (optimise && isInitialized) cancelAll(context, groupId, channelId)
-        else context.sendBroadcast(
-                RqCancelAllReceiver.getStartIntent(context, groupId, channelId)
-        )
-    }
-
-    @MainThread
-    fun requestSetChannelEnabled(context: Context, groupId: String?, channelId: String,
-                                 enable: Boolean, optimise: Boolean = true) {
-        assertUsable()
-        if (optimise && isInitialized) setChannelEnabled(context, groupId, channelId, enable)
-        else context.sendBroadcast(
-                RqSetEnabledReceiver.getStartIntent(context, groupId, channelId, enable)
-        )
-    }
-
-    //--------------------------------------------------------------------------
-
-    private fun getInitialResult(): OrderedBroadcastResult =
-            OrderedBroadcastResult(
-                    code = REQUEST_RESULT_UNKNOWN,
-                    data = null,
-                    extras = null
+    fun notify(context: Context, builder: NotificationBuilder, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            if (optimise && NotifyBase.isInitialized) Notifier.notify(context, builder)
+            else context.sendBroadcast(
+                    RqNotifyReceiver.getStartIntent(context, builder)
             )
-
-    @MainThread
-    private suspend inline fun <T> sendSuspendRequest(context: Context, name: String, intent: Intent,
-                                                      resultExtractor: (result: OrderedBroadcastResult) -> T): T =
-            context.sendSuspendOrderedBroadcast(intent, getInitialResult()).let {
-                when (it.code) {
-                    REQUEST_RESULT_OK -> resultExtractor(it)
-                    REQUEST_RESULT_FAIL ->
-                        throw it.extras?.getSerializable(REQUEST_EXTRA_THROWABLE) as? Throwable
-                                ?: RuntimeException("Unknown fail result received from $name")
-                    REQUEST_RESULT_UNKNOWN ->
-                        throw RuntimeException("Failed to process broadcast by $name")
-                    else -> throw RuntimeException("Unknown resultCode received from $name: ${it.code}")
-                }
-            }
-
-    @MainThread
-    private suspend inline fun <T> sendSuspendRequestNotNull(context: Context, name: String, intent: Intent,
-                                                             resultExtractor: (result: OrderedBroadcastResult) -> T?): T =
-            sendSuspendRequest(context, name, intent) {
-                resultExtractor(it)
-                        ?: throw RuntimeException("Failed to extract result of $name")
-            }
-
-    @MainThread
-    suspend fun requestSuspendRefresh(context: Context, optimise: Boolean = true) {
-        assertUsable()
-        return if (optimise && isInitialized) refresh(context)
-        else sendSuspendRequest(
-                context = context,
-                name = "RqRefreshReceiver",
-                intent = RqRefreshReceiver.getStartIntent(context),
-                resultExtractor = { Unit }
-        )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "notify(builder=$builder, optimise=$optimise)", e)
+        }
     }
 
     @MainThread
-    suspend fun requestSuspendNotify(context: Context, builder: NotificationBuilder,
-                                     optimise: Boolean = true): NotifyId {
-        assertUsable()
-        return if (optimise && isInitialized) notify(context, builder)
-        else sendSuspendRequestNotNull(
-                context = context,
-                name = "RqNotifyReceiver",
-                intent = RqNotifyReceiver.getStartIntent(context, builder),
-                resultExtractor = {
-                    it.extras?.getKSerializable(REQUEST_EXTRA_RESULT, NotifyIdSerializer)
-                }
-        )
+    fun notifyAll(context: Context, builder: MultiNotificationBuilder, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            if (optimise && NotifyBase.isInitialized) Notifier.notifyAll(context, builder)
+            else context.sendBroadcast(
+                    RqNotifyAllReceiver.getStartIntent(context, builder)
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "notifyAll(builder=$builder, optimise=$optimise)", e)
+        }
     }
 
     @MainThread
-    suspend fun requestSuspendNotifyAll(context: Context, builder: MultiNotificationBuilder,
-                                        optimise: Boolean = true): Map<out NotifyId, Bundle> {
-        assertUsable()
-        return if (optimise && isInitialized) notifyAll(context, builder)
-        else sendSuspendRequestNotNull(
-                context = context,
-                name = "RqNotifyAllReceiver",
-                intent = RqNotifyAllReceiver.getStartIntent(context, builder),
-                resultExtractor = {
-                    it.extras
-                            ?.getKSerializable(
-                                    key = REQUEST_EXTRA_RESULT,
-                                    loader = RqNotifyAllReceiver.RESULT_SERIALIZER
-                            )
-                }
-        )
+    fun cancel(context: Context, notifyId: NotifyId, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            if (optimise && NotifyBase.isInitialized) Notifier.cancel(context, notifyId)
+            else context.sendBroadcast(RqCancelReceiver.getStartIntent(context, notifyId))
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "cancel(notifyId=$notifyId, optimise=$optimise)", e)
+        }
     }
 
     @MainThread
-    suspend fun requestSuspendCancel(context: Context, notifyId: NotifyId,
-                                     optimise: Boolean = true): Bundle? {
-        assertUsable()
-        return if (optimise && isInitialized) cancel(context, notifyId)
-        else sendSuspendRequest(
-                context = context,
-                name = "RqCancelReceiver",
-                intent = RqCancelReceiver.getStartIntent(context, notifyId),
-                resultExtractor = {
-                    it.extras?.getBundle(REQUEST_EXTRA_RESULT)
-                }
-        )
+    fun cancelAll(context: Context, notifyIds: Collection<NotifyId>, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            if (optimise && NotifyBase.isInitialized) Notifier.cancelAll(context, notifyIds)
+            else context.sendBroadcast(RqCancelAllIdsReceiver.getStartIntent(context, notifyIds))
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "cancelAll(notifyIds=$notifyIds, optimise=$optimise)", e)
+        }
     }
 
     @MainThread
-    suspend fun requestSuspendCancelAll(context: Context, vararg notifyIds: NotifyId,
-                                        optimise: Boolean = true): Map<out NotifyId, Bundle> =
-            requestSuspendCancelAll(context, notifyIds.asList(), optimise)
-
-    @MainThread
-    suspend fun requestSuspendCancelAll(context: Context, notifyIds: Collection<NotifyId>,
-                                        optimise: Boolean = true): Map<out NotifyId, Bundle> {
-        assertUsable()
-        return if (optimise && isInitialized) cancelAll(context, notifyIds)
-        else sendSuspendRequestNotNull(
-                context = context,
-                name = "RqCancelAllIdsReceiver",
-                intent = RqCancelAllIdsReceiver.getStartIntent(context, notifyIds),
-                resultExtractor = {
-                    it.extras
-                            ?.getKSerializable(
-                                    key = REQUEST_EXTRA_RESULT,
-                                    loader = RqCancelAllIdsReceiver.RESULT_SERIALIZER
-                            )
-                }
-        )
+    fun cancelAll(context: Context, groupId: String? = null,
+                  channelId: String? = null, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            if (optimise && NotifyBase.isInitialized) Notifier.cancelAll(context, groupId, channelId)
+            else context.sendBroadcast(
+                    RqCancelAllReceiver.getStartIntent(context, groupId, channelId)
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "cancelAll(groupId=$groupId," +
+                    " channelId=$channelId, optimise=$optimise)", e)
+        }
     }
 
     @MainThread
-    suspend fun requestSuspendCancelAll(context: Context, groupId: String? = null,
-                                        channelId: String? = null, optimise: Boolean = true): Map<out NotifyId, Bundle> {
-        assertUsable()
-        return if (optimise && isInitialized) cancelAll(context, groupId, channelId)
-        else sendSuspendRequestNotNull(
-                context = context,
-                name = "RqCancelAllReceiver",
-                intent = RqCancelAllReceiver.getStartIntent(context, groupId, channelId),
-                resultExtractor = {
-                    it.extras
-                            ?.getKSerializable(
-                                    key = REQUEST_EXTRA_RESULT,
-                                    loader = RqCancelAllReceiver.RESULT_SERIALIZER
-                            )
-                }
-        )
+    fun setChannelEnabled(context: Context, groupId: String?, channelId: String,
+                          enable: Boolean, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            if (optimise && NotifyBase.isInitialized)
+                ChannelsEnabler.setChannelEnabled(context, groupId, channelId, enable)
+            else context.sendBroadcast(
+                    RqSetEnabledReceiver.getStartIntent(context, groupId, channelId, enable)
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "setChannelEnabled(groupId=$groupId, channelId=$channelId," +
+                    " enable=$enable, optimise=$optimise)", e)
+        }
+    }
+
+    //--------------------------------------------------------------------------
+
+    @MainThread
+    suspend fun sRefresh(context: Context, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            return if (optimise && NotifyBase.isInitialized) Notifier.refresh(context)
+            else sendSuspendRequest(
+                    context = context,
+                    name = "RqRefreshReceiver",
+                    intent = RqRefreshReceiver.getStartIntent(context),
+                    resultExtractor = { Unit }
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "sRefresh(optimise=$optimise)", e)
+        }
     }
 
     @MainThread
-    suspend fun requestSuspendSetChannelEnabled(context: Context, groupId: String?,
-                                                channelId: String, enable: Boolean,
-                                                optimise: Boolean = true) {
-        assertUsable()
-        return if (optimise && isInitialized) setChannelEnabled(context, groupId, channelId, enable)
-        else sendSuspendRequest(
-                context = context,
-                name = "RqSetEnabledReceiver",
-                intent = RqSetEnabledReceiver.getStartIntent(context, groupId, channelId, enable),
-                resultExtractor = { Unit }
-        )
+    suspend fun sNotify(context: Context, builder: NotificationBuilder,
+                        optimise: Boolean = true): NotifyId? {
+        try {
+            NotifyBase.assertUsable()
+            return if (optimise && NotifyBase.isInitialized) Notifier.notify(context, builder)
+            else sendSuspendRequestNotNull(
+                    context = context,
+                    name = "RqNotifyReceiver",
+                    intent = RqNotifyReceiver.getStartIntent(context, builder),
+                    resultExtractor = {
+                        it.extras?.getKSerializable(REQUEST_EXTRA_RESULT, NotifyIdSerializer)
+                    }
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "notify(builder=$builder, optimise=$optimise)", e)
+        }
+        return null
+    }
+
+    @MainThread
+    suspend fun sNotifyAll(context: Context, builder: MultiNotificationBuilder,
+                           optimise: Boolean = true): Map<out NotifyId, Bundle> {
+        try {
+            NotifyBase.assertUsable()
+            return if (optimise && NotifyBase.isInitialized) Notifier.notifyAll(context, builder)
+            else sendSuspendRequestNotNull(
+                    context = context,
+                    name = "RqNotifyAllReceiver",
+                    intent = RqNotifyAllReceiver.getStartIntent(context, builder),
+                    resultExtractor = {
+                        it.extras
+                                ?.getKSerializable(
+                                        key = REQUEST_EXTRA_RESULT,
+                                        loader = RqNotifyAllReceiver.RESULT_SERIALIZER
+                                )
+                    }
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "notifyAll(builder=$builder, optimise=$optimise)", e)
+        }
+        return emptyMap()
+    }
+
+    @MainThread
+    suspend fun sCancel(context: Context, notifyId: NotifyId,
+                        optimise: Boolean = true): Bundle? {
+        try {
+            NotifyBase.assertUsable()
+            return if (optimise && NotifyBase.isInitialized) Notifier.cancel(context, notifyId)
+            else sendSuspendRequest(
+                    context = context,
+                    name = "RqCancelReceiver",
+                    intent = RqCancelReceiver.getStartIntent(context, notifyId),
+                    resultExtractor = {
+                        it.extras?.getBundle(REQUEST_EXTRA_RESULT)
+                    }
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "sCancel(notifyId=$notifyId, optimise=$optimise)", e)
+        }
+        return null
+    }
+
+    @MainThread
+    suspend fun sCancelAll(context: Context, vararg notifyIds: NotifyId,
+                           optimise: Boolean = true): Map<out NotifyId, Bundle> =
+            sCancelAll(context, notifyIds.asList(), optimise)
+
+    @MainThread
+    suspend fun sCancelAll(context: Context, notifyIds: Collection<NotifyId>,
+                           optimise: Boolean = true): Map<out NotifyId, Bundle> {
+        try {
+            NotifyBase.assertUsable()
+            return if (optimise && NotifyBase.isInitialized) Notifier.cancelAll(context, notifyIds)
+            else sendSuspendRequestNotNull(
+                    context = context,
+                    name = "RqCancelAllIdsReceiver",
+                    intent = RqCancelAllIdsReceiver.getStartIntent(context, notifyIds),
+                    resultExtractor = {
+                        it.extras
+                                ?.getKSerializable(
+                                        key = REQUEST_EXTRA_RESULT,
+                                        loader = RqCancelAllIdsReceiver.RESULT_SERIALIZER
+                                )
+                    }
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "sCancelAll(notifyIds=$notifyIds, optimise=$optimise)", e)
+        }
+        return emptyMap()
+    }
+
+    @MainThread
+    suspend fun sCancelAll(context: Context, groupId: String? = null, channelId: String? = null,
+                           optimise: Boolean = true): Map<out NotifyId, Bundle> {
+        try {
+            NotifyBase.assertUsable()
+            return if (optimise && NotifyBase.isInitialized)
+                Notifier.cancelAll(context, groupId, channelId)
+            else sendSuspendRequestNotNull(
+                    context = context,
+                    name = "RqCancelAllReceiver",
+                    intent = RqCancelAllReceiver.getStartIntent(context, groupId, channelId),
+                    resultExtractor = {
+                        it.extras
+                                ?.getKSerializable(
+                                        key = REQUEST_EXTRA_RESULT,
+                                        loader = RqCancelAllReceiver.RESULT_SERIALIZER
+                                )
+                    }
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "sCancelAll(groupId=$groupId," +
+                    " channelId=$channelId, optimise=$optimise)", e)
+        }
+        return emptyMap()
+    }
+
+    @MainThread
+    suspend fun sSetChannelEnabled(context: Context, groupId: String?, channelId: String,
+                                   enable: Boolean, optimise: Boolean = true) {
+        try {
+            NotifyBase.assertUsable()
+            return if (optimise && NotifyBase.isInitialized)
+                ChannelsEnabler.setChannelEnabled(context, groupId, channelId, enable)
+            else sendSuspendRequest(
+                    context = context,
+                    name = "RqSetEnabledReceiver",
+                    intent = RqSetEnabledReceiver.getStartIntent(context, groupId, channelId, enable),
+                    resultExtractor = { Unit }
+            )
+        } catch (e: Exception) {
+            Log.e(LOG_TAG, "sSetChannelEnabled(groupId=$groupId, channelId=$channelId," +
+                    " enable=$enable, optimise=$optimise)", e)
+        }
     }
 }

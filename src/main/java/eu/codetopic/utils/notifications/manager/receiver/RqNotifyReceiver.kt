@@ -22,12 +22,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.putKSerializableExtra
 import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.notifications.manager.Notifier
-import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import eu.codetopic.utils.notifications.manager.create.NotificationBuilder
 import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
+import eu.codetopic.utils.putKSerializableExtra
 import kotlinx.serialization.json.JSON
 import org.jetbrains.anko.bundleOf
 
@@ -49,7 +49,7 @@ class RqNotifyReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized(context)
+            NotifyBase.assertInitialized(context)
 
             val builder = intent.getKSerializableExtra<NotificationBuilder>(EXTRA_BUILDER)
                     ?: throw IllegalArgumentException("No notification builder received by intent")
@@ -57,16 +57,16 @@ class RqNotifyReceiver : BroadcastReceiver() {
             val result = Notifier.notify(context, builder)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_RESULT to JSON.stringify(NotifyIdSerializer, result)
+                setResult(REQUEST_RESULT_OK, null, bundleOf(
+                        REQUEST_EXTRA_RESULT to JSON.stringify(NotifyIdSerializer, result)
                 ))
             }
         } catch (e: Exception) {
             Log.e(LOG_TAG, "onReceive()", e)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_FAIL, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_THROWABLE to e
+                setResult(REQUEST_RESULT_FAIL, null, bundleOf(
+                        REQUEST_EXTRA_THROWABLE to e
                 ))
             }
         }

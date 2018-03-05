@@ -38,10 +38,11 @@ import org.jetbrains.anko.inputMethodManager
 inline fun Boolean.asViewVisibility(): Int =
         if (this) View.VISIBLE else View.GONE
 
-fun View.hideKeyboard() {
+fun View.hideKeyboard(force: Boolean = false) {
     context.inputMethodManager.hideSoftInputFromWindow(
             windowToken,
-            InputMethodManager.HIDE_IMPLICIT_ONLY
+            if (force) 0
+            else InputMethodManager.HIDE_IMPLICIT_ONLY
     )
 }
 

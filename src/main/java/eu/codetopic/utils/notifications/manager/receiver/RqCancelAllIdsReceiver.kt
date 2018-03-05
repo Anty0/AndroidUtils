@@ -22,13 +22,13 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.putKSerializableExtra
-import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.bundle.BundleSerializer
+import eu.codetopic.utils.getKSerializableExtra
 import eu.codetopic.utils.notifications.manager.Notifier
-import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
+import eu.codetopic.utils.putKSerializableExtra
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.list
 import kotlinx.serialization.map
@@ -63,7 +63,7 @@ class RqCancelAllIdsReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized(context)
+            NotifyBase.assertInitialized(context)
 
             val notifyIds = intent
                     .getKSerializableExtra(EXTRA_NOTIFY_IDS_LIST, PARAM_NOTIFY_IDS_SERIALIZER)
@@ -72,8 +72,8 @@ class RqCancelAllIdsReceiver : BroadcastReceiver() {
             val result = Notifier.cancelAll(context, notifyIds)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_RESULT to JSON.stringify(
+                setResult(REQUEST_RESULT_OK, null, bundleOf(
+                        REQUEST_EXTRA_RESULT to JSON.stringify(
                                 RESULT_SERIALIZER,
                                 result.toMap()
                         )
@@ -83,8 +83,8 @@ class RqCancelAllIdsReceiver : BroadcastReceiver() {
             Log.e(LOG_TAG, "onReceive()", e)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_FAIL, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_THROWABLE to e
+                setResult(REQUEST_RESULT_FAIL, null, bundleOf(
+                        REQUEST_EXTRA_THROWABLE to e
                 ))
             }
         }

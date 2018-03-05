@@ -44,17 +44,13 @@ fun NotifyChannel.combinedIdsMap(): Map<String, String> = NotifyChannel.combined
 // MultiNotificationBuilder
 
 @MainThread
-fun MultiNotificationBuilder.showAll(context: Context): Map<out NotifyId, Bundle> =
-        NotifyManager.notifyAll(context, this)
+fun MultiNotificationBuilder.showAll(context: Context, optimise: Boolean = true) =
+        NotifyManager.notifyAll(context, this, optimise)
 
 @MainThread
-fun MultiNotificationBuilder.requestShowAll(context: Context, optimise: Boolean = true) =
-        NotifyManager.requestNotifyAll(context, this, optimise)
-
-@MainThread
-suspend fun MultiNotificationBuilder.requestSuspendShowAll(context: Context,
-                                                           optimise: Boolean = true): Map<out NotifyId, Bundle> =
-        NotifyManager.requestSuspendNotifyAll(context, this, optimise)
+suspend fun MultiNotificationBuilder.sShowAll(context: Context,
+                                              optimise: Boolean = true): Map<out NotifyId, Bundle> =
+        NotifyManager.sNotifyAll(context, this, optimise)
 
 // NotificationBuilder
 
@@ -63,14 +59,14 @@ fun NotificationBuilder.build(context: Context, hasTag: Boolean): Pair<NotifyId,
         NotifyManager.build(context, this, hasTag)
 
 @MainThread
-fun NotificationBuilder.show(context: Context): NotifyId =
-        NotifyManager.notify(context, this)
+fun NotificationBuilder.buildOrNull(context: Context,
+                                    hasTag: Boolean): Pair<NotifyId, Notification>? =
+        NotifyManager.buildOrNull(context, this, hasTag)
 
 @MainThread
-fun NotificationBuilder.requestShow(context: Context, optimise: Boolean = true) =
-        NotifyManager.requestNotify(context, this, optimise)
+fun NotificationBuilder.show(context: Context, optimise: Boolean = true) =
+        NotifyManager.notify(context, this, optimise)
 
 @MainThread
-suspend fun NotificationBuilder.requestSuspendShow(context: Context,
-                                                   optimise: Boolean = true): NotifyId =
-        NotifyManager.requestSuspendNotify(context, this, optimise)
+suspend fun NotificationBuilder.sShow(context: Context, optimise: Boolean = true): NotifyId? =
+        NotifyManager.sNotify(context, this, optimise)

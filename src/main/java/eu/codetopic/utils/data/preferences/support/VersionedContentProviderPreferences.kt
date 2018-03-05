@@ -57,6 +57,8 @@ abstract class VersionedContentProviderPreferences<out SP : SharedPreferences>(
     @Synchronized
     protected open fun onDowngrade(editor: SharedPreferences.Editor, from: Int, to: Int) {
         // Default implementation should not support downgrading, so we will just throw exception.
-        throw UnsupportedOperationException("Cannot downgrade version of '$name' from '$from' to '$to'")
+        throw UnsupportedOperationException(
+                "Cannot downgrade version of '$authority' from '$from' to '$to'"
+        )
     }
 }

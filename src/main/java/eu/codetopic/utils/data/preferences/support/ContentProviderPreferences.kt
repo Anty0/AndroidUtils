@@ -26,12 +26,13 @@ import android.database.Cursor
 import android.net.Uri
 import android.support.annotation.CallSuper
 import eu.codetopic.java.utils.log.Log
+import eu.codetopic.utils.cursor.MultiColumnCursor
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import eu.codetopic.utils.edit
-import eu.codetopic.utils.cursor.MultiColumnCursor
 
 abstract class ContentProviderPreferences<out SP : SharedPreferences>(
-        private val authority: String) : ContentProvider() {
+        val authority: String
+) : ContentProvider() {
 
     companion object {
 
@@ -77,7 +78,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
         object Segment {
             const val CONTROL = "control"
-            const val CONTROL_VALUE_NAME = "name"
+            //const val CONTROL_VALUE_NAME = "name"
 
             const val DATA = "data"
 
@@ -98,7 +99,7 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
 
     private lateinit var preferencesProvider: ISharedPreferencesProvider<SP>
 
-    protected val name: String? get() = preferencesProvider.name
+    //protected val name: String? get() = preferencesProvider.name
 
     protected val preferences: SP get() = preferencesProvider.preferences
 
@@ -154,17 +155,18 @@ abstract class ContentProviderPreferences<out SP : SharedPreferences>(
             Segment.CONTROL -> {
                 if (uri.getBooleanQueryParameter(Query.ALL_KEYS, false)) {
                     return cursorOf(mapOf(
-                            Segment.CONTROL_VALUE_NAME to name
+                            //Segment.CONTROL_VALUE_NAME to name
                     ))
                 }
 
                 return cursorOf(uri.getQueryParameters(Query.KEY).map {
-                    when (it) {
+                    /*when (it) {
                         Segment.CONTROL_VALUE_NAME -> {
                             Segment.CONTROL_VALUE_NAME to name
                         }
                         else -> it to null
-                    }
+                    }*/
+                    it to null
                 }.toMap())
             }
             Segment.DATA -> {

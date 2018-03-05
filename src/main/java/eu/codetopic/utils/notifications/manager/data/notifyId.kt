@@ -205,17 +205,12 @@ val NotifyId.tag: String?
         else null
 
 @MainThread
-fun NotifyId.cancel(context: Context): Bundle? =
-        NotifyManager.cancel(context, this)
+fun NotifyId.cancel(context: Context, optimise: Boolean = true) =
+        NotifyManager.cancel(context, this, optimise)
 
 @MainThread
-fun NotifyId.requestCancel(context: Context, optimise: Boolean = true) =
-        NotifyManager.requestCancel(context, this, optimise)
-
-@MainThread
-suspend fun NotifyId.requestSuspendCancel(context: Context,
-                                          optimise: Boolean = true): Bundle? =
-        NotifyManager.requestSuspendCancel(context, this, optimise)
+suspend fun NotifyId.sCancel(context: Context, optimise: Boolean = true): Bundle? =
+        NotifyManager.sCancel(context, this, optimise)
 
 @get:MainThread
 val NotifyId.data: Bundle

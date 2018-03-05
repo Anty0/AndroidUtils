@@ -36,7 +36,7 @@ import eu.codetopic.utils.log.issue.notify.IssuesNotifyChannel
 import eu.codetopic.utils.log.issue.notify.IssuesNotifyGroup
 import eu.codetopic.utils.notifications.manager.NotifyManager
 import eu.codetopic.utils.notifications.manager.data.NotifyId
-import eu.codetopic.utils.notifications.manager.data.requestCancel
+import eu.codetopic.utils.notifications.manager.data.cancel
 import eu.codetopic.utils.ui.activity.modular.module.ToolbarModule
 import eu.codetopic.utils.ui.container.adapter.CustomItemAdapter
 import eu.codetopic.utils.ui.container.recycler.Recycler
@@ -101,7 +101,7 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
                     }
 
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-                        getItem(viewHolder)?.notifyId?.requestCancel(ctx)
+                        getItem(viewHolder)?.notifyId?.cancel(ctx)
                     }
                 })
 
@@ -139,7 +139,7 @@ class IssuesActivity : LoadingModularActivity(ToolbarModule()) {
                 launch(UI) {
                     holder.showLoading()
 
-                    NotifyManager.requestSuspendCancelAll(
+                    NotifyManager.sCancelAll(
                         context = self(),
                         groupId = IssuesNotifyGroup.ID,
                         channelId = IssuesNotifyChannel.ID

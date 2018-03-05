@@ -26,9 +26,9 @@ import eu.codetopic.utils.data.preferences.IPreferencesData
  * Warning: This code targets speed, not design.
  * @author anty
  */
-open class PreferencesCompanionObject<T : IPreferencesData>(private val log_tag: String,
-                                                            initializer: (Context) -> T,
-                                                            getterInitializer: () -> DataGetter<T>) :
+open class PreferencesCompanionObject<out T : IPreferencesData>(private val log_tag: String,
+                                                                initializer: (Context) -> T,
+                                                                getterInitializer: () -> DataGetter<T>) :
         IPreferencesCompanionObject<T> {
 
     private var initializer: ((Context) -> T)? = initializer

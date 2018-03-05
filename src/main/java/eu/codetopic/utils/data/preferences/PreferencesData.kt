@@ -25,9 +25,7 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import android.os.Bundle
 import android.support.annotation.CallSuper
-import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.broadcast.LocalBroadcast
-
 import eu.codetopic.utils.data.preferences.provider.ISharedPreferencesProvider
 import eu.codetopic.utils.edit
 
@@ -39,13 +37,11 @@ abstract class PreferencesData<out SP : SharedPreferences> (
 
         private const val LOG_TAG = "PreferencesData"
 
-        private const val ACTION_DATA_CHANGED_BASE =
-                "eu.codetopic.utils.data.preferences.PreferencesData.PREFERENCES_CHANGED.$1%s"
         const val EXTRA_CHANGED_DATA_KEY = "CHANGED_DATA_KEY"
 
-        private fun getBroadcastActionChanged(data: PreferencesData<*>): String {
-            return String.format(ACTION_DATA_CHANGED_BASE, data.name ?: "default")
-        }
+        private fun getBroadcastActionChanged(data: PreferencesData<*>): String =
+                "eu.codetopic.utils.data.preferences.PreferencesData" +
+                        ".PREFERENCES_CHANGED.${data.name ?: "default"}"
     }
 
     private val preferenceChangeListener = OnSharedPreferenceChangeListener { _, key -> onChanged(key) }
@@ -110,21 +106,21 @@ abstract class PreferencesData<out SP : SharedPreferences> (
     @CallSuper
     @Synchronized
     protected open fun onCreate() {
-        Log.v(LOG_TAG, "onCreate(name=$name)")
+        //Log.v(LOG_TAG, "onCreate(name=$name)")
         preferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 
     @CallSuper
     @Synchronized
     protected open fun onChanged(key: String?) {
-        Log.v(LOG_TAG, "onChanged(name=$name, key=$key)")
+        //Log.v(LOG_TAG, "onChanged(name=$name, key=$key)")
         LocalBroadcast.sendBroadcast(generateIntentActionChanged(key))
     }
 
     @CallSuper
     @Synchronized
     protected open fun onDestroy() {
-        Log.v(LOG_TAG, "onDestroy(name=$name)")
+        //Log.v(LOG_TAG, "onDestroy(name=$name)")
         preferences.unregisterOnSharedPreferenceChangeListener(preferenceChangeListener)
     }
 

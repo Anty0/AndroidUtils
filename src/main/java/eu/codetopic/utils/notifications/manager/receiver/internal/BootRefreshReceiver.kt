@@ -23,7 +23,7 @@ import android.content.Context
 import android.content.Intent
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.notifications.manager.Notifier
-import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.NotifyBase
 
 /**
  * @author anty
@@ -39,7 +39,7 @@ class BootRefreshReceiver : BroadcastReceiver() {
         if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
 
         try {
-            NotifyManager.assertInitialized(context)
+            NotifyBase.assertInitialized(context)
             Notifier.bootCleanup(context)
             Notifier.refresh(context)
         } catch (e: Exception) {

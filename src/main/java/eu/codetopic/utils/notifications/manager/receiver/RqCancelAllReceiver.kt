@@ -24,7 +24,7 @@ import android.content.Intent
 import eu.codetopic.java.utils.log.Log
 import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.notifications.manager.Notifier
-import eu.codetopic.utils.notifications.manager.NotifyManager
+import eu.codetopic.utils.notifications.manager.NotifyBase
 import eu.codetopic.utils.notifications.manager.data.NotifyIdSerializer
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.map
@@ -53,7 +53,7 @@ class RqCancelAllReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         try {
-            NotifyManager.assertInitialized(context)
+            NotifyBase.assertInitialized(context)
 
             val groupId = intent.getStringExtra(EXTRA_GROUP_ID)
             val channelId = intent.getStringExtra(EXTRA_CHANNEL_ID)
@@ -61,8 +61,8 @@ class RqCancelAllReceiver : BroadcastReceiver() {
             val result = Notifier.cancelAll(context, groupId, channelId)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_OK, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_RESULT to JSON.stringify(
+                setResult(REQUEST_RESULT_OK, null, bundleOf(
+                        REQUEST_EXTRA_RESULT to JSON.stringify(
                                 RESULT_SERIALIZER,
                                 result.toMap()
                         )
@@ -72,8 +72,8 @@ class RqCancelAllReceiver : BroadcastReceiver() {
             Log.e(LOG_TAG, "onReceive()", e)
 
             if (isOrderedBroadcast) {
-                setResult(NotifyManager.REQUEST_RESULT_FAIL, null, bundleOf(
-                        NotifyManager.REQUEST_EXTRA_THROWABLE to e
+                setResult(REQUEST_RESULT_FAIL, null, bundleOf(
+                        REQUEST_EXTRA_THROWABLE to e
                 ))
             }
         }

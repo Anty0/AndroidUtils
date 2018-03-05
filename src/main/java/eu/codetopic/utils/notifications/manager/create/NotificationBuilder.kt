@@ -60,4 +60,13 @@ class NotificationBuilder(val groupId: String, val channelId: String) {
     operator fun component4() = persistent
     operator fun component5() = refreshable
     operator fun component6() = data
+
+    override fun toString(): String =
+            "NotificationBuilder(" +
+                    "groupId='$groupId', " +
+                    "channelId='$channelId', " +
+                    "timeWhen=$timeWhen, " +
+                    "persistent=$persistent, " +
+                    "refreshable=$refreshable, " +
+                    "data=$data)"
 }
