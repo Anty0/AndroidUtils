@@ -132,11 +132,19 @@ object NotifyManager {
     fun isChannelEnabled(groupId: String?, channelId: String): Boolean =
             ChannelsEnabler.isChannelEnabled(groupId, channelId)
 
+    fun isChannelEnabledInSystem(context: Context, groupId: String, channelId: String): Boolean =
+            ChannelsEnabler.isChannelEnabledInSystem(context, groupId, channelId)
+
     //--------------------------------------------------------------------------
 
     fun getOnChangeBroadcastAction(): String {
         NotifyBase.assertUsable()
         return NotifyData.instance.broadcastActionChanged
+    }
+
+    fun isMultiProcessBroadcastBlockerDetected(): Boolean {
+        NotifyBase.assertUsable()
+        return NotifyData.instance.isBroadcastRejectionAtWarnLevel()
     }
 
     @MainThread
@@ -284,7 +292,11 @@ object NotifyManager {
                     resultExtractor = { Unit }
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "sRefresh(optimise=$optimise)", e)
+            if (e is BroadcastRejectedException) {
+                Log.w(LOG_TAG, "sRefresh(optimise=$optimise) -> Broadcast was rejected", e)
+            } else {
+                Log.e(LOG_TAG, "sRefresh(optimise=$optimise)", e)
+            }
         }
     }
 
@@ -303,7 +315,12 @@ object NotifyManager {
                     }
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "notify(builder=$builder, optimise=$optimise)", e)
+            if (e is BroadcastRejectedException) {
+                Log.w(LOG_TAG, "notify(builder=$builder, optimise=$optimise)" +
+                        " -> Broadcast was rejected", e)
+            } else {
+                Log.e(LOG_TAG, "notify(builder=$builder, optimise=$optimise)", e)
+            }
         }
         return null
     }
@@ -327,7 +344,12 @@ object NotifyManager {
                     }
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "notifyAll(builder=$builder, optimise=$optimise)", e)
+            if (e is BroadcastRejectedException) {
+                Log.w(LOG_TAG, "notifyAll(builder=$builder, optimise=$optimise)" +
+                        " -> Broadcast was rejected", e)
+            } else {
+                Log.e(LOG_TAG, "notifyAll(builder=$builder, optimise=$optimise)", e)
+            }
         }
         return emptyMap()
     }
@@ -347,7 +369,12 @@ object NotifyManager {
                     }
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "sCancel(notifyId=$notifyId, optimise=$optimise)", e)
+            if (e is BroadcastRejectedException) {
+                Log.w(LOG_TAG, "sCancel(notifyId=$notifyId, optimise=$optimise)" +
+                        " -> Broadcast was rejected", e)
+            } else {
+                Log.e(LOG_TAG, "sCancel(notifyId=$notifyId, optimise=$optimise)", e)
+            }
         }
         return null
     }
@@ -376,7 +403,12 @@ object NotifyManager {
                     }
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "sCancelAll(notifyIds=$notifyIds, optimise=$optimise)", e)
+            if (e is BroadcastRejectedException) {
+                Log.w(LOG_TAG, "sCancelAll(notifyIds=$notifyIds, optimise=$optimise)" +
+                        " -> Broadcast was rejected", e)
+            } else {
+                Log.e(LOG_TAG, "sCancelAll(notifyIds=$notifyIds, optimise=$optimise)", e)
+            }
         }
         return emptyMap()
     }
@@ -401,8 +433,13 @@ object NotifyManager {
                     }
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "sCancelAll(groupId=$groupId," +
-                    " channelId=$channelId, optimise=$optimise)", e)
+            if (e is BroadcastRejectedException) {
+                Log.w(LOG_TAG, "sCancelAll(groupId=$groupId, channelId=$channelId," +
+                        " optimise=$optimise) -> Broadcast was rejected", e)
+            } else {
+                Log.e(LOG_TAG, "sCancelAll(groupId=$groupId," +
+                        " channelId=$channelId, optimise=$optimise)", e)
+            }
         }
         return emptyMap()
     }
@@ -421,8 +458,13 @@ object NotifyManager {
                     resultExtractor = { Unit }
             )
         } catch (e: Exception) {
-            Log.e(LOG_TAG, "sSetChannelEnabled(groupId=$groupId, channelId=$channelId," +
-                    " enable=$enable, optimise=$optimise)", e)
+            if (e is BroadcastRejectedException) {
+                Log.w(LOG_TAG, "sSetChannelEnabled(groupId=$groupId, channelId=$channelId," +
+                        " enable=$enable, optimise=$optimise) -> Broadcast was rejected", e)
+            } else {
+                Log.e(LOG_TAG, "sSetChannelEnabled(groupId=$groupId, channelId=$channelId," +
+                        " enable=$enable, optimise=$optimise)", e)
+            }
         }
     }
 }

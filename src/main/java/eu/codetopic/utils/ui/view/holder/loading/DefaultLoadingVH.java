@@ -41,13 +41,15 @@ public class DefaultLoadingVH extends ProgressLoadingVH {
     @IdRes protected static final int LOADING_VIEW_ID = R.id.base_loading;
     @IdRes protected static final int CIRCLE_LOADING_VIEW_ID = R.id.base_loading_circle;
     @IdRes protected static final int HORIZONTAL_LOADING_VIEW_ID = R.id.base_loading_horizontal;
+    @IdRes protected static final int LOADING_TEXT_VIEW_ID = R.id.base_loading_text;
 
     private static final String LOG_TAG = "DefaultLoadingVH";
 
     @NonNull
     @Override
     protected LoadingWrappingInfo getWrappingInfo() {
-        return new LoadingWrappingInfo(LOADING_LAYOUT_ID, CONTENT_VIEW_ID, LOADING_VIEW_ID);
+        return new LoadingWrappingInfo(LOADING_LAYOUT_ID, CONTENT_VIEW_ID,
+                LOADING_VIEW_ID, LOADING_TEXT_VIEW_ID);
     }
 
     @Override

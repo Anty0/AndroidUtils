@@ -19,8 +19,13 @@
 package eu.codetopic.utils.notifications.manager
 
 import android.content.Context
+import android.os.Build
 import android.support.annotation.MainThread
+import android.support.v4.app.NotificationManagerCompat
+import android.support.v4.app.NotificationManagerCompat.IMPORTANCE_NONE
 import eu.codetopic.utils.notifications.manager.save.NotifyData
+import eu.codetopic.utils.notifications.manager.util.NotifyChannel
+import org.jetbrains.anko.notificationManager
 
 /**
  * @author anty
@@ -39,5 +44,15 @@ internal object ChannelsEnabler {
         NotifyBase.assertUsable()
         return NotifyData.instance.isChannelEnabled(groupId, channelId)
                 ?: NotifyManager.findChannel(channelId).defaultEnabled
+    }
+
+    fun isChannelEnabledInSystem(context: Context, groupId: String, channelId: String): Boolean {
+        if (!NotificationManagerCompat.from(context).areNotificationsEnabled()) return false
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.O) return true
+
+        val combinedChannelId = NotifyChannel.combinedId(groupId, channelId)
+        val channel = context.notificationManager.getNotificationChannel(combinedChannelId)
+
+        return channel.importance != IMPORTANCE_NONE
     }
 }

@@ -22,6 +22,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.annotation.MainThread
 import eu.codetopic.utils.OrderedBroadcastResult
+import eu.codetopic.utils.notifications.manager.save.NotifyData
 import eu.codetopic.utils.sendSuspendOrderedBroadcast
 
 /**
@@ -35,25 +36,31 @@ internal const val REQUEST_RESULT_OK = -1
 internal const val REQUEST_EXTRA_THROWABLE = "EXTRA_THROWABLE"
 internal const val REQUEST_EXTRA_RESULT = "EXTRA_RESULT"
 
-private fun initialResult(): OrderedBroadcastResult =
-        OrderedBroadcastResult(
-                code = REQUEST_RESULT_UNKNOWN,
-                data = null,
-                extras = null
-        )
+private val initialResult = OrderedBroadcastResult(
+        code = REQUEST_RESULT_UNKNOWN,
+        data = null,
+        extras = null
+)
 
 @MainThread
 internal suspend inline fun <T> sendSuspendRequest(context: Context, name: String, intent: Intent,
                                                   resultExtractor: (result: OrderedBroadcastResult) -> T): T =
-        context.sendSuspendOrderedBroadcast(intent, initialResult()).let {
+        context.sendSuspendOrderedBroadcast(intent, initialResult).let {
             when (it.code) {
-                REQUEST_RESULT_OK -> resultExtractor(it)
+                REQUEST_RESULT_OK -> {
+                    NotifyData.takeIf { it.isInitialized() }?.instance
+                            ?.decrementBroadcastRejectedCounter()
+                    return@let resultExtractor(it)
+                }
                 REQUEST_RESULT_FAIL ->
                     throw it.extras?.getSerializable(REQUEST_EXTRA_THROWABLE) as? Throwable
                             ?: RuntimeException("Unknown fail result received from $name")
-                REQUEST_RESULT_UNKNOWN ->
-                    // FIXME: Caused be some ASUS devices, maybe add some warning to user...
-                    throw RuntimeException("Failed to process broadcast by $name")
+                REQUEST_RESULT_UNKNOWN -> {
+                    // Caused be some ASUS devices by their's start-manager
+                    NotifyData.takeIf { it.isInitialized() }?.instance
+                            ?.incrementBroadcastRejectedCounter()
+                    throw BroadcastRejectedException(name)
+                }
                 else -> throw RuntimeException("Unknown resultCode received from $name: ${it.code}")
             }
         }
@@ -65,3 +72,6 @@ internal suspend inline fun <T> sendSuspendRequestNotNull(context: Context, name
             resultExtractor(it)
                     ?: throw RuntimeException("Failed to extract result of $name")
         }
+
+class BroadcastRejectedException(broadcastName: String) :
+        RuntimeException("Broadcast '$broadcastName' was rejected by system.")

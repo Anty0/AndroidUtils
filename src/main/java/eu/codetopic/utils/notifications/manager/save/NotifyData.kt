@@ -27,9 +27,10 @@ import eu.codetopic.java.utils.debug.DebugMode
 import eu.codetopic.java.utils.kSerializer
 import eu.codetopic.java.utils.letIf
 import eu.codetopic.java.utils.log.Log
-import eu.codetopic.utils.PrefNames
+import eu.codetopic.utils.PrefNames.*
 import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.data.preferences.PreferencesData
+import eu.codetopic.utils.data.preferences.preference.IntPreference
 import eu.codetopic.utils.data.preferences.preference.KSerializedPreference
 import eu.codetopic.utils.data.preferences.provider.ContentProviderPreferencesProvider
 import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
@@ -70,13 +71,30 @@ internal class NotifyData private constructor(context: Context) :
         }
     }
 
-    private var notifyMapSave: Map<CommonPersistentNotifyId, Bundle>
-            by KSerializedPreference<Map<CommonPersistentNotifyId, Bundle>>(
-                    PrefNames.NOTIFICATIONS_MAP,
-                    (kSerializer<CommonPersistentNotifyId>() to BundleSerializer).map,
-                    accessProvider,
-                    { emptyMap() }
-            )
+    private var broadcastRejectedCounter by IntPreference(
+            key = BROADCAST_REJECTED_COUNTER,
+            provider = accessProvider,
+            defaultValue = 0
+    )
+
+    fun incrementBroadcastRejectedCounter() {
+        val count = broadcastRejectedCounter
+        if (count < 10) broadcastRejectedCounter = count + 1
+    }
+
+    fun decrementBroadcastRejectedCounter() {
+        val count = broadcastRejectedCounter
+        broadcastRejectedCounter = if (count > 3) count - 3 else 0
+    }
+
+    fun isBroadcastRejectionAtWarnLevel() = broadcastRejectedCounter > 2
+
+    private var notifyMapSave by KSerializedPreference<Map<CommonPersistentNotifyId, Bundle>>(
+            key = NOTIFICATIONS_MAP,
+            serializer = (kSerializer<CommonPersistentNotifyId>() to BundleSerializer).map,
+            provider = accessProvider,
+            defaultValue = { emptyMap() }
+    )
 
     private val notifyMapCache by lazy { notifyMapSave.toMutableMap() }
 
@@ -90,14 +108,13 @@ internal class NotifyData private constructor(context: Context) :
         notifyMapSave = notifyMap
     }
 
-    private var channelsEnableMapSave: Map<Pair<String?, String>, Boolean>
-            by KSerializedPreference<Map<Pair<String?, String>, Boolean>>(
-                    PrefNames.CHANNELS_ENABLE_MAP,
-                    (PairSerializer(NullableSerializer(StringSerializer),
-                            StringSerializer) to BooleanSerializer).map,
-                    accessProvider,
-                    { emptyMap() }
-            )
+    private var channelsEnableMapSave by KSerializedPreference<Map<Pair<String?, String>, Boolean>>(
+            key = CHANNELS_ENABLE_MAP,
+            serializer = (PairSerializer(NullableSerializer(StringSerializer),
+                    StringSerializer) to BooleanSerializer).map,
+            provider = accessProvider,
+            defaultValue = { emptyMap() }
+    )
 
     private val channelsEnableMapCache by lazy { channelsEnableMapSave.toMutableMap() }
 

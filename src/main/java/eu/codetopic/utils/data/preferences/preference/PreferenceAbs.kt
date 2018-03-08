@@ -31,15 +31,19 @@ abstract class PreferenceAbs<T> {
         private const val LOG_TAG = "PreferenceAbs"
 
         const val DEFAULT_ID = "default"
+
+        fun keyFor(id: String?, key: String): String =
+                "ID{${id ?: DEFAULT_ID}}-$key"
+
+        fun keyFor(key: String): String =
+                keyFor(null, key)
     }
 
     abstract val name: String?
     abstract val key: String
     protected abstract val fallBackValue: T
 
-    protected open fun formatKey(id: String?): String {
-        return "ID{${id ?: DEFAULT_ID}}-$key"
-    }
+    protected open fun formatKey(id: String?): String = keyFor(id, key)
 
     open operator fun getValue(thisRef: Any?, property: KProperty<*>): T {
         return get(thisRef, null)

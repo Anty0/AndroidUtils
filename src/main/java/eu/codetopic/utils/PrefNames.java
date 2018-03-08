@@ -31,13 +31,11 @@ public final class PrefNames {
     public static final String LAST_IDENTIFIER = "LAST_IDENTIFIER";
     public static final String ID_TYPE_REQUEST_CODE = "REQUEST_CODE";
     public static final String ID_TYPE_NOTIFICATION_ID = "NOTIFICATION_ID";
-    // DashboardData
-    public static final String FILE_NAME_DASHBOARD_DATA = "DashboardData";
-    public static final String ADD_ENABLED_STATE = "_ENABLED_STATE";
     // NotifyData
     public static final String FILE_NAME_NOTIFY_DATA = "NotifyData";
     public static final String NOTIFICATIONS_MAP = "NOTIFICATIONS_MAP";
     public static final String CHANNELS_ENABLE_MAP = "CHANNELS_ENABLE_MAP";
+    public static final String BROADCAST_REJECTED_COUNTER = "BROADCAST_REJECTED_COUNTER";
 
     private PrefNames() {
     }
