@@ -24,7 +24,6 @@ import eu.codetopic.utils.R
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import kotlinx.android.synthetic.main.item_debug_issues.*
-import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @author anty
@@ -37,15 +36,15 @@ class IssuesDebugItem : CustomItem() {
     }
 
     override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
-        holder.butLogError.onClick {
+        holder.butLogError.setOnClickListener {
             Log.e(LOG_TAG, "Test message", RuntimeException("Test exception"))
         }
 
-        holder.butLogWarning.onClick {
+        holder.butLogWarning.setOnClickListener {
             Log.w(LOG_TAG, "Test warning message")
         }
 
-        holder.butLogBreakEvent.onClick {
+        holder.butLogBreakEvent.setOnClickListener {
             Log.b(LOG_TAG, "Test event message")
         }
     }

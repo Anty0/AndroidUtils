@@ -31,8 +31,9 @@ import eu.codetopic.utils.notifications.manager.sShowAll
 import eu.codetopic.utils.ui.container.items.custom.CustomItem
 import eu.codetopic.utils.ui.container.items.custom.CustomItemViewHolder
 import kotlinx.android.synthetic.main.item_debug_notify.*
+import kotlinx.coroutines.experimental.android.UI
+import kotlinx.coroutines.experimental.launch
 import org.jetbrains.anko.longToast
-import org.jetbrains.anko.sdk25.coroutines.onClick
 
 /**
  * @author anty
@@ -75,57 +76,67 @@ class NotifyManagerDebugItem : CustomItem() {
     }
 
     override fun onBindViewHolder(holder: CustomItemViewHolder, itemPosition: Int) {
-        holder.butRefresh.onClick {
-            try {
-                assertInitialized()
-                NotifyManager.sRefresh(holder.context)
-                holder.context.longToast(R.string.debug_item_notify_toast_refresh_done)
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "butRefresh.onClick()", e)
+        val appContext = holder.context.applicationContext
+
+        holder.butRefresh.setOnClickListener {
+            launch(UI) {
+                try {
+                    assertInitialized()
+                    NotifyManager.sRefresh(appContext)
+                    appContext.longToast(R.string.debug_item_notify_toast_refresh_done)
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "butRefresh.onClick()", e)
+                }
             }
         }
 
-        holder.butShowOne.onClick {
-            try {
-                assertInitialized()
-                NotificationBuilder.create(
-                        groupId = NotifyManagerDebugGroup.ID,
-                        channelId = NotifyManagerDebugChannel.ID) {
-                    persistent = true
-                    refreshable = true
-                }.sShow(holder.context)
-                holder.context.longToast(R.string.debug_item_notify_toast_show_one_done)
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "butShowOne.onClick()", e)
+        holder.butShowOne.setOnClickListener {
+            launch(UI) {
+                try {
+                    assertInitialized()
+                    NotificationBuilder.create(
+                            groupId = NotifyManagerDebugGroup.ID,
+                            channelId = NotifyManagerDebugChannel.ID) {
+                        persistent = true
+                        refreshable = true
+                    }.sShow(appContext)
+                    appContext.longToast(R.string.debug_item_notify_toast_show_one_done)
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "butShowOne.onClick()", e)
+                }
             }
         }
 
-        holder.butShowMulti.onClick {
-            try {
-                assertInitialized()
-                MultiNotificationBuilder.create(
-                        groupId = NotifyManagerDebugGroup.ID,
-                        channelId = NotifyManagerDebugChannel.ID) {
-                    persistent = true
-                    refreshable = true
-                }.sShowAll(holder.context)
-                holder.context.longToast(R.string.debug_item_notify_toast_show_multi_done)
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "butShowMulti.onClick()", e)
+        holder.butShowMulti.setOnClickListener {
+            launch(UI) {
+                try {
+                    assertInitialized()
+                    MultiNotificationBuilder.create(
+                            groupId = NotifyManagerDebugGroup.ID,
+                            channelId = NotifyManagerDebugChannel.ID) {
+                        persistent = true
+                        refreshable = true
+                    }.sShowAll(appContext)
+                    appContext.longToast(R.string.debug_item_notify_toast_show_multi_done)
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "butShowMulti.onClick()", e)
+                }
             }
         }
 
-        holder.butCancelAll.onClick {
-            try {
-                assertInitialized()
-                NotifyManager.sCancelAll(
-                        context = holder.context,
-                        groupId = NotifyManagerDebugGroup.ID,
-                        channelId = NotifyManagerDebugChannel.ID
-                )
-                holder.context.longToast(R.string.debug_item_notify_toast_cancel_all_done)
-            } catch (e: Exception) {
-                Log.e(LOG_TAG, "butCancelAll.onClick()", e)
+        holder.butCancelAll.setOnClickListener {
+            launch(UI) {
+                try {
+                    assertInitialized()
+                    NotifyManager.sCancelAll(
+                            context = appContext,
+                            groupId = NotifyManagerDebugGroup.ID,
+                            channelId = NotifyManagerDebugChannel.ID
+                    )
+                    appContext.longToast(R.string.debug_item_notify_toast_cancel_all_done)
+                } catch (e: Exception) {
+                    Log.e(LOG_TAG, "butCancelAll.onClick()", e)
+                }
             }
         }
     }
