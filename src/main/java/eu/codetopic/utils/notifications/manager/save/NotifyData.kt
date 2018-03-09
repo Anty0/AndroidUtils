@@ -32,6 +32,7 @@ import eu.codetopic.utils.bundle.BundleSerializer
 import eu.codetopic.utils.data.preferences.PreferencesData
 import eu.codetopic.utils.data.preferences.preference.IntPreference
 import eu.codetopic.utils.data.preferences.preference.KSerializedPreference
+import eu.codetopic.utils.data.preferences.preference.PreferenceAbs
 import eu.codetopic.utils.data.preferences.provider.ContentProviderPreferencesProvider
 import eu.codetopic.utils.data.preferences.support.ContentProviderSharedPreferences
 import eu.codetopic.utils.data.preferences.support.PreferencesCompanionObject
@@ -41,9 +42,6 @@ import eu.codetopic.utils.notifications.manager.NotifyClassifier
 import eu.codetopic.utils.notifications.manager.data.CommonPersistentNotifyId
 import eu.codetopic.utils.notifications.manager.data.NotifyId
 import kotlinx.serialization.internal.BooleanSerializer
-import kotlinx.serialization.internal.NullableSerializer
-import kotlinx.serialization.internal.PairSerializer
-import kotlinx.serialization.internal.StringSerializer
 import kotlinx.serialization.map
 
 /**
@@ -58,16 +56,21 @@ internal class NotifyData private constructor(context: Context) :
             ::NotifyData, ::Getter) {
 
         private const val LOG_TAG = "NotifyData"
-        internal const val SAVE_VERSION = 0
+        internal const val SAVE_VERSION = 1
 
         @Suppress("UNUSED_PARAMETER")
         internal fun onUpgrade(editor: SharedPreferences.Editor, from: Int, to: Int) {
             // This function will be executed by provider in provider process
-            when (from) {
-                -1 -> {
-                    // First start, nothing to do
-                }
-            } // No more versions yet
+            for (i in from until to) {
+                when (i) {
+                    -1 -> {
+                        // First start, nothing to do
+                    }
+                    0 -> {
+                        editor.remove(PreferenceAbs.keyFor(CHANNELS_ENABLE_MAP))
+                    }
+                } // No more versions yet
+            }
         }
     }
 
@@ -108,17 +111,16 @@ internal class NotifyData private constructor(context: Context) :
         notifyMapSave = notifyMap
     }
 
-    private var channelsEnableMapSave by KSerializedPreference<Map<Pair<String?, String>, Boolean>>(
+    private var channelsEnableMapSave by KSerializedPreference<Map<ChannelId, Boolean>>(
             key = CHANNELS_ENABLE_MAP,
-            serializer = (PairSerializer(NullableSerializer(StringSerializer),
-                    StringSerializer) to BooleanSerializer).map,
+            serializer = (kSerializer<ChannelId>() to BooleanSerializer).map,
             provider = accessProvider,
             defaultValue = { emptyMap() }
     )
 
     private val channelsEnableMapCache by lazy { channelsEnableMapSave.toMutableMap() }
 
-    private val channelsEnableMap: MutableMap<Pair<String?, String>, Boolean>
+    private val channelsEnableMap: MutableMap<ChannelId, Boolean>
         get() =
             if (NotifyBase.isInitialized) channelsEnableMapCache
             else channelsEnableMapSave.toMutableMap()
@@ -130,15 +132,26 @@ internal class NotifyData private constructor(context: Context) :
 
     fun setChannelEnabled(groupId: String?, channelId: String, enable: Boolean?) {
         NotifyBase.assertInitialized(context)
-        val key = groupId to channelId
-        if (enable == null) channelsEnableMap.remove(key)
-        else channelsEnableMap[key] = enable
+        val key = ChannelId(groupId, channelId)
+        val map = channelsEnableMap
+        if (enable == null) map.remove(key)
+        else map[key] = enable
         channelsEnableMapSave()
     }
 
-    fun isChannelEnabled(groupId: String?, channelId: String): Boolean? =
-            if (groupId == null) channelsEnableMap[null to channelId]
-            else channelsEnableMap[groupId to channelId] ?: channelsEnableMap[null to channelId]
+    fun isChannelEnabled(groupId: String?, channelId: String): Boolean? {
+        val map = channelsEnableMap
+
+        val key = ChannelId(groupId, channelId)
+        var enabled = map[key]
+
+        if (enabled == null && groupId != null) {
+            val nullKey = ChannelId(null, channelId)
+            enabled = map[nullKey]
+        }
+
+        return enabled
+    }
 
     fun remove(id: NotifyId): Bundle? {
         NotifyBase.assertInitialized(context)
